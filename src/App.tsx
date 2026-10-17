@@ -413,7 +413,7 @@ export default function App() {
                     onOpen={() => setDrawerId(r.id)}
                     ruleOutcome={workspace === 'rules' ? rules.snapshots[r.id]?.result ?? 'pending' : undefined}
                     local={rules.store.transactions[r.id]}
-                    messages={(rules.store.messages ?? []).filter(m => m.transactionId === r.id)}
+                    messages={(rules.store.messages ?? []).filter(m => m.items.some(i => i.transactionId === r.id))}
                   />
                 ))}
               </tbody>
@@ -525,7 +525,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
       </div>
       <div className="drawer-body">
         {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
-        {(rules.store.messages ?? []).some(m => m.transactionId === r.id) && <><h3>Draft messages</h3>{(rules.store.messages ?? []).filter(m => m.transactionId === r.id).map(m => <MessageCard key={m.id} message={m} onDecide={rules.decideMessage} />)}</>}
+        {(rules.store.messages ?? []).some(m => m.items.some(i => i.transactionId === r.id)) && <><h3>Draft messages</h3>{(rules.store.messages ?? []).filter(m => m.items.some(i => i.transactionId === r.id)).map(m => <MessageCard key={m.id} message={m} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}</>}
         <h3>Local review metadata</h3><LocalStateEditor value={rules.store.transactions[r.id]} update={value => rules.updateLocal(r.id, value)} />
         <h3>Bill</h3>
         <dl>

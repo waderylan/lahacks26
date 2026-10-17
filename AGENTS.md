@@ -1,13 +1,13 @@
 # AGENTS.md
 
-Dataset setup plus a local Transaction Review demo (React + Vite + Express, one process). Jev runs server-side via Vercel AI Gateway (`typesafe-ai/jev`, `experimental_evaluate` from `ai`); never expose `.env`.
+Dataset setup plus a local Transaction Review demo (React + Vite + Express, one process). Jev runs server-side via Vercel AI Gateway (`typesafe-ai/jev`, `experimental_evaluate` from `ai`); never expose `.env`. Gemini (`@ai-sdk/google`, `GEMINI_API_KEY`) writes draft internal messages server-side in `server/messages.ts`; Jev picks the recipient. Employees in `src/employees.ts` are fictional, not dataset records.
 
 ## Commands
 
 - `uv sync` installs dependencies.
 - `uv run scripts/download_dataset.py` downloads and extracts to `data/raw/` (idempotent; `--force` redoes it).
 - `uv run scripts/inspect_dataset.py` prints the dataset summary.
-- `npm run dev` serves the app at http://localhost:5173 (needs `AI_GATEWAY_API_KEY` in `.env`).
+- `npm run dev` serves the app at http://localhost:5173 (needs `AI_GATEWAY_API_KEY` in `.env`; `GEMINI_API_KEY` for message drafts).
 
 ## Rules
 

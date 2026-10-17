@@ -1,4 +1,5 @@
 import type { Row } from './types';
+import { employeeById } from './employees';
 
 export type Truth = 'true' | 'false' | 'uncertain';
 export type Outcome = Truth | 'pending' | 'error';
@@ -7,7 +8,8 @@ export type AICondition = { id: string; type: 'ai'; text: string; label: string 
 export type StandardCondition = { id: string; type: 'standard'; field: 'amountCents' | 'review' | 'vendor' | 'account'; operator: 'gt' | 'lt' | 'eq'; value: string };
 export type RuleNode = Group | AICondition | StandardCondition;
 export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message';
-export type Action = { id: string; type: ActionType; value: string };
+/** For `message`, `value` is the reviewer's short request and `recipient` is an employee ID or 'jev' (Jev picks per bill). */
+export type Action = { id: string; type: ActionType; value: string; recipient?: string };
 export interface Rule {
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
   expression: RuleNode; actions: Action[];
@@ -15,11 +17,21 @@ export interface Rule {
 export interface LocalTransaction { flags: string[]; tags: string[]; owner: string; automatedCheck: boolean }
 export type MessageStatus = 'pending' | 'approved' | 'rejected';
 export interface DraftMessage {
-  id: string; companyId: string; transactionId: string; billId: string;
+  id: string; companyId: string;
+  /** Every bill this message covers; a run batches all its matches into one message (up to MAX_MESSAGE_ITEMS). */
+  items: MessageItem[]; batchId: string;
   ruleId: string; ruleName: string; revision: number; actionId: string;
   to: string; subject: string; body: string; reason: string;
   status: MessageStatus; edited: boolean; createdAt: string; decidedAt?: string;
+  /** Absent on drafts saved before generated messages; those are ready. */
+  request?: string; routing?: 'jev' | 'manual'; employeeId?: string | null; routingProbability?: number;
+  generation?: 'pending' | 'ready' | 'error'; generationError?: string;
 }
+export interface MessageItem { transactionId: string; billId: string; context: MessageContext[] }
+export const MAX_MESSAGE_ITEMS = 25;
+/** One rule condition and its result for this bill: the filtering evidence handed to Jev and Gemini. */
+export interface MessageContext { condition: string; kind: 'ai' | 'standard'; result: Truth }
+export interface DraftResult { employeeId: string; routingProbability?: number; subject: string; body: string }
 export type NoticeTone = 'good' | 'info' | 'warn';
 export interface Notice {
   id: string; companyId: string; title: string; body?: string; tone: NoticeTone;
@@ -37,7 +49,7 @@ export interface RuleStore {
   executions: string[]; arrivals: Record<string, string[]>; messages: DraftMessage[]; notices: Notice[];
 }
 export const EMPTY_STORE: RuleStore = { rules: [], transactions: {}, history: [], executions: [], arrivals: {}, messages: [], notices: [] };
-export const DEFAULT_MESSAGE_ASK = 'Please confirm whether this bill is a standing overhead or service charge, or a purchase of goods, and whether the memo matches what was supplied.';
+export const DEFAULT_MESSAGE_ASK = 'Ask them to confirm what this bill actually covers and whether it is coded to the right account.';
 export const emptyTransaction = (): LocalTransaction => ({ flags: [], tags: [], owner: '', automatedCheck: false });
 export const uid = () => crypto.randomUUID();
 
@@ -122,9 +134,17 @@ export function validateRule(input: unknown): string[] {
   };
   visit(r.expression, 1);
   if (!Array.isArray(r.actions) || !r.actions.length) errors.push('Choose at least one action.');
-  else r.actions.forEach(a => { checkId(a.id); if (!['flag', 'assign', 'tag', 'pass', 'message'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.'); });
+  else r.actions.forEach(a => {
+    checkId(a.id);
+    if (!['flag', 'assign', 'tag', 'pass', 'message'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
+    else if (a.type === 'message' && a.value.length > 500) errors.push('Message requests must be 500 characters or fewer.');
+    else if (a.type === 'message' && a.recipient !== 'jev' && !employeeById(a.recipient)) errors.push('Choose a message recipient or let Jev choose.');
+  });
   return [...new Set(errors)];
 }
+
+/** Message actions saved before recipients existed default to letting Jev choose. */
+export const migrateRule = (rule: Rule): Rule => ({ ...rule, actions: rule.actions.map(a => a.type === 'message' && !a.recipient ? { ...a, recipient: 'jev' } : a) });
 
 // Content version includes all loaded evidence. Review status adds a local update version for execution.
 export function transactionVersion(row: Row, reviewed?: boolean): string {
@@ -133,25 +153,58 @@ export function transactionVersion(row: Row, reviewed?: boolean): string {
   return `${(a >>> 0).toString(16)}${(b >>> 0).toString(16)}`;
 }
 export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
-export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message: ${a.value}` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
+export const recipientLabel = (recipient?: string) => recipient === 'jev' ? 'Jev chooses recipient' : employeeById(recipient)?.name ?? 'No recipient';
+export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${recipientLabel(a.recipient)}): ${a.value}` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
 
-function formatUsd(cents: number): string {
-  const sign = cents < 0 ? '-' : '';
-  const n = Math.abs(cents);
-  return `${sign}$${Math.floor(n / 100)}.${(n % 100).toString().padStart(2, '0')}`;
+export const describeCondition = (n: AICondition | StandardCondition) => n.type === 'ai' ? n.label ? `${n.label}: ${n.text}` : n.text
+  : `${{ amountCents: 'Amount', review: 'Review status', vendor: 'Vendor', account: 'Account' }[n.field]} ${{ gt: 'greater than', lt: 'less than', eq: 'equals' }[n.operator]} ${n.field === 'amountCents' ? `$${n.value}` : n.value}`;
+
+const messageItem = (row: Row, rule: Rule, snapshot: Snapshot): MessageItem => ({ transactionId: row.id, billId: row.billId,
+  context: leaves(rule.expression).map(n => ({ condition: describeCondition(n), kind: n.type, result: snapshot.conditions[n.id] as Truth })) });
+export const messageBills = (m: DraftMessage) => m.items.length === 1 ? m.items[0].billId : `${m.items.length} bills`;
+/** Back to un-generated: the recipient (if Jev routes) and text are produced again for the current items. */
+const resetGeneration = (m: DraftMessage): DraftMessage => ({ ...m, subject: '', body: '', generation: 'pending', generationError: undefined,
+  ...(m.routing === 'jev' ? { employeeId: null, to: 'Choosing recipient…', routingProbability: undefined } : {}) });
+/** Older drafts covered a single bill. */
+export function migrateMessage(m: DraftMessage & { transactionId?: string; billId?: string; context?: MessageContext[] }): DraftMessage {
+  if (Array.isArray(m.items)) return m;
+  const { transactionId, billId, context, ...rest } = m;
+  return { ...rest, batchId: m.id, items: [{ transactionId: transactionId ?? '', billId: billId ?? '', context: context ?? [] }] };
 }
 
-export function composeMessage(row: Row, rule: Rule, action: Action): DraftMessage {
-  const ask = action.value.trim() || DEFAULT_MESSAGE_ASK;
+/** Pending draft: Jev (if asked) picks the recipient and Gemini writes subject/body later, via completeDraft. */
+export function createDraft(row: Row, rule: Rule, action: Action, snapshot: Snapshot, batchId: string = uid()): DraftMessage {
+  const routing = action.recipient === 'jev' ? 'jev' : 'manual';
+  const employee = routing === 'manual' ? employeeById(action.recipient) : undefined;
   return {
-    id: uid(), companyId: row.companyId, transactionId: row.id, billId: row.billId,
+    id: uid(), companyId: row.companyId, items: [messageItem(row, rule, snapshot)], batchId,
     ruleId: rule.id, ruleName: rule.name, revision: rule.revision, actionId: action.id,
-    to: row.vendor, subject: `Clarification needed on ${row.docNumber || row.billId}`,
-    body: `Hello ${row.vendor},\n\nWe are reviewing ${row.docNumber || row.billId} dated ${row.date} for ${formatUsd(row.amountCents)}.\n\n${ask}\n\nDescription: ${row.description.trim() || '(blank)'}\nMemo: ${row.memo.trim() || '(blank)'}\nItems: ${row.itemNames.join(', ') || '(none)'}\nAccount: ${row.account}\n\nPlease reply with what this charge covers so we can record it correctly.\n\nThank you`,
+    to: employee?.name ?? 'Choosing recipient…', subject: '', body: '',
     reason: `Drafted by rule “${rule.name}” r${rule.revision}. Nothing has been sent.`,
     status: 'pending', edited: false, createdAt: new Date().toISOString(),
+    request: action.value.trim() || DEFAULT_MESSAGE_ASK, routing, employeeId: employee?.id ?? null,
+    generation: 'pending',
   };
 }
+
+/** `sentFor` is the transaction IDs the request covered; a result for a since-changed set of bills is dropped. */
+export function completeDraft(store: RuleStore, id: string, result: DraftResult | { error: string }, sentFor?: string[]): RuleStore {
+  const current = (store.messages ?? []).find(message => message.id === id);
+  // Undone or already completed while the request was in flight.
+  if (!current || current.generation !== 'pending' || current.status !== 'pending') return store;
+  if (sentFor && sentFor.join() !== current.items.map(i => i.transactionId).join()) return store;
+  if ('error' in result) {
+    return { ...store, messages: store.messages.map(m => m.id === id ? { ...m, generation: 'error', generationError: result.error } : m),
+      notices: [notice(current.companyId, 'Could not draft message', `${messageBills(current)} · ${result.error}`, 'warn', current.items[0]?.transactionId), ...(store.notices ?? [])] };
+  }
+  const employee = employeeById(result.employeeId);
+  if (!employee || (current.routing === 'manual' && employee.id !== current.employeeId)) return completeDraft(store, id, { error: 'Draft came back for an unknown recipient.' });
+  const updated: DraftMessage = { ...current, to: employee.name, employeeId: employee.id, routingProbability: result.routingProbability, subject: result.subject, body: result.body, generation: 'ready', generationError: undefined };
+  return { ...store, messages: store.messages.map(m => m.id === id ? updated : m),
+    notices: [notice(current.companyId, `Draft message to ${employee.name}`, `${messageBills(current)} · ${current.ruleName}${current.routing === 'jev' ? ' · recipient chosen by Jev' : ''} · approve to mark sent locally`, 'info', current.items[0]?.transactionId), ...(store.notices ?? [])] };
+}
+export const retryDraft = (store: RuleStore, id: string): RuleStore =>
+  ({ ...store, messages: (store.messages ?? []).map(m => m.id === id && m.generation === 'error' && m.status === 'pending' ? { ...m, generation: 'pending', generationError: undefined } : m) });
 
 function notice(companyId: string, title: string, body: string | undefined, tone: NoticeTone, transactionId?: string): Notice {
   return { id: uid(), companyId, title, body, tone, time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }), read: false, toasted: false, transactionId };
@@ -160,12 +213,13 @@ function notice(companyId: string, title: string, body: string | undefined, tone
 export function decideMessage(store: RuleStore, id: string, status: Exclude<MessageStatus, 'pending'>, body?: string): { store: RuleStore; error?: string } {
   const current = (store.messages ?? []).find(message => message.id === id);
   if (!current || current.status !== 'pending') return { store, error: 'This draft is no longer pending.' };
+  if (status === 'approved' && (current.generation ?? 'ready') !== 'ready') return { store, error: 'This draft is still being written.' };
   const nextBody = body ?? current.body;
   const edited = current.edited || nextBody !== current.body;
   const messages = (store.messages ?? []).map(message => message.id === id ? { ...message, status, body: nextBody, edited, decidedAt: new Date().toISOString() } : message);
   const title = status === 'approved' ? `Marked sent to ${current.to}` : `Rejected draft to ${current.to}`;
-  const noticeBody = status === 'approved' ? `${current.billId} · local only — no email was delivered.` : `${current.billId} · this draft will not be sent.`;
-  return { store: { ...store, messages, notices: [notice(current.companyId, title, noticeBody, status === 'approved' ? 'good' : 'warn', current.transactionId), ...(store.notices ?? [])] } };
+  const noticeBody = status === 'approved' ? `${messageBills(current)} · local only — no email was delivered.` : `${messageBills(current)} · this draft will not be sent.`;
+  return { store: { ...store, messages, notices: [notice(current.companyId, title, noticeBody, status === 'approved' ? 'good' : 'warn', current.items[0]?.transactionId), ...(store.notices ?? [])] } };
 }
 
 export function markNoticesRead(store: RuleStore, companyId?: string): RuleStore {
@@ -176,7 +230,8 @@ export function markNoticeToasted(store: RuleStore, id: string): RuleStore {
 }
 
 /** Pure atomic state transition; its idempotency keys survive undo and page reloads. */
-export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source']): RuleStore {
+/** Pass the same `batchId` for every row of one run so its message actions share one draft per action. */
+export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid()): RuleStore {
   if (validateRule(rule).length || row.companyId !== rule.companyId) return store;
   if (leaves(rule.expression).some(n => !['true', 'false', 'uncertain'].includes(snapshot.conditions[n.id])) || evaluateTree(rule.expression, snapshot.conditions) !== snapshot.result) return store;
   const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}`;
@@ -191,10 +246,11 @@ export function executeRule(store: RuleStore, rule: Rule, row: Row, version: str
     if (next.executions.includes(key)) continue;
     next.executions.push(key);
     if (action.type === 'message') {
-      const draft = composeMessage(row, rule, action);
-      next.messages = [draft, ...next.messages];
-      next.notices = [notice(row.companyId, `Draft message to ${draft.to}`, `${row.billId} · ${rule.name} · approve to mark sent locally`, 'info', row.id), ...next.notices];
-      record(key, action, null, { id: draft.id, status: draft.status, to: draft.to });
+      const open = next.messages.find(m => m.batchId === batchId && m.ruleId === rule.id && m.revision === rule.revision && m.actionId === action.id
+        && m.status === 'pending' && m.generation === 'pending' && m.items.length < MAX_MESSAGE_ITEMS);
+      const draft = open ? { ...open, items: [...open.items, messageItem(row, rule, snapshot)] } : createDraft(row, rule, action, snapshot, batchId);
+      next.messages = open ? next.messages.map(m => m.id === open.id ? draft : m) : [draft, ...next.messages];
+      record(key, action, null, { id: draft.id, status: draft.status, recipient: action.recipient });
       continue;
     }
     const tx = { ...(next.transactions[row.id] ?? emptyTransaction()) }; const field = actionField(action)!;
@@ -216,7 +272,10 @@ export function undoEntry(store: RuleStore, id: string): { store: RuleStore; err
     const resulting = entry.resulting as { id?: string } | null;
     const message = (store.messages ?? []).find(item => item.id === resulting?.id);
     if (!message || message.status !== 'pending') return { store, error: 'Undo conflict: this draft was already decided. The current value was preserved.' };
-    return { store: { ...store, messages: store.messages.filter(item => item.id !== message.id), history } };
+    // Drop this bill from the shared draft; the rest is re-drafted without it.
+    const items = message.items.filter(item => item.transactionId !== entry.transactionId);
+    const messages = items.length ? store.messages.map(m => m.id === message.id ? resetGeneration({ ...m, items }) : m) : store.messages.filter(m => m.id !== message.id);
+    return { store: { ...store, messages, history } };
   }
   const field = actionField(entry.action)!; const tx = store.transactions[entry.transactionId] ?? emptyTransaction();
   if (JSON.stringify(tx[field]) !== JSON.stringify(entry.resulting)) return { store, error: 'Undo conflict: this value changed after the action. The current value was preserved.' };

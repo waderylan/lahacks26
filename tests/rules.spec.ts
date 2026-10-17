@@ -13,7 +13,7 @@ test('independent real AI conditions, live composition, edits, drag/drop, and st
   let inFlight = 0, maximum = 0;
   page.on('request', req => { if (req.url().endsWith('/api/evaluate')) { requests.push(req.postDataJSON()); maximum = Math.max(maximum, ++inFlight); } });
   page.on('requestfinished', req => { if (req.url().endsWith('/api/evaluate')) inFlight--; });
-  await page.goto('/'); await complete(page);
+  await page.goto('/?workspace=rules'); await complete(page);
   expect(new Set(requests.map(r => r.criterion)).size).toBe(2);
   expect(new Set(requests.slice(0, 3).map(r => r.criterion)).size).toBe(2);
   expect(maximum).toBeLessThanOrEqual(3);
@@ -61,7 +61,7 @@ test('independent real AI conditions, live composition, edits, drag/drop, and st
 
 test('save, run, persistence, undo conflicts, separate automated pass, active revisions, and real enabled replay', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
-  await page.goto('/'); await complete(page);
+  await page.goto('/?workspace=rules'); await complete(page);
   await page.getByRole('button', { name: '+ Add action', exact: true }).click();
   await page.getByLabel('Action value').last().fill('Demo review');
   await page.getByRole('button', { name: '+ Add action', exact: true }).click();
@@ -82,6 +82,7 @@ test('save, run, persistence, undo conflicts, separate automated pass, active re
   expect((await store(page)).history).toHaveLength(count * 4);
   await page.getByRole('button', { name: 'Inspect a match', exact: true }).click();
   await expect(page.getByLabel('Transaction detail')).toContainText('Condition results');
+  await page.getByText('Browser rule demo metadata', { exact: true }).click();
   await expect(page.getByLabel('Local assignment')).toHaveValue('Bookkeeper');
   await expect(page.getByLabel('Passed automated check', { exact: true })).toBeChecked();
   const transactionId = await page.locator('.drawer-head .muted').innerText();
@@ -132,7 +133,7 @@ test('save, run, persistence, undo conflicts, separate automated pass, active re
 });
 
 test('company switching drops stale results and original evidence remains inspectable', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?workspace=rules');
   await page.getByLabel('Rule name', { exact: true }).waitFor();
   await page.getByLabel('Company', { exact: true }).fill('Pistonhouse');
   await page.getByLabel('Company', { exact: true }).press('Enter');
@@ -153,7 +154,7 @@ test('company switching drops stale results and original evidence remains inspec
 });
 
 test('clean reset URL clears Shipwise automation and replay state while retaining its rule', async ({ page }) => {
-  await page.goto('/'); await complete(page);
+  await page.goto('/?workspace=rules'); await complete(page);
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
   await page.getByRole('button', { name: /^Run once/ }).click();
   await page.getByLabel('Toggle rule enabled').click();
@@ -166,7 +167,7 @@ test('clean reset URL clears Shipwise automation and replay state while retainin
     localStorage.setItem('tr.reviewed.v1', JSON.stringify(['company-018:bill-reviewed', 'company-005:bill-reviewed']));
   });
   const receipt = page.waitForResponse(response => response.url().endsWith('/api/demo-reset/receipt') && response.status() === 204);
-  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test');
+  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test&workspace=rules');
   await receipt; await complete(page);
   const after = await store(page);
   expect(after.transactions).toEqual({}); expect(after.history).toEqual([]); expect(after.executions).toEqual([]);

@@ -1,5 +1,5 @@
 import { experimental_evaluate as evaluate } from 'ai';
-import { getRow } from './data.ts';
+import { getRow, type Row } from './data.ts';
 
 export type MatchState = 'match' | 'no_match' | 'uncertain';
 export interface RecordResult {
@@ -43,8 +43,9 @@ const OPTIONS = {
 export async function evaluateBatch(
   req: EvalRequest,
   signal?: AbortSignal,
+  visibleRows?: Row[],
 ): Promise<{ results: RecordResult[]; costNanoUsd: string }> {
-  const rows = req.ids.map((id) => getRow(id)).filter((r): r is NonNullable<typeof r> => !!r);
+  const rows = req.ids.map((id) => visibleRows?.find(row => row.id === id) ?? getRow(id)).filter((r): r is NonNullable<typeof r> => !!r);
   const refs = rows.map((row, i) => ({ key: `t${i}`, row }));
   const state = {
     company: req.company,

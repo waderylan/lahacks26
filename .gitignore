@@ -17,3 +17,6 @@ test-results/
 playwright-report/
 artifacts/
 .playwright/
+
+# Persistent dashboard database (never original dataset files).
+/workspace/

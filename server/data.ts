@@ -97,6 +97,12 @@ function worldDir(companyId: string) {
   return path.join(base, world);
 }
 
+export function companyAccounts(companyId: string): { id: string; name: string }[] {
+  if (companyId === SCENARIO_ID) return [];
+  return loadYaml(worldDir(companyId), 'accounts').filter(account => account.active !== false && account.is_active !== false)
+    .map(account => ({ id: String(account.id), name: String(account.name) }));
+}
+
 function loadYaml(dir: string, entity: string): any[] {
   const file = path.join(dir, `${entity}.yaml`);
   if (!fs.existsSync(file)) return [];

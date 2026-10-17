@@ -5,6 +5,7 @@ export interface CompanySummary {
   profile: string;
   billCount: number;
   scenario?: boolean;
+  source?: 'workspace';
 }
 
 export interface Row {
@@ -30,6 +31,9 @@ export interface Row {
   vendorRecord: Record<string, unknown> | null;
   projectRecord: Record<string, unknown> | null;
   provenance?: { description: string; memo: string } | null;
+  workspaceChanges?: { account?: string; memo?: string };
+  sourceVersion?: string;
+  dashboard?: { owner: string; flags: string[]; tags: string[]; reviewed: boolean; automatedCheck: boolean; taskIds: string[] };
 }
 
 export interface CompanyBills {

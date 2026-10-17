@@ -1,11 +1,20 @@
 import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
-import { listCompanies, loadCompanyBills, loadCompanyBillsLimited } from './data.ts';
-import { evaluateBatch, jevConfigured, JEV_MODEL } from './jev.ts';
+import { listCompanies } from './data.ts';
+import { jevConfigured, JEV_MODEL } from './jev.ts';
+import { actionStore } from './actionStore.ts';
+import { WorkspaceData } from './workspaceData.ts';
+import { ActionEngine } from './actionEngine.ts';
+import { SemanticService } from './semanticService.ts';
+import { actionRoutes } from './actionRoutes.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
+const database = actionStore();
+const workspace = new WorkspaceData(database);
+const semantics = new SemanticService(workspace);
+const actions = new ActionEngine(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
 
 app.get('/api/status', (_req, res) => {
   res.json({ jev: { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway' } });
@@ -22,7 +31,7 @@ app.post('/api/demo-reset/receipt', (req, res) => {
 
 app.get('/api/companies/:id/bills', (req, res) => {
   try {
-    const full = loadCompanyBills(req.params.id);
+    const full = workspace.bills(req.params.id);
     if (req.query.reserve === '1' && !full.company.scenario) {
       const reservedRows = full.rows.slice(-5);
       const available = full.rows.slice(0, -5);
@@ -30,7 +39,9 @@ app.get('/api/companies/:id/bills', (req, res) => {
       const rows = limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
       return res.json({ ...full, rows, reservedRows, sampled: rows.length < available.length, referenceOptions: { vendors: [...new Set(full.rows.map(r => r.vendor))].sort(), accounts: [...new Set(full.rows.map(r => r.account))].sort() } });
     }
-    res.json(loadCompanyBillsLimited(req.params.id, Number(req.query.limit) || undefined));
+    const limit = Number(req.query.limit) || full.rows.length;
+    const rows = limit < full.rows.length ? Array.from({ length: limit }, (_, index) => full.rows[Math.floor(index * full.rows.length / limit)]) : full.rows;
+    res.json({ ...full, rows, sampled: rows.length < full.rows.length });
   } catch (e) {
     res.status(404).json({ error: (e as Error).message });
   }
@@ -45,12 +56,9 @@ app.post('/api/evaluate', async (req, res) => {
   const ac = new AbortController();
   res.on('close', () => !res.writableEnded && ac.abort());
   try {
-    const { company, rows } = loadCompanyBills(String(companyId));
+    const { rows } = workspace.bills(String(companyId));
     if (ids.some((id: string) => !rows.some(row => row.id === id))) return res.status(400).json({ error: 'Unknown or cross-company transaction ID' });
-    const { results, costNanoUsd } = await evaluateBatch(
-      { company: { name: company.name.replace(/ — review scenarios$/, ''), industry: company.industry }, criterion: criterion.slice(0, 500), ids: ids.map(String) },
-      ac.signal,
-    );
+    const { results, costNanoUsd } = await semantics.evaluateRows(String(companyId), criterion.slice(0, 500), ids.map((id: string) => rows.find(row => row.id === id)!), ac.signal);
     res.json({ results, costNanoUsd });
   } catch (e) {
     if (ac.signal.aborted) return;
@@ -58,6 +66,12 @@ app.post('/api/evaluate', async (req, res) => {
     res.status(502).json({ error: 'Jev request failed' });
   }
 });
+
+actionRoutes(app, actions);
+// Enabled dashboard actions keep running while this server is open, even after
+// the browser closes. Their baseline prevents implicit historical backfills.
+const automationTimer = setInterval(() => { void actions.scan().catch(error => console.error('Automation:', (error as Error).message)); }, 10_000);
+automationTimer.unref();
 
 const server = createServer(app);
 const vite = await createVite({ server: { middlewareMode: true, hmr: { server } }, appType: 'spa' });

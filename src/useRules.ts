@@ -13,7 +13,7 @@ export function readRuleStore(): RuleStore {
 }
 const signature = (r: Rule) => JSON.stringify([r.name, r.expression, r.actions]);
 
-export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void) {
+export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void, previewEnabled = true) {
   const [storageError, setStorageError] = useState('');
   const [store, setStore] = useState<RuleStore>(() => { try { return readRuleStore(); } catch (e) { setTimeout(() => setStorageError((e as Error).message)); return structuredClone(EMPTY_STORE); } });
   const storeRef = useRef(store); storeRef.current = store;
@@ -51,7 +51,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
   useEffect(() => {
     let current = true;
     const texts: string[] = JSON.parse(aiTexts);
-    if (!data || !texts.length) { setTiming({ start: 0, end: 0 }); return; }
+    if (!previewEnabled || !data || !texts.length) { setTiming({ start: 0, end: 0 }); return; }
     const t = setTimeout(() => {
       const start = performance.now(); setTiming({ start, end: 0 });
       void Promise.all(texts.map(text => evaluateCondition(data, text, (row, outcome, error) => {
@@ -62,7 +62,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
       }))).then(() => current && setTiming({ start, end: performance.now() }));
     }, 400);
     return () => { current = false; clearTimeout(t); };
-  }, [aiTexts, dataKey, retry]);
+  }, [aiTexts, dataKey, retry, previewEnabled]);
   useEffect(() => {
     if (!timing.start || timing.end) return;
     const t = setInterval(() => setNow(performance.now()), 100);

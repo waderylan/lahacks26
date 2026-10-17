@@ -1,42 +1,42 @@
-# Transaction Review: visual rules
+# Transaction Review: search and act
 
-- Start with `npm install` and `npm run dev` (default http://localhost:5173).
-- For this worktree alongside the original app, PowerShell: `$env:PORT='5174'; npm run dev`. The running worktree is at http://localhost:5174.
-- Use the existing `.env` with `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN`. Credentials stay server-side. No direct TypeSafe endpoint or Chat Completions adapter is used.
+- Run `npm install`, then `npm run dev` (http://localhost:5173). Requires Node 22.13+ for built-in SQLite.
+- For this worktree alongside the original app: `$env:PORT='5174'; npm run dev`. Preview: http://localhost:5174.
+- Semantic search uses the existing Jev adapter and server-side `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN`. There is no Intuit connection.
 
-## 60-second walkthrough
+## Dashboard walkthrough
 
-- **0–10s:** Open Rules, Shipwise Online Goods. Read the IF / THEN summary. The editable example flags overhead memos attached to bills whose line items are not ongoing overhead.
-- **10–20s:** Click **Inspect a match**. Compare the two independent condition results, NOT, and ALL against the original memo and line items. Close the drawer.
-- **20–30s:** Add an Amount standard condition, change ALL to ANY, and watch the preview update. Group and action edits reuse judgments. Remove the new condition and return to ALL.
-- **30–40s:** Click **Save rule**, then **Run once**. Open Action history to see rule revision, original bill ID, condition snapshot, and before/after values. Undo one flag.
-- **40–50s:** Click **Disabled · Enable**, then **Replay next original bill**. Read the replay log: the next original record is evaluated against the saved revision. True applies actions; false or uncertain leaves it untouched.
-- **50–60s:** Edit the enabled rule. The previous revision stays active until **Save and activate revision**. Switch to Transactions to show semantic filtering and separate human review.
+1. Choose a company and search in everyday language, such as "Anything electronic or tech-related". Matches highlight in the original spreadsheet. Uncertain judgments are shown separately.
+2. In **Take action**, choose matches in the current filtered view or checked bills. Choose a task, category/memo edit, assignment, flag/tag, or review status.
+3. Click **Preview changes**, inspect the bill-level before/after values, then explicitly apply. The receipt shows successes, skips, and failures.
+4. Filter the spreadsheet with **Status** and **Assigned to**. Creating a task also assigns its bill to the task owner.
+5. Open **Tasks & activity**, filter by status/assignee, and mark tasks done. Completing a task and reviewing a bill are separate operations.
+6. Expand an action receipt to undo an individual change. Later edits and completed tasks are protected from conflicting undo attempts.
 
-## Semantics and storage
+## SQLite storage and execution
 
-- Original records remain unchanged. The existing loader reads only visible accounting entities. Scenario fixtures stay behind `ENABLE_SCENARIO=1` and retain their disclosure. Five original bills per company are reserved outside the initial sample, then appended exactly once by replay. Arrivals persist across reloads.
-- Every AI leaf sends its own exact criterion to the existing Jev adapter. A shared, round-robin queue interleaves conditions with a maximum of three gateway batches and twenty records per batch. Conditions are debounced 400ms. Successful judgments and shared in-flight requests are cached in memory by company, transaction content, criterion text, and model/config version. Failed requests are retryable and are not cached as semantic judgments.
-- Standard conditions compare integer cents, human review status, vendor, or account locally. Vendor/account choices come from the complete selected company.
-- Semantic outcomes are true / false / uncertain. NOT preserves uncertain. Pending and error remain execution states. Each leaf must finish successfully before Run once or automatic actions can execute, including children that do not change the final ALL/ANY result.
-- Preview evaluates the current draft. It never writes transaction metadata. Run once requires a saved, unchanged, valid, complete revision and freezes its definite matches and evidence before an atomic browser storage write.
-- Saved rules, local flags/tags/owner/automated pass, execution keys, action history, and replay arrivals use `tr.rules.v1` in localStorage. Human review continues to use `tr.reviewed.v1`. Automated pass never changes human review.
-- Enabling and activating revisions never backfills history. Enabled saved revisions handle subsequent replay arrivals and human review updates while this app is open. Draft changes do not affect that revision. Stale preview responses and obsolete active revisions cannot apply actions.
-- Each action is idempotent by rule ID + revision + transaction ID + content/review version + action ID. Duplicate tags and flags are also prevented. Undo retains execution keys, checks the current field against the written value, and reports a conflict if it changed. Subsequent false/uncertain updates are recorded without reversing earlier actions.
-- Reset demo action state clears this company's action metadata, history, and execution keys. It preserves rules, replay arrivals, and human review, allowing explicit Run once demonstrations again.
-- For a complete Shipwise restart, open `http://localhost:5174/?resetDemo=company-018&resetToken=manual-reset` in the browser profile used for the demo. This also restores the five reserved replay bills, clears Shipwise human-review marks, and disables its saved rules while retaining their definitions. Other companies remain unchanged. The URL removes its reset parameters after applying the reset.
+- Working bills, task records, owners, flags/tags, human review, action previews/receipts, and dashboard automations live in `workspace/actions.sqlite`. Set `WORKSPACE_DB` to use another database file. Browser sessions using this server share the state.
+- Original records are imported once per company. No files in `data/raw/` are modified, and `hidden/` is never read. Category and memo edits change only the working copy, with original values disclosed in highlighted cells and the drawer. Original line items and monetary amounts stay intact.
+- Actions on search matches are revalidated on the server using current bill data and the exact criterion or ALL/ANY/NOT expression. Checked-bill actions use the explicit selection. IDs are company-scoped throughout.
+- Successful semantic judgments are cached by company, criterion, and business evidence. Calls share a bounded queue of three gateway requests, with twenty records per batch. Failure is retryable; uncertain results never trigger matched actions.
+- A preview freezes bill revisions. Applying it commits changes, created tasks, and the receipt in a SQLite transaction. Repeating an apply is idempotent; stale bills fail without overwriting newer data. Identical open tasks are skipped.
+- Undo checks the bill revision and task state. A later edit or changed task blocks undo and preserves current values.
+- Optional dashboard automations baseline existing bills without a historical backfill. They check new/changed records every ten seconds while the server runs, including after the browser closes. Pause them in **Tasks & activity**. Competing automatic writes to the same scalar field must be paused before enabling another.
+- The initial spreadsheet is a labeled 50-record year-round sample. Choose 100 or All for a larger view. Five original bills remain reserved for the legacy replay demo. Actions apply to visible filtered matches or the explicit selection.
+
+## Original browser rule demo
+
+- **Rules** retains the original builder, including nested ALL/ANY/NOT groups, independent AI conditions, amount/vendor/account/review conditions, drag/drop, saved revisions, and replay. Use **Take action** there for the shared SQLite execution path.
+- The older **Save rule**, **Run once**, legacy action history, and replay controls are a browser demo. Saved rules, demo flags/tags/owner/automated pass, execution keys, history, and replay arrivals remain in `tr.rules.v1` localStorage. The drawer labels this metadata **Browser rule demo metadata**. These demo actions are separate from SQLite dashboard tasks and assignments. Human review is now shared SQLite state.
+- The Shipwise example identifies overhead memos on bills whose line items are not ongoing overhead. Inspect a match to compare independent conditions against original evidence. Change ALL to ANY, add a condition, or nest a group to see the result change.
+- Save before **Run once**. Enabling a saved revision does not backfill existing rows; subsequent replay arrivals use that revision while the browser is open. Draft edits do not activate until explicitly saved and activated. Uncertain, pending, and failed conditions cannot execute actions.
+- Browser demo actions are idempotent and retain execution keys after undo. Undo checks the current written field. Automated pass remains separate from human review.
+- Reset demo action state preserves rule definitions and arrivals. For a full Shipwise browser-demo reset, use `http://localhost:5174/?resetDemo=company-018&resetToken=manual-reset`; this also restores reserved replay bills and disables saved rules. It does not clear the SQLite workspace. Other companies remain unchanged.
 
 ## Verification
 
-- `npm test`: existing spreadsheet ordering tests plus truth tables, invalid expressions, integer cents, duplicate execution, company isolation, undo conflicts, and updated nonmatch behavior.
+- `npm test`: 26 tests covering ordering, three-valued rule logic, integer cents, SQLite persistence, action idempotency, company isolation, stale previews, undo conflicts, atomic rollback, automations, and real HTTP routes.
 - `npm run typecheck` and `npm run build`.
-- With the app running at port 5174: `npm run test:browser`. Uses installed Google Chrome. Set `RULES_BROWSER=msedge` or `RULES_TEST_URL` as needed. These browser tests make real gateway calls; they do not mock Jev.
-- Browser coverage: independent parallel criteria, bounded requests, condition-specific cache reuse, ALL/ANY/NOT, add/edit/remove, drag/drop and moves, stable row order, invalid drafts, save/reload, Run once idempotency, undo/conflicts, separate automated pass, explicit activation, original-bill replay, company switching, and original bill-00540 evidence.
-- Screenshots are written under ignored `artifacts/`; failed tests retain screenshots and traces under ignored `test-results/`.
-
-## Limits
-
-- This is a local, single-browser demo. Storage and automation are not shared across users, and automation does not run after the app closes. There is no live QuickBooks connection or background worker.
-- The default preview is a clearly labeled 50-record year-round sample. Select All to inspect all original active records; five originals remain reserved until replayed.
-- Judgment cache is session memory. Reloading the page reevaluates AI conditions through the gateway.
-- Replay uses five actual reserved bills, so the example policy may honestly return false or uncertain. For an all-arrivals walkthrough, use an AI criterion such as “The transaction has a vendor name.” and activate it explicitly; results still come from Jev.
+- Run browser tests against a separate database to keep demo state clean: start the server with `$env:PORT='5175'; $env:WORKSPACE_DB='artifacts/action-browser-verification.sqlite'; npm run dev`, then in another terminal run `$env:RULES_TEST_URL='http://localhost:5175'; npm run test:browser`.
+- Four original browser tests exercise real gateway calls, grouped rules, saved revisions, replay, company switching, and original evidence. Three dashboard browser tests cover SQLite actions, status/assignee filters, completion, a fresh browser context, reload persistence, category/memo undo, and desktop/mobile layout. One dashboard test controls only model inference; all its database/API actions are real.
+- Browser tests use installed Google Chrome; set `RULES_BROWSER=msedge` if needed. Screenshots and failure traces are stored in ignored artifact directories.

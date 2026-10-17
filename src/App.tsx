@@ -5,9 +5,10 @@ import { useSemanticEval } from './useSemanticEval';
 import { readRuleStore, useRules } from './useRules';
 import { LocalStateEditor, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel } from './RulesPanel';
 import { actionLabel, type LocalTransaction, type Outcome } from './rules';
+import { useWorkspace, type RowPatch } from './useWorkspace';
+import { ActionPanel, TaskBoard } from './ActionPanel';
 
 const DEFAULT_COMPANY = 'company-018';
-const REVIEW_KEY = 'tr.reviewed.v1';
 const PREFS_KEY = 'tr.prefs.v1';
 
 // Example prompts, grouped. The dropdown picks which group the chips show.
@@ -62,19 +63,15 @@ type SortKey = 'date' | 'vendor' | 'account' | 'amountCents' | 'match';
 const DEFAULT_WIDTHS = { date: 92, vendor: 170, items: 160, description: 250, memo: 250, account: 130, amount: 100, review: 104, match: 170 };
 type WidthKey = keyof typeof DEFAULT_WIDTHS;
 
-function loadReviewed(): Set<string> {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(REVIEW_KEY) ?? '[]'));
-  } catch {
-    return new Set();
-  }
-}
-
 export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
   const [companyId, setCompanyId] = useState(DEFAULT_COMPANY);
-  const [workspace, setWorkspace] = useState<'transactions' | 'rules'>('rules');
+  const [workspace, setWorkspace] = useState<'transactions' | 'rules' | 'tasks'>(() => new URLSearchParams(location.search).get('workspace') === 'rules' ? 'rules' : 'transactions');
+  const [takeAction, setTakeAction] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [drawerExtra, setDrawerExtra] = useState<Row | null>(null);
   const [previewFilter, setPreviewFilter] = useState('all');
   const [recordSearch, setRecordSearch] = useState('');
   const [data, setData] = useState<CompanyBills | null>(null);
@@ -86,11 +83,26 @@ export default function App() {
   const [matchesOnly, setMatchesOnly] = useState(false);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'match', dir: -1 }); // default: match % once a query runs, date order otherwise
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [reviewed, setReviewed] = useState<Set<string>>(loadReviewed);
+  const [reviewed, setReviewed] = useState<Set<string>>(() => new Set());
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [widths, setWidths] = useState(DEFAULT_WIDTHS);
   const [now, setNow] = useState(performance.now());
   const [prefs, setPrefs] = useState(loadPrefs);
+  const updateRows = useCallback((patches: RowPatch[]) => {
+    setData(current => {
+      if (!current || current.company.companyId !== companyId) return current;
+      const updates = new Map(patches.filter(row => row.companyId === companyId).map(row => [row.id, row]));
+      let changed = false;
+      const rows = current.rows.map(row => {
+        const patch = updates.get(row.id);
+        if (!patch || patch.sourceVersion === row.sourceVersion) return row;
+        changed = true; return { ...row, ...patch };
+      });
+      return changed ? { ...current, rows } : current;
+    });
+    setDrawerExtra(current => { const patch = patches.find(row => row.id === current?.id); return current && patch ? { ...current, ...patch } : current; });
+  }, [companyId]);
+  const dashboard = useWorkspace(companyId, updateRows);
   const updatePrefs = (p: Partial<typeof prefs>) =>
     setPrefs((cur) => {
       const next = { ...cur, ...p };
@@ -113,6 +125,7 @@ export default function App() {
     setLoadError(null);
     setSelected(new Set());
     setDrawerId(null);
+    setDrawerExtra(null); setStatusFilter('all'); setAssigneeFilter('all');
     fetch(`/api/companies/${companyId}/bills?limit=${prefs.limit}&reserve=1`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: CompanyBills) => {
@@ -135,7 +148,11 @@ export default function App() {
   useEffect(() => setSelected(new Set()), [query]);
 
   const rows = data?.rows ?? [];
-  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current));
+  useEffect(() => {
+    if (!data) return;
+    setReviewed(current => new Set([...current].filter(id => !id.startsWith(`${data.company.companyId}:`)).concat(data.rows.filter(row => row.dashboard?.reviewed).map(row => row.id))));
+  }, [data]);
+  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules');
   const counts = useMemo(() => {
     const rev = rows.filter((r) => reviewed.has(r.id)).length;
     return { all: rows.length, needs: rows.length - rev, reviewed: rev };
@@ -168,7 +185,8 @@ export default function App() {
   const shownBase =
     sort.key === 'match' && active ? sortByMatch(filtered, (id) => evalState.results[id], sort.dir) : filtered;
   // Matches rise to the top while a query is active; with no query the original order returns.
-  const visibleRows = workspace === 'rules' ? tabRows.filter(r => (previewFilter === 'all' || rules.snapshots[r.id]?.result === previewFilter) && (!recordSearch.trim() || [r.billId, r.vendor, r.description, r.memo, r.account, ...r.itemNames].join(' ').toLowerCase().includes(recordSearch.trim().toLowerCase()))) : arrangeRows(shownBase, isMatch, active);
+  const workspaceRows = workspace === 'rules' ? tabRows.filter(r => (previewFilter === 'all' || rules.snapshots[r.id]?.result === previewFilter) && (!recordSearch.trim() || [r.billId, r.vendor, r.description, r.memo, r.account, ...r.itemNames].join(' ').toLowerCase().includes(recordSearch.trim().toLowerCase()))) : arrangeRows(shownBase, isMatch, active);
+  const visibleRows = workspaceRows.filter(row => (statusFilter === 'all' || (statusFilter === 'reviewed' ? reviewed.has(row.id) : statusFilter === 'flagged' ? Boolean(row.dashboard?.flags.length) : !reviewed.has(row.id))) && (assigneeFilter === 'all' || (assigneeFilter === 'unassigned' ? !row.dashboard?.owner : row.dashboard?.owner === assigneeFilter)));
 
   // Animate rows to their new positions (FLIP) so the reordering is visible.
   const bodyRef = useRef<HTMLTableSectionElement>(null);
@@ -206,22 +224,14 @@ export default function App() {
   const selCents = selRows.reduce((s, r) => s + r.amountCents, 0);
   const complete = active && evalState.pending.size === 0 && evalState.failed.size === 0;
 
-  const persistReviewed = (next: Set<string>) => {
-    setReviewed(next);
-    try {
-      localStorage.setItem(REVIEW_KEY, JSON.stringify([...next]));
-    } catch {}
-  };
   const setReviewStatus = (value: boolean) => {
-    const next = new Set(reviewed);
-    selected.forEach((id) => (value ? next.add(id) : next.delete(id)));
-    persistReviewed(next);
-    rows.filter(r => selected.has(r.id)).forEach(row => rules.processUpdate(row, value));
-    setSelected(new Set());
+    void dashboard.review([...selected], value).then(() => {
+      rows.filter(row => selected.has(row.id)).forEach(row => rules.processUpdate(row, value));
+      setSelected(new Set());
+    }).catch(() => {});
   };
   const resetReview = () => {
-    persistReviewed(new Set());
-    setSelected(new Set());
+    if (rows.length) void dashboard.review(rows.map(row => row.id), false).then(() => setSelected(new Set())).catch(() => {});
   };
   const selectMatches = () => {
     const ids = visibleRows.filter((r) => workspace === 'rules' ? rules.snapshots[r.id]?.result === 'true' : matchOf(r.id)?.state === 'match').map((r) => r.id);
@@ -261,7 +271,17 @@ export default function App() {
   };
 
   const company = data?.company ?? companies.find((c) => c.companyId === companyId);
-  const drawerRow = rows.find((r) => r.id === drawerId) ?? null;
+  const drawerRow = rows.find((r) => r.id === drawerId) ?? (drawerExtra?.id === drawerId ? drawerExtra : null);
+  const inspect = (id: string) => {
+    if (rows.some(row => row.id === id)) { setDrawerId(id); return; }
+    void fetch(`/api/companies/${companyId}/bills/${encodeURIComponent(id)}`).then(async response => {
+      const row = await response.json(); if (!response.ok) throw new Error(row.error ?? 'Could not load bill.');
+      if (row.companyId === companyId) { setDrawerExtra(row); setDrawerId(id); }
+    }).catch(() => {});
+  };
+  const actionMatches = workspace === 'rules' ? { ids: visibleRows.filter(row => rules.snapshots[row.id]?.result === 'true').map(row => row.id), expression: rules.draft?.expression, scope: 'matches' as const } : { ids: visibleRows.filter(row => isMatch(row.id)).map(row => row.id), criterion: query, scope: 'matches' as const };
+  const actionReady = workspace === 'rules' ? rules.complete : complete && !awaitingDebounce;
+  const sidebarActions = workspace !== 'rules' || takeAction;
 
   return (
     <div className="app">
@@ -296,7 +316,8 @@ export default function App() {
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules <span className="nav-caption">Build → Preview → Automate</span></button></nav><span className="muted">{data?.company.scenario ? 'Labeled modified scenario' : 'Original accounting records'} · Local review state</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => { setWorkspace('transactions'); setTakeAction(false); }}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => { setWorkspace('rules'); setTakeAction(false); }}>Rules <span className="nav-caption">Build → Preview → Automate</span></button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button></nav><span className="muted">SQLite workspace · Original dataset preserved</span></div>
+      {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
 
       {workspace === 'transactions' && <section className="semantic">
         <label htmlFor="criterion">Select transactions by meaning</label>
@@ -362,13 +383,14 @@ export default function App() {
       {workspace === 'rules' && (rules.storageError || rules.message) && <div className={`rules-notice ${rules.storageError ? 'error' : ''}`} role="status">{rules.storageError || rules.message}</div>}
       {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Jev evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
       {workspace === 'rules' && data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
-      <div className={`workspace-body ${workspace === 'rules' ? 'with-builder' : ''}`}>
-      {workspace === 'rules' && data && <RulesPanel controller={rules} data={data} />}
+      <div className="workspace-body with-builder">
+      {sidebarActions ? <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} /> : workspace === 'rules' && data && <RulesPanel controller={rules} data={data} />}
       <div className="ledger-column">
+      {workspace !== 'tasks' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span>{workspace === 'rules' && <button onClick={() => setTakeAction(!takeAction)}>{takeAction ? 'Edit rule' : 'Take action'}</button>}</div>}
       {workspace === 'rules' && <RulePreviewBar c={rules} total={rows.length} onInspect={() => rules.matches[0] && setDrawerId(rules.matches[0].id)} />}
       {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
 
-      <main className="sheet-wrap">
+      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : <main className="sheet-wrap">
         {loadError ? (
           <div className="state">Could not load records ({loadError}). <button onClick={() => setCompanyId(companyId + '')}>Retry</button></div>
         ) : !data ? (
@@ -389,9 +411,9 @@ export default function App() {
                   <Th w={widths.memo} onResize={(e) => startResize('memo', e)}>Memo</Th>
                   <Th w={widths.account} onClick={() => sortBy('account')} onResize={(e) => startResize('account', e)}>Account{arrow('account')}</Th>
                   <Th w={widths.amount} right onClick={() => sortBy('amountCents')} onResize={(e) => startResize('amount', e)}>Amount{arrow('amountCents')}</Th>
-                  <Th w={widths.review} onResize={(e) => startResize('review', e)}>Review</Th>
+                  <Th w={widths.review} onResize={(e) => startResize('review', e)}>Status</Th>
                   <Th w={widths.match} className={workspace === 'rules' ? 'rule-result-column' : ''} onClick={workspace === 'transactions' ? () => sortBy('match') : undefined} onResize={(e) => startResize('match', e)}>{workspace === 'rules' ? 'Rule result' : `Semantic match %${arrow('match')}`}</Th>
-                  <th style={{ minWidth: 230, width: 230 }}>Local automation</th>
+                  <th className="dashboard-assignment-column" style={{ minWidth: 230, width: 230 }}>Assigned to</th>
                 </tr>
               </thead>
               <tbody ref={bodyRef}>
@@ -410,7 +432,7 @@ export default function App() {
                     onToggle={() => toggle(r.id)}
                     onOpen={() => setDrawerId(r.id)}
                     ruleOutcome={workspace === 'rules' ? rules.snapshots[r.id]?.result ?? 'pending' : undefined}
-                    local={rules.store.transactions[r.id]}
+                    local={{ ...rules.store.transactions[r.id], flags: [...new Set([...(r.dashboard?.flags ?? []), ...(rules.store.transactions[r.id]?.flags ?? [])])], tags: [...new Set([...(r.dashboard?.tags ?? []), ...(rules.store.transactions[r.id]?.tags ?? [])])], owner: r.dashboard?.owner || rules.store.transactions[r.id]?.owner || '', automatedCheck: Boolean(r.dashboard?.automatedCheck || rules.store.transactions[r.id]?.automatedCheck) }}
                   />
                 ))}
               </tbody>
@@ -430,7 +452,7 @@ export default function App() {
             )}
           </div>
         )}
-      </main>
+      </main>}
       {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} />}
       </div>
       </div>
@@ -450,14 +472,14 @@ export default function App() {
         </div>
         <div className="spacer" />
         <button onClick={selectMatches} disabled={workspace === 'rules' ? rules.matches.length === 0 : !active || matchRows.length === 0}>Select current matches</button>
-        <button className="primary" onClick={() => setReviewStatus(true)} disabled={selected.size === 0}>Mark reviewed</button>
-        <button onClick={() => setReviewStatus(false)} disabled={selected.size === 0}>Mark needs review</button>
+        <button className="primary" onClick={() => setReviewStatus(true)} disabled={selected.size === 0 || dashboard.busy}>Mark reviewed</button>
+        <button onClick={() => setReviewStatus(false)} disabled={selected.size === 0 || dashboard.busy}>Mark needs review</button>
         <button className="ghost" onClick={() => setSelected(new Set())} disabled={selected.size === 0}>Clear selection</button>
-        <button className="ghost" onClick={resetReview} title="Reset all review state (all companies)">Reset review state</button>
+        <button className="ghost" onClick={resetReview} disabled={dashboard.busy || !rows.length} title="Reset review for loaded bills in this company">Reset review state</button>
       </footer>
 
       {drawerRow && (
-        <Drawer row={drawerRow} reviewed={reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />
+        <Drawer row={drawerRow} reviewed={drawerRow.dashboard?.reviewed ?? reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />
       )}
     </div>
   );
@@ -490,8 +512,8 @@ function SheetRow(p: {
       <td title={r.vendor}>{r.vendor}</td>
       <td title={r.itemNames.join(', ')}>{r.itemNames.join(', ')}</td>
       <td title={r.description.trim() ? r.description : '(blank)'} className="pre">{r.description}</td>
-      <td title={r.memo.trim() ? r.memo : '(blank)'} className="pre">{r.memo}</td>
-      <td title={r.account}>{r.account}</td>
+      <td title={r.workspaceChanges?.memo !== undefined ? `Original memo: ${r.workspaceChanges.memo}` : r.memo.trim() ? r.memo : '(blank)'} className={`pre ${r.workspaceChanges?.memo !== undefined ? 'workspace-edited' : ''}`}>{r.memo}</td>
+      <td title={r.workspaceChanges?.account !== undefined ? `Original category: ${r.workspaceChanges.account}` : r.account} className={r.workspaceChanges?.account !== undefined ? 'workspace-edited' : ''}>{r.account}</td>
       <td className="right num">{money(r.amountCents)}</td>
       <td><span className={'tag ' + (p.reviewed ? 'rev' : 'need')}>{p.reviewed ? 'Reviewed' : 'Needs review'}</span></td>
       <td className={p.ruleOutcome ? 'rule-result-column' : undefined}>
@@ -503,7 +525,7 @@ function SheetRow(p: {
           ) : p.failed ? <span className="tag bad">Failed</span>
           : p.pending ? <span className="muted">Pending…</span> : <span className="muted">—</span>}
       </td>
-      <td title={[...(p.local?.flags ?? []), ...(p.local?.tags ?? []), p.local?.owner ?? ''].filter(Boolean).join(' · ')}>{p.local?.automatedCheck && <span className="tag ok">Automated pass</span>} {p.local?.flags.map(flag => <span className="tag warn" key={flag}>{flag}</span>)} {p.local?.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)} {p.local?.owner && <span className="muted">→ {p.local.owner}</span>}</td>
+      <td className="dashboard-assignment-column" title={[...(p.local?.flags ?? []), ...(p.local?.tags ?? []), p.local?.owner ?? ''].filter(Boolean).join(' · ')}><span className={p.local?.owner ? 'assigned-owner' : 'muted'}>{p.local?.owner || 'Unassigned'}</span> {p.local?.automatedCheck && <span className="tag ok">Automated pass</span>} {p.local?.flags.map(flag => <span className="tag warn" key={flag}>{flag}</span>)} {p.local?.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)} {Boolean(r.dashboard?.taskIds.length) && <span className="tag">{r.dashboard!.taskIds.length} tasks</span>}</td>
     </tr>
   );
 }
@@ -522,7 +544,9 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
       </div>
       <div className="drawer-body">
         {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
-        <h3>Local review metadata</h3><LocalStateEditor value={rules.store.transactions[r.id]} update={value => rules.updateLocal(r.id, value)} />
+        {r.dashboard && <><h3>Dashboard status · Saved in SQLite</h3><dl><dt>Status</dt><dd>{r.dashboard.reviewed ? 'Reviewed' : 'Needs review'}</dd><dt>Assigned to</dt><dd>{r.dashboard.owner || 'Unassigned'}</dd><dt>Flags</dt><dd>{r.dashboard.flags.join(', ') || 'None'}</dd><dt>Tags</dt><dd>{r.dashboard.tags.join(', ') || 'None'}</dd><dt>Tasks</dt><dd>{r.dashboard.taskIds.length}</dd></dl></>}
+        <details className="legacy-metadata"><summary>Browser rule demo metadata</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => rules.updateLocal(r.id, value)} /></details>
+        {r.workspaceChanges && Object.keys(r.workspaceChanges).length > 0 && <><h3>Original source values</h3><dl>{r.workspaceChanges.account !== undefined && <><dt>Category</dt><dd>{r.workspaceChanges.account}</dd></>}{r.workspaceChanges.memo !== undefined && <><dt>Memo</dt><dd>{r.workspaceChanges.memo || '(blank)'}</dd></>}</dl></>}
         <h3>Bill</h3>
         <dl>
           <dt>Date</dt><dd>{r.date}</dd>

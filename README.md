@@ -51,5 +51,8 @@ npm run dev        # http://localhost:5173
 
 - Spreadsheet of original vendor bills per company, loaded on demand from `data/raw/`. Choose 50, 100, or all records. Bill payments appear only as drawer context, never as separate spend.
 - Semantic input calls Jev (`typesafe-ai/jev` via Vercel AI Gateway, `experimental_evaluate` choice questions) from `server/jev.ts`; requires `AI_GATEWAY_API_KEY` in `.env`. Jev returns match, no match, or uncertain. Probabilities are displayed as evidence, without replacing the selected outcome.
-- Review state is stored in browser localStorage, keyed by company-scoped bill ID.
-- The **Rules** workspace adds editable ALL / ANY / NOT groups, independent AI judgments, local standard conditions, persistent actions, saved revisions, history, and conflict-aware undo. See [RULES_DEMO.md](RULES_DEMO.md) for the demo and execution semantics.
+- Search in plain language, select matching bills, then use **Take action** to preview and create assigned review tasks, change categories or memos, assign bills, add flags/tags, or update review status.
+- **Status** and **Assigned to** filters sit above the spreadsheet. **Tasks & activity** has task status/assignee filters, completion controls, action receipts, and conflict-aware undo.
+- Bills are imported into a working SQLite database at `workspace/actions.sqlite` (override with `WORKSPACE_DB`). Tasks, review status, assignments, edits, receipts, and enabled dashboard automations persist on this server across browser sessions. Requires Node 22.13+; no separate database service or Intuit account is needed.
+- Dataset disclosure: `data/raw/` stays unchanged. Category and memo edits affect only working copies in SQLite; edited cells and the bill drawer disclose their original values. Original line items and monetary amounts are preserved.
+- The **Rules** workspace retains editable ALL / ANY / NOT groups. **Take action** executes grouped matches through the SQLite backend. The older **Run once** / replay demonstration still uses browser storage and is separate from dashboard actions. See [RULES_DEMO.md](RULES_DEMO.md) for both flows.

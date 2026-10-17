@@ -151,3 +151,28 @@ test('company switching drops stale results and original evidence remains inspec
   await expect(page.getByLabel('Transaction detail')).toContainText('earbuds');
   await page.screenshot({ path: 'artifacts/verified-original-evidence.png', fullPage: true });
 });
+
+test('clean reset URL clears Shipwise automation and replay state while retaining its rule', async ({ page }) => {
+  await page.goto('/'); await complete(page);
+  await page.getByRole('button', { name: 'Save rule', exact: true }).click();
+  await page.getByRole('button', { name: /^Run once/ }).click();
+  await page.getByLabel('Toggle rule enabled').click();
+  const before = await store(page);
+  expect(before.history.length).toBeGreaterThan(0);
+  await page.evaluate(() => {
+    const state = JSON.parse(localStorage.getItem('tr.rules.v1')!);
+    state.arrivals['company-018'] = ['company-018:reserved-original'];
+    localStorage.setItem('tr.rules.v1', JSON.stringify(state));
+    localStorage.setItem('tr.reviewed.v1', JSON.stringify(['company-018:bill-reviewed', 'company-005:bill-reviewed']));
+  });
+  const receipt = page.waitForResponse(response => response.url().endsWith('/api/demo-reset/receipt') && response.status() === 204);
+  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test');
+  await receipt; await complete(page);
+  const after = await store(page);
+  expect(after.transactions).toEqual({}); expect(after.history).toEqual([]); expect(after.executions).toEqual([]);
+  expect(after.arrivals['company-018']).toEqual([]);
+  expect(after.rules).toEqual(before.rules.map((rule: any) => ({ ...rule, enabled: false })));
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('tr.reviewed.v1')!))).toEqual(['company-005:bill-reviewed']);
+  expect(page.url()).not.toContain('resetDemo');
+  await expect(page.getByRole('button', { name: /^Replay next original bill/ })).toContainText('(5)');
+});

@@ -24,6 +24,7 @@
 - Enabling and activating revisions never backfills history. Enabled saved revisions handle subsequent replay arrivals and human review updates while this app is open. Draft changes do not affect that revision. Stale preview responses and obsolete active revisions cannot apply actions.
 - Each action is idempotent by rule ID + revision + transaction ID + content/review version + action ID. Duplicate tags and flags are also prevented. Undo retains execution keys, checks the current field against the written value, and reports a conflict if it changed. Subsequent false/uncertain updates are recorded without reversing earlier actions.
 - Reset demo action state clears this company's action metadata, history, and execution keys. It preserves rules, replay arrivals, and human review, allowing explicit Run once demonstrations again.
+- For a complete Shipwise restart, open `http://localhost:5174/?resetDemo=company-018&resetToken=manual-reset` in the browser profile used for the demo. This also restores the five reserved replay bills, clears Shipwise human-review marks, and disables its saved rules while retaining their definitions. Other companies remain unchanged. The URL removes its reset parameters after applying the reset.
 
 ## Verification
 

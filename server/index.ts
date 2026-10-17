@@ -13,6 +13,13 @@ app.get('/api/status', (_req, res) => {
 
 app.get('/api/companies', (_req, res) => res.json(listCompanies()));
 
+app.post('/api/demo-reset/receipt', (req, res) => {
+  const r = req.body;
+  if (!/^company-\d{3}$/.test(r?.companyId) || typeof r?.token !== 'string') return res.sendStatus(400);
+  console.log('Demo reset receipt:', JSON.stringify({ companyId: r.companyId, token: r.token, actions: r.actions, history: r.history, arrivals: r.arrivals, enabledRules: r.enabledRules, humanReviewed: r.humanReviewed }));
+  res.sendStatus(204);
+});
+
 app.get('/api/companies/:id/bills', (req, res) => {
   try {
     const full = loadCompanyBills(req.params.id);

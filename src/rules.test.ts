@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compose, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, parseCents, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
+import { compose, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, parseCents, resetCompanyDemo, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
 import type { Row } from './types';
 
 const row = { id: 'company-018:bill-original', companyId: 'company-018', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo' } as Row;
@@ -101,4 +101,23 @@ test('updated nonmatches record the outcome without reversing earlier actions', 
   assert.notEqual(transactionVersion(row), transactionVersion({ ...row, memo: 'Updated original memo' }));
   assert.notEqual(transactionVersion(row, false), transactionVersion(row, true));
   assert.deepEqual(emptyTransaction(), { flags: [], tags: [], owner: '', automatedCheck: false });
+});
+
+test('clean demo reset clears only the selected company and preserves disabled rule definitions', () => {
+  const rule = { ...exampleRule(row.companyId), enabled: true };
+  const otherRow = { ...row, id: 'company-005:bill-original', companyId: 'company-005' };
+  const otherRule = { ...exampleRule(otherRow.companyId), enabled: true };
+  let store = { ...structuredClone(EMPTY_STORE), rules: [rule, otherRule], arrivals: { [row.companyId]: [row.id], [otherRow.companyId]: [otherRow.id] } };
+  store = executeRule(store, rule, row, 'v1', snapshotFor(rule), 'arrival');
+  store = executeRule(store, otherRule, otherRow, 'v1', snapshotFor(otherRule), 'arrival');
+  const reset = resetCompanyDemo(store, row.companyId);
+  assert.equal(reset.transactions[row.id], undefined);
+  assert.deepEqual(reset.arrivals[row.companyId], []);
+  assert.ok(reset.history.every(h => h.companyId === otherRow.companyId));
+  assert.ok(reset.executions.every(key => !key.includes(`:${row.companyId}:`)));
+  assert.deepEqual(reset.rules[0], { ...rule, enabled: false });
+  assert.deepEqual(reset.rules[1], otherRule);
+  assert.deepEqual(reset.transactions[otherRow.id], store.transactions[otherRow.id]);
+  assert.deepEqual(reset.arrivals[otherRow.companyId], [otherRow.id]);
+  assert.equal(store.rules[0].enabled, true);
 });

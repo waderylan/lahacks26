@@ -24,6 +24,17 @@ export const EMPTY_STORE: RuleStore = { rules: [], transactions: {}, history: []
 export const emptyTransaction = (): LocalTransaction => ({ flags: [], tags: [], owner: '', automatedCheck: false });
 export const uid = () => crypto.randomUUID();
 
+export function resetCompanyDemo(store: RuleStore, companyId: string): RuleStore {
+  return {
+    ...store,
+    rules: store.rules.map(rule => rule.companyId === companyId ? { ...rule, enabled: false } : rule),
+    transactions: Object.fromEntries(Object.entries(store.transactions).filter(([id]) => !id.startsWith(`${companyId}:`))),
+    history: store.history.filter(entry => entry.companyId !== companyId),
+    executions: store.executions.filter(key => !key.includes(`:${companyId}:`)),
+    arrivals: { ...store.arrivals, [companyId]: [] },
+  };
+}
+
 export function exampleRule(companyId: string): Rule {
   return { id: uid(), companyId, name: 'Memo needs clarification', revision: 1, enabled: false,
     expression: { id: uid(), type: 'all', children: [

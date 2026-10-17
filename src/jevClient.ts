@@ -1,5 +1,5 @@
 import type { CompanyBills, RecordResult, Row } from './types';
-import { transactionVersion, type Outcome } from './rules';
+import { transactionVersion, type DraftMessage, type DraftResult, type Outcome } from './rules';
 
 // Shared by semantic filtering, rule preview, and arrivals: at most three gateway batches.
 let active = 0;
@@ -51,4 +51,14 @@ export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, 
     try { onResult(row, await judgments.get(judgmentKey(row, text))!); }
     catch (error) { onResult(row, 'error', (error as Error).message); }
   })).then(() => {});
+}
+
+/** Jev picks the recipient when routing is 'jev'; Gemini writes the draft. Server-side, as with evaluation. */
+export async function requestMessageDraft(m: DraftMessage): Promise<DraftResult> {
+  const res = await fetch('/api/messages/draft', { method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90000),
+    body: JSON.stringify({ companyId: m.companyId, request: m.request, recipient: m.routing === 'jev' ? 'jev' : m.employeeId, items: m.items.map(i => ({ transactionId: i.transactionId, context: i.context })) }) });
+  const body = await res.json();
+  if (!res.ok) throw Object.assign(new Error(body.error ?? `HTTP ${res.status}`), { retryable: res.status === 429 });
+  if (typeof body.employeeId !== 'string' || typeof body.subject !== 'string' || typeof body.body !== 'string') throw new Error('Incomplete draft response');
+  return body;
 }

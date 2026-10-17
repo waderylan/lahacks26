@@ -3,8 +3,8 @@ import { arrangeRows, sortByMatch } from './arrange';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useSemanticEval } from './useSemanticEval';
 import { readRuleStore, useRules } from './useRules';
-import { LocalStateEditor, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel } from './RulesPanel';
-import { actionLabel, type LocalTransaction, type Outcome } from './rules';
+import { LocalStateEditor, MessageCard, NotificationBell, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel, Toasts } from './RulesPanel';
+import { actionLabel, type DraftMessage, type LocalTransaction, type Outcome } from './rules';
 
 const DEFAULT_COMPANY = 'company-018';
 const REVIEW_KEY = 'tr.reviewed.v1';
@@ -265,6 +265,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <Toasts notices={(rules.store.notices ?? []).filter(n => n.companyId === companyId)} onDismiss={rules.markNoticeToasted} />
       <header className="toolbar">
         <h1>Transaction Review</h1>
         <CompanyPicker companies={companies} value={companyId} onChange={(id) => id !== companyId && setCompanyId(id)} />
@@ -293,6 +294,7 @@ export default function App() {
             Sample: {data.rows.length} of {data.totalBills} bills
           </span>
         )}
+        <NotificationBell notices={(rules.store.notices ?? []).filter(n => n.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={setDrawerId} />
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
       </header>
 
@@ -411,6 +413,7 @@ export default function App() {
                     onOpen={() => setDrawerId(r.id)}
                     ruleOutcome={workspace === 'rules' ? rules.snapshots[r.id]?.result ?? 'pending' : undefined}
                     local={rules.store.transactions[r.id]}
+                    messages={(rules.store.messages ?? []).filter(m => m.items.some(i => i.transactionId === r.id))}
                   />
                 ))}
               </tbody>
@@ -431,7 +434,7 @@ export default function App() {
           </div>
         )}
       </main>
-      {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} />}
+      {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} onOpen={setDrawerId} />}
       </div>
       </div>
 
@@ -476,7 +479,7 @@ function SheetRow(p: {
   row: Row; n: number; selected: boolean; reviewed: boolean; open: boolean; active: boolean;
   match?: { state: string; pMatch: number }; pending: boolean; failed: boolean;
   onToggle: () => void; onOpen: () => void;
-  ruleOutcome?: Outcome; local?: LocalTransaction;
+  ruleOutcome?: Outcome; local?: LocalTransaction; messages?: DraftMessage[];
 }) {
   const { row: r, match } = p;
   const cls = ['row', (p.ruleOutcome ? p.ruleOutcome === 'true' : match?.state === 'match') ? 'm-match' : (p.ruleOutcome ? p.ruleOutcome === 'uncertain' : match?.state === 'uncertain') ? 'm-unc' : '', p.selected ? 'is-sel' : '', p.open ? 'is-open' : ''].join(' ');
@@ -503,7 +506,7 @@ function SheetRow(p: {
           ) : p.failed ? <span className="tag bad">Failed</span>
           : p.pending ? <span className="muted">Pending…</span> : <span className="muted">—</span>}
       </td>
-      <td title={[...(p.local?.flags ?? []), ...(p.local?.tags ?? []), p.local?.owner ?? ''].filter(Boolean).join(' · ')}>{p.local?.automatedCheck && <span className="tag ok">Automated pass</span>} {p.local?.flags.map(flag => <span className="tag warn" key={flag}>{flag}</span>)} {p.local?.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)} {p.local?.owner && <span className="muted">→ {p.local.owner}</span>}</td>
+      <td title={[...(p.local?.flags ?? []), ...(p.local?.tags ?? []), p.local?.owner ?? '', ...(p.messages ?? []).map(m => `Message ${m.status}`)].filter(Boolean).join(' · ')}>{p.local?.automatedCheck && <span className="tag ok">Automated pass</span>} {p.local?.flags.map(flag => <span className="tag warn" key={flag}>{flag}</span>)} {p.local?.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)} {p.local?.owner && <span className="muted">→ {p.local.owner}</span>} {(p.messages ?? []).some(m => m.status === 'pending') && <span className="tag warn">Message draft</span>} {(p.messages ?? []).some(m => m.status === 'approved') && <span className="tag ok">Message sent</span>}</td>
     </tr>
   );
 }
@@ -522,6 +525,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
       </div>
       <div className="drawer-body">
         {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
+        {(rules.store.messages ?? []).some(m => m.items.some(i => i.transactionId === r.id)) && <><h3>Draft messages</h3>{(rules.store.messages ?? []).filter(m => m.items.some(i => i.transactionId === r.id)).map(m => <MessageCard key={m.id} message={m} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}</>}
         <h3>Local review metadata</h3><LocalStateEditor value={rules.store.transactions[r.id]} update={value => rules.updateLocal(r.id, value)} />
         <h3>Bill</h3>
         <dl>

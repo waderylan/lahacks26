@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
-import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, executeRule, leaves, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
+import { evaluateCondition, judgmentKey, requestMessageDraft } from './jevClient';
+import { completeDraft, decideMessage, EMPTY_STORE, evaluateTree, exampleRule, executeRule, leaves, markNoticeToasted, markNoticesRead, migrateMessage, migrateRule, uid, retryDraft, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
 
 const STORE_KEY = 'tr.rules.v1';
 export function readRuleStore(): RuleStore {
   const raw = localStorage.getItem(STORE_KEY);
   if (!raw) return structuredClone(EMPTY_STORE);
   const value = JSON.parse(raw);
+  if (Array.isArray(value.rules)) value.rules = value.rules.map(migrateRule);
   if (!Array.isArray(value.rules) || value.rules.some((r: Rule) => validateRule(r).length) || !value.transactions || !Array.isArray(value.history) || !Array.isArray(value.executions) || !value.arrivals) throw new Error('Saved rule storage is invalid. Export or clear tr.rules.v1 in browser storage before continuing.');
-  return value;
+  return { ...value, messages: Array.isArray(value.messages) ? value.messages.map(migrateMessage) : [], notices: Array.isArray(value.notices) ? value.notices : [] };
 }
 const signature = (r: Rule) => JSON.stringify([r.name, r.expression, r.actions]);
 
@@ -43,6 +44,28 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     setDraft(storeRef.current.rules.find(r => r.companyId === companyId) ?? exampleRule(companyId));
     setMessage('');
   }, [companyId]);
+
+  // Fill pending drafts in the background, three at a time. Drafts left pending by a reload resume here.
+  // Rate-limited drafts stay pending and are retried with backoff (15s, 30s, 45s) before failing.
+  const drafting = useRef(new Set<string>());
+  const draftAttempts = useRef(new Map<string, number>());
+  const [draftTick, setDraftTick] = useState(0);
+  useEffect(() => {
+    if (storageError) return;
+    const queue = (store.messages ?? []).filter(m => m.generation === 'pending' && m.status === 'pending' && !drafting.current.has(m.id));
+    for (const m of queue.slice(0, Math.max(0, 3 - drafting.current.size))) {
+      drafting.current.add(m.id);
+      const sentFor = m.items.map(i => i.transactionId);
+      const finish = (result: Parameters<typeof completeDraft>[2]) => { try { commit(cur => completeDraft(cur, m.id, result, sentFor)); } catch { /* storageError is shown */ } };
+      const release = () => { drafting.current.delete(m.id); setDraftTick(n => n + 1); };
+      void requestMessageDraft(m).then(result => { finish(result); release(); }, (e: Error & { retryable?: boolean }) => {
+        const attempt = (draftAttempts.current.get(m.id) ?? 0) + 1;
+        draftAttempts.current.set(m.id, attempt);
+        if (e.retryable && attempt < 4) setTimeout(release, 15000 * attempt);
+        else { draftAttempts.current.delete(m.id); finish({ error: e.message }); release(); }
+      });
+    }
+  }, [store.messages, draftTick, storageError]);
 
   const validCompany = Boolean(draft && draft.companyId === companyId && data);
   const conditions = validCompany ? leaves(draft!.expression) : [];
@@ -107,8 +130,8 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     if (!complete || !saved || dirty || !draft) return;
     // Freeze this exact revision, list, and evidence before the atomic local write.
     const frozen = structuredClone(matches.map(row => ({ row, version: transactionVersion(row, reviewed.has(row.id)), snapshot: snapshots[row.id] })));
-    const rule = structuredClone(saved);
-    commit(cur => frozen.reduce((next, item) => executeRule(next, rule, item.row, item.version, item.snapshot, 'run'), cur));
+    const rule = structuredClone(saved); const batchId = uid();
+    commit(cur => frozen.reduce((next, item) => executeRule(next, rule, item.row, item.version, item.snapshot, 'run', batchId), cur));
     setMessage(`Run once completed for ${frozen.length} definite matches · revision ${rule.revision}. Repeated runs do not duplicate actions.`);
   };
 
@@ -154,8 +177,13 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     else { commit(() => result.store); setMessage('Action undone. Its execution key is retained to prevent duplicate actions.'); }
   };
   const reset = () => {
-    commit(cur => ({ ...cur, transactions: Object.fromEntries(Object.entries(cur.transactions).filter(([id]) => !id.startsWith(`${companyId}:`))), history: cur.history.filter(h => h.companyId !== companyId), executions: cur.executions.filter(key => !cur.rules.some(r => r.companyId === companyId && key.startsWith(`${r.id}:`))) }));
+    commit(cur => ({ ...cur, transactions: Object.fromEntries(Object.entries(cur.transactions).filter(([id]) => !id.startsWith(`${companyId}:`))), history: cur.history.filter(h => h.companyId !== companyId), executions: cur.executions.filter(key => !cur.rules.some(r => r.companyId === companyId && key.startsWith(`${r.id}:`))), messages: (cur.messages ?? []).filter(item => item.companyId !== companyId), notices: (cur.notices ?? []).filter(item => item.companyId !== companyId) }));
     setMessage('Demo actions and history reset for this company. Saved rules, replayed bills, and human review were preserved.');
+  };
+  const decide = (id: string, status: 'approved' | 'rejected', body?: string) => {
+    const result = decideMessage(storeRef.current, id, status, body);
+    if (result.error) setMessage(result.error);
+    else { commit(() => result.store); setMessage(status === 'approved' ? 'Marked sent locally. No email was delivered.' : 'Draft rejected. Nothing was sent.'); }
   };
   return { store, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain, elapsed: timing.start ? Math.max(0, ((timing.end || now) - timing.start) / 1000) : 0,
     previewErrors: [...previewErrors], retry: () => setRetry(n => n + 1), save, toggleEnabled, runOnce, replay, busy, automation, message, storageError, undo, reset,
@@ -166,6 +194,10 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(r => r.id === id); if (rule) setDraft(structuredClone(rule)); },
     loadExample: () => { setDraft(exampleRule(companyId)); setMessage('Editable suggested review policy. A match is not proof of an accounting error.'); },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [] }, actions: [] }); setMessage('Add your conditions under IF, then choose actions under THEN.'); },
+    decideMessage: decide,
+    retryDraft: (id: string) => commit(cur => retryDraft(cur, id)),
+    markNoticesRead: () => commit(cur => markNoticesRead(cur, companyId)),
+    markNoticeToasted: (id: string) => commit(cur => markNoticeToasted(cur, id)),
   };
 }
 export type RulesController = ReturnType<typeof useRules>;

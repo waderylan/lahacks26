@@ -9,7 +9,7 @@
 - **0–10s:** Open Rules, Shipwise Online Goods. Read the IF / THEN summary. The editable example flags overhead memos attached to bills whose line items are not ongoing overhead.
 - **10–20s:** Click **Inspect a match**. Compare the two independent condition results, NOT, and ALL against the original memo and line items. Close the drawer.
 - **20–30s:** Add an Amount standard condition, change ALL to ANY, and watch the preview update. Group and action edits reuse judgments. Remove the new condition and return to ALL.
-- **30–40s:** Click **Save rule**, then **Run once**. Open Action history to see rule revision, original bill ID, condition snapshot, and before/after values. Undo one flag.
+- **30–40s:** Add **Draft internal message** if you want the approval card: describe the message and pick an employee or let Jev choose. Click **Save rule**, then **Run once**. Open Action history or Messages to see the local draft. Approve, edit, or reject it — nothing is emailed. Undo one flag.
 - **40–50s:** Click **Disabled · Enable**, then **Replay next original bill**. Read the replay log: the next original record is evaluated against the saved revision. True applies actions; false or uncertain leaves it untouched.
 - **50–60s:** Edit the enabled rule. The previous revision stays active until **Save and activate revision**. Switch to Transactions to show semantic filtering and separate human review.
 
@@ -20,7 +20,7 @@
 - Standard conditions compare integer cents, human review status, vendor, or account locally. Vendor/account choices come from the complete selected company.
 - Semantic outcomes are true / false / uncertain. NOT preserves uncertain. Pending and error remain execution states. Each leaf must finish successfully before Run once or automatic actions can execute, including children that do not change the final ALL/ANY result.
 - Preview evaluates the current draft. It never writes transaction metadata. Run once requires a saved, unchanged, valid, complete revision and freezes its definite matches and evidence before an atomic browser storage write.
-- Saved rules, local flags/tags/owner/automated pass, execution keys, action history, and replay arrivals use `tr.rules.v1` in localStorage. Human review continues to use `tr.reviewed.v1`. Automated pass never changes human review.
+- Saved rules, local flags/tags/owner/automated pass, draft vendor messages, notifications, execution keys, action history, and replay arrivals use `tr.rules.v1` in localStorage. Human review continues to use `tr.reviewed.v1`. Automated pass never changes human review. A **Draft internal message** action writes one pending local card per run that covers all of the run's matching bills (split at 25 bills; each replayed arrival gets its own). Jev chooses one recipient for the whole message from the fictional team in `src/employees.ts` (unless one was picked), then Gemini writes a single subject and body from the request, visible bill fields, and each bill's condition results. Undoing one bill removes it from the message and re-drafts the rest. Approve / edit / reject; never an email.
 - Enabling and activating revisions never backfills history. Enabled saved revisions handle subsequent replay arrivals and human review updates while this app is open. Draft changes do not affect that revision. Stale preview responses and obsolete active revisions cannot apply actions.
 - Each action is idempotent by rule ID + revision + transaction ID + content/review version + action ID. Duplicate tags and flags are also prevented. Undo retains execution keys, checks the current field against the written value, and reports a conflict if it changed. Subsequent false/uncertain updates are recorded without reversing earlier actions.
 - Reset demo action state clears this company's action metadata, history, and execution keys. It preserves rules, replay arrivals, and human review, allowing explicit Run once demonstrations again.
@@ -36,7 +36,7 @@
 
 ## Limits
 
-- This is a local, single-browser demo. Storage and automation are not shared across users, and automation does not run after the app closes. There is no live QuickBooks connection or background worker.
+- This is a local, single-browser demo. Storage and automation are not shared across users, and automation does not run after the app closes. There is no live QuickBooks connection, background worker, or outbound email. Approved messages are marked sent locally only.
 - The default preview is a clearly labeled 50-record year-round sample. Select All to inspect all original active records; five originals remain reserved until replayed.
 - Judgment cache is session memory. Reloading the page reevaluates AI conditions through the gateway.
 - Replay uses five actual reserved bills, so the example policy may honestly return false or uncertain. For an all-arrivals walkthrough, use an AI criterion such as “The transaction has a vendor name.” and activate it explicitly; results still come from Jev.

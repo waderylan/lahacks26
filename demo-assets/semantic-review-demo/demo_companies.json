@@ -1,0 +1,3091 @@
+{
+  "disclosure": "SYNTHETIC SCENARIO OVERLAY: all 30 descriptions and memos were authored for this demo. Financial amounts, IDs, dates, vendor and account relationships are preserved. Original bills retained separately. This is not evidence of naturally occurring defects.",
+  "companies": [
+    {
+      "company_id": "company-030",
+      "name": "Hearthworn Remodeling \u2014 review scenarios",
+      "industry": "Residential Remodelers",
+      "source_dataset_id": "world-124e77eae9f4387c",
+      "full_bill_count": 596,
+      "sample_count": 30,
+      "sample_method": "30 real source bills with disclosed authored description/memo overlays; 6 examples in each of five scenario groups.",
+      "transactions": [
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00001",
+          "date": "2025-10-06",
+          "vendor": "Keaton & Sons Works",
+          "description": "",
+          "item_names": [],
+          "accounts": [
+            "Equipment"
+          ],
+          "amount_cents": 3000000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00225",
+              "vendor_id": "vend-equipment-vendor",
+              "vendor_name": "Keaton & Sons Works",
+              "txn_date": "2025-11-05",
+              "amount": "30000.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00001",
+                  "amount": "30000.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 3000000,
+          "original_source_bill": {
+            "id": "pbill-00001",
+            "doc_number": "BILL-5001",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-06",
+            "due_date": "2025-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-equipment",
+                "account_name": "Equipment",
+                "description": "owned_equipment on the job (owned_equipment).",
+                "amount": "30000.00"
+              }
+            ],
+            "total_amount": "30000.00",
+            "project_id": null,
+            "cost_category": "owned_equipment",
+            "memo": "Owned equipment charged by the provider."
+          },
+          "memo": "Vendor bill recorded; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00001",
+            "doc_number": "BILL-5001",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-06",
+            "due_date": "2025-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-equipment",
+                "account_name": "Equipment",
+                "description": "",
+                "amount": "30000.00"
+              }
+            ],
+            "total_amount": "30000.00",
+            "project_id": null,
+            "cost_category": "owned_equipment",
+            "memo": "Vendor bill recorded; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00002",
+          "date": "2025-10-06",
+          "vendor": "Quintero Quilting LLC",
+          "description": "   ",
+          "item_names": [],
+          "accounts": [
+            "Legal and Professional Fees"
+          ],
+          "amount_cents": 25000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-estimator",
+            "display_name": "Quintero Quilting LLC",
+            "company_name": "Quintero Quilting LLC",
+            "contact_given_name": "Pascal",
+            "contact_family_name": "Oyelaran",
+            "email": "pascal.oyelaran@quinteroquiltingllc.example",
+            "phone": "(555) 724-9760",
+            "address": {
+              "line1": "8584 Drayman Court",
+              "city": "Lubbock",
+              "state": "TX",
+              "postal_code": "79405",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00226",
+              "vendor_id": "vend-estimator",
+              "vendor_name": "Quintero Quilting LLC",
+              "txn_date": "2025-11-05",
+              "amount": "250.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00002",
+                  "amount": "250.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 25000,
+          "original_source_bill": {
+            "id": "pbill-00002",
+            "doc_number": "BILL-5002",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-06",
+            "due_date": "2025-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "External estimating on a bid (estimating_service).",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Estimating service charged by the provider."
+          },
+          "memo": "Vendor bill recorded; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00002",
+            "doc_number": "BILL-5002",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-06",
+            "due_date": "2025-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "   ",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Vendor bill recorded; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00004",
+          "date": "2025-10-07",
+          "vendor": "Ironbridge Stationers & Co.",
+          "description": "\u2014",
+          "item_names": [],
+          "accounts": [
+            "Advertising and Marketing"
+          ],
+          "amount_cents": 50000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-marketing-provider",
+            "display_name": "Ironbridge Stationers & Co.",
+            "company_name": "Ironbridge Stationers & Co.",
+            "contact_given_name": "Gideon",
+            "contact_family_name": "Wexler",
+            "email": "gideon.wexler@ironbridgestationersco.example",
+            "phone": "(555) 710-1836",
+            "address": {
+              "line1": "4522 Inkhouse Street",
+              "city": "Chattanooga",
+              "state": "TN",
+              "postal_code": "37476",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 1,
+            "joined_date": "2025-10-07"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00019",
+              "vendor_id": "vend-marketing-provider",
+              "vendor_name": "Ironbridge Stationers & Co.",
+              "txn_date": "2025-10-07",
+              "amount": "500.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00004",
+                  "amount": "500.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 50000,
+          "original_source_bill": {
+            "id": "pbill-00004",
+            "doc_number": "BILL-5003",
+            "vendor_id": "vend-marketing-provider",
+            "vendor_name": "Ironbridge Stationers & Co.",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-07",
+            "due_date": "2025-10-07",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-marketing",
+                "account_name": "Advertising and Marketing",
+                "description": "Prospecting and outreach (outreach).",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "outreach",
+            "memo": "Outreach charged by the provider."
+          },
+          "memo": "Vendor bill recorded; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00004",
+            "doc_number": "BILL-5003",
+            "vendor_id": "vend-marketing-provider",
+            "vendor_name": "Ironbridge Stationers & Co.",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-07",
+            "due_date": "2025-10-07",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-marketing",
+                "account_name": "Advertising and Marketing",
+                "description": "\u2014",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "outreach",
+            "memo": "Vendor bill recorded; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00009",
+          "date": "2025-10-13",
+          "vendor": "Pemberton Holdings LLC",
+          "description": "N/A",
+          "item_names": [],
+          "accounts": [
+            "Rent and Lease"
+          ],
+          "amount_cents": 50000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-landlord",
+            "display_name": "Pemberton Holdings LLC",
+            "company_name": "Pemberton Holdings LLC",
+            "contact_given_name": "Amara",
+            "contact_family_name": "Halvorsen",
+            "email": "amara.halvorsen@pembertonholdingsllc.example",
+            "phone": "(555) 875-0515",
+            "address": {
+              "line1": "2701 Ventwell Road",
+              "city": "Boise",
+              "state": "ID",
+              "postal_code": "83717",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "premises",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00305",
+              "vendor_id": "vend-landlord",
+              "vendor_name": "Pemberton Holdings LLC",
+              "txn_date": "2025-11-12",
+              "amount": "500.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00009",
+                  "amount": "500.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 50000,
+          "original_source_bill": {
+            "id": "pbill-00009",
+            "doc_number": "BILL-5004",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-13",
+            "due_date": "2025-11-12",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "Premises rent (premises).",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Premises charged by the provider."
+          },
+          "memo": "Vendor bill recorded; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00009",
+            "doc_number": "BILL-5004",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-13",
+            "due_date": "2025-11-12",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "N/A",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Vendor bill recorded; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00010",
+          "date": "2025-10-13",
+          "vendor": "City of Hollyhock",
+          "description": "TBD",
+          "item_names": [],
+          "accounts": [
+            "Taxes and Licenses"
+          ],
+          "amount_cents": 100000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-government",
+            "display_name": "City of Hollyhock",
+            "company_name": "City of Hollyhock",
+            "contact_given_name": "Kaveh",
+            "contact_family_name": "Cavanaugh",
+            "email": "kaveh.cavanaugh@cityofhollyhock.example",
+            "phone": "(555) 763-6144",
+            "address": {
+              "line1": "2279 Kraftpaper Way",
+              "city": "Mobile",
+              "state": "AL",
+              "postal_code": "36656",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "government",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00306",
+              "vendor_id": "vend-government",
+              "vendor_name": "City of Hollyhock",
+              "txn_date": "2025-11-12",
+              "amount": "1000.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00010",
+                  "amount": "1000.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 100000,
+          "original_source_bill": {
+            "id": "pbill-00010",
+            "doc_number": "BILL-5005",
+            "vendor_id": "vend-government",
+            "vendor_name": "City of Hollyhock",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-13",
+            "due_date": "2025-11-12",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-permits",
+                "account_name": "Taxes and Licenses",
+                "description": "Statutory permit and licence fees (permit).",
+                "amount": "1000.00"
+              }
+            ],
+            "total_amount": "1000.00",
+            "project_id": "proj-00001",
+            "cost_category": "permit",
+            "memo": "Permit charged by the provider."
+          },
+          "memo": "Vendor bill recorded; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00010",
+            "doc_number": "BILL-5005",
+            "vendor_id": "vend-government",
+            "vendor_name": "City of Hollyhock",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-13",
+            "due_date": "2025-11-12",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-permits",
+                "account_name": "Taxes and Licenses",
+                "description": "TBD",
+                "amount": "1000.00"
+              }
+            ],
+            "total_amount": "1000.00",
+            "project_id": "proj-00001",
+            "cost_category": "permit",
+            "memo": "Vendor bill recorded; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00016",
+          "date": "2025-10-20",
+          "vendor": "Pemberton Holdings LLC",
+          "description": ".",
+          "item_names": [],
+          "accounts": [
+            "Rent and Lease"
+          ],
+          "amount_cents": 50000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-landlord",
+            "display_name": "Pemberton Holdings LLC",
+            "company_name": "Pemberton Holdings LLC",
+            "contact_given_name": "Amara",
+            "contact_family_name": "Halvorsen",
+            "email": "amara.halvorsen@pembertonholdingsllc.example",
+            "phone": "(555) 875-0515",
+            "address": {
+              "line1": "2701 Ventwell Road",
+              "city": "Boise",
+              "state": "ID",
+              "postal_code": "83717",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "premises",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00396",
+              "vendor_id": "vend-landlord",
+              "vendor_name": "Pemberton Holdings LLC",
+              "txn_date": "2025-11-19",
+              "amount": "500.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00016",
+                  "amount": "500.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 50000,
+          "original_source_bill": {
+            "id": "pbill-00016",
+            "doc_number": "BILL-5006",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-20",
+            "due_date": "2025-11-19",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "Premises rent (premises).",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Premises charged by the provider."
+          },
+          "memo": "Vendor bill recorded; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00016",
+            "doc_number": "BILL-5006",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-20",
+            "due_date": "2025-11-19",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": ".",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Vendor bill recorded; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00018",
+          "date": "2025-10-21",
+          "vendor": "Quintero Quilting LLC",
+          "description": "Payment",
+          "item_names": [],
+          "accounts": [
+            "Legal and Professional Fees"
+          ],
+          "amount_cents": 25000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-estimator",
+            "display_name": "Quintero Quilting LLC",
+            "company_name": "Quintero Quilting LLC",
+            "contact_given_name": "Pascal",
+            "contact_family_name": "Oyelaran",
+            "email": "pascal.oyelaran@quinteroquiltingllc.example",
+            "phone": "(555) 724-9760",
+            "address": {
+              "line1": "8584 Drayman Court",
+              "city": "Lubbock",
+              "state": "TX",
+              "postal_code": "79405",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00411",
+              "vendor_id": "vend-estimator",
+              "vendor_name": "Quintero Quilting LLC",
+              "txn_date": "2025-11-20",
+              "amount": "250.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00018",
+                  "amount": "250.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 25000,
+          "original_source_bill": {
+            "id": "pbill-00018",
+            "doc_number": "BILL-5007",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-21",
+            "due_date": "2025-11-20",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "External estimating on a bid (estimating_service).",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Estimating service charged by the provider."
+          },
+          "memo": "Processed for review; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00018",
+            "doc_number": "BILL-5007",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-21",
+            "due_date": "2025-11-20",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "Payment",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Processed for review; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00023",
+          "date": "2025-10-26",
+          "vendor": "Ironclad Fulfillment Co.",
+          "description": "Miscellaneous",
+          "item_names": [],
+          "accounts": [
+            "Inventory Asset"
+          ],
+          "amount_cents": 133912,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-materials",
+            "display_name": "Ironclad Fulfillment Co.",
+            "company_name": "Ironclad Fulfillment Co.",
+            "contact_given_name": "Quentin",
+            "contact_family_name": "Gustafsson",
+            "email": "quentin.gustafsson@ironcladfulfillmentco.example",
+            "phone": "(555) 997-2256",
+            "address": {
+              "line1": "7498 Brickworks Road",
+              "city": "Chattanooga",
+              "state": "TN",
+              "postal_code": "37421",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 20,
+            "joined_date": "2025-10-26"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00454",
+              "vendor_id": "vend-materials",
+              "vendor_name": "Ironclad Fulfillment Co.",
+              "txn_date": "2025-11-25",
+              "amount": "1339.12",
+              "applications": [
+                {
+                  "document_id": "pbill-00023",
+                  "amount": "1339.12"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 133912,
+          "original_source_bill": {
+            "id": "pbill-00023",
+            "doc_number": "BILL-5008",
+            "vendor_id": "vend-materials",
+            "vendor_name": "Ironclad Fulfillment Co.",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-26",
+            "due_date": "2025-11-25",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-inventory",
+                "account_name": "Inventory Asset",
+                "description": "materials on the job (materials).",
+                "amount": "1339.12"
+              }
+            ],
+            "total_amount": "1339.12",
+            "project_id": "proj-00001",
+            "cost_category": "materials",
+            "memo": "Materials charged by the provider."
+          },
+          "memo": "Processed for review; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00023",
+            "doc_number": "BILL-5008",
+            "vendor_id": "vend-materials",
+            "vendor_name": "Ironclad Fulfillment Co.",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-26",
+            "due_date": "2025-11-25",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-inventory",
+                "account_name": "Inventory Asset",
+                "description": "Miscellaneous",
+                "amount": "1339.12"
+              }
+            ],
+            "total_amount": "1339.12",
+            "project_id": "proj-00001",
+            "cost_category": "materials",
+            "memo": "Processed for review; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00024",
+          "date": "2025-10-27",
+          "vendor": "Pemberton Holdings LLC",
+          "description": "Monthly charge",
+          "item_names": [],
+          "accounts": [
+            "Rent and Lease"
+          ],
+          "amount_cents": 50000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-landlord",
+            "display_name": "Pemberton Holdings LLC",
+            "company_name": "Pemberton Holdings LLC",
+            "contact_given_name": "Amara",
+            "contact_family_name": "Halvorsen",
+            "email": "amara.halvorsen@pembertonholdingsllc.example",
+            "phone": "(555) 875-0515",
+            "address": {
+              "line1": "2701 Ventwell Road",
+              "city": "Boise",
+              "state": "ID",
+              "postal_code": "83717",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "premises",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00471",
+              "vendor_id": "vend-landlord",
+              "vendor_name": "Pemberton Holdings LLC",
+              "txn_date": "2025-11-26",
+              "amount": "500.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00024",
+                  "amount": "500.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 50000,
+          "original_source_bill": {
+            "id": "pbill-00024",
+            "doc_number": "BILL-5009",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-27",
+            "due_date": "2025-11-26",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "Premises rent (premises).",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Premises charged by the provider."
+          },
+          "memo": "Processed for review; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00024",
+            "doc_number": "BILL-5009",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-27",
+            "due_date": "2025-11-26",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "Monthly charge",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Processed for review; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00025",
+          "date": "2025-10-27",
+          "vendor": "Quintero Quilting LLC",
+          "description": "Vendor services",
+          "item_names": [],
+          "accounts": [
+            "Legal and Professional Fees"
+          ],
+          "amount_cents": 25000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-estimator",
+            "display_name": "Quintero Quilting LLC",
+            "company_name": "Quintero Quilting LLC",
+            "contact_given_name": "Pascal",
+            "contact_family_name": "Oyelaran",
+            "email": "pascal.oyelaran@quinteroquiltingllc.example",
+            "phone": "(555) 724-9760",
+            "address": {
+              "line1": "8584 Drayman Court",
+              "city": "Lubbock",
+              "state": "TX",
+              "postal_code": "79405",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00472",
+              "vendor_id": "vend-estimator",
+              "vendor_name": "Quintero Quilting LLC",
+              "txn_date": "2025-11-26",
+              "amount": "250.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00025",
+                  "amount": "250.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 25000,
+          "original_source_bill": {
+            "id": "pbill-00025",
+            "doc_number": "BILL-5010",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-27",
+            "due_date": "2025-11-26",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "External estimating on a bid (estimating_service).",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Estimating service charged by the provider."
+          },
+          "memo": "Processed for review; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00025",
+            "doc_number": "BILL-5010",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-27",
+            "due_date": "2025-11-26",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "Vendor services",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Processed for review; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00027",
+          "date": "2025-10-28",
+          "vendor": "City of Hollyhock",
+          "description": "Purchase",
+          "item_names": [],
+          "accounts": [
+            "Taxes and Licenses"
+          ],
+          "amount_cents": 100000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-government",
+            "display_name": "City of Hollyhock",
+            "company_name": "City of Hollyhock",
+            "contact_given_name": "Kaveh",
+            "contact_family_name": "Cavanaugh",
+            "email": "kaveh.cavanaugh@cityofhollyhock.example",
+            "phone": "(555) 763-6144",
+            "address": {
+              "line1": "2279 Kraftpaper Way",
+              "city": "Mobile",
+              "state": "AL",
+              "postal_code": "36656",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "government",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": {
+            "id": "proj-00002",
+            "name": "Renovation for Foxglove Pioneer Quilting Group",
+            "customer_id": "cust-client-2",
+            "customer_name": "Foxglove Pioneer Quilting Group",
+            "project_kind": "renovation",
+            "contract_amount": "132000.00",
+            "original_contract_amount": "132000.00",
+            "change_orders": [],
+            "started_date": "2025-10-21",
+            "planned_finish_sim_day": 156,
+            "planned_finish_date": "2026-03-11",
+            "reschedules": [],
+            "completed_date": "2026-04-03",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00487",
+              "vendor_id": "vend-government",
+              "vendor_name": "City of Hollyhock",
+              "txn_date": "2025-11-27",
+              "amount": "1000.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00027",
+                  "amount": "1000.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 100000,
+          "original_source_bill": {
+            "id": "pbill-00027",
+            "doc_number": "BILL-5011",
+            "vendor_id": "vend-government",
+            "vendor_name": "City of Hollyhock",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-28",
+            "due_date": "2025-11-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-permits",
+                "account_name": "Taxes and Licenses",
+                "description": "Statutory permit and licence fees (permit).",
+                "amount": "1000.00"
+              }
+            ],
+            "total_amount": "1000.00",
+            "project_id": "proj-00002",
+            "cost_category": "permit",
+            "memo": "Permit charged by the provider."
+          },
+          "memo": "Processed for review; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00027",
+            "doc_number": "BILL-5011",
+            "vendor_id": "vend-government",
+            "vendor_name": "City of Hollyhock",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-28",
+            "due_date": "2025-11-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-permits",
+                "account_name": "Taxes and Licenses",
+                "description": "Purchase",
+                "amount": "1000.00"
+              }
+            ],
+            "total_amount": "1000.00",
+            "project_id": "proj-00002",
+            "cost_category": "permit",
+            "memo": "Processed for review; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00028",
+          "date": "2025-10-28",
+          "vendor": "Keaton & Sons Works",
+          "description": "Invoice attached",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 66100,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00488",
+              "vendor_id": "vend-equipment-vendor",
+              "vendor_name": "Keaton & Sons Works",
+              "txn_date": "2025-11-27",
+              "amount": "661.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00028",
+                  "amount": "661.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 66100,
+          "original_source_bill": {
+            "id": "pbill-00028",
+            "doc_number": "BILL-5012",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-28",
+            "due_date": "2025-11-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "project_equipment_rental on the job (project_equipment_rental).",
+                "amount": "661.00"
+              }
+            ],
+            "total_amount": "661.00",
+            "project_id": "proj-00001",
+            "cost_category": "project_equipment_rental",
+            "memo": "Project equipment rental charged by the provider."
+          },
+          "memo": "Processed for review; see supporting document.",
+          "source_bill": {
+            "id": "pbill-00028",
+            "doc_number": "BILL-5012",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-28",
+            "due_date": "2025-11-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "Invoice attached",
+                "amount": "661.00"
+              }
+            ],
+            "total_amount": "661.00",
+            "project_id": "proj-00001",
+            "cost_category": "project_equipment_rental",
+            "memo": "Processed for review; see supporting document."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00029",
+          "date": "2025-10-28",
+          "vendor": "Copper Sitework Services",
+          "description": "Rental of a compact excavator for seven days; equipment returned after use.",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 46702,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-sitework",
+            "display_name": "Copper Sitework Services",
+            "company_name": "Copper Sitework Services",
+            "contact_given_name": "Eleni",
+            "contact_family_name": "Oyelaran",
+            "email": "eleni.oyelaran@coppersiteworkservices.example",
+            "phone": "(555) 233-3071",
+            "address": {
+              "line1": "3087 Inkhouse Street",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "subcontract",
+            "joined_sim_day": 22,
+            "joined_date": "2025-10-28"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00489",
+              "vendor_id": "vend-sitework",
+              "vendor_name": "Copper Sitework Services",
+              "txn_date": "2025-11-27",
+              "amount": "467.02",
+              "applications": [
+                {
+                  "document_id": "pbill-00029",
+                  "amount": "467.02"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 46702,
+          "original_source_bill": {
+            "id": "pbill-00029",
+            "doc_number": "BILL-5013",
+            "vendor_id": "vend-sitework",
+            "vendor_name": "Copper Sitework Services",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-28",
+            "due_date": "2025-11-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "subcontract on the job (subcontract).",
+                "amount": "467.02"
+              }
+            ],
+            "total_amount": "467.02",
+            "project_id": "proj-00001",
+            "cost_category": "subcontract",
+            "memo": "Subcontract charged by the provider."
+          },
+          "memo": "Outright purchase of the excavator; ownership transferred to our company.",
+          "source_bill": {
+            "id": "pbill-00029",
+            "doc_number": "BILL-5013",
+            "vendor_id": "vend-sitework",
+            "vendor_name": "Copper Sitework Services",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-28",
+            "due_date": "2025-11-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "Rental of a compact excavator for seven days; equipment returned after use.",
+                "amount": "467.02"
+              }
+            ],
+            "total_amount": "467.02",
+            "project_id": "proj-00001",
+            "cost_category": "subcontract",
+            "memo": "Outright purchase of the excavator; ownership transferred to our company."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00031",
+          "date": "2025-10-29",
+          "vendor": "Keaton & Sons Works",
+          "description": "Roofing subcontract labor: replace shingles and roof flashing.",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 36100,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00499",
+              "vendor_id": "vend-equipment-vendor",
+              "vendor_name": "Keaton & Sons Works",
+              "txn_date": "2025-11-28",
+              "amount": "361.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00031",
+                  "amount": "361.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 36100,
+          "original_source_bill": {
+            "id": "pbill-00031",
+            "doc_number": "BILL-5014",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-29",
+            "due_date": "2025-11-28",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "project_equipment_rental on the job (project_equipment_rental).",
+                "amount": "361.00"
+              }
+            ],
+            "total_amount": "361.00",
+            "project_id": "proj-00001",
+            "cost_category": "project_equipment_rental",
+            "memo": "Project equipment rental charged by the provider."
+          },
+          "memo": "Landscaping labor only; no roofing work performed.",
+          "source_bill": {
+            "id": "pbill-00031",
+            "doc_number": "BILL-5014",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-29",
+            "due_date": "2025-11-28",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "Roofing subcontract labor: replace shingles and roof flashing.",
+                "amount": "361.00"
+              }
+            ],
+            "total_amount": "361.00",
+            "project_id": "proj-00001",
+            "cost_category": "project_equipment_rental",
+            "memo": "Landscaping labor only; no roofing work performed."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00032",
+          "date": "2025-10-29",
+          "vendor": "Copper Sitework Services",
+          "description": "Materials delivered exclusively to the Oak Street renovation.",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 46702,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-sitework",
+            "display_name": "Copper Sitework Services",
+            "company_name": "Copper Sitework Services",
+            "contact_given_name": "Eleni",
+            "contact_family_name": "Oyelaran",
+            "email": "eleni.oyelaran@coppersiteworkservices.example",
+            "phone": "(555) 233-3071",
+            "address": {
+              "line1": "3087 Inkhouse Street",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "subcontract",
+            "joined_sim_day": 22,
+            "joined_date": "2025-10-28"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00500",
+              "vendor_id": "vend-sitework",
+              "vendor_name": "Copper Sitework Services",
+              "txn_date": "2025-11-28",
+              "amount": "467.02",
+              "applications": [
+                {
+                  "document_id": "pbill-00032",
+                  "amount": "467.02"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 46702,
+          "original_source_bill": {
+            "id": "pbill-00032",
+            "doc_number": "BILL-5015",
+            "vendor_id": "vend-sitework",
+            "vendor_name": "Copper Sitework Services",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-29",
+            "due_date": "2025-11-28",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "subcontract on the job (subcontract).",
+                "amount": "467.02"
+              }
+            ],
+            "total_amount": "467.02",
+            "project_id": "proj-00001",
+            "cost_category": "subcontract",
+            "memo": "Subcontract charged by the provider."
+          },
+          "memo": "All materials delivered exclusively to the Pine Avenue renovation; none for Oak Street.",
+          "source_bill": {
+            "id": "pbill-00032",
+            "doc_number": "BILL-5015",
+            "vendor_id": "vend-sitework",
+            "vendor_name": "Copper Sitework Services",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-29",
+            "due_date": "2025-11-28",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "Materials delivered exclusively to the Oak Street renovation.",
+                "amount": "467.02"
+              }
+            ],
+            "total_amount": "467.02",
+            "project_id": "proj-00001",
+            "cost_category": "subcontract",
+            "memo": "All materials delivered exclusively to the Pine Avenue renovation; none for Oak Street."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00034",
+          "date": "2025-10-30",
+          "vendor": "Copper Sitework Services",
+          "description": "Equipment servicing for September only; no other period included.",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 46702,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-sitework",
+            "display_name": "Copper Sitework Services",
+            "company_name": "Copper Sitework Services",
+            "contact_given_name": "Eleni",
+            "contact_family_name": "Oyelaran",
+            "email": "eleni.oyelaran@coppersiteworkservices.example",
+            "phone": "(555) 233-3071",
+            "address": {
+              "line1": "3087 Inkhouse Street",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "subcontract",
+            "joined_sim_day": 22,
+            "joined_date": "2025-10-28"
+          },
+          "project_record": {
+            "id": "proj-00001",
+            "name": "Landscaping for Dubois Toyworks Inc.",
+            "customer_id": "cust-client-1",
+            "customer_name": "Dubois Toyworks Inc.",
+            "project_kind": "landscaping",
+            "contract_amount": "22496.25",
+            "original_contract_amount": "22496.25",
+            "change_orders": [],
+            "started_date": "2025-10-06",
+            "planned_finish_sim_day": 54,
+            "planned_finish_date": "2025-11-29",
+            "reschedules": [],
+            "completed_date": "2025-12-11",
+            "status": "completed"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-00509",
+              "vendor_id": "vend-sitework",
+              "vendor_name": "Copper Sitework Services",
+              "txn_date": "2025-11-29",
+              "amount": "467.02",
+              "applications": [
+                {
+                  "document_id": "pbill-00034",
+                  "amount": "467.02"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 46702,
+          "original_source_bill": {
+            "id": "pbill-00034",
+            "doc_number": "BILL-5016",
+            "vendor_id": "vend-sitework",
+            "vendor_name": "Copper Sitework Services",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-30",
+            "due_date": "2025-11-29",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "subcontract on the job (subcontract).",
+                "amount": "467.02"
+              }
+            ],
+            "total_amount": "467.02",
+            "project_id": "proj-00001",
+            "cost_category": "subcontract",
+            "memo": "Subcontract charged by the provider."
+          },
+          "memo": "This bill covers October servicing only, not September.",
+          "source_bill": {
+            "id": "pbill-00034",
+            "doc_number": "BILL-5016",
+            "vendor_id": "vend-sitework",
+            "vendor_name": "Copper Sitework Services",
+            "expense_kind": "operating",
+            "txn_date": "2025-10-30",
+            "due_date": "2025-11-29",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "Equipment servicing for September only; no other period included.",
+                "amount": "467.02"
+              }
+            ],
+            "total_amount": "467.02",
+            "project_id": "proj-00001",
+            "cost_category": "subcontract",
+            "memo": "This bill covers October servicing only, not September."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00041",
+          "date": "2025-11-04",
+          "vendor": "Rasmussen Insurance Agency",
+          "description": "Repair existing hydraulic pump; no new equipment supplied.",
+          "item_names": [],
+          "accounts": [
+            "Insurance"
+          ],
+          "amount_cents": 69041,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-insurer",
+            "display_name": "Rasmussen Insurance Agency",
+            "company_name": "Rasmussen Insurance Agency",
+            "contact_given_name": "Gideon",
+            "contact_family_name": "Karlsen",
+            "email": "gideon.karlsen@rasmusseninsuranceagency.example",
+            "phone": "(555) 332-7457",
+            "address": {
+              "line1": "377 Hoist Street",
+              "city": "Lincoln",
+              "state": "NE",
+              "postal_code": "68545",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "insurance",
+            "joined_sim_day": 29,
+            "joined_date": "2025-11-04"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00557",
+              "vendor_id": "vend-insurer",
+              "vendor_name": "Rasmussen Insurance Agency",
+              "txn_date": "2025-12-04",
+              "amount": "690.41",
+              "applications": [
+                {
+                  "document_id": "pbill-00041",
+                  "amount": "690.41"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 69041,
+          "original_source_bill": {
+            "id": "pbill-00041",
+            "doc_number": "BILL-5019",
+            "vendor_id": "vend-insurer",
+            "vendor_name": "Rasmussen Insurance Agency",
+            "expense_kind": "operating",
+            "txn_date": "2025-11-04",
+            "due_date": "2025-12-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-insurance",
+                "account_name": "Insurance",
+                "description": "Business and project insurance (insurance).",
+                "amount": "690.41"
+              }
+            ],
+            "total_amount": "690.41",
+            "project_id": null,
+            "cost_category": "insurance",
+            "memo": "Insurance charged by the provider."
+          },
+          "memo": "Purchase of a new replacement pump; no repair services included.",
+          "source_bill": {
+            "id": "pbill-00041",
+            "doc_number": "BILL-5019",
+            "vendor_id": "vend-insurer",
+            "vendor_name": "Rasmussen Insurance Agency",
+            "expense_kind": "operating",
+            "txn_date": "2025-11-04",
+            "due_date": "2025-12-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-insurance",
+                "account_name": "Insurance",
+                "description": "Repair existing hydraulic pump; no new equipment supplied.",
+                "amount": "690.41"
+              }
+            ],
+            "total_amount": "690.41",
+            "project_id": null,
+            "cost_category": "insurance",
+            "memo": "Purchase of a new replacement pump; no repair services included."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00042",
+          "date": "2025-11-04",
+          "vendor": "Underwood Power & Light",
+          "description": "Licensed electrician labor only; all materials supplied by us.",
+          "item_names": [],
+          "accounts": [
+            "Utilities"
+          ],
+          "amount_cents": 66500,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-utilities",
+            "display_name": "Underwood Power & Light",
+            "company_name": "Underwood Power & Light",
+            "contact_given_name": "Wren",
+            "contact_family_name": "Eriksdottir",
+            "email": "wren.eriksdottir@underwoodpowerlight.example",
+            "phone": "(555) 920-9530",
+            "address": {
+              "line1": "6310 Strapping Lane",
+              "city": "Davenport",
+              "state": "IA",
+              "postal_code": "52803",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "utility",
+            "joined_sim_day": 29,
+            "joined_date": "2025-11-04"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00558",
+              "vendor_id": "vend-utilities",
+              "vendor_name": "Underwood Power & Light",
+              "txn_date": "2025-12-04",
+              "amount": "665.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00042",
+                  "amount": "665.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 66500,
+          "original_source_bill": {
+            "id": "pbill-00042",
+            "doc_number": "BILL-5020",
+            "vendor_id": "vend-utilities",
+            "vendor_name": "Underwood Power & Light",
+            "expense_kind": "operating",
+            "txn_date": "2025-11-04",
+            "due_date": "2025-12-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-utilities",
+                "account_name": "Utilities",
+                "description": "Metered electricity and water (utilities).",
+                "amount": "665.00"
+              }
+            ],
+            "total_amount": "665.00",
+            "project_id": null,
+            "cost_category": "utilities",
+            "memo": "Utilities charged by the provider."
+          },
+          "memo": "Materials only; no labor or installation services included.",
+          "source_bill": {
+            "id": "pbill-00042",
+            "doc_number": "BILL-5020",
+            "vendor_id": "vend-utilities",
+            "vendor_name": "Underwood Power & Light",
+            "expense_kind": "operating",
+            "txn_date": "2025-11-04",
+            "due_date": "2025-12-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-utilities",
+                "account_name": "Utilities",
+                "description": "Licensed electrician labor only; all materials supplied by us.",
+                "amount": "665.00"
+              }
+            ],
+            "total_amount": "665.00",
+            "project_id": null,
+            "cost_category": "utilities",
+            "memo": "Materials only; no labor or installation services included."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00043",
+          "date": "2025-11-05",
+          "vendor": "Keaton & Sons Works",
+          "description": "Monthly rent for the company workshop and storage unit.",
+          "item_names": [],
+          "accounts": [
+            "Repairs and Maintenance"
+          ],
+          "amount_cents": 10000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-00571",
+              "vendor_id": "vend-equipment-vendor",
+              "vendor_name": "Keaton & Sons Works",
+              "txn_date": "2025-12-05",
+              "amount": "100.00",
+              "applications": [
+                {
+                  "document_id": "pbill-00043",
+                  "amount": "100.00"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 10000,
+          "original_source_bill": {
+            "id": "pbill-00043",
+            "doc_number": "BILL-5021",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-11-05",
+            "due_date": "2025-12-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-repairs",
+                "account_name": "Repairs and Maintenance",
+                "description": "Servicing of owned equipment (equipment_maintenance).",
+                "amount": "100.00"
+              }
+            ],
+            "total_amount": "100.00",
+            "project_id": null,
+            "cost_category": "equipment_maintenance",
+            "memo": "Equipment maintenance charged by the provider."
+          },
+          "memo": "Workshop and storage rent for the period.",
+          "source_bill": {
+            "id": "pbill-00043",
+            "doc_number": "BILL-5021",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2025-11-05",
+            "due_date": "2025-12-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-repairs",
+                "account_name": "Repairs and Maintenance",
+                "description": "Monthly rent for the company workshop and storage unit.",
+                "amount": "100.00"
+              }
+            ],
+            "total_amount": "100.00",
+            "project_id": null,
+            "cost_category": "equipment_maintenance",
+            "memo": "Workshop and storage rent for the period."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00444",
+          "date": "2026-04-04",
+          "vendor": "Keaton & Sons Works",
+          "description": "Metered electricity supplied to the business workshop.",
+          "item_names": [],
+          "accounts": [
+            "Equipment"
+          ],
+          "amount_cents": 377520,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [
+            {
+              "id": "ppmt-02773",
+              "vendor_id": "vend-equipment-vendor",
+              "vendor_name": "Keaton & Sons Works",
+              "txn_date": "2026-05-04",
+              "amount": "3775.20",
+              "applications": [
+                {
+                  "document_id": "pbill-00444",
+                  "amount": "3775.20"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 377520,
+          "original_source_bill": {
+            "id": "pbill-00444",
+            "doc_number": "BILL-5314",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2026-04-04",
+            "due_date": "2026-05-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-equipment",
+                "account_name": "Equipment",
+                "description": "project_owned_equipment on the job (project_owned_equipment).",
+                "amount": "3775.20"
+              }
+            ],
+            "total_amount": "3775.20",
+            "project_id": null,
+            "cost_category": "project_owned_equipment",
+            "memo": "Project owned equipment charged by the provider."
+          },
+          "memo": "Workshop electricity charges.",
+          "source_bill": {
+            "id": "pbill-00444",
+            "doc_number": "BILL-5314",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2026-04-04",
+            "due_date": "2026-05-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-equipment",
+                "account_name": "Equipment",
+                "description": "Metered electricity supplied to the business workshop.",
+                "amount": "3775.20"
+              }
+            ],
+            "total_amount": "3775.20",
+            "project_id": null,
+            "cost_category": "project_owned_equipment",
+            "memo": "Workshop electricity charges."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00775",
+          "date": "2026-08-28",
+          "vendor": "Keaton & Sons Works",
+          "description": "External estimator prepared a bid for a kitchen renovation.",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 18050,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": {
+            "id": "proj-00006",
+            "name": "New home for Keystone Supply Partners",
+            "customer_id": "cust-client-6",
+            "customer_name": "Keystone Supply Partners",
+            "project_kind": "new home",
+            "contract_amount": "512668.60",
+            "original_contract_amount": "512668.60",
+            "change_orders": [],
+            "started_date": "2026-07-27",
+            "planned_finish_sim_day": 506,
+            "planned_finish_date": "2027-02-24",
+            "reschedules": [],
+            "completed_date": null,
+            "status": "active"
+          },
+          "payment_records": [
+            {
+              "id": "ppmt-04802",
+              "vendor_id": "vend-equipment-vendor",
+              "vendor_name": "Keaton & Sons Works",
+              "txn_date": "2026-09-27",
+              "amount": "180.50",
+              "applications": [
+                {
+                  "document_id": "pbill-00775",
+                  "amount": "180.50"
+                }
+              ],
+              "payment_account_id": "acct-checking",
+              "memo": "Provider bill paid."
+            }
+          ],
+          "paid_to_observation_date_cents": 18050,
+          "original_source_bill": {
+            "id": "pbill-00775",
+            "doc_number": "BILL-5541",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2026-08-28",
+            "due_date": "2026-09-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "project_equipment_rental on the job (project_equipment_rental).",
+                "amount": "180.50"
+              }
+            ],
+            "total_amount": "180.50",
+            "project_id": "proj-00006",
+            "cost_category": "project_equipment_rental",
+            "memo": "Project equipment rental charged by the provider."
+          },
+          "memo": "Fee for preparing the kitchen-renovation estimate.",
+          "source_bill": {
+            "id": "pbill-00775",
+            "doc_number": "BILL-5541",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2026-08-28",
+            "due_date": "2026-09-27",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "External estimator prepared a bid for a kitchen renovation.",
+                "amount": "180.50"
+              }
+            ],
+            "total_amount": "180.50",
+            "project_id": "proj-00006",
+            "cost_category": "project_equipment_rental",
+            "memo": "Fee for preparing the kitchen-renovation estimate."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00829",
+          "date": "2026-09-26",
+          "vendor": "Ironclad Fulfillment Co.",
+          "description": "Servicing of the company-owned compact excavator, including oil change.",
+          "item_names": [],
+          "accounts": [
+            "Inventory Asset"
+          ],
+          "amount_cents": 4884582,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-materials",
+            "display_name": "Ironclad Fulfillment Co.",
+            "company_name": "Ironclad Fulfillment Co.",
+            "contact_given_name": "Quentin",
+            "contact_family_name": "Gustafsson",
+            "email": "quentin.gustafsson@ironcladfulfillmentco.example",
+            "phone": "(555) 997-2256",
+            "address": {
+              "line1": "7498 Brickworks Road",
+              "city": "Chattanooga",
+              "state": "TN",
+              "postal_code": "37421",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 20,
+            "joined_date": "2025-10-26"
+          },
+          "project_record": {
+            "id": "proj-00006",
+            "name": "New home for Keystone Supply Partners",
+            "customer_id": "cust-client-6",
+            "customer_name": "Keystone Supply Partners",
+            "project_kind": "new home",
+            "contract_amount": "512668.60",
+            "original_contract_amount": "512668.60",
+            "change_orders": [],
+            "started_date": "2026-07-27",
+            "planned_finish_sim_day": 506,
+            "planned_finish_date": "2027-02-24",
+            "reschedules": [],
+            "completed_date": null,
+            "status": "active"
+          },
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00829",
+            "doc_number": "BILL-5574",
+            "vendor_id": "vend-materials",
+            "vendor_name": "Ironclad Fulfillment Co.",
+            "expense_kind": "operating",
+            "txn_date": "2026-09-26",
+            "due_date": "2026-10-26",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-inventory",
+                "account_name": "Inventory Asset",
+                "description": "materials on the job (materials).",
+                "amount": "48845.82"
+              }
+            ],
+            "total_amount": "48845.82",
+            "project_id": "proj-00006",
+            "cost_category": "materials",
+            "memo": "Materials charged by the provider."
+          },
+          "memo": "Excavator oil change and scheduled servicing.",
+          "source_bill": {
+            "id": "pbill-00829",
+            "doc_number": "BILL-5574",
+            "vendor_id": "vend-materials",
+            "vendor_name": "Ironclad Fulfillment Co.",
+            "expense_kind": "operating",
+            "txn_date": "2026-09-26",
+            "due_date": "2026-10-26",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-inventory",
+                "account_name": "Inventory Asset",
+                "description": "Servicing of the company-owned compact excavator, including oil change.",
+                "amount": "48845.82"
+              }
+            ],
+            "total_amount": "48845.82",
+            "project_id": "proj-00006",
+            "cost_category": "materials",
+            "memo": "Excavator oil change and scheduled servicing."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00831",
+          "date": "2026-09-28",
+          "vendor": "Quintero Quilting LLC",
+          "description": "Equipment rental for a customer renovation; no ownership transfer.",
+          "item_names": [],
+          "accounts": [
+            "Legal and Professional Fees"
+          ],
+          "amount_cents": 25000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-estimator",
+            "display_name": "Quintero Quilting LLC",
+            "company_name": "Quintero Quilting LLC",
+            "contact_given_name": "Pascal",
+            "contact_family_name": "Oyelaran",
+            "email": "pascal.oyelaran@quinteroquiltingllc.example",
+            "phone": "(555) 724-9760",
+            "address": {
+              "line1": "8584 Drayman Court",
+              "city": "Lubbock",
+              "state": "TX",
+              "postal_code": "79405",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00831",
+            "doc_number": "BILL-5576",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2026-09-28",
+            "due_date": "2026-10-28",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "External estimating on a bid (estimating_service).",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Estimating service charged by the provider."
+          },
+          "memo": "Temporary equipment hire for the renovation.",
+          "source_bill": {
+            "id": "pbill-00831",
+            "doc_number": "BILL-5576",
+            "vendor_id": "vend-estimator",
+            "vendor_name": "Quintero Quilting LLC",
+            "expense_kind": "operating",
+            "txn_date": "2026-09-28",
+            "due_date": "2026-10-28",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-professional-fees",
+                "account_name": "Legal and Professional Fees",
+                "description": "Equipment rental for a customer renovation; no ownership transfer.",
+                "amount": "250.00"
+              }
+            ],
+            "total_amount": "250.00",
+            "project_id": null,
+            "cost_category": "estimating_service",
+            "memo": "Temporary equipment hire for the renovation."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00843",
+          "date": "2026-10-01",
+          "vendor": "Keaton & Sons Works",
+          "description": "Lumber and fasteners supplied for a customer construction project.",
+          "item_names": [],
+          "accounts": [
+            "Repairs and Maintenance"
+          ],
+          "amount_cents": 11258,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-equipment-vendor",
+            "display_name": "Keaton & Sons Works",
+            "company_name": "Keaton & Sons Works",
+            "contact_given_name": "Zora",
+            "contact_family_name": "Hawthorne",
+            "email": "zora.hawthorne@keatonsonsworks.example",
+            "phone": "(555) 605-5089",
+            "address": {
+              "line1": "6081 Ventwell Road",
+              "city": "Spokane",
+              "state": "WA",
+              "postal_code": "99200",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "operating",
+            "joined_sim_day": 0,
+            "joined_date": "2025-10-06"
+          },
+          "project_record": null,
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00843",
+            "doc_number": "BILL-5585",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-01",
+            "due_date": "2026-10-31",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-repairs",
+                "account_name": "Repairs and Maintenance",
+                "description": "Servicing of owned equipment (equipment_maintenance).",
+                "amount": "112.58"
+              }
+            ],
+            "total_amount": "112.58",
+            "project_id": null,
+            "cost_category": "equipment_maintenance",
+            "memo": "Equipment maintenance charged by the provider."
+          },
+          "memo": "Construction materials: lumber and fasteners.",
+          "source_bill": {
+            "id": "pbill-00843",
+            "doc_number": "BILL-5585",
+            "vendor_id": "vend-equipment-vendor",
+            "vendor_name": "Keaton & Sons Works",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-01",
+            "due_date": "2026-10-31",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-repairs",
+                "account_name": "Repairs and Maintenance",
+                "description": "Lumber and fasteners supplied for a customer construction project.",
+                "amount": "112.58"
+              }
+            ],
+            "total_amount": "112.58",
+            "project_id": null,
+            "cost_category": "equipment_maintenance",
+            "memo": "Construction materials: lumber and fasteners."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00849",
+          "date": "2026-10-05",
+          "vendor": "Pemberton Holdings LLC",
+          "description": "General liability insurance premium for the business.",
+          "item_names": [],
+          "accounts": [
+            "Rent and Lease"
+          ],
+          "amount_cents": 50000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-landlord",
+            "display_name": "Pemberton Holdings LLC",
+            "company_name": "Pemberton Holdings LLC",
+            "contact_given_name": "Amara",
+            "contact_family_name": "Halvorsen",
+            "email": "amara.halvorsen@pembertonholdingsllc.example",
+            "phone": "(555) 875-0515",
+            "address": {
+              "line1": "2701 Ventwell Road",
+              "city": "Boise",
+              "state": "ID",
+              "postal_code": "83717",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "premises",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": null,
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00849",
+            "doc_number": "BILL-5589",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-05",
+            "due_date": "2026-11-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "Premises rent (premises).",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Premises charged by the provider."
+          },
+          "memo": "Business general liability coverage.",
+          "source_bill": {
+            "id": "pbill-00849",
+            "doc_number": "BILL-5589",
+            "vendor_id": "vend-landlord",
+            "vendor_name": "Pemberton Holdings LLC",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-05",
+            "due_date": "2026-11-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-rent",
+                "account_name": "Rent and Lease",
+                "description": "General liability insurance premium for the business.",
+                "amount": "500.00"
+              }
+            ],
+            "total_amount": "500.00",
+            "project_id": null,
+            "cost_category": "premises",
+            "memo": "Business general liability coverage."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00850",
+          "date": "2026-10-05",
+          "vendor": "City of Hollyhock",
+          "description": "Local authority permit fee for a customer construction project.",
+          "item_names": [],
+          "accounts": [
+            "Taxes and Licenses"
+          ],
+          "amount_cents": 100000,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-government",
+            "display_name": "City of Hollyhock",
+            "company_name": "City of Hollyhock",
+            "contact_given_name": "Kaveh",
+            "contact_family_name": "Cavanaugh",
+            "email": "kaveh.cavanaugh@cityofhollyhock.example",
+            "phone": "(555) 763-6144",
+            "address": {
+              "line1": "2279 Kraftpaper Way",
+              "city": "Mobile",
+              "state": "AL",
+              "postal_code": "36656",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "government",
+            "joined_sim_day": 7,
+            "joined_date": "2025-10-13"
+          },
+          "project_record": {
+            "id": "proj-00007",
+            "name": "Landscaping for Lindqvist & Daughters Roasters",
+            "customer_id": "cust-client-7",
+            "customer_name": "Lindqvist & Daughters Roasters",
+            "project_kind": "landscaping",
+            "contract_amount": "28889.29",
+            "original_contract_amount": "28889.29",
+            "change_orders": [],
+            "started_date": "2026-09-28",
+            "planned_finish_sim_day": 417,
+            "planned_finish_date": "2026-11-27",
+            "reschedules": [],
+            "completed_date": null,
+            "status": "active"
+          },
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00850",
+            "doc_number": "BILL-5590",
+            "vendor_id": "vend-government",
+            "vendor_name": "City of Hollyhock",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-05",
+            "due_date": "2026-11-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-permits",
+                "account_name": "Taxes and Licenses",
+                "description": "Statutory permit and licence fees (permit).",
+                "amount": "1000.00"
+              }
+            ],
+            "total_amount": "1000.00",
+            "project_id": "proj-00007",
+            "cost_category": "permit",
+            "memo": "Permit charged by the provider."
+          },
+          "memo": "Construction permit issued by the local authority.",
+          "source_bill": {
+            "id": "pbill-00850",
+            "doc_number": "BILL-5590",
+            "vendor_id": "vend-government",
+            "vendor_name": "City of Hollyhock",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-05",
+            "due_date": "2026-11-04",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-permits",
+                "account_name": "Taxes and Licenses",
+                "description": "Local authority permit fee for a customer construction project.",
+                "amount": "1000.00"
+              }
+            ],
+            "total_amount": "1000.00",
+            "project_id": "proj-00007",
+            "cost_category": "permit",
+            "memo": "Construction permit issued by the local authority."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00854",
+          "date": "2026-10-05",
+          "vendor": "Eastgate County Treasurer",
+          "description": "Plumbing subcontract labor to install bathroom fixtures.",
+          "item_names": [],
+          "accounts": [
+            "Income Tax Expense"
+          ],
+          "amount_cents": 1241930,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-income-tax-authority",
+            "display_name": "Eastgate County Treasurer",
+            "company_name": "Eastgate County Treasurer",
+            "contact_given_name": "Lucia",
+            "contact_family_name": "Paredes",
+            "email": "lucia.paredes@eastgatecountytreasurer.example",
+            "phone": "(555) 602-4601",
+            "address": {
+              "line1": "3082 Toolhouse Way",
+              "city": "Davenport",
+              "state": "IA",
+              "postal_code": "52807",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "government",
+            "joined_sim_day": 364,
+            "joined_date": "2026-10-05"
+          },
+          "project_record": null,
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00854",
+            "doc_number": "BILL-5593",
+            "vendor_id": "vend-income-tax-authority",
+            "vendor_name": "Eastgate County Treasurer",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-05",
+            "due_date": "2027-01-03",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-income-tax",
+                "account_name": "Income Tax Expense",
+                "description": "income_tax on the job (income_tax).",
+                "amount": "12419.30"
+              }
+            ],
+            "total_amount": "12419.30",
+            "project_id": null,
+            "cost_category": "income_tax",
+            "memo": "Income tax charged by the provider."
+          },
+          "memo": "Bathroom fixture installation labor.",
+          "source_bill": {
+            "id": "pbill-00854",
+            "doc_number": "BILL-5593",
+            "vendor_id": "vend-income-tax-authority",
+            "vendor_name": "Eastgate County Treasurer",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-05",
+            "due_date": "2027-01-03",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-income-tax",
+                "account_name": "Income Tax Expense",
+                "description": "Plumbing subcontract labor to install bathroom fixtures.",
+                "amount": "12419.30"
+              }
+            ],
+            "total_amount": "12419.30",
+            "project_id": null,
+            "cost_category": "income_tax",
+            "memo": "Bathroom fixture installation labor."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00855",
+          "date": "2026-10-06",
+          "vendor": "Underwood Evergreen Plumbing",
+          "description": "Purchase of a company-owned table saw for workshop use.",
+          "item_names": [],
+          "accounts": [
+            "Work in Progress"
+          ],
+          "amount_cents": 209514,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-plumbing",
+            "display_name": "Underwood Evergreen Plumbing",
+            "company_name": "Underwood Evergreen Plumbing",
+            "contact_given_name": "Odette",
+            "contact_family_name": "Lindholm",
+            "email": "odette.lindholm@underwoodevergreenplumbi.example",
+            "phone": "(555) 866-8306",
+            "address": {
+              "line1": "1546 Brickworks Road",
+              "city": "Eugene",
+              "state": "OR",
+              "postal_code": "97427",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "subcontract",
+            "joined_sim_day": 94,
+            "joined_date": "2026-01-08"
+          },
+          "project_record": {
+            "id": "proj-00005",
+            "name": "New home for Yarrow Field Confections Inc.",
+            "customer_id": "cust-client-5",
+            "customer_name": "Yarrow Field Confections Inc.",
+            "project_kind": "new home",
+            "contract_amount": "710620.29",
+            "original_contract_amount": "650472.67",
+            "change_orders": [
+              {
+                "date": "2026-05-16",
+                "amount": "42967.22"
+              },
+              {
+                "date": "2026-08-28",
+                "amount": "17180.40"
+              }
+            ],
+            "started_date": "2026-03-23",
+            "planned_finish_sim_day": 431,
+            "planned_finish_date": "2026-12-11",
+            "reschedules": [],
+            "completed_date": null,
+            "status": "active"
+          },
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00855",
+            "doc_number": "BILL-5594",
+            "vendor_id": "vend-plumbing",
+            "vendor_name": "Underwood Evergreen Plumbing",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-06",
+            "due_date": "2026-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "subcontract on the job (subcontract).",
+                "amount": "2095.14"
+              }
+            ],
+            "total_amount": "2095.14",
+            "project_id": "proj-00005",
+            "cost_category": "subcontract",
+            "memo": "Subcontract charged by the provider."
+          },
+          "memo": "Workshop table saw acquired for company ownership.",
+          "source_bill": {
+            "id": "pbill-00855",
+            "doc_number": "BILL-5594",
+            "vendor_id": "vend-plumbing",
+            "vendor_name": "Underwood Evergreen Plumbing",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-06",
+            "due_date": "2026-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-wip",
+                "account_name": "Work in Progress",
+                "description": "Purchase of a company-owned table saw for workshop use.",
+                "amount": "2095.14"
+              }
+            ],
+            "total_amount": "2095.14",
+            "project_id": "proj-00005",
+            "cost_category": "subcontract",
+            "memo": "Workshop table saw acquired for company ownership."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00857",
+          "date": "2026-10-06",
+          "vendor": "Rasmussen Insurance Agency",
+          "description": "Marketing consultant designed a campaign to acquire remodeling customers.",
+          "item_names": [],
+          "accounts": [
+            "Insurance"
+          ],
+          "amount_cents": 13877,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-insurer",
+            "display_name": "Rasmussen Insurance Agency",
+            "company_name": "Rasmussen Insurance Agency",
+            "contact_given_name": "Gideon",
+            "contact_family_name": "Karlsen",
+            "email": "gideon.karlsen@rasmusseninsuranceagency.example",
+            "phone": "(555) 332-7457",
+            "address": {
+              "line1": "377 Hoist Street",
+              "city": "Lincoln",
+              "state": "NE",
+              "postal_code": "68545",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "insurance",
+            "joined_sim_day": 29,
+            "joined_date": "2025-11-04"
+          },
+          "project_record": null,
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00857",
+            "doc_number": "BILL-5595",
+            "vendor_id": "vend-insurer",
+            "vendor_name": "Rasmussen Insurance Agency",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-06",
+            "due_date": "2026-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-insurance",
+                "account_name": "Insurance",
+                "description": "Business and project insurance (insurance).",
+                "amount": "138.77"
+              }
+            ],
+            "total_amount": "138.77",
+            "project_id": null,
+            "cost_category": "insurance",
+            "memo": "Insurance charged by the provider."
+          },
+          "memo": "Customer-acquisition campaign design fee.",
+          "source_bill": {
+            "id": "pbill-00857",
+            "doc_number": "BILL-5595",
+            "vendor_id": "vend-insurer",
+            "vendor_name": "Rasmussen Insurance Agency",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-06",
+            "due_date": "2026-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-insurance",
+                "account_name": "Insurance",
+                "description": "Marketing consultant designed a campaign to acquire remodeling customers.",
+                "amount": "138.77"
+              }
+            ],
+            "total_amount": "138.77",
+            "project_id": null,
+            "cost_category": "insurance",
+            "memo": "Customer-acquisition campaign design fee."
+          }
+        },
+        {
+          "company_id": "company-030",
+          "transaction_id": "pbill-00858",
+          "date": "2026-10-06",
+          "vendor": "Underwood Power & Light",
+          "description": "Monthly water service for the company workshop.",
+          "item_names": [],
+          "accounts": [
+            "Utilities"
+          ],
+          "amount_cents": 25155,
+          "review_status": "needs_review",
+          "vendor_record": {
+            "id": "vend-utilities",
+            "display_name": "Underwood Power & Light",
+            "company_name": "Underwood Power & Light",
+            "contact_given_name": "Wren",
+            "contact_family_name": "Eriksdottir",
+            "email": "wren.eriksdottir@underwoodpowerlight.example",
+            "phone": "(555) 920-9530",
+            "address": {
+              "line1": "6310 Strapping Lane",
+              "city": "Davenport",
+              "state": "IA",
+              "postal_code": "52803",
+              "country": "United States",
+              "line2": null
+            },
+            "payment_terms": "Net 7",
+            "payment_terms_days": 7,
+            "supply_role": "utility",
+            "joined_sim_day": 29,
+            "joined_date": "2025-11-04"
+          },
+          "project_record": null,
+          "payment_records": [],
+          "paid_to_observation_date_cents": 0,
+          "original_source_bill": {
+            "id": "pbill-00858",
+            "doc_number": "BILL-5596",
+            "vendor_id": "vend-utilities",
+            "vendor_name": "Underwood Power & Light",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-06",
+            "due_date": "2026-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-utilities",
+                "account_name": "Utilities",
+                "description": "Metered electricity and water (utilities).",
+                "amount": "251.55"
+              }
+            ],
+            "total_amount": "251.55",
+            "project_id": null,
+            "cost_category": "utilities",
+            "memo": "Utilities charged by the provider."
+          },
+          "memo": "Workshop water usage and service charge.",
+          "source_bill": {
+            "id": "pbill-00858",
+            "doc_number": "BILL-5596",
+            "vendor_id": "vend-utilities",
+            "vendor_name": "Underwood Power & Light",
+            "expense_kind": "operating",
+            "txn_date": "2026-10-06",
+            "due_date": "2026-11-05",
+            "item_lines": [],
+            "account_lines": [
+              {
+                "line_num": 1,
+                "account_id": "acct-utilities",
+                "account_name": "Utilities",
+                "description": "Monthly water service for the company workshop.",
+                "amount": "251.55"
+              }
+            ],
+            "total_amount": "251.55",
+            "project_id": null,
+            "cost_category": "utilities",
+            "memo": "Workshop water usage and service charge."
+          }
+        }
+      ]
+    }
+  ]
+}

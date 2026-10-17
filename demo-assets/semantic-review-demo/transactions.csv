@@ -1,0 +1,31 @@
+company_id,transaction_id,date,vendor,description,memo,accounts,amount_cents,review_status
+company-030,pbill-00001,2025-10-06,Keaton & Sons Works,,Vendor bill recorded; see supporting document.,Equipment,3000000,needs_review
+company-030,pbill-00002,2025-10-06,Quintero Quilting LLC,   ,Vendor bill recorded; see supporting document.,Legal and Professional Fees,25000,needs_review
+company-030,pbill-00004,2025-10-07,Ironbridge Stationers & Co.,—,Vendor bill recorded; see supporting document.,Advertising and Marketing,50000,needs_review
+company-030,pbill-00009,2025-10-13,Pemberton Holdings LLC,N/A,Vendor bill recorded; see supporting document.,Rent and Lease,50000,needs_review
+company-030,pbill-00010,2025-10-13,City of Hollyhock,TBD,Vendor bill recorded; see supporting document.,Taxes and Licenses,100000,needs_review
+company-030,pbill-00016,2025-10-20,Pemberton Holdings LLC,.,Vendor bill recorded; see supporting document.,Rent and Lease,50000,needs_review
+company-030,pbill-00018,2025-10-21,Quintero Quilting LLC,Payment,Processed for review; see supporting document.,Legal and Professional Fees,25000,needs_review
+company-030,pbill-00023,2025-10-26,Ironclad Fulfillment Co.,Miscellaneous,Processed for review; see supporting document.,Inventory Asset,133912,needs_review
+company-030,pbill-00024,2025-10-27,Pemberton Holdings LLC,Monthly charge,Processed for review; see supporting document.,Rent and Lease,50000,needs_review
+company-030,pbill-00025,2025-10-27,Quintero Quilting LLC,Vendor services,Processed for review; see supporting document.,Legal and Professional Fees,25000,needs_review
+company-030,pbill-00027,2025-10-28,City of Hollyhock,Purchase,Processed for review; see supporting document.,Taxes and Licenses,100000,needs_review
+company-030,pbill-00028,2025-10-28,Keaton & Sons Works,Invoice attached,Processed for review; see supporting document.,Work in Progress,66100,needs_review
+company-030,pbill-00029,2025-10-28,Copper Sitework Services,Rental of a compact excavator for seven days; equipment returned after use.,Outright purchase of the excavator; ownership transferred to our company.,Work in Progress,46702,needs_review
+company-030,pbill-00031,2025-10-29,Keaton & Sons Works,Roofing subcontract labor: replace shingles and roof flashing.,Landscaping labor only; no roofing work performed.,Work in Progress,36100,needs_review
+company-030,pbill-00032,2025-10-29,Copper Sitework Services,Materials delivered exclusively to the Oak Street renovation.,All materials delivered exclusively to the Pine Avenue renovation; none for Oak Street.,Work in Progress,46702,needs_review
+company-030,pbill-00034,2025-10-30,Copper Sitework Services,Equipment servicing for September only; no other period included.,"This bill covers October servicing only, not September.",Work in Progress,46702,needs_review
+company-030,pbill-00041,2025-11-04,Rasmussen Insurance Agency,Repair existing hydraulic pump; no new equipment supplied.,Purchase of a new replacement pump; no repair services included.,Insurance,69041,needs_review
+company-030,pbill-00042,2025-11-04,Underwood Power & Light,Licensed electrician labor only; all materials supplied by us.,Materials only; no labor or installation services included.,Utilities,66500,needs_review
+company-030,pbill-00043,2025-11-05,Keaton & Sons Works,Monthly rent for the company workshop and storage unit.,Workshop and storage rent for the period.,Repairs and Maintenance,10000,needs_review
+company-030,pbill-00444,2026-04-04,Keaton & Sons Works,Metered electricity supplied to the business workshop.,Workshop electricity charges.,Equipment,377520,needs_review
+company-030,pbill-00775,2026-08-28,Keaton & Sons Works,External estimator prepared a bid for a kitchen renovation.,Fee for preparing the kitchen-renovation estimate.,Work in Progress,18050,needs_review
+company-030,pbill-00829,2026-09-26,Ironclad Fulfillment Co.,"Servicing of the company-owned compact excavator, including oil change.",Excavator oil change and scheduled servicing.,Inventory Asset,4884582,needs_review
+company-030,pbill-00831,2026-09-28,Quintero Quilting LLC,Equipment rental for a customer renovation; no ownership transfer.,Temporary equipment hire for the renovation.,Legal and Professional Fees,25000,needs_review
+company-030,pbill-00843,2026-10-01,Keaton & Sons Works,Lumber and fasteners supplied for a customer construction project.,Construction materials: lumber and fasteners.,Repairs and Maintenance,11258,needs_review
+company-030,pbill-00849,2026-10-05,Pemberton Holdings LLC,General liability insurance premium for the business.,Business general liability coverage.,Rent and Lease,50000,needs_review
+company-030,pbill-00850,2026-10-05,City of Hollyhock,Local authority permit fee for a customer construction project.,Construction permit issued by the local authority.,Taxes and Licenses,100000,needs_review
+company-030,pbill-00854,2026-10-05,Eastgate County Treasurer,Plumbing subcontract labor to install bathroom fixtures.,Bathroom fixture installation labor.,Income Tax Expense,1241930,needs_review
+company-030,pbill-00855,2026-10-06,Underwood Evergreen Plumbing,Purchase of a company-owned table saw for workshop use.,Workshop table saw acquired for company ownership.,Work in Progress,209514,needs_review
+company-030,pbill-00857,2026-10-06,Rasmussen Insurance Agency,Marketing consultant designed a campaign to acquire remodeling customers.,Customer-acquisition campaign design fee.,Insurance,13877,needs_review
+company-030,pbill-00858,2026-10-06,Underwood Power & Light,Monthly water service for the company workshop.,Workshop water usage and service charge.,Utilities,25155,needs_review

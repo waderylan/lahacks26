@@ -1,0 +1,362 @@
+[
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00001",
+    "scenario_group": "blank",
+    "original_descriptions": [
+      "owned_equipment on the job (owned_equipment)."
+    ],
+    "original_memo": "Owned equipment charged by the provider.",
+    "new_description": "",
+    "new_memo": "Vendor bill recorded; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00002",
+    "scenario_group": "blank",
+    "original_descriptions": [
+      "External estimating on a bid (estimating_service)."
+    ],
+    "original_memo": "Estimating service charged by the provider.",
+    "new_description": "   ",
+    "new_memo": "Vendor bill recorded; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00004",
+    "scenario_group": "blank",
+    "original_descriptions": [
+      "Prospecting and outreach (outreach)."
+    ],
+    "original_memo": "Outreach charged by the provider.",
+    "new_description": "\u2014",
+    "new_memo": "Vendor bill recorded; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00009",
+    "scenario_group": "blank",
+    "original_descriptions": [
+      "Premises rent (premises)."
+    ],
+    "original_memo": "Premises charged by the provider.",
+    "new_description": "N/A",
+    "new_memo": "Vendor bill recorded; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00010",
+    "scenario_group": "blank",
+    "original_descriptions": [
+      "Statutory permit and licence fees (permit)."
+    ],
+    "original_memo": "Permit charged by the provider.",
+    "new_description": "TBD",
+    "new_memo": "Vendor bill recorded; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00016",
+    "scenario_group": "blank",
+    "original_descriptions": [
+      "Premises rent (premises)."
+    ],
+    "original_memo": "Premises charged by the provider.",
+    "new_description": ".",
+    "new_memo": "Vendor bill recorded; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00018",
+    "scenario_group": "vague",
+    "original_descriptions": [
+      "External estimating on a bid (estimating_service)."
+    ],
+    "original_memo": "Estimating service charged by the provider.",
+    "new_description": "Payment",
+    "new_memo": "Processed for review; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00023",
+    "scenario_group": "vague",
+    "original_descriptions": [
+      "materials on the job (materials)."
+    ],
+    "original_memo": "Materials charged by the provider.",
+    "new_description": "Miscellaneous",
+    "new_memo": "Processed for review; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00024",
+    "scenario_group": "vague",
+    "original_descriptions": [
+      "Premises rent (premises)."
+    ],
+    "original_memo": "Premises charged by the provider.",
+    "new_description": "Monthly charge",
+    "new_memo": "Processed for review; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00025",
+    "scenario_group": "vague",
+    "original_descriptions": [
+      "External estimating on a bid (estimating_service)."
+    ],
+    "original_memo": "Estimating service charged by the provider.",
+    "new_description": "Vendor services",
+    "new_memo": "Processed for review; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00027",
+    "scenario_group": "vague",
+    "original_descriptions": [
+      "Statutory permit and licence fees (permit)."
+    ],
+    "original_memo": "Permit charged by the provider.",
+    "new_description": "Purchase",
+    "new_memo": "Processed for review; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00028",
+    "scenario_group": "vague",
+    "original_descriptions": [
+      "project_equipment_rental on the job (project_equipment_rental)."
+    ],
+    "original_memo": "Project equipment rental charged by the provider.",
+    "new_description": "Invoice attached",
+    "new_memo": "Processed for review; see supporting document.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00029",
+    "scenario_group": "conflict",
+    "original_descriptions": [
+      "subcontract on the job (subcontract)."
+    ],
+    "original_memo": "Subcontract charged by the provider.",
+    "new_description": "Rental of a compact excavator for seven days; equipment returned after use.",
+    "new_memo": "Outright purchase of the excavator; ownership transferred to our company.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00031",
+    "scenario_group": "conflict",
+    "original_descriptions": [
+      "project_equipment_rental on the job (project_equipment_rental)."
+    ],
+    "original_memo": "Project equipment rental charged by the provider.",
+    "new_description": "Roofing subcontract labor: replace shingles and roof flashing.",
+    "new_memo": "Landscaping labor only; no roofing work performed.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00032",
+    "scenario_group": "conflict",
+    "original_descriptions": [
+      "subcontract on the job (subcontract)."
+    ],
+    "original_memo": "Subcontract charged by the provider.",
+    "new_description": "Materials delivered exclusively to the Oak Street renovation.",
+    "new_memo": "All materials delivered exclusively to the Pine Avenue renovation; none for Oak Street.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00034",
+    "scenario_group": "conflict",
+    "original_descriptions": [
+      "subcontract on the job (subcontract)."
+    ],
+    "original_memo": "Subcontract charged by the provider.",
+    "new_description": "Equipment servicing for September only; no other period included.",
+    "new_memo": "This bill covers October servicing only, not September.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00041",
+    "scenario_group": "conflict",
+    "original_descriptions": [
+      "Business and project insurance (insurance)."
+    ],
+    "original_memo": "Insurance charged by the provider.",
+    "new_description": "Repair existing hydraulic pump; no new equipment supplied.",
+    "new_memo": "Purchase of a new replacement pump; no repair services included.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00042",
+    "scenario_group": "conflict",
+    "original_descriptions": [
+      "Metered electricity and water (utilities)."
+    ],
+    "original_memo": "Utilities charged by the provider.",
+    "new_description": "Licensed electrician labor only; all materials supplied by us.",
+    "new_memo": "Materials only; no labor or installation services included.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00043",
+    "scenario_group": "clear",
+    "original_descriptions": [
+      "Servicing of owned equipment (equipment_maintenance)."
+    ],
+    "original_memo": "Equipment maintenance charged by the provider.",
+    "new_description": "Monthly rent for the company workshop and storage unit.",
+    "new_memo": "Workshop and storage rent for the period.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00444",
+    "scenario_group": "clear",
+    "original_descriptions": [
+      "project_owned_equipment on the job (project_owned_equipment)."
+    ],
+    "original_memo": "Project owned equipment charged by the provider.",
+    "new_description": "Metered electricity supplied to the business workshop.",
+    "new_memo": "Workshop electricity charges.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00775",
+    "scenario_group": "clear",
+    "original_descriptions": [
+      "project_equipment_rental on the job (project_equipment_rental)."
+    ],
+    "original_memo": "Project equipment rental charged by the provider.",
+    "new_description": "External estimator prepared a bid for a kitchen renovation.",
+    "new_memo": "Fee for preparing the kitchen-renovation estimate.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00829",
+    "scenario_group": "clear",
+    "original_descriptions": [
+      "materials on the job (materials)."
+    ],
+    "original_memo": "Materials charged by the provider.",
+    "new_description": "Servicing of the company-owned compact excavator, including oil change.",
+    "new_memo": "Excavator oil change and scheduled servicing.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00831",
+    "scenario_group": "clear",
+    "original_descriptions": [
+      "External estimating on a bid (estimating_service)."
+    ],
+    "original_memo": "Estimating service charged by the provider.",
+    "new_description": "Equipment rental for a customer renovation; no ownership transfer.",
+    "new_memo": "Temporary equipment hire for the renovation.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00843",
+    "scenario_group": "clear",
+    "original_descriptions": [
+      "Servicing of owned equipment (equipment_maintenance)."
+    ],
+    "original_memo": "Equipment maintenance charged by the provider.",
+    "new_description": "Lumber and fasteners supplied for a customer construction project.",
+    "new_memo": "Construction materials: lumber and fasteners.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00849",
+    "scenario_group": "clear2",
+    "original_descriptions": [
+      "Premises rent (premises)."
+    ],
+    "original_memo": "Premises charged by the provider.",
+    "new_description": "General liability insurance premium for the business.",
+    "new_memo": "Business general liability coverage.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00850",
+    "scenario_group": "clear2",
+    "original_descriptions": [
+      "Statutory permit and licence fees (permit)."
+    ],
+    "original_memo": "Permit charged by the provider.",
+    "new_description": "Local authority permit fee for a customer construction project.",
+    "new_memo": "Construction permit issued by the local authority.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00854",
+    "scenario_group": "clear2",
+    "original_descriptions": [
+      "income_tax on the job (income_tax)."
+    ],
+    "original_memo": "Income tax charged by the provider.",
+    "new_description": "Plumbing subcontract labor to install bathroom fixtures.",
+    "new_memo": "Bathroom fixture installation labor.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00855",
+    "scenario_group": "clear2",
+    "original_descriptions": [
+      "subcontract on the job (subcontract)."
+    ],
+    "original_memo": "Subcontract charged by the provider.",
+    "new_description": "Purchase of a company-owned table saw for workshop use.",
+    "new_memo": "Workshop table saw acquired for company ownership.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00857",
+    "scenario_group": "clear2",
+    "original_descriptions": [
+      "Business and project insurance (insurance)."
+    ],
+    "original_memo": "Insurance charged by the provider.",
+    "new_description": "Marketing consultant designed a campaign to acquire remodeling customers.",
+    "new_memo": "Customer-acquisition campaign design fee.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  },
+  {
+    "company_id": "company-030",
+    "transaction_id": "pbill-00858",
+    "scenario_group": "clear2",
+    "original_descriptions": [
+      "Metered electricity and water (utilities)."
+    ],
+    "original_memo": "Utilities charged by the provider.",
+    "new_description": "Monthly water service for the company workshop.",
+    "new_memo": "Workshop water usage and service charge.",
+    "changes": "Description and memo replaced with authored review scenario. IDs, amounts, dates, vendor and account assignments unchanged. These are semantic-review fixtures, not asserted real bookkeeping defects."
+  }
+]

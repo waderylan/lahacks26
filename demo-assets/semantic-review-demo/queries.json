@@ -1,0 +1,131 @@
+[
+  {
+    "query_id": "effectively_blank",
+    "prompt": "Find transactions whose description is effectively blank, including placeholders.",
+    "label_policy": "Classify only the displayed Description field. Empty/whitespace and punctuation or placeholders such as N/A and TBD are blank. Generic purchase words are vague, not blank.",
+    "expected_match_ids": [
+      "pbill-00001",
+      "pbill-00002",
+      "pbill-00004",
+      "pbill-00009",
+      "pbill-00010",
+      "pbill-00016"
+    ],
+    "expected_uncertain_ids": [],
+    "expected_match_count": 6,
+    "expected_uncertain_count": 0,
+    "expected_match_total_cents": 3275000
+  },
+  {
+    "query_id": "nonempty_uninformative",
+    "prompt": "Find transactions whose description contains real words but does not explain what was purchased.",
+    "label_policy": "Classify only Description. Generic payment, miscellaneous, monthly charge, vendor services, purchase, invoice attached do not identify goods or services. Blank placeholders do not satisfy contains real words.",
+    "expected_match_ids": [
+      "pbill-00018",
+      "pbill-00023",
+      "pbill-00024",
+      "pbill-00025",
+      "pbill-00027",
+      "pbill-00028"
+    ],
+    "expected_uncertain_ids": [],
+    "expected_match_count": 6,
+    "expected_uncertain_count": 0,
+    "expected_match_total_cents": 400012
+  },
+  {
+    "query_id": "conflict",
+    "prompt": "Find transactions where the memo contradicts the description.",
+    "label_policy": "Require affirmative incompatible claims about purchase type, scope, delivery site, service period, repair versus acquisition, or labor versus materials. Missing or uninformative description means uncertain, not contradiction.",
+    "expected_match_ids": [
+      "pbill-00029",
+      "pbill-00031",
+      "pbill-00032",
+      "pbill-00034",
+      "pbill-00041",
+      "pbill-00042"
+    ],
+    "expected_uncertain_ids": [
+      "pbill-00001",
+      "pbill-00002",
+      "pbill-00004",
+      "pbill-00009",
+      "pbill-00010",
+      "pbill-00016",
+      "pbill-00018",
+      "pbill-00023",
+      "pbill-00024",
+      "pbill-00025",
+      "pbill-00027",
+      "pbill-00028"
+    ],
+    "expected_match_count": 6,
+    "expected_uncertain_count": 12,
+    "expected_match_total_cents": 311747
+  },
+  {
+    "query_id": "needs_attention",
+    "prompt": "Find transactions needing description review because the description is effectively blank, uninformative, or contradicted by the memo.",
+    "label_policy": "Union of missing purchase information and explicit semantic conflict; this is a review signal, not an accusation of fraud or an accounting correction.",
+    "expected_match_ids": [
+      "pbill-00001",
+      "pbill-00002",
+      "pbill-00004",
+      "pbill-00009",
+      "pbill-00010",
+      "pbill-00016",
+      "pbill-00018",
+      "pbill-00023",
+      "pbill-00024",
+      "pbill-00025",
+      "pbill-00027",
+      "pbill-00028",
+      "pbill-00029",
+      "pbill-00031",
+      "pbill-00032",
+      "pbill-00034",
+      "pbill-00041",
+      "pbill-00042"
+    ],
+    "expected_uncertain_ids": [],
+    "expected_match_count": 18,
+    "expected_uncertain_count": 0,
+    "expected_match_total_cents": 3986759
+  },
+  {
+    "query_id": "agreement",
+    "prompt": "Find transactions where the description and memo give consistent substantive accounts of the purchase.",
+    "label_policy": "Both fields must substantively describe compatible goods/services. Blank and vague descriptions are uncertain; explicit contradictory claims are no_match.",
+    "expected_match_ids": [
+      "pbill-00043",
+      "pbill-00444",
+      "pbill-00775",
+      "pbill-00829",
+      "pbill-00831",
+      "pbill-00843",
+      "pbill-00849",
+      "pbill-00850",
+      "pbill-00854",
+      "pbill-00855",
+      "pbill-00857",
+      "pbill-00858"
+    ],
+    "expected_uncertain_ids": [
+      "pbill-00001",
+      "pbill-00002",
+      "pbill-00004",
+      "pbill-00009",
+      "pbill-00010",
+      "pbill-00016",
+      "pbill-00018",
+      "pbill-00023",
+      "pbill-00024",
+      "pbill-00025",
+      "pbill-00027",
+      "pbill-00028"
+    ],
+    "expected_match_count": 12,
+    "expected_uncertain_count": 12,
+    "expected_match_total_cents": 6966886
+  }
+]

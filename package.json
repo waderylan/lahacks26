@@ -1,0 +1,34 @@
+{
+  "name": "quickbooks-hackathon",
+  "version": "1.0.0",
+  "description": "Setup for the [QuickBooks-Hackathon-2026](https://huggingface.co/datasets/CL251215/QuickBooks-Hackathon-2026) `hackathon-100-participant` dataset: 100 synthetic companies, one year of books each.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsx --test src/arrange.test.ts",
+    "start": "tsx --env-file=.env server/index.ts",
+    "dev": "tsx --env-file=.env server/index.ts",
+    "typecheck": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": "true",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "ai": "^7.0.143",
+    "express": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "yaml": "^2.9.1"
+  }
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CompanyBills } from './types';
-import { actionLabel, emptyTransaction, evaluateTree, uid, type Action, type Group, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
+import { actionLabel, DEFAULT_MESSAGE_ASK, emptyTransaction, evaluateTree, uid, type Action, type DraftMessage, type Group, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
 import type { RulesController } from './useRules';
 
 const labels = { all: 'ALL', any: 'ANY', not: 'NOT', ai: 'AI condition', standard: 'Standard condition' };
@@ -96,7 +96,7 @@ export function RulesPanel({ controller: c, data }: { controller: RulesControlle
       {render(draft.expression, 1)}
       <div className="section-label then-label">2. THEN <span>What should happen?</span></div>
       <datalist id="flag-labels"><option value="Needs clarification" /><option value="Possible mismatch" /></datalist>
-      {draft.actions.map(a => <article className="action-block" key={a.id}><div className="node-heading"><b>Action</b><span className="spacer" /><button className="ghost" aria-label="Remove action" onClick={() => c.setDraft({ ...draft, actions: draft.actions.filter(x => x.id !== a.id) })}>×</button></div><select aria-label="Action type" value={a.type} onChange={e => updateAction(a.id, { type: e.target.value as Action['type'], value: '' })}><option value="flag">Add flag</option><option value="assign">Assign to</option><option value="tag">Add tag</option><option value="pass">Mark passed automated check</option></select>{a.type !== 'pass' && <input aria-label="Action value" list={a.type === 'flag' ? 'flag-labels' : undefined} placeholder={a.type === 'flag' ? 'Choose or type a custom flag' : a.type === 'assign' ? 'Local owner name' : 'Tag name'} value={a.value} onChange={e => updateAction(a.id, { value: e.target.value })} />}{a.type === 'pass' && <p className="small muted">Human review status stays separate.</p>}</article>)}
+      {draft.actions.map(a => <article className="action-block" key={a.id}><div className="node-heading"><b>Action</b><span className="spacer" /><button className="ghost" aria-label="Remove action" onClick={() => c.setDraft({ ...draft, actions: draft.actions.filter(x => x.id !== a.id) })}>×</button></div><select aria-label="Action type" value={a.type} onChange={e => updateAction(a.id, { type: e.target.value as Action['type'], value: e.target.value === 'message' ? DEFAULT_MESSAGE_ASK : '' })}><option value="flag">Add flag</option><option value="assign">Assign to</option><option value="tag">Add tag</option><option value="pass">Mark passed automated check</option><option value="message">Draft vendor message</option></select>{a.type === 'message' ? <><textarea aria-label="Message to ask" placeholder="What should we ask the vendor?" value={a.value} onChange={e => updateAction(a.id, { value: e.target.value })} /><p className="small muted">Creates a local draft to the vendor. Approve, edit, or reject it — nothing is emailed.</p></> : a.type !== 'pass' ? <input aria-label="Action value" list={a.type === 'flag' ? 'flag-labels' : undefined} placeholder={a.type === 'flag' ? 'Choose or type a custom flag' : a.type === 'assign' ? 'Local owner name' : 'Tag name'} value={a.value} onChange={e => updateAction(a.id, { value: e.target.value })} /> : <p className="small muted">Human review status stays separate.</p>}</article>)}
       <button className="add-action" onClick={() => c.setDraft({ ...draft, actions: [...draft.actions, { id: uid(), type: 'tag', value: '' }] })}>+ Add action</button>
       {(treeError || c.validation.length > 0) && <div className="builder-validation" role="status">{treeError || c.validation.join(' ')}</div>}
       <p className="policy-note">Suggested review policy. A match is not proof of an accounting error.</p>
@@ -114,12 +114,14 @@ function Equation({ node }: { node: RuleNode }) {
   return <span className={`equation-condition equation-${node.type}`}>{node.type === 'ai' ? node.label || node.text || 'Describe a condition' : `${node.field === 'amountCents' ? 'Amount' : node.field === 'review' ? 'Review status' : node.field} ${node.operator === 'gt' ? '>' : node.operator === 'lt' ? '<' : '='} ${node.value || '…'}`}</span>;
 }
 
-export function RuleHistory({ c, companyId }: { c: RulesController; companyId: string }) {
-  const [tab, setTab] = useState<'history' | 'replay'>('history');
+export function RuleHistory({ c, companyId, onOpen }: { c: RulesController; companyId: string; onOpen?: (transactionId: string) => void }) {
+  const [tab, setTab] = useState<'history' | 'replay' | 'messages'>('history');
   const [open, setOpen] = useState(false);
   const history = c.store.history.filter(h => h.companyId === companyId);
-  return <section className={`rule-history ${open ? 'expanded' : ''}`} aria-label="Action history"><div className="history-toolbar"><button aria-expanded={open} onClick={() => setOpen(!open)}>{open ? '▾' : '▸'} Activity <b>{history.length}</b></button><button className={tab === 'history' ? 'active' : 'ghost'} onClick={() => { setTab('history'); setOpen(true); }}>Action history</button><button className={tab === 'replay' ? 'active' : 'ghost'} onClick={() => { setTab('replay'); setOpen(true); }}>Replay log</button><span className="spacer" /><button disabled={c.busy || !c.remaining || Boolean(c.storageError)} onClick={() => { setTab('replay'); setOpen(true); void c.replay(); }}>{c.busy ? 'Evaluating replay…' : 'Replay next original bill'} <b>({c.remaining})</b></button><button className="ghost" disabled={c.busy || Boolean(c.storageError)} onClick={c.reset}>Reset demo action state</button></div>
-    {open && <div className="history-body">{tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
+  const messages = (c.store.messages ?? []).filter(m => m.companyId === companyId);
+  const pending = messages.filter(m => m.status === 'pending').length;
+  return <section className={`rule-history ${open ? 'expanded' : ''}`} aria-label="Action history"><div className="history-toolbar"><button aria-expanded={open} onClick={() => setOpen(!open)}>{open ? '▾' : '▸'} Activity <b>{history.length}</b></button><button className={tab === 'history' ? 'active' : 'ghost'} onClick={() => { setTab('history'); setOpen(true); }}>Action history</button><button className={tab === 'messages' ? 'active' : 'ghost'} onClick={() => { setTab('messages'); setOpen(true); }}>Messages{pending ? ` · ${pending}` : ''}</button><button className={tab === 'replay' ? 'active' : 'ghost'} onClick={() => { setTab('replay'); setOpen(true); }}>Replay log</button><span className="spacer" /><button disabled={c.busy || !c.remaining || Boolean(c.storageError)} onClick={() => { setTab('replay'); setOpen(true); void c.replay(); }}>{c.busy ? 'Evaluating replay…' : 'Replay next original bill'} <b>({c.remaining})</b></button><button className="ghost" disabled={c.busy || Boolean(c.storageError)} onClick={c.reset}>Reset demo action state</button></div>
+    {open && <div className="history-body">{tab === 'messages' ? messages.length ? messages.map(m => <MessageCard key={m.id} message={m} onDecide={c.decideMessage} onOpen={onOpen} />) : <p className="muted">No drafts yet. Add a Draft vendor message action, save, and run the rule.</p> : tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
       <div><b>{h.transactionId.split(':').pop()}</b> · {h.action ? actionLabel(h.action) : `Rule result: ${h.snapshot.result}`}<span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
         <div className="small muted">{h.action && `${JSON.stringify(h.previous)} → ${JSON.stringify(h.resulting)} · `}Version {h.transactionVersion} · Rule result: {h.snapshot.result}</div>
         {h.snapshot.expression && <details className="history-evidence"><summary>View condition results</summary><RuleEvidence node={h.snapshot.expression} snapshot={h.snapshot} /></details>}
@@ -135,4 +137,71 @@ export function RuleEvidence({ node, snapshot }: { node: RuleNode; snapshot: Sna
 export function LocalStateEditor({ value, update }: { value?: LocalTransaction; update: (value: LocalTransaction) => void }) {
   const tx = value ?? emptyTransaction();
   return <div className="local-editor"><label>Assigned to<input aria-label="Local assignment" value={tx.owner} onChange={e => update({ ...tx, owner: e.target.value })} /></label><label>Flags (comma separated)<input key={`flags-${JSON.stringify(tx.flags)}`} aria-label="Local flags" defaultValue={tx.flags.join(', ')} onBlur={e => update({ ...tx, flags: [...new Set(e.target.value.split(',').map(s => s.trim()).filter(Boolean))] })} /></label><label>Tags (comma separated)<input key={`tags-${JSON.stringify(tx.tags)}`} aria-label="Local tags" defaultValue={tx.tags.join(', ')} onBlur={e => update({ ...tx, tags: [...new Set(e.target.value.split(',').map(s => s.trim()).filter(Boolean))] })} /></label><label className="check"><input type="checkbox" checked={tx.automatedCheck} onChange={e => update({ ...tx, automatedCheck: e.target.checked })} /> Passed automated check</label><p className="small muted">Local review metadata. Automated check does not mark a bill human reviewed.</p></div>;
+}
+
+const MESSAGE_STATUS = { pending: 'Pending approval', approved: 'Marked sent · local only', rejected: 'Rejected · not sent' };
+
+export function MessageCard({ message, onDecide, onOpen }: { message: DraftMessage; onDecide: (id: string, status: 'approved' | 'rejected', body?: string) => void; onOpen?: (transactionId: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState(message.status === 'pending');
+  const [draft, setDraft] = useState(message.body);
+  const done = message.status !== 'pending';
+  return <article className={`message-card status-${message.status}`} aria-label={`Draft message to ${message.to}`}>
+    <div className="message-card-head">
+      <span className="message-icon" aria-hidden>✉</span>
+      <div>
+        <div className="message-meta"><span>Message</span><span className={`message-status status-${message.status}`}>{MESSAGE_STATUS[message.status]}</span>{message.edited && <span className="muted">· edited</span>}</div>
+        <h3>{message.subject}</h3>
+        <p className="muted">To {message.to} · {message.billId} · {message.ruleName} r{message.revision}</p>
+        <p className="muted">{message.reason}</p>
+      </div>
+    </div>
+    {!editing && <button className="ghost" onClick={() => setOpen(o => !o)}>{open ? 'Hide draft' : 'View draft'}</button>}
+    {editing ? <textarea aria-label="Edit draft message" value={draft} onChange={e => setDraft(e.target.value)} rows={Math.min(12, draft.split('\n').length + 2)} /> : open && <pre className="message-body">{message.body}</pre>}
+    {done ? <p className={`message-result status-${message.status}`}>{MESSAGE_STATUS[message.status]}</p> : <div className="message-actions">
+      <button className="primary" onClick={() => { onDecide(message.id, 'approved', editing ? draft : undefined); setEditing(false); }}>Approve</button>
+      <button onClick={() => { setEditing(e => !e); setOpen(true); }}>{editing ? 'Cancel edit' : 'Edit'}</button>
+      <button className="ghost" onClick={() => onDecide(message.id, 'rejected')}>Reject</button>
+    </div>}
+    {onOpen && <button className="ghost" onClick={() => onOpen(message.transactionId)}>Open bill</button>}
+  </article>;
+}
+
+export function NotificationBell({ notices, onRead, onOpen }: { notices: import('./rules').Notice[]; onRead: () => void; onOpen?: (transactionId: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const unread = notices.filter(n => !n.read).length;
+  useEffect(() => {
+    const close = (e: MouseEvent) => ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, []);
+  return <div className="notice-bell" ref={ref}>
+    <button aria-label={`Notifications${unread ? `, ${unread} unread` : ''}`} aria-expanded={open} onClick={() => { setOpen(o => !o); if (!open) onRead(); }}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+      {unread > 0 && <span className="notice-count">{unread}</span>}
+    </button>
+    {open && <div className="notice-menu" role="dialog" aria-label="Notifications">
+      <p>Notifications</p>
+      {notices.length ? <ul>{notices.map(n => <li key={n.id}><span className={`notice-dot tone-${n.tone}`} aria-hidden /><span><b>{n.title}</b>{n.body && <span className="muted">{n.body}</span>}<span className="muted">{n.time}</span>{n.transactionId && onOpen && <button className="ghost" onClick={() => { onOpen(n.transactionId!); setOpen(false); }}>Open bill</button>}</span></li>)}</ul> : <p className="muted">No notifications yet.</p>}
+    </div>}
+  </div>;
+}
+
+export function Toasts({ notices, onDismiss }: { notices: import('./rules').Notice[]; onDismiss: (id: string) => void }) {
+  const pending = notices.filter(n => !n.toasted).slice(0, 3);
+  const ids = pending.map(n => n.id).join(',');
+  const dismissRef = useRef(onDismiss);
+  dismissRef.current = onDismiss;
+  useEffect(() => {
+    if (!ids) return;
+    const timers = ids.split(',').map(id => setTimeout(() => dismissRef.current(id), 12000));
+    return () => timers.forEach(clearTimeout);
+  }, [ids]);
+  if (!pending.length) return null;
+  return <div className="notice-toasts" aria-live="polite">{pending.map(n => <div key={n.id} className={`notice-toast tone-${n.tone}`}>
+    <span className="notice-dot" aria-hidden />
+    <div><b>{n.title}</b>{n.body && <p>{n.body}</p>}</div>
+    <button className="ghost" aria-label="Dismiss" onClick={() => onDismiss(n.id)}>✕</button>
+  </div>)}</div>;
 }

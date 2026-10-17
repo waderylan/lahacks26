@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, executeRule, leaves, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
+import { decideMessage, EMPTY_STORE, evaluateTree, exampleRule, executeRule, leaves, markNoticeToasted, markNoticesRead, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
 
 const STORE_KEY = 'tr.rules.v1';
 export function readRuleStore(): RuleStore {
@@ -9,7 +9,7 @@ export function readRuleStore(): RuleStore {
   if (!raw) return structuredClone(EMPTY_STORE);
   const value = JSON.parse(raw);
   if (!Array.isArray(value.rules) || value.rules.some((r: Rule) => validateRule(r).length) || !value.transactions || !Array.isArray(value.history) || !Array.isArray(value.executions) || !value.arrivals) throw new Error('Saved rule storage is invalid. Export or clear tr.rules.v1 in browser storage before continuing.');
-  return value;
+  return { ...value, messages: Array.isArray(value.messages) ? value.messages : [], notices: Array.isArray(value.notices) ? value.notices : [] };
 }
 const signature = (r: Rule) => JSON.stringify([r.name, r.expression, r.actions]);
 
@@ -154,8 +154,13 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     else { commit(() => result.store); setMessage('Action undone. Its execution key is retained to prevent duplicate actions.'); }
   };
   const reset = () => {
-    commit(cur => ({ ...cur, transactions: Object.fromEntries(Object.entries(cur.transactions).filter(([id]) => !id.startsWith(`${companyId}:`))), history: cur.history.filter(h => h.companyId !== companyId), executions: cur.executions.filter(key => !cur.rules.some(r => r.companyId === companyId && key.startsWith(`${r.id}:`))) }));
+    commit(cur => ({ ...cur, transactions: Object.fromEntries(Object.entries(cur.transactions).filter(([id]) => !id.startsWith(`${companyId}:`))), history: cur.history.filter(h => h.companyId !== companyId), executions: cur.executions.filter(key => !cur.rules.some(r => r.companyId === companyId && key.startsWith(`${r.id}:`))), messages: (cur.messages ?? []).filter(item => item.companyId !== companyId), notices: (cur.notices ?? []).filter(item => item.companyId !== companyId) }));
     setMessage('Demo actions and history reset for this company. Saved rules, replayed bills, and human review were preserved.');
+  };
+  const decide = (id: string, status: 'approved' | 'rejected', body?: string) => {
+    const result = decideMessage(storeRef.current, id, status, body);
+    if (result.error) setMessage(result.error);
+    else { commit(() => result.store); setMessage(status === 'approved' ? 'Marked sent locally. No email was delivered.' : 'Draft rejected. Nothing was sent.'); }
   };
   return { store, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain, elapsed: timing.start ? Math.max(0, ((timing.end || now) - timing.start) / 1000) : 0,
     previewErrors: [...previewErrors], retry: () => setRetry(n => n + 1), save, toggleEnabled, runOnce, replay, busy, automation, message, storageError, undo, reset,
@@ -166,6 +171,9 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(r => r.id === id); if (rule) setDraft(structuredClone(rule)); },
     loadExample: () => { setDraft(exampleRule(companyId)); setMessage('Editable suggested review policy. A match is not proof of an accounting error.'); },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [] }, actions: [] }); setMessage('Add your conditions under IF, then choose actions under THEN.'); },
+    decideMessage: decide,
+    markNoticesRead: () => commit(cur => markNoticesRead(cur, companyId)),
+    markNoticeToasted: (id: string) => commit(cur => markNoticeToasted(cur, id)),
   };
 }
 export type RulesController = ReturnType<typeof useRules>;

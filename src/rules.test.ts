@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compose, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, parseCents, resetCompanyDemo, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
+import { compose, decideMessage, DEFAULT_MESSAGE_ASK, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, parseCents, resetCompanyDemo, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
 import type { Row } from './types';
 
-const row = { id: 'company-018:bill-original', companyId: 'company-018', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo' } as Row;
+const row = { id: 'company-018:bill-original', companyId: 'company-018', billId: 'bill-original', docNumber: 'BILL-1', date: '2026-01-15', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo', description: 'Original description', itemNames: ['Widget'] } as Row;
 const snapshotFor = (rule: Rule, result: Outcome = 'true') => ({ result, conditions: { [leaves(rule.expression)[0].id]: result, [leaves(rule.expression)[1].id]: 'false' as Outcome } });
 
 test('three-valued truth tables preserve uncertainty, including under nested NOT', () => {
@@ -120,4 +120,34 @@ test('clean demo reset clears only the selected company and preserves disabled r
   assert.deepEqual(reset.transactions[otherRow.id], store.transactions[otherRow.id]);
   assert.deepEqual(reset.arrivals[otherRow.companyId], [otherRow.id]);
   assert.equal(store.rules[0].enabled, true);
+});
+
+test('message actions draft local vendor cards, stay idempotent, and require approval', () => {
+  const rule = exampleRule(row.companyId);
+  rule.actions.push({ id: 'message', type: 'message', value: DEFAULT_MESSAGE_ASK });
+  assert.deepEqual(validateRule(rule), []);
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'blank', type: 'message', value: '   ' }] }).length);
+  const snapshot = snapshotFor(rule);
+  const first = executeRule(structuredClone(EMPTY_STORE), rule, row, 'v1', snapshot, 'run');
+  assert.equal(first.messages.length, 1);
+  assert.equal(first.messages[0].status, 'pending');
+  assert.equal(first.messages[0].to, row.vendor);
+  assert.match(first.messages[0].body, /\$10\.50/);
+  assert.equal(first.notices[0].tone, 'info');
+  assert.equal(executeRule(first, rule, row, 'v1', snapshot, 'run').messages.length, 1);
+  const entry = first.history.find(h => h.action?.type === 'message')!;
+  const undone = undoEntry(first, entry.id);
+  assert.equal(undone.error, undefined);
+  assert.equal(undone.store.messages.length, 0);
+  const decided = decideMessage(first, first.messages[0].id, 'approved', 'Edited vendor note');
+  assert.equal(decided.store.messages[0].status, 'approved');
+  assert.equal(decided.store.messages[0].edited, true);
+  assert.match(decided.store.notices[0].body!, /no email/);
+  assert.match(undoEntry(decided.store, entry.id).error!, /conflict/);
+  const otherRow = { ...row, id: 'company-005:bill-original', companyId: 'company-005' };
+  const otherRule = { ...exampleRule(otherRow.companyId), actions: [{ id: 'message', type: 'message' as const, value: DEFAULT_MESSAGE_ASK }] };
+  const mixed = executeRule({ ...structuredClone(first), rules: [rule, otherRule] }, otherRule, otherRow, 'v1', { result: 'true', conditions: { [leaves(otherRule.expression)[0].id]: 'true', [leaves(otherRule.expression)[1].id]: 'false' } }, 'run');
+  const reset = resetCompanyDemo(mixed, row.companyId);
+  assert.equal(reset.messages.every(m => m.companyId === otherRow.companyId), true);
+  assert.equal(reset.notices.every(n => n.companyId === otherRow.companyId), true);
 });

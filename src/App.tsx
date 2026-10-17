@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { arrangeRows, sortByMatch } from './arrange';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useSemanticEval } from './useSemanticEval';
+import { readRuleStore, useRules } from './useRules';
+import { LocalStateEditor, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel } from './RulesPanel';
+import { actionLabel, type LocalTransaction, type Outcome } from './rules';
 
 const DEFAULT_COMPANY = 'company-018';
 const REVIEW_KEY = 'tr.reviewed.v1';
@@ -71,6 +74,9 @@ export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
   const [companyId, setCompanyId] = useState(DEFAULT_COMPANY);
+  const [workspace, setWorkspace] = useState<'transactions' | 'rules'>('rules');
+  const [previewFilter, setPreviewFilter] = useState('all');
+  const [recordSearch, setRecordSearch] = useState('');
   const [data, setData] = useState<CompanyBills | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -107,9 +113,14 @@ export default function App() {
     setLoadError(null);
     setSelected(new Set());
     setDrawerId(null);
-    fetch(`/api/companies/${companyId}/bills?limit=${prefs.limit}`)
+    fetch(`/api/companies/${companyId}/bills?limit=${prefs.limit}&reserve=1`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((d: CompanyBills) => seq === loadSeq.current && setData(d))
+      .then((d: CompanyBills) => {
+        if (seq !== loadSeq.current) return;
+        const arrived = readRuleStore().arrivals[companyId] ?? [];
+        const rows = [...d.rows, ...(d.reservedRows ?? []).filter(r => arrived.includes(r.id) && !d.rows.some(x => x.id === r.id))];
+        setData({ ...d, rows });
+      })
       .catch((e: Error) => seq === loadSeq.current && setLoadError(e.message));
   }, [companyId, prefs.limit]);
 
@@ -124,6 +135,7 @@ export default function App() {
   useEffect(() => setSelected(new Set()), [query]);
 
   const rows = data?.rows ?? [];
+  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current));
   const counts = useMemo(() => {
     const rev = rows.filter((r) => reviewed.has(r.id)).length;
     return { all: rows.length, needs: rows.length - rev, reviewed: rev };
@@ -146,7 +158,7 @@ export default function App() {
   // Visible rows are evaluated first.
   const orderRef = useRef<string[]>([]);
   orderRef.current = [...tabRows.map((r) => r.id), ...sortedRows.filter((r) => !tabRows.includes(r)).map((r) => r.id)];
-  const { evalState, retry } = useSemanticEval(data, query, useCallback(() => orderRef.current, []));
+  const { evalState, retry } = useSemanticEval(workspace === 'transactions' ? data : null, query, useCallback(() => orderRef.current, []));
   const active = query.trim() !== '' && evalState.query === query.trim();
   const awaitingDebounce = input.trim() !== query.trim();
 
@@ -156,7 +168,7 @@ export default function App() {
   const shownBase =
     sort.key === 'match' && active ? sortByMatch(filtered, (id) => evalState.results[id], sort.dir) : filtered;
   // Matches rise to the top while a query is active; with no query the original order returns.
-  const visibleRows = arrangeRows(shownBase, isMatch, active);
+  const visibleRows = workspace === 'rules' ? tabRows.filter(r => (previewFilter === 'all' || rules.snapshots[r.id]?.result === previewFilter) && (!recordSearch.trim() || [r.billId, r.vendor, r.description, r.memo, r.account, ...r.itemNames].join(' ').toLowerCase().includes(recordSearch.trim().toLowerCase()))) : arrangeRows(shownBase, isMatch, active);
 
   // Animate rows to their new positions (FLIP) so the reordering is visible.
   const bodyRef = useRef<HTMLTableSectionElement>(null);
@@ -171,7 +183,7 @@ export default function App() {
       const top = el.offsetTop;
       next.set(id, top);
       const before = prevTops.current.get(id);
-      if (!reduce && before !== undefined && before !== top && Math.abs(before - top) < 3000) {
+      if (workspace === 'transactions' && !reduce && before !== undefined && before !== top && Math.abs(before - top) < 3000) {
         el.animate([{ transform: `translateY(${before - top}px)` }, { transform: 'none' }], { duration: 260, easing: 'ease-out' });
       }
     }
@@ -204,6 +216,7 @@ export default function App() {
     const next = new Set(reviewed);
     selected.forEach((id) => (value ? next.add(id) : next.delete(id)));
     persistReviewed(next);
+    rows.filter(r => selected.has(r.id)).forEach(row => rules.processUpdate(row, value));
     setSelected(new Set());
   };
   const resetReview = () => {
@@ -211,7 +224,7 @@ export default function App() {
     setSelected(new Set());
   };
   const selectMatches = () => {
-    const ids = visibleRows.filter((r) => matchOf(r.id)?.state === 'match').map((r) => r.id);
+    const ids = visibleRows.filter((r) => workspace === 'rules' ? rules.snapshots[r.id]?.result === 'true' : matchOf(r.id)?.state === 'match').map((r) => r.id);
     setSelected(new Set(ids));
   };
   const toggle = (id: string) =>
@@ -283,7 +296,9 @@ export default function App() {
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
       </header>
 
-      <section className="semantic">
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules <span className="nav-caption">Build → Preview → Automate</span></button></nav><span className="muted">{data?.company.scenario ? 'Labeled modified scenario' : 'Original accounting records'} · Local review state</span></div>
+
+      {workspace === 'transactions' && <section className="semantic">
         <label htmlFor="criterion">Select transactions by meaning</label>
         <div className="semantic-row">
           <input
@@ -342,7 +357,16 @@ export default function App() {
         {jev && !jev.configured && (
           <div className="banner error">Jev is not configured: set AI_GATEWAY_API_KEY on the server. Matching is unavailable.</div>
         )}
-      </section>
+      </section>}
+
+      {workspace === 'rules' && (rules.storageError || rules.message) && <div className={`rules-notice ${rules.storageError ? 'error' : ''}`} role="status">{rules.storageError || rules.message}</div>}
+      {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Jev evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
+      {workspace === 'rules' && data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
+      <div className={`workspace-body ${workspace === 'rules' ? 'with-builder' : ''}`}>
+      {workspace === 'rules' && data && <RulesPanel controller={rules} data={data} />}
+      <div className="ledger-column">
+      {workspace === 'rules' && <RulePreviewBar c={rules} total={rows.length} onInspect={() => rules.matches[0] && setDrawerId(rules.matches[0].id)} />}
+      {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
 
       <main className="sheet-wrap">
         {loadError ? (
@@ -366,7 +390,8 @@ export default function App() {
                   <Th w={widths.account} onClick={() => sortBy('account')} onResize={(e) => startResize('account', e)}>Account{arrow('account')}</Th>
                   <Th w={widths.amount} right onClick={() => sortBy('amountCents')} onResize={(e) => startResize('amount', e)}>Amount{arrow('amountCents')}</Th>
                   <Th w={widths.review} onResize={(e) => startResize('review', e)}>Review</Th>
-                  <Th w={widths.match} onClick={() => sortBy('match')} onResize={(e) => startResize('match', e)}>Semantic match %{arrow('match')}</Th>
+                  <Th w={widths.match} className={workspace === 'rules' ? 'rule-result-column' : ''} onClick={workspace === 'transactions' ? () => sortBy('match') : undefined} onResize={(e) => startResize('match', e)}>{workspace === 'rules' ? 'Rule result' : `Semantic match %${arrow('match')}`}</Th>
+                  <th style={{ minWidth: 230, width: 230 }}>Local automation</th>
                 </tr>
               </thead>
               <tbody ref={bodyRef}>
@@ -384,6 +409,8 @@ export default function App() {
                     failed={active && evalState.failed.has(r.id)}
                     onToggle={() => toggle(r.id)}
                     onOpen={() => setDrawerId(r.id)}
+                    ruleOutcome={workspace === 'rules' ? rules.snapshots[r.id]?.result ?? 'pending' : undefined}
+                    local={rules.store.transactions[r.id]}
                   />
                 ))}
               </tbody>
@@ -394,7 +421,7 @@ export default function App() {
                   ? evalState.pending.size
                     ? 'No matches yet — still evaluating.'
                     : 'No rows match this criterion.'
-                  : tab === 'reviewed'
+                  : workspace === 'rules' && (previewFilter !== 'all' || recordSearch.trim()) ? 'No bills match this view. Change the result filter or search.' : tab === 'reviewed'
                     ? 'No reviewed transactions yet.'
                     : tab === 'needs'
                       ? 'Everything here has been reviewed.'
@@ -404,11 +431,14 @@ export default function App() {
           </div>
         )}
       </main>
+      {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} />}
+      </div>
+      </div>
 
       <footer className="actions">
         <div className="stat">
           <span>Matches</span>
-          <b>{active ? matchRows.length : '–'}</b>
+          <b>{workspace === 'rules' ? rules.matches.length : active ? matchRows.length : '–'}</b>
           <span className="sub">
             {active ? `${money(matchCents)}${complete ? '' : ' (partial)'}` : ''}
           </span>
@@ -419,7 +449,7 @@ export default function App() {
           <span className="sub">{money(selCents)}</span>
         </div>
         <div className="spacer" />
-        <button onClick={selectMatches} disabled={!active || matchRows.length === 0}>Select current matches</button>
+        <button onClick={selectMatches} disabled={workspace === 'rules' ? rules.matches.length === 0 : !active || matchRows.length === 0}>Select current matches</button>
         <button className="primary" onClick={() => setReviewStatus(true)} disabled={selected.size === 0}>Mark reviewed</button>
         <button onClick={() => setReviewStatus(false)} disabled={selected.size === 0}>Mark needs review</button>
         <button className="ghost" onClick={() => setSelected(new Set())} disabled={selected.size === 0}>Clear selection</button>
@@ -427,15 +457,15 @@ export default function App() {
       </footer>
 
       {drawerRow && (
-        <Drawer row={drawerRow} reviewed={reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} />
+        <Drawer row={drawerRow} reviewed={reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />
       )}
     </div>
   );
 }
 
-function Th(props: { w: number; right?: boolean; onClick?: () => void; onResize: (e: React.MouseEvent) => void; children: React.ReactNode }) {
+function Th(props: { w: number; right?: boolean; className?: string; onClick?: () => void; onResize: (e: React.MouseEvent) => void; children: React.ReactNode }) {
   return (
-    <th style={{ width: props.w, minWidth: props.w }} className={(props.right ? 'right ' : '') + (props.onClick ? 'sortable' : '')} onClick={props.onClick}>
+    <th style={{ width: props.w, minWidth: props.w }} className={(props.right ? 'right ' : '') + (props.onClick ? 'sortable ' : '') + (props.className ?? '')} onClick={props.onClick}>
       {props.children}
       <span className="resizer" onMouseDown={props.onResize} onClick={(e) => e.stopPropagation()} />
     </th>
@@ -446,9 +476,10 @@ function SheetRow(p: {
   row: Row; n: number; selected: boolean; reviewed: boolean; open: boolean; active: boolean;
   match?: { state: string; pMatch: number }; pending: boolean; failed: boolean;
   onToggle: () => void; onOpen: () => void;
+  ruleOutcome?: Outcome; local?: LocalTransaction;
 }) {
   const { row: r, match } = p;
-  const cls = ['row', match?.state === 'match' ? 'm-match' : match?.state === 'uncertain' ? 'm-unc' : '', p.selected ? 'is-sel' : '', p.open ? 'is-open' : ''].join(' ');
+  const cls = ['row', (p.ruleOutcome ? p.ruleOutcome === 'true' : match?.state === 'match') ? 'm-match' : (p.ruleOutcome ? p.ruleOutcome === 'uncertain' : match?.state === 'uncertain') ? 'm-unc' : '', p.selected ? 'is-sel' : '', p.open ? 'is-open' : ''].join(' ');
   return (
     <tr className={cls} data-id={r.id} onClick={p.onOpen}>
       <td className="gutter sticky-l0">{p.n}</td>
@@ -463,8 +494,8 @@ function SheetRow(p: {
       <td title={r.account}>{r.account}</td>
       <td className="right num">{money(r.amountCents)}</td>
       <td><span className={'tag ' + (p.reviewed ? 'rev' : 'need')}>{p.reviewed ? 'Reviewed' : 'Needs review'}</span></td>
-      <td>
-        {!p.active ? <span className="muted">—</span>
+      <td className={p.ruleOutcome ? 'rule-result-column' : undefined}>
+        {p.ruleOutcome ? <ResultBadge value={p.ruleOutcome} /> : !p.active ? <span className="muted">—</span>
           : match ? (
             match.state === 'match' ? <span className="tag ok" title="Jev's probability that this matches">● Match {pct(match.pMatch)}</span>
             : match.state === 'uncertain' ? <span className="tag warn" title="Jev's probability that this matches">◐ Uncertain {pct(match.pMatch)}</span>
@@ -472,11 +503,12 @@ function SheetRow(p: {
           ) : p.failed ? <span className="tag bad">Failed</span>
           : p.pending ? <span className="muted">Pending…</span> : <span className="muted">—</span>}
       </td>
+      <td title={[...(p.local?.flags ?? []), ...(p.local?.tags ?? []), p.local?.owner ?? ''].filter(Boolean).join(' · ')}>{p.local?.automatedCheck && <span className="tag ok">Automated pass</span>} {p.local?.flags.map(flag => <span className="tag warn" key={flag}>{flag}</span>)} {p.local?.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)} {p.local?.owner && <span className="muted">→ {p.local.owner}</span>}</td>
     </tr>
   );
 }
 
-function Drawer({ row: r, reviewed, match, onClose }: { row: Row; reviewed: boolean; match?: { state: string; pMatch: number }; onClose: () => void }) {
+function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewed: boolean; match?: { state: string; pMatch: number }; onClose: () => void; rules: ReturnType<typeof useRules> }) {
   const kv = (o: Record<string, unknown> | null) =>
     o ? Object.entries(o).filter(([, v]) => v !== null && typeof v !== 'object') : [];
   return (
@@ -489,6 +521,8 @@ function Drawer({ row: r, reviewed, match, onClose }: { row: Row; reviewed: bool
         <button className="ghost" onClick={onClose} aria-label="Close detail">✕</button>
       </div>
       <div className="drawer-body">
+        {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
+        <h3>Local review metadata</h3><LocalStateEditor value={rules.store.transactions[r.id]} update={value => rules.updateLocal(r.id, value)} />
         <h3>Bill</h3>
         <dl>
           <dt>Date</dt><dd>{r.date}</dd>
@@ -498,13 +532,15 @@ function Drawer({ row: r, reviewed, match, onClose }: { row: Row; reviewed: bool
           <dt>Account</dt><dd>{r.account}</dd>
           <dt>Project</dt><dd>{r.project ?? '—'}</dd>
           <dt>Memo</dt><dd>{r.memo || '—'}</dd>
+          <dt>Description</dt><dd>{r.description || '(blank)'}</dd>
+          <dt>Items</dt><dd>{r.itemNames.join(', ') || '(none)'}</dd>
           <dt>Review</dt><dd>{reviewed ? 'Reviewed' : 'Needs review'}</dd>
           <dt>Jev</dt><dd>{match ? `${match.state.replace('_', ' ')} (P(match) ${pct(match.pMatch)})` : '—'}</dd>
         </dl>
         <h3>Lines</h3>
         {r.lines.map((l, i) => (
           <dl key={i} className="line">
-            {kv(l).map(([k, v]) => (<><dt key={k}>{k}</dt><dd>{String(v)}</dd></>))}
+            {kv(l).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}
           </dl>
         ))}
         {r.provenance && (
@@ -522,8 +558,8 @@ function Drawer({ row: r, reviewed, match, onClose }: { row: Row; reviewed: bool
           <dl key={p.id} className="line"><dt>{p.id}</dt><dd>{p.date} · {money(p.amountCents)} from {p.account}</dd></dl>
         ))}
         <h3>Vendor</h3>
-        <dl>{kv(r.vendorRecord).map(([k, v]) => (<><dt key={k}>{k}</dt><dd>{String(v)}</dd></>))}</dl>
-        {r.projectRecord && (<><h3>Project</h3><dl>{kv(r.projectRecord).map(([k, v]) => (<><dt key={k}>{k}</dt><dd>{String(v)}</dd></>))}</dl></>)}
+        <dl>{kv(r.vendorRecord).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}</dl>
+        {r.projectRecord && (<><h3>Project</h3><dl>{kv(r.projectRecord).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}</dl></>)}
         <p className="muted small">Payments are shown as context only and are not counted as separate spend.</p>
       </div>
     </aside>
@@ -566,7 +602,7 @@ function CompanyPicker({ companies, value, onChange }: { companies: CompanySumma
         placeholder="Search companies by name or industry"
         value={open ? q : current?.name ?? ''}
         onFocus={() => { setOpen(true); setQ(''); }}
-        onChange={(e) => setQ(e.target.value)}
+        onChange={(e) => { setOpen(true); setQ(e.target.value); }}
         onKeyDown={(e) => { if (e.key === 'Enter' && list[0]) pick(list[0].companyId); if (e.key === 'Escape') setOpen(false); }}
       />
       {open && (

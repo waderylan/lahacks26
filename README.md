@@ -49,6 +49,7 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-- Spreadsheet of vendor bills per company (100-record sample when a company has more), loaded on demand from `data/raw/`. Bill payments appear only as drawer context, never as separate spend.
-- Semantic input calls Jev (`typesafe-ai/jev` via Vercel AI Gateway, `experimental_evaluate` boolean questions) from `server/jev.ts`; requires `AI_GATEWAY_API_KEY` in `.env`. Match >= 0.75, no match <= 0.35, otherwise uncertain.
+- Spreadsheet of original vendor bills per company, loaded on demand from `data/raw/`. Choose 50, 100, or all records. Bill payments appear only as drawer context, never as separate spend.
+- Semantic input calls Jev (`typesafe-ai/jev` via Vercel AI Gateway, `experimental_evaluate` choice questions) from `server/jev.ts`; requires `AI_GATEWAY_API_KEY` in `.env`. Jev returns match, no match, or uncertain. Probabilities are displayed as evidence, without replacing the selected outcome.
 - Review state is stored in browser localStorage, keyed by company-scoped bill ID.
+- The **Rules** workspace adds editable ALL / ANY / NOT groups, independent AI judgments, local standard conditions, persistent actions, saved revisions, history, and conflict-aware undo. See [RULES_DEMO.md](RULES_DEMO.md) for the demo and execution semantics.

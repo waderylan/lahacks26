@@ -12,5 +12,8 @@ node_modules/
 
 dist/
 dev.log
+*.log
+test-results/
+playwright-report/
 artifacts/
 .playwright/

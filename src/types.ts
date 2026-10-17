@@ -38,6 +38,8 @@ export interface CompanyBills {
   sampled: boolean;
   rows: Row[];
   disclosure?: string;
+  reservedRows?: Row[];
+  referenceOptions?: { vendors: string[]; accounts: string[] };
 }
 
 export type MatchState = 'match' | 'no_match' | 'uncertain';

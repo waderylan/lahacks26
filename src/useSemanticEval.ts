@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CompanyBills, RecordResult } from './types';
+import { requestEvaluation } from './jevClient';
 
 const BATCH_SIZE = 20;
 const CONCURRENCY = 3;
@@ -66,14 +67,7 @@ export function useSemanticEval(data: CompanyBills | null, query: string, order:
         while (live && batches.length) {
           const batch = batches.shift()!;
           try {
-            const res = await fetch('/api/evaluate', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ companyId, criterion: q, ids: batch }),
-              signal: ac.signal,
-            });
-            if (!res.ok) throw new Error(((await res.json().catch(() => ({}))) as any).error ?? `HTTP ${res.status}`);
-            const { results, costNanoUsd } = (await res.json()) as { results: RecordResult[]; costNanoUsd: string };
+            const { results, costNanoUsd } = await requestEvaluation(companyId, q, batch, ac.signal);
             commit((s) => {
               const pending = new Set(s.pending);
               const failed = new Set(s.failed);

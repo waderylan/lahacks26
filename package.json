@@ -4,7 +4,9 @@
   "description": "Setup for the [QuickBooks-Hackathon-2026](https://huggingface.co/datasets/CL251215/QuickBooks-Hackathon-2026) `hackathon-100-participant` dataset: 100 synthetic companies, one year of books each.",
   "main": "index.js",
   "scripts": {
-    "test": "tsx --test src/arrange.test.ts",
+    "test": "tsx --test src/arrange.test.ts src/rules.test.ts",
+    "build": "vite build",
+    "test:browser": "playwright test",
     "start": "tsx --env-file=.env server/index.ts",
     "dev": "tsx --env-file=.env server/index.ts",
     "typecheck": "tsc"
@@ -15,6 +17,7 @@
   "type": "module",
   "private": "true",
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",

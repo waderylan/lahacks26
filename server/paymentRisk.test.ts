@@ -4,6 +4,7 @@ import { ActionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
 import { Mailbox } from './mailbox.ts';
 import { PaymentRisk, type Assessor } from './paymentRisk.ts';
+import { RuleService } from './ruleService.ts';
 import { paymentSignals, RISK_FLAG } from '../src/paymentRisk.ts';
 import type { CompanyBills, Row } from '../src/types.ts';
 
@@ -50,4 +51,25 @@ test('checks are cached by evidence, and escalation flags suspicious rows and me
   assert.throws(() => risk.escalate(companyId, 'emp-ap', [rows[1].id]), /Nothing new/);
   db.write({ ...data.row(companyId, rows[2].id), memo: 'Edited memo' }, data.row(companyId, rows[2].id).sourceVersion!);
   await risk.check(companyId, 'all'); assert.equal(calls, 2, 'an edited transaction is re-checked');
+});
+
+test('"check all" is not limited to 1000 transactions', async t => {
+  const db = new ActionStore(':memory:'); t.after(() => db.db.close());
+  const many = Array.from({ length: 1205 }, (_, i) => row(i + 1));
+  const data = new WorkspaceData(db, id => ({ company: { companyId: id, name: 'Big', industry: 'Retail', profile: '', billCount: many.length }, totalBills: many.length, sampled: false, rows: many }) satisfies CompanyBills, () => []);
+  const risk = new PaymentRisk(db, data, async (_company, batch) => batch.map(r => ({ id: r.id, verdict: 'safe', probability: .9, pSuspicious: .01 })));
+  assert.equal(Object.keys((await risk.check(companyId, 'all')).results).length, 1205);
+  await assert.rejects(risk.check(companyId, many.map(r => r.id)), /1-1000/);
+});
+
+test('a demo reset forgets escalations along with their mail, so they can be sent again', async t => {
+  const db = new ActionStore(':memory:'); t.after(() => db.db.close());
+  const rows = [row(1, { memo: 'Remit to the account ending 7731.' })];
+  const data = new WorkspaceData(db, id => ({ company: { companyId: id, name: 'Parcelmint', industry: 'Retail', profile: '', billCount: 1 }, totalBills: 1, sampled: false, rows }) satisfies CompanyBills, () => []);
+  const risk = new PaymentRisk(db, data, async (_c, batch) => batch.map(r => ({ id: r.id, verdict: 'suspicious', probability: .9, pSuspicious: .9 })));
+  await risk.check(companyId, 'all'); risk.escalate(companyId, 'emp-ap', [rows[0].id]);
+  new RuleService(db, data, async () => ({})).reset(companyId);
+  assert.deepEqual(risk.state(companyId).escalated, {});
+  assert.equal(Object.keys(risk.state(companyId).results).length, 1, 'Jev results are kept');
+  assert.equal(Object.keys(risk.escalate(companyId, 'emp-ap', [rows[0].id]).escalated).length, 1);
 });

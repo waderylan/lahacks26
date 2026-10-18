@@ -111,7 +111,7 @@ export function paymentFraudRule(companyId: string, sender: string = DEFAULT_SEN
   return { id: uid(), companyId, name: 'Possible payment fraud', revision: 1, enabled: false,
     expression: { id: uid(), type: 'all', children: [
       { id: uid(), type: 'any', children: [
-        ai('Paid to an account not on file', 'Payment is sent, or asked to be sent, to a bank account that differs from the account on file (the vendor\'s payee details, or the company\'s remit-to account for a customer invoice).'),
+        ai('Paid to an account not on file', 'The transaction or its supporting records name a bank account that this payment goes to, or is asked to go to, and it differs from the account on file (the vendor\'s payee details, or the company\'s remit-to account for a customer invoice). If no destination bank account is named anywhere, this is not met.'),
         ai('Asks to change payment details', 'The text or supporting records ask to change where payment goes, such as new bank details or a new remittance account. Urgency alone, without a change to payment details, does not count.'),
       ] },
       { id: uid(), type: 'not', children: [

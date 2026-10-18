@@ -12,6 +12,8 @@ export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => vo
   const current = useRef(companyId); current.current = companyId;
   const rowCallback = useRef(onRows); rowCallback.current = onRows;
   const sequence = useRef(0);
+  // Set when the background poll fails, so the next successful poll can clear that error (and only that one).
+  const pollFailed = useRef(false);
   const refresh = useCallback(async () => {
     const request = ++sequence.current;
     const response = await fetch(`/api/companies/${companyId}/workspace`);
@@ -19,12 +21,14 @@ export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => vo
     if (!response.ok) throw new Error(body.error ?? 'Could not load dashboard actions.');
     if (current.current === companyId && request === sequence.current) {
       setState(body); rowCallback.current(body.rows ?? []);
+      if (pollFailed.current) { pollFailed.current = false; setError(''); }
     }
   }, [companyId]);
   useEffect(() => {
-    setState(empty()); setError(''); setBusy(false);
-    void refresh().catch(error => { if (current.current === companyId) setError(error.message); });
-    const timer = setInterval(() => { void refresh().catch(error => { if (current.current === companyId) setError(error.message); }); }, 10_000);
+    setState(empty()); setError(''); setBusy(false); pollFailed.current = false;
+    const poll = () => refresh().catch(error => { if (current.current === companyId) { pollFailed.current = true; setError(error.message); } });
+    void poll();
+    const timer = setInterval(() => void poll(), 10_000);
     return () => { clearInterval(timer); sequence.current++; };
   }, [companyId, refresh]);
   const request = async <T,>(path: string, body: unknown, method = 'POST'): Promise<T> => {
@@ -37,7 +41,8 @@ export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => vo
       if (current.current !== companyId) throw new Error('Company changed. The action receipt is available in its original company.');
       if (result.state) setState(previous => ({ ...previous, ...result.state }));
       if (result.rows) rowCallback.current(result.rows);
-      await refresh();
+      // The action already succeeded; a failed follow-up refresh is left to the next poll.
+      await refresh().catch(() => {});
       return result;
     } catch (error) { if (current.current === companyId) setError((error as Error).message); throw error; }
     finally { if (current.current === companyId) setBusy(false); }

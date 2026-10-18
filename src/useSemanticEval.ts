@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { evaluationEvidence } from './jevEvidence';
 import type { CompanyBills, RecordResult } from './types';
 import { requestEvaluation } from './jevClient';
 
@@ -33,12 +34,16 @@ const IDLE: EvalState = {
  * Evaluates `query` against every row (in the given display order) in small batches with
  * bounded concurrency. Any change of query/company aborts in-flight requests and drops
  * their results; a run only writes state while it is still the current one.
+ * Runs restart only when the evidence Jev sees changes, not on review/flag/owner updates.
  */
 export function useSemanticEval(data: CompanyBills | null, query: string, order: () => string[]) {
   const [state, setState] = useState<EvalState>(IDLE);
   const retryRef = useRef<() => void>(() => {});
+  const dataRef = useRef(data); dataRef.current = data;
+  const evidenceKey = useMemo(() => data ? JSON.stringify([data.company.companyId, data.rows.map(row => [row.id, evaluationEvidence(row)])]) : '', [data]);
 
   useEffect(() => {
+    const data = dataRef.current;
     const q = query.trim();
     if (!data || !q) {
       setState(IDLE);
@@ -110,7 +115,7 @@ export function useSemanticEval(data: CompanyBills | null, query: string, order:
     };
     // `order` is read once per run on purpose: row order must not reshuffle mid-run.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, query]);
+  }, [evidenceKey, query]);
 
   const retry = useCallback(() => retryRef.current(), []);
   return { evalState: state, retry };

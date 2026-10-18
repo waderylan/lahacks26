@@ -124,7 +124,16 @@ export class RuleService {
     const state = this.read(companyId), row = reserved.find(row => !(state.store.arrivals[companyId] ?? []).includes(row.id));
     if (!row) throw new Error('No reserved bills remain.');
     this.change(companyId, saved => { saved.store.arrivals[companyId] = [...new Set([...(saved.store.arrivals[companyId] ?? []), row.id])]; });
-    for (const rule of state.store.rules.filter(rule => rule.enabled)) await this.run(companyId, rule.id, rule.revision, [row.id], 'arrival');
+    // One failing rule must not skip the others. A failed rule's watch is cleared for this bill, so the scan retries it.
+    const failed: string[] = [];
+    for (const rule of state.store.rules.filter(rule => rule.enabled)) {
+      try { await this.run(companyId, rule.id, rule.revision, [row.id], 'arrival'); }
+      catch (error) {
+        failed.push(rule.name);
+        this.change(companyId, saved => { if (saved.watches[rule.id]) delete saved.watches[rule.id][row.id]; saved.log = [`${rule.name}: ${(error as Error).message} Will retry.`, ...saved.log].slice(0, 20); });
+      }
+    }
+    if (failed.length) throw new Error(`${row.billId} arrived, but ${failed.join(', ')} failed. It will be retried automatically.`);
     return row;
   }
   undo(companyId: string, id: string) {
@@ -164,6 +173,9 @@ export class RuleService {
       if (full) { saved.watches = {}; for (const row of this.data.bills(companyId).rows.filter(row => row.dashboard?.reviewed)) this.db.write({ ...row, dashboard: { ...row.dashboard!, reviewed: false } }, row.sourceVersion!); }
       saved.log = [];
       this.db.removeAll('mail', companyId);
+      // The escalation mail and flags are gone, so forget the escalations too (Jev's results stay cached).
+      const risk = this.db.get<{ escalated?: Record<string, unknown> }>('payment-risk', companyId);
+      if (risk?.escalated && Object.keys(risk.escalated).length) this.db.put('payment-risk', companyId, companyId, { ...risk, escalated: {} });
     });
   }
   importLegacy(companyId: string, legacy: RuleStore, reviewed: string[] = []) {
@@ -198,7 +210,8 @@ export class RuleService {
           if (!watched) { this.change(companyId, saved => { saved.watches[rule.id] = Object.fromEntries(rows.map(row => [row.id, version(row)])); }); continue; }
           const changed = rows.filter(row => watched[row.id] !== version(row));
           if (!changed.length) continue;
-          try { await this.run(companyId, rule.id, rule.revision, changed.map(row => row.id), 'update'); }
+          // run() takes at most 1000 bills at a time.
+          try { for (let index = 0; index < changed.length; index += 1000) await this.run(companyId, rule.id, rule.revision, changed.slice(index, index + 1000).map(row => row.id), 'update'); }
           catch (error) { this.change(companyId, saved => { saved.log = [`${rule.name}: ${(error as Error).message}`, ...saved.log].slice(0, 20); }); }
         }
       }

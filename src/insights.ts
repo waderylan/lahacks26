@@ -129,7 +129,10 @@ function parsePeriod(q: string, latest: string): { period: ParsedQuestion['perio
       rest: q.slice(0, quarter.index) + q.slice(quarter.index + quarter[0].length),
     };
   }
-  const month = new RegExp(`\\b(?:in |during |for )?(${MONTH_NAMES.join('|')}|${MONTH_NAMES.map(m => m.slice(0, 3)).join('|')})\\b(?: (20\\d\\d))?`).exec(lower);
+  // "may" is usually the verb ("bills that may be duplicates"): only read it as the month with a lead-in or a year.
+  const month = [...lower.matchAll(new RegExp(`\\b(in |during |for |since |of )?(${MONTH_NAMES.join('|')}|${MONTH_NAMES.map(m => m.slice(0, 3)).join('|')})\\b(?: (20\\d\\d))?`, 'g'))]
+    .map(m => Object.assign([m[0], m[2], m[3]], { index: m.index! }))
+    .find((m, _, __, prefixed = /^(in|during|for|since|of) /.test(m[0])) => m[1] !== 'may' || prefixed || Boolean(m[2]));
   if (month) {
     const m = MONTH_NAMES.findIndex(n => n.startsWith(month[1])) + 1;
     const mm = String(m).padStart(2, '0');

@@ -61,8 +61,9 @@ export class PaymentRisk {
   /** `ids: 'all'` checks every transaction in the company, including ones not loaded in the browser. */
   async check(companyId: string, ids: string[] | 'all', signal?: AbortSignal): Promise<RiskState> {
     const company = this.data.bills(companyId).company;
-    if (ids === 'all') ids = this.data.bills(companyId).rows.map(row => row.id);
-    if (!Array.isArray(ids) || !ids.length || ids.length > 1000) throw new Error('Choose 1-1000 transactions to check.');
+    // 'all' may exceed the 1000-id limit for explicit lists; each batch is saved as it finishes, so a long run keeps its progress.
+    if (ids === 'all') { ids = this.data.bills(companyId).rows.map(row => row.id); if (!ids.length) throw new Error('This company has no transactions to check.'); }
+    else if (!Array.isArray(ids) || !ids.length || ids.length > 1000) throw new Error('Choose 1-1000 transactions to check.');
     const rows = [...new Set(ids)].map(id => this.data.row(companyId, id));
     const known = this.read(companyId);
     const todo = rows.filter(row => known.versions[row.id] !== evidenceKey(row));

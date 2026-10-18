@@ -6,7 +6,7 @@ import type { ActionStore } from './actionStore.ts';
 import { emptyDashboard } from './actionStore.ts';
 import type { WorkspaceData } from './workspaceData.ts';
 
-export type Judge = (companyId: string, criterion: string, rows: Row[]) => Promise<Record<string, 'match' | 'no_match' | 'uncertain'>>;
+export type Judge = (companyId: string, criterion: string, rows: Row[], provider?: 'jev' | 'qwen') => Promise<Record<string, 'match' | 'no_match' | 'uncertain'>>;
 const now = () => new Date().toISOString();
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 export function validateAction(input: unknown): BillAction {
@@ -153,9 +153,12 @@ export class ActionEngine {
   async automate(companyId: string, selection: ActionSelection, action: unknown): Promise<ServerAutomation> {
     if (!selection || (!selection.criterion?.trim() && !selection.expression) || selection.scope !== 'matches') throw new Error('A natural-language search or rule is required.');
     const validated = validateAction(action), field = this.field(validated);
-    if (['account', 'memo', 'owner', 'reviewed'].includes(field) && this.store.list<ServerAutomation>('automation', companyId).some(rule => rule.enabled && this.field(rule.action) === field)) throw new Error('Pause the current automatic action for this field before enabling another.');
+    const conflict = () => ['account', 'memo', 'owner', 'reviewed'].includes(field) && this.store.list<ServerAutomation>('automation', companyId).some(rule => rule.enabled && this.field(rule.action) === field);
+    if (conflict()) throw new Error('Pause the current automatic action for this field before enabling another.');
     const data = this.data.bills(companyId);
     await this.matches(companyId, data.rows.slice(0, 1), selection);
+    // Checked again after the await: a concurrent request may have enabled one for this field meanwhile.
+    if (conflict()) throw new Error('Pause the current automatic action for this field before enabling another.');
     const rule: ServerAutomation = { id: crypto.randomUUID(), companyId, criterion: selection.criterion ?? 'Grouped rule', expression: selection.expression, action: validated, enabled: true, createdAt: now(), versions: Object.fromEntries(data.rows.map(row => [row.id, row.sourceVersion!])) };
     this.store.put('automation', rule.id, companyId, rule); return rule;
   }
@@ -169,17 +172,23 @@ export class ActionEngine {
     this.scanning = true;
     try {
       for (const rule of this.store.list<ServerAutomation>('automation').filter(rule => rule.enabled)) {
+        const stillEnabled = () => Boolean(this.store.get<ServerAutomation>('automation', rule.id)?.enabled);
+        let error: string | undefined;
         try {
           const changed = this.data.bills(rule.companyId).rows.filter(row => rule.versions[row.id] !== row.sourceVersion);
           for (let index = 0; index < changed.length; index += 1000) {
             const plan = await this.preview(rule.companyId, { ids: changed.slice(index, index + 1000).map(row => row.id), criterion: rule.criterion, expression: rule.expression, scope: 'matches' }, rule.action);
+            // Paused (or deleted) while Jev was judging: apply nothing. apply() is synchronous, so this check can't go stale.
+            if (!stillEnabled()) break;
             const result = this.apply(rule.companyId, plan.id);
             if (result.items.some(item => item.status === 'failed')) throw new Error('An automated action failed. Check its receipt.');
             for (const item of result.items) rule.versions[item.billId] = item.afterVersion ?? item.version;
           }
-          rule.lastChecked = now(); rule.error = undefined;
-        } catch (error) { rule.error = (error as Error).message; rule.enabled = false; }
-        this.store.put('automation', rule.id, rule.companyId, rule);
+        } catch (caught) { error = (caught as Error).message; }
+        // Save only what the scan owns onto the latest stored copy, so a pause made during the scan sticks.
+        const latest = this.store.get<ServerAutomation>('automation', rule.id);
+        if (!latest) continue;
+        this.store.put('automation', rule.id, rule.companyId, { ...latest, versions: rule.versions, lastChecked: now(), error, enabled: latest.enabled && !error });
       }
     } finally { this.scanning = false; }
   }

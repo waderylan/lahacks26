@@ -1,5 +1,6 @@
 import { experimental_evaluate as evaluate } from 'ai';
 import { getRow, type Row } from './data.ts';
+import { type DecisionInput, type Decision } from './modelContract.ts';
 import { evaluationEvidence } from '../src/jevEvidence.ts';
 
 export type MatchState = 'match' | 'no_match' | 'uncertain';
@@ -7,7 +8,8 @@ export interface RecordResult {
   id: string;
   state: MatchState;
   /** Jev's probability that the criterion is met (the `match` option), for every row whatever it chose. */
-  pMatch: number;
+  pMatch: number | null;
+  scoreKind?: 'candidate_score_uncalibrated' | 'jev_probability' | 'validation_calibrated';
 }
 
 export const JEV_MODEL = 'typesafe-ai/jev';
@@ -85,3 +87,18 @@ export async function evaluateBatch(
   });
   return { results, costNanoUsd };
 }
+
+export async function evaluateJevInputs(inputs: DecisionInput[], signal?: AbortSignal): Promise<{ results: Decision[]; costNanoUsd: string }> {
+  if (!inputs.length) return { results: [], costNanoUsd: '0' };
+  if (inputs.some(x => x.criterion !== inputs[0].criterion || JSON.stringify(x.company) !== JSON.stringify(inputs[0].company))) throw new Error('Jev comparison batches must share company and criterion');
+  const state = { company: inputs[0].company, criterion: inputs[0].criterion, transactions: inputs.map((x, i) => ({ref: 't'+i, ...x.transaction})) };
+  const questions = Object.fromEntries(inputs.map((_, i) => ['t'+i, {type: 'choice' as const, instructions: criterionInstructions('t'+i), criteria: OPTIONS}]));
+  const result: any = await evaluate({ model: JEV_MODEL, state, questions, abortSignal: signal } as any);
+  return {costNanoUsd: toNanoUsd(result.providerMetadata?.gateway?.cost).toString(), results: inputs.map((_, i) => {
+    const a = result.answers['t'+i]; const p = Number(a?.probabilities?.match);
+    if (!a || !(a.choice in OPTIONS) || !Number.isFinite(p)) throw new Error('Invalid Jev comparison answer');
+    return {state: a.choice, pMatch: p, scoreKind: 'jev_probability' as const};
+  })};
+}
+
+export const criterionInstructions = judgeInstructions;

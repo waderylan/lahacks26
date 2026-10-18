@@ -1,0 +1,16 @@
+{
+  "object": "dataset",
+  "id": "5a33a7d072c2",
+  "name": "accounting-semantic-review-sft-v1",
+  "source_type": "upload",
+  "source_uri": null,
+  "huggingface_dataset": null,
+  "num_rows": 1000,
+  "created_at": "2026-10-17T23:13:58.225268Z",
+  "format": "chat_no_prompt",
+  "head_row": 1000,
+  "auto_snapshot_rows": null,
+  "latest_snapshot_id": null,
+  "unsnapshotted_rows": null,
+  "snapshot_count": null
+}

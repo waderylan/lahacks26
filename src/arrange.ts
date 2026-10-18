@@ -13,13 +13,13 @@ export function arrangeRows<T extends { id: string }>(base: T[], isMatch: (id: s
 
 export interface MatchResult {
   state: 'match' | 'no_match' | 'uncertain';
-  pMatch: number;
+  pMatch: number | null;
 }
 
 
 /** Stable sort by P(match). dir -1: highest first; dir 1: lowest first. Unevaluated rows always stay last. */
 export function sortByMatch<T extends { id: string }>(rows: T[], resultOf: (id: string) => MatchResult | undefined, dir: 1 | -1): T[] {
-  const keyed = rows.map((row, i) => ({ row, i, p: resultOf(row.id)?.pMatch }));
+  const keyed = rows.map((row, i) => ({ row, i, p: resultOf(row.id)?.pMatch ?? undefined }));
   keyed.sort((a, b) => {
     if (a.p === undefined || b.p === undefined) return Number(a.p === undefined) - Number(b.p === undefined) || a.i - b.i;
     return (a.p === b.p ? 0 : (a.p - b.p) * dir) || a.i - b.i;

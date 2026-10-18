@@ -2,7 +2,8 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
 import { demoSample, listCompanies } from './data.ts';
-import { jevConfigured, JEV_MODEL } from './jev.ts';
+import { QwenReadinessError, QwenRequestError } from './qwen.ts';
+import { providerStatus, type Provider } from './evaluator.ts';
 import { actionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
 import { ActionEngine } from './actionEngine.ts';
@@ -12,7 +13,10 @@ import { geminiConfigured, GEMINI_MODEL } from './messages.ts';
 import { RuleService } from './ruleService.ts';
 import { ruleRoutes } from './ruleRoutes.ts';
 import { Mailbox, mailRoutes } from './mailbox.ts';
-import { PaymentRisk, paymentRiskRoutes } from './paymentRisk.ts';
+import { paymentRiskCheck } from './paymentRisk.ts';
+import { duplicatesCheck } from './duplicates.ts';
+import { ReviewCheck, reviewCheckRoutes } from './reviewChecks.ts';
+import { SavedSearchService, savedSearchRoutes } from './savedSearches.ts';
 import { ChatStore, chatRoutes } from './chat.ts';
 
 const app = express();
@@ -20,13 +24,24 @@ app.use(express.json({ limit: '1mb' }));
 const database = actionStore();
 const workspace = new WorkspaceData(database);
 const semantics = new SemanticService(workspace);
-const actions = new ActionEngine(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
-const rules = new RuleService(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
+const actions = new ActionEngine(database, workspace, (companyId, criterion, rows, provider) => semantics.judge(companyId, criterion, rows, provider));
+const rules = new RuleService(database, workspace, (companyId, criterion, rows, provider) => semantics.judge(companyId, criterion, rows, provider));
+const savedSearches = new SavedSearchService(database, id => listCompanies().some(company => company.companyId === id), {
+  rows: companyId => {
+    const full = workspace.bills(companyId);
+    if (full.company.scenario) return full.rows;
+    const reserved = new Set(full.rows.slice(-5).map(row => row.id));
+    const arrived = rules.snapshot(companyId).store.arrivals[companyId] ?? [];
+    return full.rows.filter(row => !reserved.has(row.id) || arrived.includes(row.id));
+  },
+  judge: (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows),
+});
 
 app.use('/api', sameOriginApi);
 
-app.get('/api/status', (_req, res) => {
-  res.json({ jev: { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway' }, gemini: { configured: geminiConfigured(), model: GEMINI_MODEL } });
+app.get('/api/status', (req, res) => {
+  const provider: Provider = req.query.model === 'qwen' ? 'qwen' : 'jev';
+  res.json({ jev: providerStatus(provider), providers: { jev: providerStatus('jev'), qwen: providerStatus('qwen') }, gemini: { configured: geminiConfigured(), model: GEMINI_MODEL } });
 });
 
 app.get('/api/companies', (_req, res) => res.json(listCompanies()));
@@ -57,25 +72,31 @@ app.post('/api/evaluate', async (req, res) => {
   if (typeof criterion !== 'string' || !criterion.trim() || criterion.length > 500 || !Array.isArray(ids) || !ids.length || ids.length > 25 || !ids.every(id => typeof id === 'string' && id.startsWith(`${companyId}:`))) {
     return res.status(400).json({ error: 'invalid request' });
   }
-  if (!jevConfigured()) return res.status(503).json({ error: 'Jev is not configured (AI_GATEWAY_API_KEY missing)' });
+  if (req.body.model !== undefined && !['jev', 'qwen'].includes(req.body.model)) return res.status(400).json({ error: 'Unknown model' });
+  const provider: Provider = req.body.model === 'qwen' ? 'qwen' : 'jev';
+  if (!providerStatus(provider).configured) return res.status(503).json({ error: 'Selected model is not configured on the server' });
   const ac = new AbortController();
   res.on('close', () => !res.writableEnded && ac.abort());
   try {
     const { rows } = workspace.bills(String(companyId));
     if (ids.some((id: string) => !rows.some(row => row.id === id))) return res.status(400).json({ error: 'Unknown or cross-company transaction ID' });
-    const { results, costNanoUsd } = await semantics.evaluateRows(String(companyId), criterion.slice(0, 500), ids.map((id: string) => rows.find(row => row.id === id)!), ac.signal);
-    res.json({ results, costNanoUsd });
+    const { results, costNanoUsd } = await semantics.evaluateRows(String(companyId), criterion.slice(0, 500), ids.map((id: string) => rows.find(row => row.id === id)!), ac.signal, provider);
+    res.json({ results, costNanoUsd, model: providerStatus(provider).model, costKind: provider === 'qwen' ? 'gpu_time_unavailable' : 'request' });
   } catch (e) {
     if (ac.signal.aborted) return;
+    if (e instanceof QwenRequestError) return res.status(e.status).json({ error: e.message, requestId: e.requestId });
+    if (e instanceof QwenReadinessError) return res.status(503).json({ error: e.message + ' No actions were applied.' });
     console.error('evaluate failed:', (e as Error).message);
-    res.status(502).json({ error: 'Jev request failed' });
+    res.status(502).json({ error: 'Model request failed; no failed record is treated as false' });
   }
 });
 
 actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));
-paymentRiskRoutes(app, new PaymentRisk(database, workspace));
+reviewCheckRoutes(app, { 'payment-risk': new ReviewCheck(database, workspace, paymentRiskCheck), duplicates: new ReviewCheck(database, workspace, duplicatesCheck) });
+savedSearches.retireMonitoring();
+savedSearchRoutes(app, savedSearches);
 chatRoutes(app, new ChatStore(database, workspace));
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.

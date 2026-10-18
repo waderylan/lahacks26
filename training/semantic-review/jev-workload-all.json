@@ -1,0 +1,2094 @@
+{
+  "provider": "jev",
+  "model": "jev",
+  "companyId": "company-018",
+  "criterion": "Anything electronic or tech-related",
+  "n": 416,
+  "totalMs": 7062.562375,
+  "concurrency": "3 batches of up to 20; Qwen uses 3 concurrent record calls per batch",
+  "requestCostNanoUsd": "7149492",
+  "costNote": "Gateway metadata if available",
+  "results": [
+    {
+      "id": "company-018:bill-00826",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-operating-00356",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00349",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00350",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00351",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00811",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00884",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00900",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-00920",
+      "state": "match",
+      "pMatch": 0.95
+    },
+    {
+      "id": "company-018:bill-00936",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00956",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-operating-00423",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-product-development-00413",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00416",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00417",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-variable-services-00418",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-01002",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01022",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01039",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01056",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-00540",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-00550",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00570",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00588",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00218",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00211",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00212",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00213",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00642",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-00655",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-00668",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00286",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00279",
+      "state": "no_match",
+      "pMatch": 0.04
+    },
+    {
+      "id": "company-018:bill-utilities-00280",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00281",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00686",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-00704",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-00760",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00779",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00793",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-utilities-00683",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00684",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01315",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01365",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01379",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01399",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01418",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-operating-00783",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00776",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00777",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-variable-services-00778",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01435",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01482",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01499",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01520",
+      "state": "match",
+      "pMatch": 0.92
+    },
+    {
+      "id": "company-018:bill-01535",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-income-tax-00894",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-00908",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00901",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00902",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-01075",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00510",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00503",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-00504",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00505",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01145",
+      "state": "match",
+      "pMatch": 1
+    },
+    {
+      "id": "company-018:bill-01124",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01159",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-01178",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-01191",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00601",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00594",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00595",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00596",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01241",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01259",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01276",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01298",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-operating-00689",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00682",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-product-development-01260",
+      "state": "uncertain",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-01267",
+      "state": "no_match",
+      "pMatch": 0.07
+    },
+    {
+      "id": "company-018:bill-utilities-01268",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-variable-services-01269",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01987",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-operating-01384",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-01377",
+      "state": "no_match",
+      "pMatch": 0.06
+    },
+    {
+      "id": "company-018:bill-utilities-01378",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-01379",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-interest-01407",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-02049",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-01509",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-01502",
+      "state": "no_match",
+      "pMatch": 0.06
+    },
+    {
+      "id": "company-018:bill-utilities-01503",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-01504",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02122",
+      "state": "match",
+      "pMatch": 0.92
+    },
+    {
+      "id": "company-018:bill-02190",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-operating-01633",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-01626",
+      "state": "no_match",
+      "pMatch": 0.04
+    },
+    {
+      "id": "company-018:bill-utilities-01627",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-variable-services-00903",
+      "state": "uncertain",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01548",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01549",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01572",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01610",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01624",
+      "state": "match",
+      "pMatch": 0.88
+    },
+    {
+      "id": "company-018:bill-01655",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-01042",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-01035",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-01036",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-variable-services-01037",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-01690",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-01742",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-operating-01161",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-01154",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-01155",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-01156",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-01846",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-01872",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-operating-01274",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02575",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-02601",
+      "state": "match",
+      "pMatch": 0.79
+    },
+    {
+      "id": "company-018:bill-02654",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-02182",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-02175",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-utilities-02176",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-variable-services-02177",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02757",
+      "state": "match",
+      "pMatch": 0.77
+    },
+    {
+      "id": "company-018:bill-growth-02327",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-02345",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-product-development-02326",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-02338",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-02339",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-02340",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-02792",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-02813",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-02857",
+      "state": "match",
+      "pMatch": 0.61
+    },
+    {
+      "id": "company-018:bill-operating-02483",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-02476",
+      "state": "no_match",
+      "pMatch": 0.06
+    },
+    {
+      "id": "company-018:bill-utilities-02477",
+      "state": "no_match",
+      "pMatch": 0.04
+    },
+    {
+      "id": "company-018:bill-variable-services-01628",
+      "state": "uncertain",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02240",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-02303",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-operating-01751",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-01744",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-01745",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-variable-services-01746",
+      "state": "uncertain",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-02379",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-02431",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-02467",
+      "state": "match",
+      "pMatch": 0.63
+    },
+    {
+      "id": "company-018:bill-operating-01894",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-01887",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-01888",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-01889",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-02476",
+      "state": "match",
+      "pMatch": 0.55
+    },
+    {
+      "id": "company-018:bill-interest-01969",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-operating-02034",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-02027",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-02028",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-02029",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-00016",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00006",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00096",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00139",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00045",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00038",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00039",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00040",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00295",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-00097",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00090",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00091",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00092",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00396",
+      "state": "match",
+      "pMatch": 0.94
+    },
+    {
+      "id": "company-018:bill-operating-00144",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00137",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-00138",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-00139",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00463",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00520",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-variable-services-02478",
+      "state": "uncertain",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02938",
+      "state": "match",
+      "pMatch": 0.88
+    },
+    {
+      "id": "company-018:bill-02955",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-interest-02610",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02973",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-income-tax-02612",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-02628",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-02621",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-02622",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-02623",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-03077",
+      "state": "match",
+      "pMatch": 0.62
+    },
+    {
+      "id": "company-018:bill-03076",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-03075",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-operating-02766",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-02759",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-02760",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-02761",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03181",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-03182",
+      "state": "no_match",
+      "pMatch": 0.22
+    },
+    {
+      "id": "company-018:bill-03215",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-growth-02892",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-02908",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-02901",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-02902",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-02903",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03305",
+      "state": "match",
+      "pMatch": 0.85
+    },
+    {
+      "id": "company-018:bill-03330",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-03331",
+      "state": "match",
+      "pMatch": 0.94
+    },
+    {
+      "id": "company-018:bill-03376",
+      "state": "match",
+      "pMatch": 0.65
+    },
+    {
+      "id": "company-018:bill-operating-03061",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03054",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-03055",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03056",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03360",
+      "state": "match",
+      "pMatch": 0.59
+    },
+    {
+      "id": "company-018:bill-03457",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-03227",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03220",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-03221",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03222",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03527",
+      "state": "no_match",
+      "pMatch": 0.46
+    },
+    {
+      "id": "company-018:bill-03528",
+      "state": "match",
+      "pMatch": 0.89
+    },
+    {
+      "id": "company-018:bill-operating-03387",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03380",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-03381",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03382",
+      "state": "uncertain",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03601",
+      "state": "match",
+      "pMatch": 0.9400000000000001
+    },
+    {
+      "id": "company-018:bill-03640",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-03671",
+      "state": "match",
+      "pMatch": 0.86
+    },
+    {
+      "id": "company-018:bill-03724",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-growth-03515",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-03532",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-product-development-03514",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-03525",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-03526",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03527",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-03742",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-03763",
+      "state": "match",
+      "pMatch": 0.84
+    },
+    {
+      "id": "company-018:bill-03797",
+      "state": "match",
+      "pMatch": 0.84
+    },
+    {
+      "id": "company-018:bill-operating-03665",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03658",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-04202",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-04239",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-growth-04071",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-04088",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-04081",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04082",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-04083",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04261",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-04288",
+      "state": "match",
+      "pMatch": 0.83
+    },
+    {
+      "id": "company-018:bill-04376",
+      "state": "match",
+      "pMatch": 0.83
+    },
+    {
+      "id": "company-018:bill-operating-04234",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-04227",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04228",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-04229",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04392",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-04393",
+      "state": "match",
+      "pMatch": 0.86
+    },
+    {
+      "id": "company-018:bill-04418",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-04417",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-04455",
+      "state": "match",
+      "pMatch": 0.5700000000000001
+    },
+    {
+      "id": "company-018:bill-operating-04368",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03659",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03660",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03906",
+      "state": "match",
+      "pMatch": 0.92
+    },
+    {
+      "id": "company-018:bill-03907",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-03923",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-03924",
+      "state": "match",
+      "pMatch": 0.95
+    },
+    {
+      "id": "company-018:bill-operating-03798",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03791",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-03792",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03793",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-04033",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-04034",
+      "state": "match",
+      "pMatch": 0.6900000000000001
+    },
+    {
+      "id": "company-018:bill-04067",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-04092",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-03943",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03936",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-03937",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-variable-services-03938",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04113",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-04164",
+      "state": "match",
+      "pMatch": 0.7
+    },
+    {
+      "id": "company-018:bill-utilities-04361",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04362",
+      "state": "no_match",
+      "pMatch": 0.07
+    },
+    {
+      "id": "company-018:bill-variable-services-04363",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04579",
+      "state": "match",
+      "pMatch": 0.82
+    },
+    {
+      "id": "company-018:bill-04578",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-04605",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-04606",
+      "state": "match",
+      "pMatch": 0.83
+    },
+    {
+      "id": "company-018:bill-04628",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-income-tax-04501",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-04518",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-04511",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-04512",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-04513",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04677",
+      "state": "match",
+      "pMatch": 0.85
+    },
+    {
+      "id": "company-018:bill-04737",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-04779",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-04780",
+      "state": "match",
+      "pMatch": 0.87
+    },
+    {
+      "id": "company-018:bill-growth-04645",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-04662",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-product-development-04644",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04655",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04656",
+      "state": "no_match",
+      "pMatch": 0.04
+    },
+    {
+      "id": "company-018:bill-variable-services-04657",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04814",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-04837",
+      "state": "match",
+      "pMatch": 0.79
+    },
+    {
+      "id": "company-018:bill-04906",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-04797",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-04790",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-utilities-04791",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-04792",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-04946",
+      "state": "match",
+      "pMatch": 0.77
+    },
+    {
+      "id": "company-018:bill-04974",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-05027",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-05028",
+      "state": "match",
+      "pMatch": 0.82
+    },
+    {
+      "id": "company-018:bill-05072",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-operating-04953",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-04946",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04947",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-04948",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-05111",
+      "state": "match",
+      "pMatch": 0.53
+    },
+    {
+      "id": "company-018:bill-05112",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-05153",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-05112",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-05105",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-05106",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-05107",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-05226",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-05252",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-05277",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-05292",
+      "state": "match",
+      "pMatch": 0.92
+    },
+    {
+      "id": "company-018:bill-05293",
+      "state": "match",
+      "pMatch": 0.94
+    },
+    {
+      "id": "company-018:bill-growth-05250",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-05267",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-05260",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-05261",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-05262",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-05400",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-05401",
+      "state": "match",
+      "pMatch": 0.86
+    },
+    {
+      "id": "company-018:bill-05452",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-05453",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-05454",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-05502",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-05503",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-operating-05426",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-05419",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-05420",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-variable-services-05421",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-05526",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-05571",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-05593",
+      "state": "match",
+      "pMatch": 0.95
+    },
+    {
+      "id": "company-018:bill-05610",
+      "state": "match",
+      "pMatch": 0.89
+    },
+    {
+      "id": "company-018:bill-operating-05560",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-05553",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-05554",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-05555",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-05654",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-05690",
+      "state": "match",
+      "pMatch": 1
+    },
+    {
+      "id": "company-018:bill-05713",
+      "state": "match",
+      "pMatch": 0.8
+    },
+    {
+      "id": "company-018:bill-05714",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-05800",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-operating-06028",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-06021",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-06022",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-variable-services-06023",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06104",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-06128",
+      "state": "match",
+      "pMatch": 0.57
+    },
+    {
+      "id": "company-018:bill-06167",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-06213",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-06193",
+      "state": "match",
+      "pMatch": 0.78
+    },
+    {
+      "id": "company-018:bill-06228",
+      "state": "match",
+      "pMatch": 0.82
+    },
+    {
+      "id": "company-018:bill-operating-06176",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-06169",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-06170",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-06171",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06212",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-06293",
+      "state": "match",
+      "pMatch": 0.67
+    },
+    {
+      "id": "company-018:bill-06315",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-06353",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-06354",
+      "state": "match",
+      "pMatch": 0.79
+    },
+    {
+      "id": "company-018:bill-operating-06325",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-05801",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-operating-05716",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-05709",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-utilities-05710",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-05711",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-05826",
+      "state": "match",
+      "pMatch": 0.85
+    },
+    {
+      "id": "company-018:bill-05848",
+      "state": "match",
+      "pMatch": 0.86
+    },
+    {
+      "id": "company-018:bill-05906",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-05924",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-05925",
+      "state": "match",
+      "pMatch": 0.82
+    },
+    {
+      "id": "company-018:bill-equipment-05859",
+      "state": "uncertain",
+      "pMatch": 0.1
+    },
+    {
+      "id": "company-018:bill-growth-05860",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-05876",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-05869",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-05870",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-variable-services-05871",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06010",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-06011",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06069",
+      "state": "match",
+      "pMatch": 0.75
+    },
+    {
+      "id": "company-018:bill-06070",
+      "state": "match",
+      "pMatch": 0.88
+    },
+    {
+      "id": "company-018:bill-utilities-06318",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-utilities-06319",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-06320",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06370",
+      "state": "match",
+      "pMatch": 0.96
+    },
+    {
+      "id": "company-018:bill-06478",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-06455",
+      "state": "match",
+      "pMatch": 0.78
+    },
+    {
+      "id": "company-018:bill-06456",
+      "state": "match",
+      "pMatch": 0.84
+    },
+    {
+      "id": "company-018:bill-06477",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-growth-06462",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-income-tax-06461",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-operating-06479",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-06472",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-utilities-06473",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-06474",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06541",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-permit-06507",
+      "state": "no_match",
+      "pMatch": 0
+    }
+  ],
+  "note": "Original records. Jev/Qwen agreement is not independent accounting accuracy. One warm-server run; not a statistical latency benchmark."
+}

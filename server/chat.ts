@@ -19,6 +19,9 @@ export class ChatStore {
   }
   save(companyId: string, turn: any) {
     if (!employeeById(turn?.as) || typeof turn.id !== 'string' || typeof turn.question !== 'string' || turn.question.length > 300) throw new Error('Invalid chat turn.');
+    // Turn ids come from the client (it re-saves a turn as the answer arrives); never let one overwrite another company's or employee's turn.
+    const existing = this.db.get<{ companyId: string; as: string }>('chat-turn', turn.id);
+    if (existing && (existing.companyId !== companyId || existing.as !== turn.as)) throw new Error('Invalid chat turn.');
     this.db.put('chat-turn', turn.id, companyId, { ...turn, companyId, createdAt: turn.createdAt ?? new Date().toISOString() });
   }
   /** Dashboard charts are shared by everyone in the company; null until someone changes the starter set. */
@@ -31,7 +34,8 @@ export class ChatStore {
     this.db.put('dashboard-charts', companyId, companyId, { charts });
   }
   clear(companyId: string, as: string) {
-    for (const turn of this.history(companyId, as)) this.db.db.prepare('DELETE FROM documents WHERE kind=? AND id=?').run('chat-turn', turn.id);
+    // Every turn, not just the 50 that history() returns.
+    for (const turn of this.db.list<{ id: string; as: string }>('chat-turn', companyId).filter(t => t.as === as)) this.db.db.prepare('DELETE FROM documents WHERE kind=? AND id=?').run('chat-turn', turn.id);
   }
 
   /** Jev (or the chosen Gemini model) picks who should handle a set of bills, using the team's employee descriptions. */

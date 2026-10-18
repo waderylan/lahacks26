@@ -37,6 +37,73 @@ async function eventually(check: () => boolean) {
   assert.fail('Expected worker to settle.');
 }
 
+test('record filters exclude transactions from every outcome action, including no-match actions', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const rule: Rule = { ...makeRule(), scope: { type: 'invoice', status: 'needs_review', assignee: 'unassigned' },
+    expression: { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '1000' },
+    actions: [{ id: 'tag', type: 'tag', value: 'Checked invoice', when: 'false' }] };
+  const invoice = data.row(companyId, ids[0]);
+  db.write({ ...invoice, txnType: 'invoice' }, invoice.sourceVersion!);
+  service.save(companyId, rule, null);
+  await service.run(companyId, rule.id, 1, ids);
+  assert.deepEqual(data.row(companyId, ids[0]).dashboard?.tags, ['Checked invoice']);
+  assert.deepEqual(data.row(companyId, ids[1]).dashboard?.tags, []);
+  assert.equal(service.snapshot(companyId).store.history.length, 1);
+});
+
+test('recurring scoped rules notice a record entering the assignee filter without a business-evidence change', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const rule: Rule = { ...makeRule(), scope: { type: 'all', status: 'all', assignee: 'Bookkeeper' }, actions: [{ id: 'flag', type: 'flag', value: 'Review assigned item' }] };
+  service.save(companyId, rule, null); service.toggle(companyId, rule.id, 1, true);
+  await service.scan();
+  assert.equal(service.snapshot(companyId).store.history.length, 0);
+  const row = data.row(companyId, ids[0]);
+  db.write({ ...row, dashboard: { ...row.dashboard!, owner: 'Bookkeeper' } }, row.sourceVersion!);
+  await service.scan();
+  assert.deepEqual(data.row(companyId, ids[0]).dashboard?.flags, ['Review assigned item']);
+  await service.scan();
+  assert.equal(service.snapshot(companyId).store.history.length, 1);
+});
+
+test('adding its own flag does not make a flagged-record rule send a second message', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const rule: Rule = { ...makeRule(), scope: { type: 'all', status: 'flagged', assignee: 'all' } };
+  const row = data.row(companyId, ids[0]);
+  db.write({ ...row, dashboard: { ...row.dashboard!, flags: ['Manual hold'] } }, row.sourceVersion!);
+  service.save(companyId, rule, null); service.toggle(companyId, rule.id, 1, true);
+  await service.run(companyId, rule.id, 1, [ids[0]]);
+  await eventually(() => service.snapshot(companyId).store.messages[0]?.generation === 'ready');
+  await service.scan();
+  assert.equal(service.snapshot(companyId).store.messages.length, 1);
+});
+
+test('outcome actions are rechecked server-side and uncertain drafts retain their trigger through approval', async t => {
+  const { db, data } = setup(); t.after(() => db.db.close());
+  let writtenOutcome: string | undefined;
+  const service = new RuleService(db, data, async (_company, _text, rows) => Object.fromEntries(rows.map(row => [row.id, row.billId === 'bill-1' ? 'match' : row.billId === 'bill-2' ? 'uncertain' : 'no_match'])), async request => {
+    writtenOutcome = request.outcome; return draft;
+  });
+  const rule: Rule = { ...makeRule(), expression: { id: 'check', type: 'ai', text: 'Needs review', label: '' }, actions: [
+    { id: 'match', type: 'flag', value: 'Check charge' },
+    { id: 'uncertain', type: 'message', value: 'Request receipt', recipient: 'jev', sender: 'emp-ap', when: 'uncertain' },
+    { id: 'nonmatch', type: 'tag', value: 'No issue', when: 'false' },
+  ] };
+  service.save(companyId, rule, null);
+  await service.run(companyId, rule.id, 1, [row(1).id, row(2).id, row(3).id]);
+  await eventually(() => service.snapshot(companyId).store.messages[0]?.generation === 'ready');
+  assert.deepEqual(data.row(companyId, row(1).id).dashboard?.flags, ['Check charge']);
+  assert.deepEqual(data.row(companyId, row(2).id).dashboard?.flags, []);
+  assert.deepEqual(data.row(companyId, row(3).id).dashboard?.tags, ['No issue']);
+  assert.equal(writtenOutcome, 'uncertain');
+  const message = service.snapshot(companyId).store.messages[0];
+  assert.equal(message.outcome, 'uncertain');
+  assert.equal(db.list('mail', companyId).length, 0);
+  service.decide(companyId, message.id, 'approved', message.body, message.body, 'emp-ap');
+  assert.equal(db.list('mail', companyId).length, 1);
+  await service.run(companyId, rule.id, 1, [row(1).id, row(2).id, row(3).id]);
+  assert.equal(service.snapshot(companyId).store.messages.length, 1);
+});
+
 test('rules, messages, approvals, notification flags, bill metadata and arrivals survive database reopen', async () => {
   const filename = path.join(os.tmpdir(), `lahacks-rules-${crypto.randomUUID()}.sqlite`);
   const first = setup(filename), rule = makeRule();
@@ -198,4 +265,20 @@ test('mail: X sends Y, Y sees it in their inbox; replies thread; only the recipi
   assert.equal(mailbox.view(companyId, 'emp-ap').sent.find(mail => mail.source === 'rule')!.id, delivered.id);
   service.reset(companyId);
   assert.equal(mailbox.view(companyId, 'emp-controller').inbox.length, 0);
+});
+
+test('rule runs use the selected provider and retain it for background runs', async () => {
+  const { db, data } = setup();
+  const providers: (string | undefined)[] = [];
+  const service = new RuleService(db, data, async (company, text, rows, provider) => {
+    providers.push(provider); return judge(company, text, rows);
+  });
+  try {
+    const rule: Rule = { ...makeRule(), provider: 'qwen', expression: { id: 'ai', type: 'ai', text: 'Equipment purchase', label: '' }, actions: [{ id: 'flag', type: 'flag', value: 'Needs review' }] };
+    service.save(companyId, rule, null);
+    await service.run(companyId, rule.id, 1, ids);
+    await service.run(companyId, rule.id, 1, ids, 'run', false, 'jev');
+    assert.deepEqual(providers, ['qwen', 'jev']);
+    assert.equal(service.snapshot(companyId).store.rules[0].provider, 'qwen');
+  } finally { db.db.close(); }
 });

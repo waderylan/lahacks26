@@ -22,14 +22,20 @@ export function ruleRoutes(app: Express, service: RuleService) {
   }));
   app.post('/api/companies/:id/rules/commands', route(async (req, res) => {
     const id = company(req), command = req.body ?? {};
-    let replayed;
+    if (command.model !== undefined && !['jev', 'qwen'].includes(command.model)) throw new Error('Unknown model');
+    const provider = command.model as 'jev' | 'qwen' | undefined;
+    let replayed, selectedRuleId;
     switch (command.type) {
-      case 'save': service.save(id, command.rule, command.expectedRevision, command.activate); break;
+      case 'save': service.save(id, { ...command.rule, provider: provider ?? command.rule?.provider ?? 'jev' }, command.expectedRevision, command.activate); break;
+      case 'add-preset': selectedRuleId = service.addPreset(id, command.presetId, command.sender); break;
       case 'toggle': service.toggle(id, command.id, command.revision, command.enabled); break;
-      case 'run': await service.run(id, command.id, command.revision, command.ids); break;
+      case 'run': await service.run(id, command.id, command.revision, command.ids, 'run', false, provider); break;
+      case 'run-all': await service.runAll(id, command.id, command.revision, provider); break;
+      case 'delete': service.delete(id, command.id, command.revision); break;
       case 'replay': replayed = await service.replay(id); break;
       case 'undo': service.undo(id, command.id); break;
       case 'metadata': service.updateMetadata(id, command.id, command.value, command.expectedVersion); break;
+      case 'add-evidence': service.addEvidence(id, command.id, command.title, command.text, command.expectedVersion); break;
       case 'decide': service.decide(id, command.id, command.status, command.body, command.expectedBody, command.actor); break;
       case 'retry-draft': service.retry(id, command.id); break;
       case 'read-notices': service.notices(id); break;
@@ -38,6 +44,6 @@ export function ruleRoutes(app: Express, service: RuleService) {
       case 'reset': service.reset(id, command.full === true); break;
       default: throw new Error('Unknown workspace command.');
     }
-    res.json({ ...service.snapshot(id), replayed });
+    res.json({ ...service.snapshot(id), replayed, selectedRuleId });
   }));
 }

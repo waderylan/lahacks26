@@ -15,6 +15,7 @@ import { Mailbox, mailRoutes } from './mailbox.ts';
 import { paymentRiskCheck } from './paymentRisk.ts';
 import { duplicatesCheck } from './duplicates.ts';
 import { ReviewCheck, reviewCheckRoutes } from './reviewChecks.ts';
+import { SavedSearchService, savedSearchRoutes } from './savedSearches.ts';
 import { ChatStore, chatRoutes } from './chat.ts';
 
 const app = express();
@@ -24,6 +25,16 @@ const workspace = new WorkspaceData(database);
 const semantics = new SemanticService(workspace);
 const actions = new ActionEngine(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
 const rules = new RuleService(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
+const savedSearches = new SavedSearchService(database, id => listCompanies().some(company => company.companyId === id), {
+  rows: companyId => {
+    const full = workspace.bills(companyId);
+    if (full.company.scenario) return full.rows;
+    const reserved = new Set(full.rows.slice(-5).map(row => row.id));
+    const arrived = rules.snapshot(companyId).store.arrivals[companyId] ?? [];
+    return full.rows.filter(row => !reserved.has(row.id) || arrived.includes(row.id));
+  },
+  judge: (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows),
+});
 
 app.use('/api', sameOriginApi);
 
@@ -78,6 +89,8 @@ actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));
 reviewCheckRoutes(app, { 'payment-risk': new ReviewCheck(database, workspace, paymentRiskCheck), duplicates: new ReviewCheck(database, workspace, duplicatesCheck) });
+savedSearches.retireMonitoring();
+savedSearchRoutes(app, savedSearches);
 chatRoutes(app, new ChatStore(database, workspace));
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.

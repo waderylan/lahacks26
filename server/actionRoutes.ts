@@ -18,7 +18,7 @@ export function actionRoutes(app: Express, engine: ActionEngine) {
   app.use('/api', sameOriginApi);
   app.get('/api/companies/:id/workspace', route((req, res) => {
     const data = engine.data.bills(company(req));
-    const rows = data.rows.map(({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges }) => ({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges }));
+    const rows = data.rows.map(({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges, evidence }) => ({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges, evidence }));
     const state = engine.store.state(company(req));
     const owners = [...new Set([...data.rows.map(row => row.dashboard?.owner ?? ''), ...state.tasks.map(task => task.owner)])].filter(Boolean).sort();
     res.json({ ...state, accounts: engine.data.accounts(company(req)), rows, owners });

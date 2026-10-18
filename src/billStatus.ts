@@ -14,10 +14,11 @@ export function billEvents(history: HistoryEntry[], messages: DraftMessage[], ru
   const events = new Map<string, BillEvent[]>();
   const add = (id: string, event: BillEvent) => { const list = events.get(id) ?? []; list.push(event); events.set(id, list); };
   for (const entry of history) {
+    if (entry.resolution) { add(entry.transactionId, { label: `Resolved: ${entry.ruleName}`, tone: 'ok', at: entry.timestamp }); continue; }
     const a = entry.action;
     if (!a || entry.undoneAt || a.type === 'message') continue;
     add(entry.transactionId, { at: entry.timestamp, ...(a.type === 'flag' ? { label: `Flagged: ${a.value}`, tone: 'warn' } : a.type === 'assign' ? { label: `Assigned to ${a.value}`, tone: 'info' }
-      : a.type === 'tag' ? { label: `Tagged: ${a.value}`, tone: 'info' } : { label: 'Passed automated check', tone: 'ok' }) });
+      : a.type === 'tag' ? { label: `Tagged: ${a.value}`, tone: 'info' } : a.type === 'task' ? { label: `Task for ${a.owner}: ${a.value}`, tone: 'info' } : { label: 'Passed automated check', tone: 'ok' }) });
   }
   for (const m of messages) {
     const event: BillEvent = m.status === 'approved' ? { label: `Sent message to ${firstName(m.employeeId)}`, tone: 'ok', at: m.decidedAt ?? m.createdAt }

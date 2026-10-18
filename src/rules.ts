@@ -1,5 +1,7 @@
+import type { RuleScope } from './ruleScope';
 import type { Row } from './types';
 import { employeeById } from './employees';
+import type { ReviewTask } from './actionTypes';
 
 export type Truth = 'true' | 'false' | 'uncertain';
 export type Outcome = Truth | 'pending' | 'error';
@@ -7,17 +9,39 @@ export type Group = { id: string; type: 'all' | 'any' | 'not'; children: RuleNod
 export type AICondition = { id: string; type: 'ai'; text: string; label: string };
 export type StandardCondition = { id: string; type: 'standard'; field: 'amountCents' | 'review' | 'vendor' | 'account'; operator: 'gt' | 'lt' | 'eq'; value: string };
 export type RuleNode = Group | AICondition | StandardCondition;
-export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message';
+export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message' | 'task';
 /**
  * For `message`, `value` is the reviewer's short request, `recipient` is an employee ID or 'jev' (Jev picks),
  * and `sender` is the employee who approves the drafts and sends them.
  */
-export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string };
+export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string; when?: Truth; owner?: string; dueDays?: number };
+export const RESULT_LABELS: Record<Truth, string> = { true: 'Match', uncertain: 'Not enough information', false: 'No match' };
+/** Actions saved before outcome branches were added still run only on matches. */
+export const actionOutcome = (action: Action): Truth => action.when ?? 'true';
+export const actionsForOutcome = (rule: Rule, outcome: Outcome): Action[] =>
+  rule.actions.filter(action => actionOutcome(action) === outcome);
 /** Drafts and rules saved before senders existed are sent from AP, the default reviewer. */
 export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
+  /** Retained after editing or renaming a starter so the library can reopen it. */
+  presetId?: string;
   expression: RuleNode; actions: Action[];
+  autoResolve?: boolean;
+  scope?: RuleScope;
+}
+/** Preserve issue ownership for older rules when an unrestricted scope is added. */
+export const ruleConditionKey = (rule: Rule): string => rule.scope && (rule.scope.type !== 'all' || rule.scope.status !== 'all' || rule.scope.assignee !== 'all')
+  ? JSON.stringify([rule.expression, rule.scope]) : JSON.stringify(rule.expression);
+export interface RuleIssue {
+  id: string; companyId: string; ruleId: string; ruleName: string; transactionId: string;
+  conditionKey: string; cycle: string; openedAt: string; resolvedAt?: string;
+  status: 'open' | 'resolved'; lastResult: Truth;
+  flags: { label: string; removable: boolean }[]; taskIds: string[];
+}
+export interface RuleRunSummary {
+  ruleId: string; revision: number; checkedAt: string; transactionCount: number;
+  matches: number; uncertain: number; nonmatches: number; source: 'run' | 'arrival' | 'update';
 }
 export interface LocalTransaction { flags: string[]; tags: string[]; owner: string; automatedCheck: boolean }
 export type MessageStatus = 'pending' | 'approved' | 'rejected';
@@ -26,6 +50,7 @@ export interface DraftMessage {
   /** Every bill this message covers; a run batches all its matches into one message (up to MAX_MESSAGE_ITEMS). */
   items: MessageItem[]; batchId: string;
   ruleId: string; ruleName: string; revision: number; actionId: string;
+  outcome?: Truth;
   to: string; subject: string; body: string; reason: string;
   status: MessageStatus; edited: boolean; createdAt: string; decidedAt?: string;
   /** Absent on drafts saved before generated messages; those are ready. */
@@ -48,6 +73,7 @@ export interface HistoryEntry {
   companyId: string; transactionId: string; transactionVersion: string; action: Action | null;
   timestamp: string; previous: unknown; resulting: unknown; snapshot: Snapshot;
   source: 'run' | 'arrival' | 'update'; undoneAt?: string;
+  resolution?: { issueId: string; flags: string[]; taskIds: string[]; kept: string[] };
 }
 export interface RuleStore {
   rules: Rule[]; transactions: Record<string, LocalTransaction>; history: HistoryEntry[];
@@ -124,15 +150,60 @@ export function paymentFraudRule(companyId: string, sender: string = DEFAULT_SEN
     ] };
 }
 
-export interface RulePreset { id: string; name: string; description: string; build: (companyId: string, sender: string) => Rule }
+/** The same editable condition/action blocks as the payment-fraud preset. */
+function accountingStarter(companyId: string, sender: string, name: string, label: string, text: string, flag: string, task: string, owner: string, request: string): Rule {
+  return { id: uid(), companyId, name, revision: 1, enabled: false, autoResolve: true,
+    expression: { id: uid(), type: 'all', children: [{ id: uid(), type: 'ai', label, text }] },
+    actions: [
+      { id: uid(), type: 'flag', value: flag },
+      { id: uid(), type: 'task', value: task, owner, dueDays: 2 },
+      { id: uid(), type: 'message', value: request, recipient: 'jev', sender },
+      { id: uid(), type: 'task', value: `Clarify: ${task}`, owner, dueDays: 2, when: 'uncertain' },
+    ] };
+}
+
+export function duplicateChargesRule(companyId: string, sender = DEFAULT_SENDER): Rule {
+  return accountingStarter(companyId, sender, 'Possible duplicate charges', 'Same charge more than once',
+    'This transaction appears to charge or pay again for the same underlying goods, work, invoice or one-time fee as a nearby transaction. Compare the related records, amounts, dates and references. Exclude separate deliveries, documented installments, distinct service periods and payments applied to different invoices. If similar charges cannot be distinguished with the available records, return uncertain.',
+    'Possible duplicate', 'Verify whether this charge was already billed or paid', 'Priya Natarajan',
+    'Ask whether these charges cover the same work, goods or invoice. Request the original invoice and delivery, service-period or payment records that distinguish them. Describe them as possible duplicates pending review.');
+}
+
+export function missingDocumentationRule(companyId: string, sender = DEFAULT_SENDER): Rule {
+  return accountingStarter(companyId, sender, 'Missing documentation', 'Insufficient purchase detail',
+    'The available description, memo and supporting records together do not identify what was bought or paid for, its business purpose, or its applicable service period, job or event. An unitemized receipt or generic placeholder without supporting detail counts. A blank memo or description alone does not count when the other records explain the transaction. Do not require a job or event for ordinary overhead.',
+    'Needs documentation', 'Request itemized documentation and business purpose', 'Priya Natarajan',
+    'Ask for itemized purchase details, business purpose and any applicable service period, job or event reference for these transactions. Explain what is missing without calling the charge fraudulent.');
+}
+
+export function unsupportedExpensesRule(companyId: string, sender = DEFAULT_SENDER): Rule {
+  return accountingStarter(companyId, sender, 'Unsupported expenses', 'Expense conflicts with supporting records',
+    'The transaction claims goods, work or a business expense that the receiving, completion, project, order or receipt records contradict: undelivered quantities, work after cancellation, unauthorized scope, or personal purchases inconsistent with the stated purpose. Exclude approved change orders, documented business purchases and late invoices for work completed before cancellation. If authorization or receipt evidence is missing rather than contradictory, return uncertain.',
+    'Unsupported expense', 'Verify delivery, authorization or business purpose', 'Grace Adeyemi',
+    'Ask for the delivery, completion, approval or receipt records supporting these expenses. Identify any conflict with the billed quantity, project timeline or stated business purpose. Request review before payment; do not present a screening result as proven fraud.');
+}
+
+export interface RulePreset { id: string; name: string; description: string; starter?: boolean; build: (companyId: string, sender: string) => Rule }
 /** Starting points for the rule builder. Choosing one fills in its conditions and actions for editing. */
 export function rulePresets(synthetic: boolean): RulePreset[] {
   const presets: RulePreset[] = [
-    { id: 'payment-fraud', name: 'Possible payment fraud', description: 'Payment to a bank account not on file, or a request to change payment details, without a verified change. Flags it and drafts a message to the CFO. Works best on companies with bank records (the synthetic ones).', build: paymentFraudRule },
+    { id: 'duplicate-charges', name: 'Possible duplicate charges', starter: true, description: 'Compare repeated bills and payments while allowing separate deliveries, installments and service periods.', build: duplicateChargesRule },
+    { id: 'missing-documentation', name: 'Missing documentation', starter: true, description: 'Find vague purchase details and unitemized receipts; use supporting records before requesting more detail.', build: missingDocumentationRule },
+    { id: 'payment-fraud', name: 'Possible payment fraud', starter: true, description: 'Find unverified payment changes and account mismatches. Flag possible diversion and draft a message to the CFO.', build: paymentFraudRule },
+    { id: 'unsupported-expenses', name: 'Unsupported expenses', starter: true, description: 'Compare billed work, delivered quantities and business purpose with approvals, project records and receipts.', build: unsupportedExpensesRule },
     { id: 'memo-clarification', name: 'Memo needs clarification', description: 'Memo says standing overhead, but the items are physical goods.', build: companyId => exampleRule(companyId) },
   ];
   if (synthetic) syntheticExampleRules('').forEach((rule, index) => presets.push({ id: `synthetic-${index}`, name: rule.name, description: leaves(rule.expression).map(n => n.type === 'ai' ? n.label : '').filter(Boolean).join(' · '), build: companyId => syntheticExampleRules(companyId)[index] }));
-  return presets;
+  return presets.map(preset => ({ ...preset, build: (companyId, sender) => ({ ...preset.build(companyId, sender), presetId: preset.id }) }));
+}
+
+/** Older presets have no marker. Recognize their exact conditions without relying on the editable name. */
+export function savedPreset(rules: Rule[], preset: RulePreset, companyId: string): Rule | undefined {
+  const expression = (node: RuleNode): unknown => 'children' in node ? [node.type, node.children.map(expression)]
+    : node.type === 'ai' ? [node.type, node.text] : [node.type, node.field, node.operator, node.value];
+  const original = JSON.stringify(expression(preset.build(companyId, DEFAULT_SENDER).expression));
+  return rules.find(rule => rule.companyId === companyId && rule.presetId === preset.id)
+    ?? rules.find(rule => rule.companyId === companyId && !rule.presetId && JSON.stringify(expression(rule.expression)) === original);
 }
 export const leaves = (node: RuleNode): (AICondition | StandardCondition)[] => 'children' in node ? node.children.flatMap(leaves) : [node];
 
@@ -173,6 +244,9 @@ export function validateRule(input: unknown): string[] {
   if (typeof r.id !== 'string' || !r.id || typeof r.companyId !== 'string' || !r.companyId) errors.push('Rule and company IDs are required.');
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
+  if (r.presetId !== undefined && (typeof r.presetId !== 'string' || !/^[a-z0-9-]{1,64}$/.test(r.presetId))) errors.push('Invalid rule preset.');
+  if (r.autoResolve !== undefined && typeof r.autoResolve !== 'boolean') errors.push('Choose whether this rule clears resolved issues.');
+  if (r.scope !== undefined && (!r.scope || typeof r.scope !== 'object' || !['all', 'bill', 'invoice', 'bank'].includes(r.scope.type) || !['all', 'needs_review', 'reviewed', 'flagged'].includes(r.scope.status) || typeof r.scope.assignee !== 'string' || !r.scope.assignee || r.scope.assignee.length > 100)) errors.push('Choose valid record filters.');
   const checkId = (id: unknown) => { if (typeof id !== 'string' || !id || ids.has(id)) errors.push('Every block needs a unique ID.'); else ids.add(id); };
   const visit = (n: RuleNode, depth: number) => {
     if (!n || typeof n !== 'object') { errors.push('Missing condition.'); return; }
@@ -196,8 +270,12 @@ export function validateRule(input: unknown): string[] {
   visit(r.expression, 1);
   if (!Array.isArray(r.actions) || !r.actions.length) errors.push('Choose at least one action.');
   else r.actions.forEach(a => {
+    if (!a || typeof a !== 'object') { errors.push('Complete each action.'); return; }
     checkId(a.id);
-    if (!['flag', 'assign', 'tag', 'pass', 'message'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
+    if (a.when !== undefined && !['true', 'false', 'uncertain'].includes(a.when)) errors.push('Choose a result for each action.');
+    if (a.when === 'uncertain' && a.type === 'pass') errors.push('Uncertain results cannot be marked checked.');
+    if (!['flag', 'assign', 'tag', 'pass', 'message', 'task'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
+    else if (a.type === 'task' && (typeof a.owner !== 'string' || !a.owner.trim() || a.owner.length > 100 || !Number.isSafeInteger(a.dueDays) || a.dueDays! < 0 || a.dueDays! > 365)) errors.push('Give each task an owner and a due date from 0 to 365 days.');
     else if (a.type === 'message' && a.value.length > 500) errors.push('Message requests must be 500 characters or fewer.');
     else if (a.type === 'message' && a.recipient !== 'jev' && !employeeById(a.recipient)) errors.push('Choose a message recipient or let Jev choose.');
     else if (a.type === 'message' && !employeeById(a.sender)) errors.push('Choose who the message is sent from.');
@@ -214,9 +292,9 @@ export function transactionVersion(row: Row, reviewed?: boolean): string {
   for (let i = 0; i < text.length; i++) { a = Math.imul(a ^ text.charCodeAt(i), 16777619); b = Math.imul(b, 33) ^ text.charCodeAt(i); }
   return `${(a >>> 0).toString(16)}${(b >>> 0).toString(16)}`;
 }
-export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
+export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' || a.type === 'task' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
 export const recipientLabel = (recipient?: string) => recipient === 'jev' ? 'Jev chooses recipient' : employeeById(recipient)?.name ?? 'No recipient';
-export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
+export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : a.type === 'task' ? `Task for ${a.owner}: ${a.value} (due in ${a.dueDays} ${a.dueDays === 1 ? 'day' : 'days'})` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
 
 export const describeCondition = (n: AICondition | StandardCondition) => n.type === 'ai' ? n.label ? `${n.label}: ${n.text}` : n.text
   : `${{ amountCents: 'Amount', review: 'Review status', vendor: 'Vendor', account: 'Account' }[n.field]} ${{ gt: 'greater than', lt: 'less than', eq: 'equals' }[n.operator]} ${n.field === 'amountCents' ? `$${n.value}` : n.value}`;
@@ -242,7 +320,7 @@ export function createDraft(row: Row, rule: Rule, action: Action, snapshot: Snap
   const employee = routing === 'manual' ? employeeById(action.recipient) : undefined;
   return {
     id: uid(), companyId: row.companyId, items: [messageItem(row, rule, snapshot)], batchId,
-    ruleId: rule.id, ruleName: rule.name, revision: rule.revision, actionId: action.id,
+    ruleId: rule.id, ruleName: rule.name, revision: rule.revision, actionId: action.id, outcome: snapshot.result as Truth,
     to: employee?.name ?? 'Choosing recipient…', subject: '', body: '',
     reason: `Drafted by rule “${rule.name}” r${rule.revision}. Nothing has been sent.`,
     status: 'pending', edited: false, createdAt: new Date().toISOString(),
@@ -295,7 +373,7 @@ export function markNoticeToasted(store: RuleStore, id: string): RuleStore {
 
 /** Pure atomic state transition; its idempotency keys survive undo and page reloads. */
 /** Pass the same `batchId` for every row of one run so its message actions share one draft per action. */
-export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid()): RuleStore {
+export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid(), tasks: ReviewTask[] = []): RuleStore {
   if (validateRule(rule).length || row.companyId !== rule.companyId) return store;
   if (leaves(rule.expression).some(n => !['true', 'false', 'uncertain'].includes(snapshot.conditions[n.id])) || evaluateTree(rule.expression, snapshot.conditions) !== snapshot.result) return store;
   const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}`;
@@ -304,11 +382,22 @@ export function executeRule(store: RuleStore, rule: Rule, row: Row, version: str
   if (snapshot.result === 'pending' || snapshot.result === 'error' || Object.values(snapshot.conditions).some(v => v === 'pending' || v === 'error')) return store;
   let next: RuleStore = { ...store, transactions: { ...store.transactions }, history: [...store.history], executions: [...store.executions, executionKey], messages: [...(store.messages ?? [])], notices: [...(store.notices ?? [])] };
   const record = (key: string, action: Action | null, previous: unknown, resulting: unknown) => next.history.unshift({ id: uid(), key, ruleId: rule.id, ruleName: rule.name, revision: rule.revision, companyId: row.companyId, transactionId: row.id, transactionVersion: version, action: action ? structuredClone(action) : null, timestamp: new Date().toISOString(), previous, resulting, snapshot: { ...structuredClone(snapshot), expression: structuredClone(rule.expression) }, source });
-  if (snapshot.result !== 'true') { if (source !== 'run') record(executionKey, null, null, snapshot.result); return next; }
-  for (const action of rule.actions) {
+  const actions = actionsForOutcome(rule, snapshot.result);
+  if (!actions.length) { if (source !== 'run') record(executionKey, null, null, snapshot.result); return next; }
+  for (const action of actions) {
     const key = `${prefix}:${action.id}`;
     if (next.executions.includes(key)) continue;
     next.executions.push(key);
+    if (action.type === 'task') {
+      if (tasks.some(task => task.billId === row.id && task.ruleId === rule.id && task.ruleActionId === action.id && task.status === 'open')) continue;
+      const timestamp = new Date().toISOString();
+      const due = new Date(timestamp); due.setUTCDate(due.getUTCDate() + action.dueDays!);
+      const task: ReviewTask = { id: uid(), companyId: row.companyId, billId: row.id, vendor: row.vendor, title: action.value.trim(),
+        owner: action.owner!.trim(), dueDate: due.toISOString().slice(0, 10), status: 'open', createdAt: timestamp, updatedAt: timestamp,
+        ruleId: rule.id, ruleActionId: action.id, ruleRevision: rule.revision };
+      record(key, action, null, task);
+      continue;
+    }
     if (action.type === 'message') {
       const open = next.messages.find(m => m.batchId === batchId && m.ruleId === rule.id && m.revision === rule.revision && m.actionId === action.id
         && m.status === 'pending' && m.generation === 'pending' && m.items.length < MAX_MESSAGE_ITEMS);
@@ -331,7 +420,9 @@ export function executeRule(store: RuleStore, rule: Rule, row: Row, version: str
 export function undoEntry(store: RuleStore, id: string): { store: RuleStore; error?: string } {
   const entry = store.history.find(h => h.id === id);
   if (!entry || !entry.action || entry.undoneAt) return { store, error: 'This entry cannot be undone.' };
+  if (entry.resolution) return { store, error: 'This issue was resolved after another check.' };
   const history = store.history.map(h => h.id === id ? { ...h, undoneAt: new Date().toISOString() } : h);
+  if (entry.action.type === 'task') return { store: { ...store, history } };
   if (entry.action.type === 'message') {
     const resulting = entry.resulting as { id?: string } | null;
     const message = (store.messages ?? []).find(item => item.id === resulting?.id);

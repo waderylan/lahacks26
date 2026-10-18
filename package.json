@@ -5,6 +5,7 @@
   "scripts": {
     "test": "tsx scripts/test.ts",
     "build": "vite build",
+    "demo": "node scripts/demo/run.mjs",
     "test:browser": "playwright test",
     "start": "tsx --env-file-if-exists=.env server/index.ts",
     "dev": "tsx --env-file-if-exists=.env server/index.ts",

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, leaves, standardResult, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
+import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
@@ -22,6 +22,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
   const pending = useRef(0);
   const callbacks = useRef({ onArrival, onRows, onChange }); callbacks.current = { onArrival, onRows, onChange };
   const requestSeq = useRef(0);
+  const exampleIndex = useRef(0);
   const accept = useCallback((reply: Reply) => {
     setStore(old => JSON.stringify(old) === JSON.stringify(reply.store) ? old : reply.store);
     storeRef.current = reply.store;
@@ -134,7 +135,12 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     retryAutomation: () => command({ type: 'retry-automation' }),
     remaining: data?.reservedRows?.filter(row => !(store.arrivals[companyId] ?? []).includes(row.id)).length ?? 0,
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(rule => rule.id === id); if (rule) { setDraft(structuredClone(rule)); setMessage(''); } },
-    loadExample: () => { setDraft(exampleRule(companyId)); setMessage('Editable suggested review policy. A match is not proof of an accounting error.'); },
+    loadExample: () => {
+      // Synthetic extension companies cycle through four draft review policies; others keep the single example.
+      const examples = data?.company.synthetic ? syntheticExampleRules(companyId) : [exampleRule(companyId)];
+      const next = examples[exampleIndex.current++ % examples.length];
+      setDraft(next); setMessage(`Editable suggested review policy: ${next.name}. A match is not proof of an accounting error.`);
+    },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [] }, actions: [] }); setMessage('Add conditions under IF, then actions under THEN.'); },
     decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Approval saved. No email was delivered.' : 'Draft rejected.'),
     retryDraft: (id: string) => command({ type: 'retry-draft', id }),

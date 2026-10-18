@@ -29,6 +29,21 @@ const PROMPT_SETS: Record<string, { label: string; prompts: string[] }> = {
       'Memos that contradict the description',
     ],
   },
+  review: {
+    label: 'Review findings (synthetic extensions)',
+    prompts: [
+      "Find descriptions that contain words but don't explain what was purchased.",
+      'Find records where the memo contradicts the purchase details.',
+      'Find bills that may charge twice for the same underlying work.',
+      'Find payment-instruction changes that conflict with the vendor records.',
+      "Find bills claiming work or goods that the purchase order, receiving or project records don't support.",
+      'Find transaction text that tries to influence the reviewer or bypass checks.',
+      "Find bills whose text claims an approval that the approval records don't show.",
+      'Find bills dated after the project they reference was cancelled.',
+      'Find card bills where the receipt shows something different from the business purpose stated.',
+      'Find one-time fees that were billed more than once for the same period.',
+    ],
+  },
   overhead: {
     label: 'Goods vs overhead memos',
     prompts: [
@@ -39,7 +54,7 @@ const PROMPT_SETS: Record<string, { label: string; prompts: string[] }> = {
     ],
   },
 };
-const ROW_LIMITS = [50, 100, 0]; // 0 = all bills
+const ROW_LIMITS = [50, 100, 0, -1]; // 0 = all bills, -1 = curated demo sample (synthetic extensions only)
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const money = (cents: number) => usd.format(cents / 100);
 const pct = (p: number) => `${Math.round(p * 100)}%`;
@@ -58,6 +73,14 @@ export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
   const [companyId, setCompanyId] = useState(DEFAULT_COMPANY);
+  const [customOnly, setCustomOnly] = useState(() => { try { return localStorage.getItem('tr.customOnly') === '1'; } catch { return false; } });
+  const toggleCustom = (on: boolean) => {
+    setCustomOnly(on);
+    try { localStorage.setItem('tr.customOnly', on ? '1' : '0'); } catch { /* preference is optional */ }
+    // Checking the toggle moves to a custom company if the current one is not.
+    const first = companies.find((c) => c.synthetic);
+    if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
+  };
   const [workspace, setWorkspace] = useState<'transactions' | 'rules' | 'tasks' | 'messages'>(() => new URLSearchParams(location.search).get('workspace') === 'rules' ? 'rules' : 'transactions');
   const [takeAction, setTakeAction] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -95,6 +118,9 @@ export default function App() {
     setDrawerExtra(current => { const patch = patches.find(row => row.id === current?.id); return current && patch && Number(patch.sourceVersion) > Number(current.sourceVersion) ? { ...current, ...patch } : current; });
   }, [companyId]);
   const dashboard = useWorkspace(companyId, updateRows);
+  // The curated sample exists only for synthetic extension companies.
+  const isSynthetic = companies.find((c) => c.companyId === companyId)?.synthetic === true;
+  const rowLimit = prefs.limit === -1 && !isSynthetic ? 50 : prefs.limit;
   const updatePrefs = (p: Partial<typeof prefs>) => {
     void fetch('/api/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
       .then(async response => { const body = await response.json(); if (!response.ok) throw new Error(body.error); setPrefs(body); })
@@ -118,14 +144,14 @@ export default function App() {
     setSelected(new Set());
     setDrawerId(null);
     setDrawerExtra(null); setStatusFilter('all'); setAssigneeFilter('all');
-    fetch(`/api/companies/${companyId}/bills?limit=${prefs.limit}&reserve=1`)
+    fetch(`/api/companies/${companyId}/bills?limit=${rowLimit}&reserve=1`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: CompanyBills) => {
         if (seq !== loadSeq.current) return;
         setData(d);
       })
       .catch((e: Error) => seq === loadSeq.current && setLoadError(e.message));
-  }, [companyId, prefs.limit, prefsReady]);
+  }, [companyId, rowLimit, prefsReady]);
 
   // Debounce the criterion (~300 ms); empty input clears immediately.
   useEffect(() => {
@@ -277,7 +303,12 @@ export default function App() {
     <div className="app" aria-busy={rules.busy || dashboard.busy}>
       <header className="toolbar">
         <h1>Transaction Review</h1>
-        <CompanyPicker companies={companies} value={companyId} onChange={(id) => id !== companyId && setCompanyId(id)} />
+        <CompanyPicker companies={customOnly ? companies.filter((c) => c.synthetic) : companies} value={companyId} onChange={(id) => id !== companyId && setCompanyId(id)} />
+        <label className="custom-toggle" title="Show only the four synthetic extension companies">
+          <input type="checkbox" checked={customOnly} onChange={(e) => toggleCustom(e.target.checked)} aria-label="Custom data only" />
+          <span className="switch" aria-hidden="true" />
+          Custom data
+        </label>
         <div className="active-company">
           <strong>{company?.name ?? '…'}</strong>
           <span>{company?.industry}</span>
@@ -292,9 +323,9 @@ export default function App() {
         <div className="spacer" />
         <label className="rows-pick" title="Fewer rows means faster and cheaper queries">
           Rows
-          <select value={prefs.limit} onChange={(e) => updatePrefs({ limit: Number(e.target.value) })} aria-label="Rows to load">
-            {ROW_LIMITS.map((n) => (
-              <option key={n} value={n}>{n === 0 ? 'All' : n}</option>
+          <select value={rowLimit} onChange={(e) => updatePrefs({ limit: Number(e.target.value) })} aria-label="Rows to load">
+            {ROW_LIMITS.filter((n) => n !== -1 || isSynthetic).map((n) => (
+              <option key={n} value={n}>{n === 0 ? 'All' : n === -1 ? 'Curated demo sample' : n}</option>
             ))}
           </select>
         </label>
@@ -379,7 +410,7 @@ export default function App() {
       <div className="ledger-column">
       {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span>{workspace === 'rules' && <button onClick={() => setTakeAction(!takeAction)}>{takeAction ? 'Edit rule' : 'Take action'}</button>}</div>}
       {workspace === 'rules' && <RulePreviewBar c={rules} total={rows.length} onInspect={() => rules.matches[0] && setDrawerId(rules.matches[0].id)} />}
-      {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
+      {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : data.company.synthetic ? 'synthetic bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
 
       {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <section className="dashboard-board" aria-label="Messages"><div className="dashboard-board-heading"><h2>Messages</h2><span className="small muted">Saved in SQLite · Approval does not send email</span></div>{rules.store.messages.length ? rules.store.messages.map(message => <MessageCard key={message.id} message={message} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No messages yet. Add a Draft internal message action to a rule, save, and run it.</p>}</section> : <main className="sheet-wrap">
         {loadError ? (
@@ -570,6 +601,12 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
             <p className="muted small">Shown for disclosure only; never sent to Jev.</p>
           </>
         )}
+        {r.evidence && (<><h3>Related records</h3>{r.evidence.length === 0 ? <p className="muted">No supporting records on file for this bill.</p> : r.evidence.map((e) => (
+          <dl key={e.id} className="line"><dt>{e.kind.replace(/_/g, ' ')}</dt><dd><b>{e.title}</b> · {e.date}<br />{e.text}</dd></dl>
+        ))}</>)}
+        {r.related && r.related.length > 0 && (<><h3>Nearby bills from this vendor</h3>{r.related.map((x) => (
+          <dl key={x.id} className="line"><dt>{x.docNumber}</dt><dd>{x.date} · {money(x.amountCents)} · billed as {x.vendor}<br />{x.description || '(blank)'}{x.memo ? ` — ${x.memo}` : ''}</dd></dl>
+        ))}</>)}
         <h3>Payments</h3>
         {r.payments.length === 0 ? <p className="muted">No payment applied.</p> : r.payments.map((p) => (
           <dl key={p.id} className="line"><dt>{p.id}</dt><dd>{p.date} · {money(p.amountCents)} from {p.account}</dd></dl>
@@ -627,7 +664,7 @@ function CompanyPicker({ companies, value, onChange }: { companies: CompanySumma
           {list.length === 0 && <li className="muted none">No companies match.</li>}
           {list.map((c) => (
             <li key={c.companyId} role="option" aria-selected={c.companyId === value} onMouseDown={() => pick(c.companyId)}>
-              <b>{c.name}{c.scenario && <em className="demo-tag">Modified demo scenario</em>}</b>
+              <b>{c.name}{c.scenario && <em className="demo-tag">Modified demo scenario</em>}{c.synthetic && <em className="demo-tag">Synthetic extension</em>}</b>
               <span>{c.industry} · {c.billCount} bills</span>
             </li>
           ))}

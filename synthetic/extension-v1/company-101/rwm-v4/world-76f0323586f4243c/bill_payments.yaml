@@ -1,0 +1,1660 @@
+- id: bpay-00001
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2025-10-15'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00002
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00002
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-10-19'
+  amount: '6060.00'
+  applications:
+  - document_id: bill-00001
+    amount: '6060.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00003
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2025-10-21'
+  amount: '208.25'
+  applications:
+  - document_id: bill-00005
+    amount: '208.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00004
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2025-10-23'
+  amount: '1040.64'
+  applications:
+  - document_id: bill-00004
+    amount: '1040.64'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00005
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2025-10-23'
+  amount: '8.33'
+  applications:
+  - document_id: bill-00006
+    amount: '8.33'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00006
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-10-25'
+  amount: '59297.10'
+  applications:
+  - document_id: bill-00003
+    amount: '59297.10'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00007
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2025-10-30'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00007
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00008
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2025-11-04'
+  amount: '300.00'
+  applications:
+  - document_id: bill-00009
+    amount: '300.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00009
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2025-11-05'
+  amount: '12.00'
+  applications:
+  - document_id: bill-00008
+    amount: '12.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00010
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2025-11-06'
+  amount: '1543.68'
+  applications:
+  - document_id: bill-00010
+    amount: '1543.68'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00011
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-11-14'
+  amount: '10029.30'
+  applications:
+  - document_id: bill-00011
+    amount: '10029.30'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00012
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-11-18'
+  amount: '4102.20'
+  applications:
+  - document_id: bill-00012
+    amount: '4102.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00013
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2025-11-18'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00014
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00014
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-11-23'
+  amount: '3826.60'
+  applications:
+  - document_id: bill-00013
+    amount: '3826.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00015
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2025-11-25'
+  amount: '2304.00'
+  applications:
+  - document_id: bill-00018
+    amount: '2304.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00016
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-11-26'
+  amount: '3614.60'
+  applications:
+  - document_id: bill-00015
+    amount: '3614.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00017
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2025-11-27'
+  amount: '18.00'
+  applications:
+  - document_id: bill-00019
+    amount: '18.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00018
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2025-11-27'
+  amount: '450.00'
+  applications:
+  - document_id: bill-00020
+    amount: '450.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00019
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-01'
+  amount: '3710.00'
+  applications:
+  - document_id: bill-00017
+    amount: '3710.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00020
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-04'
+  amount: '3741.80'
+  applications:
+  - document_id: bill-00021
+    amount: '3741.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00021
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2025-12-04'
+  amount: '2103.61'
+  applications:
+  - document_id: bill-00024
+    amount: '2103.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00022
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-06'
+  amount: '3826.60'
+  applications:
+  - document_id: bill-00022
+    amount: '3826.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00023
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-09'
+  amount: '3943.20'
+  applications:
+  - document_id: bill-00023
+    amount: '3943.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00024
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2025-12-09'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00026
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00025
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2025-12-16'
+  amount: '3223.68'
+  applications:
+  - document_id: bill-00030
+    amount: '3223.68'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00026
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-17'
+  amount: '5003.20'
+  applications:
+  - document_id: bill-00025
+    amount: '5003.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00027
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2025-12-17'
+  amount: '24.00'
+  applications:
+  - document_id: bill-00029
+    amount: '24.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00028
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2025-12-18'
+  amount: '600.00'
+  applications:
+  - document_id: bill-00031
+    amount: '600.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00029
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-21'
+  amount: '5036.14'
+  applications:
+  - document_id: bill-00027
+    amount: '5036.14'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00030
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-23'
+  amount: '5157.36'
+  applications:
+  - document_id: bill-00028
+    amount: '5157.36'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00031
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-29'
+  amount: '5366.74'
+  applications:
+  - document_id: bill-00032
+    amount: '5366.74'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00032
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2025-12-30'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00037
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00033
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2025-12-31'
+  amount: '5289.60'
+  applications:
+  - document_id: bill-00033
+    amount: '5289.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00034
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-01-03'
+  amount: '5565.10'
+  applications:
+  - document_id: bill-00036
+    amount: '5565.10'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00035
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-01-06'
+  amount: '750.00'
+  applications:
+  - document_id: bill-00042
+    amount: '750.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00036
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-01-07'
+  amount: '30.00'
+  applications:
+  - document_id: bill-00041
+    amount: '30.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00037
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-01-08'
+  amount: '4136.43'
+  applications:
+  - document_id: bill-00044
+    amount: '4136.43'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00038
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-01-09'
+  amount: '5234.50'
+  applications:
+  - document_id: bill-00039
+    amount: '5234.50'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00039
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-01-12'
+  amount: '385.35'
+  applications:
+  - document_id: bill-00034
+    amount: '385.35'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00040
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-01-14'
+  amount: '6336.50'
+  applications:
+  - document_id: bill-00043
+    amount: '6336.50'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00041
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-01-15'
+  amount: '446.56'
+  applications:
+  - document_id: bill-00035
+    amount: '446.56'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00042
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-01-16'
+  amount: '3786.00'
+  applications:
+  - document_id: bill-00045
+    amount: '3786.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00043
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-01-19'
+  amount: '6942.60'
+  applications:
+  - document_id: bill-00046
+    amount: '6942.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00044
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-01-20'
+  amount: '276.40'
+  applications:
+  - document_id: bill-00038
+    amount: '276.40'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00045
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-01-22'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00048
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00046
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-01-27'
+  amount: '750.00'
+  applications:
+  - document_id: bill-00052
+    amount: '750.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00047
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-01-28'
+  amount: '19802.94'
+  applications:
+  - document_id: bill-00047
+    amount: '19802.94'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00048
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-01-29'
+  amount: '30.00'
+  applications:
+  - document_id: bill-00049
+    amount: '30.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00049
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-01-29'
+  amount: '4207.94'
+  applications:
+  - document_id: bill-00050
+    amount: '4207.94'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00050
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-01-29'
+  amount: '2103.61'
+  applications:
+  - document_id: bill-00051
+    amount: '2103.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00051
+  vendor_id: vend-government
+  vendor_name: City of Havenwood
+  txn_date: '2026-02-07'
+  amount: '10008.11'
+  applications:
+  - document_id: bill-00040
+    amount: '10008.11'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00052
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-02-10'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00055
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00053
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-02-11'
+  amount: '29972.25'
+  applications:
+  - document_id: bill-00053
+    amount: '29972.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00054
+  vendor_id: vend-bank
+  vendor_name: Brightwater Savings Bank
+  txn_date: '2026-02-12'
+  amount: '24.41'
+  applications:
+  - document_id: bill-00054
+    amount: '24.41'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00055
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-02-17'
+  amount: '5183.51'
+  applications:
+  - document_id: bill-00060
+    amount: '5183.51'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00056
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-02-18'
+  amount: '36.00'
+  applications:
+  - document_id: bill-00059
+    amount: '36.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00057
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-02-19'
+  amount: '900.00'
+  applications:
+  - document_id: bill-00058
+    amount: '900.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00058
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-02-24'
+  amount: '21798.18'
+  applications:
+  - document_id: bill-00057
+    amount: '21798.18'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00059
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-03-02'
+  amount: '19212.51'
+  applications:
+  - document_id: bill-00061
+    amount: '19212.51'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00060
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-03-03'
+  amount: '1050.00'
+  applications:
+  - document_id: bill-00064
+    amount: '1050.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00061
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-03-05'
+  amount: '42.00'
+  applications:
+  - document_id: bill-00062
+    amount: '42.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00062
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-03-05'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00063
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00063
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-03-05'
+  amount: '6148.28'
+  applications:
+  - document_id: bill-00065
+    amount: '6148.28'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00064
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-03-06'
+  amount: '192.97'
+  applications:
+  - document_id: bill-00056
+    amount: '192.97'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00065
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-03-11'
+  amount: '3030.00'
+  applications:
+  - document_id: bill-00066
+    amount: '3030.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00066
+  vendor_id: vend-bank
+  vendor_name: Brightwater Savings Bank
+  txn_date: '2026-03-13'
+  amount: '122.10'
+  applications:
+  - document_id: bill-00067
+    amount: '122.10'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00067
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-03-22'
+  amount: '16773.81'
+  applications:
+  - document_id: bill-00068
+    amount: '16773.81'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00068
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-03-24'
+  amount: '1050.00'
+  applications:
+  - document_id: bill-00072
+    amount: '1050.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00069
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-03-24'
+  amount: '42.00'
+  applications:
+  - document_id: bill-00074
+    amount: '42.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00070
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-03-24'
+  amount: '6416.27'
+  applications:
+  - document_id: bill-00075
+    amount: '6416.27'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00071
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-03-25'
+  amount: '4920.00'
+  applications:
+  - document_id: bill-00073
+    amount: '4920.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00072
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-03-25'
+  amount: '2103.61'
+  applications:
+  - document_id: bill-00076
+    amount: '2103.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00073
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-03-26'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00071
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00074
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-04-01'
+  amount: '16443.00'
+  applications:
+  - document_id: bill-00077
+    amount: '16443.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00075
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-04-07'
+  amount: '241.05'
+  applications:
+  - document_id: bill-00070
+    amount: '241.05'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00076
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-04-10'
+  amount: '18797.46'
+  applications:
+  - document_id: bill-00078
+    amount: '18797.46'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00077
+  vendor_id: vend-bank
+  vendor_name: Brightwater Savings Bank
+  txn_date: '2026-04-13'
+  amount: '109.89'
+  applications:
+  - document_id: bill-00080
+    amount: '109.89'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00078
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-04-14'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00086
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00079
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-04-15'
+  amount: '900.00'
+  applications:
+  - document_id: bill-00084
+    amount: '900.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00080
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-04-16'
+  amount: '36.00'
+  applications:
+  - document_id: bill-00083
+    amount: '36.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00081
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-04-16'
+  amount: '5760.96'
+  applications:
+  - document_id: bill-00085
+    amount: '5760.96'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00082
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-04-20'
+  amount: '17578.86'
+  applications:
+  - document_id: bill-00082
+    amount: '17578.86'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00083
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-04-21'
+  amount: '5940.00'
+  applications:
+  - document_id: bill-00088
+    amount: '5940.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00084
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-04-22'
+  amount: '509.97'
+  applications:
+  - document_id: bill-00079
+    amount: '509.97'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00085
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-04-27'
+  amount: '13759.20'
+  applications:
+  - document_id: bill-00087
+    amount: '13759.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00086
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-04-28'
+  amount: '10047.00'
+  applications:
+  - document_id: bill-00089
+    amount: '10047.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00087
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-04-28'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00091
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00088
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-05-05'
+  amount: '975.00'
+  applications:
+  - document_id: bill-00094
+    amount: '975.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00089
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-05-05'
+  amount: '6024.78'
+  applications:
+  - document_id: bill-00095
+    amount: '6024.78'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00090
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-05-06'
+  amount: '14433.93'
+  applications:
+  - document_id: bill-00090
+    amount: '14433.93'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00091
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-05-06'
+  amount: '39.00'
+  applications:
+  - document_id: bill-00093
+    amount: '39.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00092
+  vendor_id: vend-government
+  vendor_name: City of Havenwood
+  txn_date: '2026-05-07'
+  amount: '19386.61'
+  applications:
+  - document_id: bill-00081
+    amount: '19386.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00093
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-05-12'
+  amount: '10638.00'
+  applications:
+  - document_id: bill-00092
+    amount: '10638.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00094
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-05-20'
+  amount: '2103.61'
+  applications:
+  - document_id: bill-00098
+    amount: '2103.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00095
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-05-20'
+  amount: '4860.00'
+  applications:
+  - document_id: bill-00099
+    amount: '4860.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00096
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-05-20'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00100
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00097
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-05-22'
+  amount: '10764.00'
+  applications:
+  - document_id: bill-00096
+    amount: '10764.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00098
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-05-26'
+  amount: '11895.00'
+  applications:
+  - document_id: bill-00097
+    amount: '11895.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00099
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-05-26'
+  amount: '29.52'
+  applications:
+  - document_id: bill-00103
+    amount: '29.52'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00100
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-05-26'
+  amount: '738.00'
+  applications:
+  - document_id: bill-00106
+    amount: '738.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00101
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-05-27'
+  amount: '4954.41'
+  applications:
+  - document_id: bill-00105
+    amount: '4954.41'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00102
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-06-02'
+  amount: '16330.93'
+  applications:
+  - document_id: bill-00101
+    amount: '16330.93'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00103
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-06-09'
+  amount: '9165.00'
+  applications:
+  - document_id: bill-00108
+    amount: '9165.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00104
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-06-10'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00111
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00105
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-06-11'
+  amount: '9827.78'
+  applications:
+  - document_id: bill-00109
+    amount: '9827.78'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00106
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-06-12'
+  amount: '153.74'
+  applications:
+  - document_id: bill-00102
+    amount: '153.74'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00107
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-06-14'
+  amount: '412.18'
+  applications:
+  - document_id: bill-00104
+    amount: '412.18'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00108
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-06-16'
+  amount: '5368.73'
+  applications:
+  - document_id: bill-00114
+    amount: '5368.73'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00109
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-06-16'
+  amount: '4320.00'
+  applications:
+  - document_id: bill-00117
+    amount: '4320.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00110
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-06-18'
+  amount: '10221.12'
+  applications:
+  - document_id: bill-00110
+    amount: '10221.12'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00111
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-06-18'
+  amount: '795.25'
+  applications:
+  - document_id: bill-00115
+    amount: '795.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00112
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-06-18'
+  amount: '31.81'
+  applications:
+  - document_id: bill-00116
+    amount: '31.81'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00113
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-06-22'
+  amount: '17457.45'
+  applications:
+  - document_id: bill-00113
+    amount: '17457.45'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00114
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-06-26'
+  amount: '12580.17'
+  applications:
+  - document_id: bill-00118
+    amount: '12580.17'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00115
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-06-30'
+  amount: '5268.30'
+  applications:
+  - document_id: bill-00123
+    amount: '5268.30'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00116
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-07-02'
+  amount: '528.00'
+  applications:
+  - document_id: bill-00112
+    amount: '528.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00117
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-07-02'
+  amount: '30.27'
+  applications:
+  - document_id: bill-00122
+    amount: '30.27'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00118
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-07-02'
+  amount: '756.75'
+  applications:
+  - document_id: bill-00124
+    amount: '756.75'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00119
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-07-02'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00125
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00120
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-07-03'
+  amount: '23512.80'
+  applications:
+  - document_id: bill-00120
+    amount: '23512.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00121
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-07-06'
+  amount: '12667.23'
+  applications:
+  - document_id: bill-00121
+    amount: '12667.23'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00122
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-07-12'
+  amount: '964.30'
+  applications:
+  - document_id: bill-00119
+    amount: '964.30'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00123
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-07-14'
+  amount: '3420.00'
+  applications:
+  - document_id: bill-00131
+    amount: '3420.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00124
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-07-15'
+  amount: '10964.30'
+  applications:
+  - document_id: bill-00126
+    amount: '10964.30'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00125
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-07-15'
+  amount: '16348.80'
+  applications:
+  - document_id: bill-00128
+    amount: '16348.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00126
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-07-16'
+  amount: '2103.61'
+  applications:
+  - document_id: bill-00130
+    amount: '2103.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00127
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-07-21'
+  amount: '728.25'
+  applications:
+  - document_id: bill-00133
+    amount: '728.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00128
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-07-21'
+  amount: '5257.35'
+  applications:
+  - document_id: bill-00135
+    amount: '5257.35'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00129
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-07-22'
+  amount: '12153.54'
+  applications:
+  - document_id: bill-00129
+    amount: '12153.54'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00130
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-07-23'
+  amount: '29.13'
+  applications:
+  - document_id: bill-00134
+    amount: '29.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00131
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-07-23'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00136
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00132
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-07-25'
+  amount: '15953.60'
+  applications:
+  - document_id: bill-00132
+    amount: '15953.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00133
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-01'
+  amount: '13134.07'
+  applications:
+  - document_id: bill-00137
+    amount: '13134.07'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00134
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-06'
+  amount: '6384.78'
+  applications:
+  - document_id: bill-00138
+    amount: '6384.78'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00135
+  vendor_id: vend-government
+  vendor_name: City of Havenwood
+  txn_date: '2026-08-08'
+  amount: '15492.84'
+  applications:
+  - document_id: bill-00127
+    amount: '15492.84'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00136
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-11'
+  amount: '8132.40'
+  applications:
+  - document_id: bill-00139
+    amount: '8132.40'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00137
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-08-11'
+  amount: '5222.59'
+  applications:
+  - document_id: bill-00142
+    amount: '5222.59'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00138
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-08-12'
+  amount: '29.76'
+  applications:
+  - document_id: bill-00141
+    amount: '29.76'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00139
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-08-12'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00143
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00140
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-08-12'
+  amount: '744.00'
+  applications:
+  - document_id: bill-00145
+    amount: '744.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00141
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-08-13'
+  amount: '2700.00'
+  applications:
+  - document_id: bill-00144
+    amount: '2700.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00142
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-17'
+  amount: '9102.82'
+  applications:
+  - document_id: bill-00140
+    amount: '9102.82'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00143
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-22'
+  amount: '6507.48'
+  applications:
+  - document_id: bill-00146
+    amount: '6507.48'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00144
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-22'
+  amount: '8776.32'
+  applications:
+  - document_id: bill-00147
+    amount: '8776.32'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00145
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-26'
+  amount: '14365.52'
+  applications:
+  - document_id: bill-00148
+    amount: '14365.52'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00146
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-08-29'
+  amount: '25446.40'
+  applications:
+  - document_id: bill-00149
+    amount: '25446.40'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00147
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-09-01'
+  amount: '5896.94'
+  applications:
+  - document_id: bill-00155
+    amount: '5896.94'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00148
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-09-03'
+  amount: '33.30'
+  applications:
+  - document_id: bill-00152
+    amount: '33.30'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00149
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-09-03'
+  amount: '832.50'
+  applications:
+  - document_id: bill-00153
+    amount: '832.50'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00150
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-09-03'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00154
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00151
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-04'
+  amount: '9494.62'
+  applications:
+  - document_id: bill-00150
+    amount: '9494.62'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00152
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-07'
+  amount: '12784.72'
+  applications:
+  - document_id: bill-00151
+    amount: '12784.72'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00153
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-09'
+  amount: '8346.78'
+  applications:
+  - document_id: bill-00156
+    amount: '8346.78'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00154
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-09-09'
+  amount: '2340.00'
+  applications:
+  - document_id: bill-00158
+    amount: '2340.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00155
+  vendor_id: vend-equipment-vendor
+  vendor_name: Novotny Racking & Warehouse Equipment
+  txn_date: '2026-09-09'
+  amount: '50000.00'
+  applications:
+  - document_id: bill-00159
+    amount: '50000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00156
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-16'
+  amount: '7281.56'
+  applications:
+  - document_id: bill-00157
+    amount: '7281.56'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00157
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-20'
+  amount: '9638.13'
+  applications:
+  - document_id: bill-00161
+    amount: '9638.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00158
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-22'
+  amount: '11344.96'
+  applications:
+  - document_id: bill-00162
+    amount: '11344.96'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00159
+  vendor_id: vend-water
+  vendor_name: Glenmoor Water District
+  txn_date: '2026-09-22'
+  amount: '33.14'
+  applications:
+  - document_id: bill-00169
+    amount: '33.14'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00160
+  vendor_id: vend-electricity
+  vendor_name: Cedar Park Power & Light
+  txn_date: '2026-09-22'
+  amount: '828.50'
+  applications:
+  - document_id: bill-00170
+    amount: '828.50'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00161
+  vendor_id: vend-logistics-vendor
+  vendor_name: Timberline Fulfillment Partners
+  txn_date: '2026-09-24'
+  amount: '5938.88'
+  applications:
+  - document_id: bill-00166
+    amount: '5938.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00162
+  vendor_id: vend-landlord
+  vendor_name: Keystone Property Group
+  txn_date: '2026-09-24'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00167
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00163
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  txn_date: '2026-09-28'
+  amount: '395.75'
+  applications:
+  - document_id: bill-00160
+    amount: '395.75'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00164
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-28'
+  amount: '8157.45'
+  applications:
+  - document_id: bill-00164
+    amount: '8157.45'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00165
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  txn_date: '2026-09-30'
+  amount: '12003.20'
+  applications:
+  - document_id: bill-00168
+    amount: '12003.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00166
+  vendor_id: vend-operating-vendor
+  vendor_name: Lanternwood Marketing Group
+  txn_date: '2026-10-06'
+  amount: '2160.00'
+  applications:
+  - document_id: bill-00175
+    amount: '2160.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.

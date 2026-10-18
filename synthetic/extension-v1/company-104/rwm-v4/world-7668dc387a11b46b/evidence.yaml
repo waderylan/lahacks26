@@ -1,0 +1,384 @@
+- id: ev-0001
+  kind: ap_intake_log
+  date: '2025-10-06'
+  title: Invoice intake entry
+  text: Invoice INV-7919 received by email and entered in the intake queue; not yet posted to the ledger. Sender asked that
+    payment details be confirmed by reply email only.
+  vendor_id: vend-equipment-vendor
+  bill_ids:
+  - bill-00001
+- id: ev-0002
+  kind: receipt
+  date: '2025-11-13'
+  title: Card statement detail Nov 15
+  text: 'Receipt summary: chafing fuel, deli containers, sheet pans, parchment, gloves.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00012
+- id: ev-0003
+  kind: completion_record
+  date: '2025-12-01'
+  title: Work sign-off Dec 1
+  text: Site lead confirmed the billed work for Private event catering for Imani Eriksdottir was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00001
+  bill_ids:
+  - bill-00016
+- id: ev-0004
+  kind: purchase_order
+  date: '2025-12-05'
+  title: Purchase order PO-7008
+  text: 'PO-7008: 600 lb of proteins and produce, delivered in two drops.'
+  vendor_id: vend-materials
+  project_id: proj-00001
+  bill_ids:
+  - bill-00024
+- id: ev-0005
+  kind: receiving_record
+  date: '2025-12-18'
+  title: Delivery receipt 7008
+  text: Received 372 lb on Dec 19; remainder scheduled for tomorrow.
+  vendor_id: vend-materials
+  project_id: proj-00001
+  bill_ids:
+  - bill-00024
+- id: ev-0006
+  kind: receipt
+  date: '2025-12-25'
+  title: Receipt detail
+  text: 'Ridgeline Sporting Goods: fly rod and reel, waders. Shipped to the owner''s home address. No event or kitchen purpose
+    recorded.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00032
+- id: ev-0007
+  kind: completion_record
+  date: '2025-12-26'
+  title: Work sign-off Dec 26
+  text: Site lead confirmed the billed work for Private event catering for Imani Eriksdottir was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-landscaping
+  project_id: proj-00001
+  bill_ids:
+  - bill-00031
+- id: ev-0008
+  kind: project_milestone
+  date: '2026-01-26'
+  title: 'Notice to proceed: Bertram Lefebvre'
+  text: Notice to proceed issued Jan 26. No site access or work was authorized before that date.
+  vendor_id: vend-sitework
+  project_id: proj-00002
+  bill_ids:
+  - bill-00039
+- id: ev-0009
+  kind: purchase_order
+  date: '2026-01-27'
+  title: Purchase order PO-7002
+  text: 'PO-7002: 600 lb of proteins and produce for the Bertram Lefebvre event. Net 30.'
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00044
+- id: ev-0010
+  kind: receiving_record
+  date: '2026-02-07'
+  title: Delivery receipt 7002
+  text: Received 372 lb on Feb 8; the remainder was not on the truck. Kitchen manager signed for a partial delivery.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00044
+- id: ev-0011
+  kind: completion_record
+  date: '2026-02-08'
+  title: Work sign-off Feb 9
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00002
+  bill_ids:
+  - bill-00046
+- id: ev-0012
+  kind: service_agreement
+  date: '2026-03-04'
+  title: Subcontract terms
+  text: 'Subcontract terms: one-time venue walkthrough fee of $1,422.85, billed once. No other survey charges.'
+  vendor_id: vend-sitework
+  project_id: proj-00003
+  bill_ids:
+  - bill-00073
+  - bill-00082
+- id: ev-0013
+  kind: completion_record
+  date: '2026-03-15'
+  title: Work sign-off Mar 16
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00060
+- id: ev-0014
+  kind: completion_record
+  date: '2026-03-23'
+  title: Work sign-off Mar 25
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00002
+  bill_ids:
+  - bill-00065
+- id: ev-0015
+  kind: receipt
+  date: '2026-04-09'
+  title: Card statement detail Apr 11
+  text: 'Receipt summary: aprons, server shirts, replacement napkins after an event.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00075
+- id: ev-0016
+  kind: completion_record
+  date: '2026-04-16'
+  title: Work sign-off Apr 17
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Tarkington was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00003
+  bill_ids:
+  - bill-00080
+- id: ev-0017
+  kind: receipt
+  date: '2026-04-19'
+  title: Receipt detail
+  text: Specialty ingredients for the Imani Eriksdottir tasting; event number noted; approved by the event manager.
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00083
+- id: ev-0018
+  kind: vendor_message
+  date: '2026-05-06'
+  title: Email asking to update remittance
+  text: Email received from the vendor's billing mailbox asking AP to remit to an account ending 7731. The vendor master lists
+    an account ending 9631. No signed bank change form on file; no call-back performed.
+  vendor_id: vend-masonry
+  project_id: proj-00002
+  bill_ids:
+  - bill-00097
+- id: ev-0019
+  kind: purchase_order
+  date: '2026-05-10'
+  title: Purchase order PO-7027
+  text: 'PO-7027: tables, chairs and serviceware rental only. Tent and lighting are not included in this order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00115
+- id: ev-0020
+  kind: purchase_order
+  date: '2026-05-20'
+  title: Purchase order PO-7019
+  text: 'PO-7019: tables, chairs and serviceware rental only. Tent and lighting are not included in this order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00119
+- id: ev-0021
+  kind: completion_record
+  date: '2026-05-25'
+  title: Work sign-off May 25
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00106
+- id: ev-0022
+  kind: change_order
+  date: '2026-05-26'
+  title: Change order CO-7027
+  text: 'Change order CO-7027: adds tent and lighting after the venue changed to an outdoor site. Approved by the event manager
+    and the client on Jun 5.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00115
+- id: ev-0023
+  kind: completion_record
+  date: '2026-05-27'
+  title: Work sign-off May 27
+  text: Site lead signed off the Bertram Tarkington work completed on May 26, before the cancellation notice.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  bill_ids:
+  - bill-00120
+- id: ev-0024
+  kind: project_milestone
+  date: '2026-06-01'
+  title: 'Project status: Bertram Tarkington'
+  text: Client cancelled the contract on Jun 1. Work already completed and signed off before that date remains billable.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  bill_ids:
+  - bill-00120
+- id: ev-0025
+  kind: project_milestone
+  date: '2026-06-01'
+  title: 'Project status: Bertram Tarkington'
+  text: Client cancelled the contract on Jun 1. All subcontractors were told in writing to stand down; no further work was
+    authorized after that date.
+  vendor_id: vend-sitework
+  project_id: proj-00003
+  bill_ids:
+  - bill-00090
+  - bill-00124
+- id: ev-0026
+  kind: vendor_statement
+  date: '2026-06-07'
+  title: Vendor statement
+  text: 'Statement of account lists one invoice for this period: INV-2523, $1,694.39. No second invoice for the period is
+    listed.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00114
+- id: ev-0027
+  kind: vendor_change_request
+  date: '2026-06-09'
+  title: Bank change form BC-7047
+  text: Bank change form BC-7047 signed by the vendor's controller and received Jun 9. Call-back to the number already on
+    file completed Jun 11; vendor master updated the same day.
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00121
+- id: ev-0028
+  kind: purchase_order
+  date: '2026-06-18'
+  title: Purchase order PO-6977
+  text: 'PO-6977: Bertram Lefebvre package billed in two progress installments (60% and 40%).'
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00131
+  - bill-00137
+- id: ev-0029
+  kind: approval_log
+  date: '2026-06-21'
+  title: Approval AP-7101
+  text: 'Approval AP-7101: invoice INV-2567 approved by the operations lead on Jun 22; amount within the referenced order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00126
+- id: ev-0030
+  kind: receipt
+  date: '2026-07-06'
+  title: Receipt detail
+  text: Thank-you boxes for two venue partners; recipient list attached; within the $100 gift policy.
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00130
+- id: ev-0031
+  kind: completion_record
+  date: '2026-07-08'
+  title: Work sign-off Jul 8
+  text: Milestone 1 (60%) signed off on site.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00131
+- id: ev-0032
+  kind: approval_log
+  date: '2026-07-10'
+  title: Approval log lookup
+  text: 'Approval log: no approval entry recorded for invoice INV-8197. Invoices over $1,500 need a second approval from the
+    operations lead.'
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  bill_ids:
+  - bill-00132
+- id: ev-0033
+  kind: completion_record
+  date: '2026-07-17'
+  title: Work sign-off Jul 17
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  bill_ids:
+  - bill-00136
+- id: ev-0034
+  kind: receipt
+  date: '2026-07-21'
+  title: Receipt detail
+  text: Restaurant supply store receipt; items are not itemized on the copy provided.
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00139
+- id: ev-0035
+  kind: completion_record
+  date: '2026-07-22'
+  title: Work sign-off Jul 22
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  bill_ids:
+  - bill-00138
+- id: ev-0036
+  kind: completion_record
+  date: '2026-07-22'
+  title: Work sign-off Jul 22
+  text: Milestone 2 (40%) signed off on site.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00137
+- id: ev-0037
+  kind: completion_record
+  date: '2026-08-14'
+  title: Work sign-off Aug 14
+  text: Event staffing sheet shows one shift for Bertram Lefebvre in this period; no second shift was scheduled.
+  vendor_id: vend-finishing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00147
+- id: ev-0038
+  kind: completion_record
+  date: '2026-08-16'
+  title: Work sign-off Aug 18
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-finishing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00150
+- id: ev-0039
+  kind: completion_record
+  date: '2026-08-27'
+  title: Work sign-off Aug 27
+  text: Crew hours and progress for the week confirmed by the site lead.
+  vendor_id: vend-finishing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00154
+- id: ev-0040
+  kind: completion_record
+  date: '2026-09-13'
+  title: Work sign-off Sep 15
+  text: Site lead confirmed the billed work for Wedding catering contract for Bertram Lefebvre was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-finishing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00163
+- id: ev-0041
+  kind: completion_record
+  date: '2026-09-17'
+  title: Work sign-off Sep 17
+  text: Crew hours and progress for the week confirmed by the site lead.
+  vendor_id: vend-finishing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00164

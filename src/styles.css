@@ -212,7 +212,7 @@ input { font: inherit; }
 .pill.bad { background: var(--red-bg); border-color: #efbdb8; color: var(--red); }
 .pill.sample { background: var(--amber-bg); border-color: #efd9a0; color: var(--amber); }
 
-.picker { position: relative; width: 300px; }
+.picker { position: relative; width: 250px; }
 .picker input { width: 100%; padding: 7px 10px; border: 1px solid var(--green); border-radius: 6px; background: #fff; font-weight: 600; }
 .picker-list { position: absolute; z-index: 30; top: 100%; left: 0; right: 0; margin: 4px 0 0; padding: 4px; list-style: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12); max-height: 360px; overflow: auto; width: 380px; }
 .picker-list li { padding: 6px 8px; border-radius: 5px; cursor: pointer; display: flex; flex-direction: column; }
@@ -361,3 +361,13 @@ table.sheet { border-collapse: separate; border-spacing: 0; table-layout: fixed;
 .message-bills { display:flex; flex-wrap:wrap; gap:2px 8px; margin:4px 0; }
 .message-bills button { padding:0; font-size:11px; }
 @media (max-width:800px) { .workspace-nav { padding:0 12px; } .workspace-nav nav { gap:16px; flex-wrap:wrap; } }
+
+.custom-toggle { display: inline-flex; align-items: center; gap: 7px; margin-left: 4px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; user-select: none; }
+.custom-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.custom-toggle .switch { position: relative; width: 28px; height: 16px; border-radius: 999px; background: var(--line); transition: background .15s; }
+.custom-toggle .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.custom-toggle input:checked + .switch { background: var(--green); }
+.custom-toggle input:checked + .switch::after { transform: translateX(12px); }
+.custom-toggle input:checked ~ * { color: inherit; }
+.custom-toggle:has(input:checked) { color: var(--text, inherit); }
+.custom-toggle input:focus-visible + .switch { outline: 2px solid var(--green); outline-offset: 2px; }

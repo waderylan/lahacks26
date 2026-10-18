@@ -10,7 +10,7 @@ export function ruleRoutes(app: Express, service: RuleService) {
   app.patch('/api/settings', route((req, res) => {
     const previous = service.db.get<Record<string, unknown>>('settings', 'workspace') ?? { set: 'plain', limit: 50 };
     const { set, limit } = req.body ?? {};
-    if ((set !== undefined && !['plain', 'text', 'overhead'].includes(set)) || (limit !== undefined && ![0, 50, 100].includes(limit))) throw new Error('Invalid display preferences.');
+    if ((set !== undefined && !['plain', 'text', 'overhead', 'review'].includes(set)) || (limit !== undefined && ![-1, 0, 50, 100].includes(limit))) throw new Error('Invalid display preferences.');
     const next = { ...previous, ...(set !== undefined && { set }), ...(limit !== undefined && { limit }) };
     service.db.put('settings', 'workspace', '', next); res.json(next);
   }));

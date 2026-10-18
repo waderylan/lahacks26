@@ -26,3 +26,4 @@ Dataset setup plus a local Transaction Review demo (React + Vite + Express, one 
 - `qbdata/loader.py`: loader API (`list_companies`, `world_dir`, `load_entity`, `load_all`, `load_report`).
 - `scripts/`: download and inspect scripts.
 - `data/`: git-ignored archive and extracted dataset.
+- `synthetic/`: generated synthetic extension companies (101-104). `extension-v1/` is app-facing; `eval/` is evaluation-only and must never be read by the app or sent to Jev. Regenerate with `uv run scripts/generate_synthetic.py`, check with `uv run scripts/validate_synthetic.py`.

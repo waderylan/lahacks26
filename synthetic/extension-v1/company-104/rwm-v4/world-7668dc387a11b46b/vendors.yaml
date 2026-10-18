@@ -1,0 +1,321 @@
+- id: vend-electrical
+  display_name: Xiong & Sons Equipment
+  company_name: Xiong & Sons Equipment
+  contact_given_name: Cormac
+  contact_family_name: Paredes
+  email: cormac.paredes@xiongsonsequipment.example
+  phone: (555) 240-9815
+  address:
+    line1: 2000 Edgeboard Street
+    city: Eugene
+    state: OR
+    postal_code: '97475'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: subcontract
+  joined_sim_day: 276
+  joined_date: '2026-07-09'
+  payee_bank: Lakeshore Trust
+  payee_account_ending: '4069'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-equipment-vendor
+  display_name: Brightline Kitchen Equipment Co.
+  company_name: Brightline Kitchen Equipment Co.
+  contact_given_name: Darius
+  contact_family_name: Hawthorne
+  email: darius.hawthorne@brightlinekitchenequipmentco.example
+  phone: (555) 345-6329
+  address:
+    line1: 6737 Interlock Drive
+    city: Peoria
+    state: IL
+    postal_code: '61654'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: operating
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  payee_bank: Marlowe National Bank
+  payee_account_ending: '8680'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-finishing
+  display_name: Hollings & Sons Service Staff
+  company_name: Hollings & Sons Service Staff
+  contact_given_name: Ulises
+  contact_family_name: Radulescu
+  email: ulises.radulescu@hollingssonsservicestaff.example
+  phone: (555) 054-9061
+  address:
+    line1: 5416 Palletyard Road
+    city: Roanoke
+    state: VA
+    postal_code: '24074'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: subcontract
+  joined_sim_day: 312
+  joined_date: '2026-08-14'
+  payee_bank: Marlowe National Bank
+  payee_account_ending: '3576'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-government
+  display_name: City of Copperfield
+  company_name: City of Copperfield
+  contact_given_name: Bertram
+  contact_family_name: Eskildsen
+  email: bertram.eskildsen@cityofcopperfield.example
+  phone: (555) 530-1711
+  address:
+    line1: 5170 Millrace Drive
+    city: Davenport
+    state: IA
+    postal_code: '52876'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: government
+  joined_sim_day: 28
+  joined_date: '2025-11-03'
+  payee_bank: Northmark Savings
+  payee_account_ending: '2707'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-income-tax-authority
+  display_name: Pinecrest County Treasurer
+  company_name: Pinecrest County Treasurer
+  contact_given_name: Soren
+  contact_family_name: Eskildsen
+  email: soren.eskildsen@pinecrestcountytreasurer.example
+  phone: (555) 334-4772
+  address:
+    line1: 8669 Cordage Avenue
+    city: Mobile
+    state: AL
+    postal_code: '36672'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: government
+  joined_sim_day: 364
+  joined_date: '2026-10-05'
+  payee_bank: Northmark Savings
+  payee_account_ending: '1112'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-insurer
+  display_name: Jarvis Insurance Agency
+  company_name: Jarvis Insurance Agency
+  contact_given_name: Yara
+  contact_family_name: Rosenthal
+  email: yara.rosenthal@jarvisinsuranceagency.example
+  phone: (555) 501-9375
+  address:
+    line1: 9496 Palletyard Road
+    city: Springfield
+    state: MO
+    postal_code: '65854'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: insurance
+  joined_sim_day: 29
+  joined_date: '2025-11-04'
+  payee_bank: Pinecrest Credit Union
+  payee_account_ending: '7108'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-landlord
+  display_name: Hearth Property Group
+  company_name: Hearth Property Group
+  contact_given_name: Cormac
+  contact_family_name: Hjelm
+  email: cormac.hjelm@hearthpropertygroup.example
+  phone: (555) 575-0299
+  address:
+    line1: 9393 Jointer Road
+    city: Akron
+    state: OH
+    postal_code: '44375'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: premises
+  joined_sim_day: 7
+  joined_date: '2025-10-13'
+  payee_bank: Pinecrest Credit Union
+  payee_account_ending: '9034'
+  payee_details_last_changed: '2026-09-03'
+  payee_change_verification: Change entered by AP clerk; supporting form not attached
+- id: vend-landscaping
+  display_name: Clearwater Opal Bar Service
+  company_name: Clearwater Opal Bar Service
+  contact_given_name: Delphine
+  contact_family_name: Jovanovic
+  email: delphine.jovanovic@clearwateropalbarservice.example
+  phone: (555) 511-3961
+  address:
+    line1: 8235 Offcut Avenue
+    city: Lincoln
+    state: NE
+    postal_code: '68569'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: subcontract
+  joined_sim_day: 74
+  joined_date: '2025-12-19'
+  payee_bank: Harbor & Vine Bank
+  payee_account_ending: '6066'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-masonry
+  display_name: Castellano Menu Design LLC
+  company_name: Castellano Menu Design LLC
+  contact_given_name: Imani
+  contact_family_name: Ostrowski
+  email: imani.ostrowski@castellanomenudesignllc.example
+  phone: (555) 183-4257
+  address:
+    line1: 7163 Gantry Lane
+    city: Eugene
+    state: OR
+    postal_code: '97410'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: subcontract
+  joined_sim_day: 56
+  joined_date: '2025-12-01'
+  payee_bank: Northmark Savings
+  payee_account_ending: '9631'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-materials
+  display_name: Larkspur Grocers LLC
+  company_name: Larkspur Grocers LLC
+  contact_given_name: Rosalind
+  contact_family_name: Jessup
+  email: rosalind.jessup@larkspurgrocersllc.example
+  phone: (555) 729-7749
+  address:
+    line1: 8986 Handcart Way
+    city: Springfield
+    state: MO
+    postal_code: '65816'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: operating
+  joined_sim_day: 39
+  joined_date: '2025-11-14'
+  payee_bank: Marlowe National Bank
+  payee_account_ending: '5546'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-plumbing
+  display_name: Inlet Cove Food Production Co.
+  company_name: Inlet Cove Food Production Co.
+  contact_given_name: Sigrid
+  contact_family_name: Ostrowski
+  email: sigrid.ostrowski@inletcovefoodproductionco.example
+  phone: (555) 148-7158
+  address:
+    line1: 8321 Millrace Drive
+    city: Pueblo
+    state: CO
+    postal_code: '81021'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: subcontract
+  joined_sim_day: 231
+  joined_date: '2026-05-25'
+  payee_bank: Northmark Savings
+  payee_account_ending: '5260'
+  payee_details_last_changed: '2026-06-11'
+  payee_change_verification: Bank change form signed by vendor officer; call-back to phone on file completed
+- id: vend-sitework
+  display_name: Thornbury Union Planning
+  company_name: Thornbury Union Planning
+  contact_given_name: Pascal
+  contact_family_name: Tokarz
+  email: pascal.tokarz@thornburyunionplanning.example
+  phone: (555) 271-6535
+  address:
+    line1: 6733 Wharfinger Lane
+    city: Peoria
+    state: IL
+    postal_code: '61681'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: subcontract
+  joined_sim_day: 39
+  joined_date: '2025-11-14'
+  payee_bank: Lakeshore Trust
+  payee_account_ending: '7938'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-utilities
+  display_name: Eastgate Municipal Utilities
+  company_name: Eastgate Municipal Utilities
+  contact_given_name: Fenna
+  contact_family_name: Ferreira
+  email: fenna.ferreira@eastgatemunicipalutilities.example
+  phone: (555) 348-1133
+  address:
+    line1: 1642 Drayman Court
+    city: Chattanooga
+    state: TN
+    postal_code: '37487'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: utility
+  joined_sim_day: 29
+  joined_date: '2025-11-04'
+  payee_bank: Northmark Savings
+  payee_account_ending: '1244'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-card
+  display_name: Summit Business Card Services
+  company_name: Summit Business Card Services
+  contact_given_name: Priya
+  contact_family_name: Lindgren
+  email: billing@summitbusinesscardservices.example
+  phone: (555) 301-9902
+  address:
+    line1: 100 Commerce Plaza
+    city: Wilmington
+    state: DE
+    postal_code: '19801'
+    country: United States
+    line2: null
+  payment_terms: Net 20
+  payment_terms_days: 20
+  supply_role: card
+  joined_date: '2025-10-06'
+  payee_bank: Pinecrest Credit Union
+  payee_account_ending: '5617'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding

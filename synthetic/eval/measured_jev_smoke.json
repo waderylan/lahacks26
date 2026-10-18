@@ -1,0 +1,341 @@
+{
+  "note": "Measured Jev outcomes on the curated demo sample (enriched, not representative). Reference labels are authored and were not tuned to these results.",
+  "runs": [
+    {
+      "company": "company-102",
+      "prompt_id": "P01",
+      "prompt": "Find descriptions that contain words but don't explain what was purchased.",
+      "rows_evaluated": 73,
+      "cost_usd": 0.002932062,
+      "reference_matches": 3,
+      "measured_matches": 14,
+      "true_positives": 3,
+      "false_positives": 11,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [],
+      "extra": [
+        "company-102:bill-00046",
+        "company-102:bill-00053",
+        "company-102:bill-00057",
+        "company-102:bill-00064",
+        "company-102:bill-00073",
+        "company-102:bill-00087",
+        "company-102:bill-00088",
+        "company-102:bill-00098",
+        "company-102:bill-00106",
+        "company-102:bill-00133",
+        "company-102:bill-00171"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P03",
+      "prompt": "Find records where the memo contradicts the purchase details.",
+      "rows_evaluated": 73,
+      "cost_usd": 0.002931894,
+      "reference_matches": 6,
+      "measured_matches": 22,
+      "true_positives": 5,
+      "false_positives": 17,
+      "false_negatives": 1,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bill-00057": "match"
+      },
+      "missed": [
+        "company-102:bill-00112"
+      ],
+      "extra": [
+        "company-102:bill-00007",
+        "company-102:bill-00032",
+        "company-102:bill-00039",
+        "company-102:bill-00042",
+        "company-102:bill-00045",
+        "company-102:bill-00057",
+        "company-102:bill-00059",
+        "company-102:bill-00064",
+        "company-102:bill-00068",
+        "company-102:bill-00097",
+        "company-102:bill-00098",
+        "company-102:bill-00100",
+        "company-102:bill-00106",
+        "company-102:bill-00124",
+        "company-102:bill-00126",
+        "company-102:bill-00132",
+        "company-102:bill-00162"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P04",
+      "prompt": "Find bills that may charge twice for the same underlying work.",
+      "rows_evaluated": 73,
+      "cost_usd": 0.002931894,
+      "reference_matches": 3,
+      "measured_matches": 19,
+      "true_positives": 3,
+      "false_positives": 12,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [
+        "company-102:bill-00009"
+      ],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bill-00122": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bill-00009",
+        "company-102:bill-00059",
+        "company-102:bill-00082",
+        "company-102:bill-00097",
+        "company-102:bill-00098",
+        "company-102:bill-00106",
+        "company-102:bill-00107",
+        "company-102:bill-00122",
+        "company-102:bill-00131",
+        "company-102:bill-00143",
+        "company-102:bill-00166",
+        "company-102:bill-00171"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P05",
+      "prompt": "Find payment-instruction changes that conflict with the vendor records.",
+      "rows_evaluated": 73,
+      "cost_usd": 0.00293223,
+      "reference_matches": 2,
+      "measured_matches": 4,
+      "true_positives": 2,
+      "false_positives": 2,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bill-00013": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bill-00001",
+        "company-102:bill-00013"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P06",
+      "prompt": "Find bills claiming work or goods that the purchase order, receiving or project records don't support.",
+      "rows_evaluated": 73,
+      "cost_usd": 0.00293307,
+      "reference_matches": 3,
+      "measured_matches": 11,
+      "true_positives": 3,
+      "false_positives": 8,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [
+        "company-102:bill-00072"
+      ],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bill-00059": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bill-00032",
+        "company-102:bill-00035",
+        "company-102:bill-00042",
+        "company-102:bill-00059",
+        "company-102:bill-00064",
+        "company-102:bill-00072",
+        "company-102:bill-00137",
+        "company-102:bill-00171"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P07",
+      "prompt": "Find transaction text that tries to influence the reviewer or bypass checks.",
+      "rows_evaluated": 73,
+      "cost_usd": 0.002932062,
+      "reference_matches": 3,
+      "measured_matches": 7,
+      "true_positives": 3,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [],
+      "extra": [
+        "company-102:bill-00013",
+        "company-102:bill-00116",
+        "company-102:bill-00124",
+        "company-102:bill-00166"
+      ]
+    },
+    {
+      "company": "company-101",
+      "prompt_id": "P01",
+      "prompt": "Find descriptions that contain words but don't explain what was purchased.",
+      "rows_evaluated": 66,
+      "cost_usd": 0.00255339,
+      "reference_matches": 4,
+      "measured_matches": 9,
+      "true_positives": 4,
+      "false_positives": 5,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [],
+      "extra": [
+        "company-101:bill-00038",
+        "company-101:bill-00089",
+        "company-101:bill-00104",
+        "company-101:bill-00117",
+        "company-101:bill-00135"
+      ]
+    },
+    {
+      "company": "company-101",
+      "prompt_id": "P03",
+      "prompt": "Find records where the memo contradicts the purchase details.",
+      "rows_evaluated": 66,
+      "cost_usd": 0.002553222,
+      "reference_matches": 5,
+      "measured_matches": 10,
+      "true_positives": 2,
+      "false_positives": 8,
+      "false_negatives": 3,
+      "lookalikes_wrongly_matched": [
+        "company-101:bill-00061"
+      ],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-101:bill-00155": "no_match"
+      },
+      "missed": [
+        "company-101:bill-00043",
+        "company-101:bill-00044",
+        "company-101:bill-00095"
+      ],
+      "extra": [
+        "company-101:bill-00036",
+        "company-101:bill-00038",
+        "company-101:bill-00051",
+        "company-101:bill-00061",
+        "company-101:bill-00085",
+        "company-101:bill-00104",
+        "company-101:bill-00105",
+        "company-101:bill-00157"
+      ]
+    },
+    {
+      "company": "company-101",
+      "prompt_id": "P04",
+      "prompt": "Find bills that may charge twice for the same underlying work.",
+      "rows_evaluated": 66,
+      "cost_usd": 0.002553222,
+      "reference_matches": 3,
+      "measured_matches": 13,
+      "true_positives": 1,
+      "false_positives": 10,
+      "false_negatives": 2,
+      "lookalikes_wrongly_matched": [
+        "company-101:bill-00163"
+      ],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-101:bill-00069": "match"
+      },
+      "missed": [
+        "company-101:bill-00107",
+        "company-101:bill-00165"
+      ],
+      "extra": [
+        "company-101:bill-00001",
+        "company-101:bill-00030",
+        "company-101:bill-00036",
+        "company-101:bill-00044",
+        "company-101:bill-00050",
+        "company-101:bill-00051",
+        "company-101:bill-00069",
+        "company-101:bill-00085",
+        "company-101:bill-00104",
+        "company-101:bill-00163"
+      ]
+    },
+    {
+      "company": "company-101",
+      "prompt_id": "P05",
+      "prompt": "Find payment-instruction changes that conflict with the vendor records.",
+      "rows_evaluated": 66,
+      "cost_usd": 0.002553558,
+      "reference_matches": 2,
+      "measured_matches": 4,
+      "true_positives": 2,
+      "false_positives": 2,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-101:bill-00007": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-101:bill-00007",
+        "company-101:bill-00085"
+      ]
+    },
+    {
+      "company": "company-101",
+      "prompt_id": "P06",
+      "prompt": "Find bills claiming work or goods that the purchase order, receiving or project records don't support.",
+      "rows_evaluated": 66,
+      "cost_usd": 0.002554398,
+      "reference_matches": 1,
+      "measured_matches": 5,
+      "true_positives": 1,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-101:bill-00085": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-101:bill-00050",
+        "company-101:bill-00085",
+        "company-101:bill-00104",
+        "company-101:bill-00171"
+      ]
+    },
+    {
+      "company": "company-101",
+      "prompt_id": "P07",
+      "prompt": "Find transaction text that tries to influence the reviewer or bypass checks.",
+      "rows_evaluated": 66,
+      "cost_usd": 0.00255339,
+      "reference_matches": 3,
+      "measured_matches": 7,
+      "true_positives": 3,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [],
+      "extra": [
+        "company-101:bill-00007",
+        "company-101:bill-00024",
+        "company-101:bill-00123",
+        "company-101:bill-00157"
+      ]
+    }
+  ]
+}

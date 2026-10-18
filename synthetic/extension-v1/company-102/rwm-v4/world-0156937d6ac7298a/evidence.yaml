@@ -1,0 +1,396 @@
+- id: ev-0001
+  kind: completion_record
+  date: '2025-11-19'
+  title: Work sign-off Nov 19
+  text: Crew hours and progress for the week confirmed by the site lead.
+  vendor_id: vend-sitework
+  project_id: proj-00001
+  bill_ids:
+  - bill-00009
+- id: ev-0002
+  kind: completion_record
+  date: '2025-11-29'
+  title: Work sign-off Dec 1
+  text: Site lead confirmed the billed work for Landscaping for Delacroix Brewing Co. was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00001
+  bill_ids:
+  - bill-00010
+- id: ev-0003
+  kind: service_agreement
+  date: '2025-12-02'
+  title: Subcontract terms
+  text: 'Subcontract terms: one-time mobilization fee of $1,522.13, billed once at start. No other mobilization charges.'
+  vendor_id: vend-sitework
+  project_id: proj-00002
+  bill_ids:
+  - bill-00028
+  - bill-00032
+- id: ev-0004
+  kind: completion_record
+  date: '2025-12-10'
+  title: Work sign-off Dec 10
+  text: Crew hours and progress for the week confirmed by the site lead.
+  vendor_id: vend-sitework
+  project_id: proj-00001
+  bill_ids:
+  - bill-00015
+- id: ev-0005
+  kind: completion_record
+  date: '2025-12-29'
+  title: Work sign-off Jan 1
+  text: Site lead confirmed the billed work for New home for Quarry Hill Works was completed and inspected. Quantities consistent
+    with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00002
+  bill_ids:
+  - bill-00025
+- id: ev-0006
+  kind: completion_record
+  date: '2026-01-19'
+  title: Work sign-off Jan 20
+  text: Site lead confirmed the billed work for Renovation for Northfield Quilting was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-demolition
+  project_id: proj-00003
+  bill_ids:
+  - bill-00034
+- id: ev-0007
+  kind: completion_record
+  date: '2026-02-06'
+  title: Work sign-off Feb 6
+  text: Site lead signed off one week of masonry for Northfield Quilting; no second week is recorded for this period.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  bill_ids:
+  - bill-00042
+- id: ev-0008
+  kind: purchase_order
+  date: '2026-02-11'
+  title: Purchase order PO-7107
+  text: 'PO-7107: rough-in plumbing only. Trenching and water line replacement are not included in this order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00003
+  bill_ids:
+  - bill-00059
+- id: ev-0009
+  kind: completion_record
+  date: '2026-02-13'
+  title: Work sign-off Feb 13
+  text: Site lead confirmed the billed work for Renovation for Northfield Quilting was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  bill_ids:
+  - bill-00047
+- id: ev-0010
+  kind: purchase_order
+  date: '2026-02-15'
+  title: Purchase order PO-7118
+  text: 'PO-7118: rough-in plumbing only. Trenching and water line replacement are not included in this order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00003
+  bill_ids:
+  - bill-00066
+- id: ev-0011
+  kind: receipt
+  date: '2026-02-21'
+  title: Receipt detail
+  text: Lumber yard slip; no job number noted and items are not itemized on the copy provided.
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00053
+- id: ev-0012
+  kind: change_order
+  date: '2026-03-03'
+  title: Change order CO-7118
+  text: 'Change order CO-7118: adds trenching and water line replacement after the inspector''s finding. Approved by the project
+    manager and the homeowner on Mar 13.'
+  vendor_id: vend-plumbing
+  project_id: proj-00003
+  bill_ids:
+  - bill-00066
+- id: ev-0013
+  kind: receipt
+  date: '2026-03-05'
+  title: Card statement detail Mar 7
+  text: 'Receipt summary: plan printing, courier to county office, notary fee for permit packet.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00060
+- id: ev-0014
+  kind: receipt
+  date: '2026-03-06'
+  title: Card statement detail Mar 8
+  text: 'Receipt summary: drill bits, saw blades, tarps, caulk, job-site first aid refill.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00061
+- id: ev-0015
+  kind: receipt
+  date: '2026-03-10'
+  title: Receipt detail
+  text: 'Lakeside Marine Outfitters: outboard fuel line kit, two life vests, trailer hitch. Delivered to the owner''s home
+    address. No job number recorded.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00064
+- id: ev-0016
+  kind: purchase_order
+  date: '2026-03-11'
+  title: Purchase order PO-7100
+  text: 'PO-7100: 40 pallets of lumber and sheet goods, delivery in two drops.'
+  vendor_id: vend-materials
+  project_id: proj-00003
+  bill_ids:
+  - bill-00072
+- id: ev-0017
+  kind: vendor_statement
+  date: '2026-03-14'
+  title: Vendor statement
+  text: 'Statement of account lists one invoice for this period: INV-1207, $797.25. No second invoice for the period is listed.'
+  vendor_id: vend-plumbing
+  project_id: proj-00003
+  bill_ids:
+  - bill-00063
+- id: ev-0018
+  kind: receiving_record
+  date: '2026-03-24'
+  title: Delivery receipt 7100
+  text: Received 26 pallets on Mar 25; remaining pallets scheduled for next week.
+  vendor_id: vend-materials
+  project_id: proj-00003
+  bill_ids:
+  - bill-00072
+- id: ev-0019
+  kind: receipt
+  date: '2026-04-07'
+  title: Receipt detail
+  text: Tile saw and blades. Job number QH-12 recorded; purchase approved by the project manager.
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00079
+- id: ev-0020
+  kind: approval_log
+  date: '2026-04-12'
+  title: Approval AP-7177
+  text: 'Approval AP-7177: invoice INV-1227 approved by the operations lead on Apr 13; amount within the referenced order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00080
+- id: ev-0021
+  kind: vendor_change_request
+  date: '2026-04-15'
+  title: Bank change form BC-7139
+  text: Bank change form BC-7139 signed by the vendor's controller and received Apr 15. Call-back to the number already on
+    file completed Apr 17; vendor master updated the same day.
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  bill_ids:
+  - bill-00086
+- id: ev-0022
+  kind: receipt
+  date: '2026-04-24'
+  title: Card statement detail Apr 26
+  text: 'Receipt summary: drill bits, saw blades, tarps, caulk, job-site first aid refill.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00089
+- id: ev-0023
+  kind: completion_record
+  date: '2026-05-10'
+  title: Work sign-off May 12
+  text: Site lead confirmed the billed work for New home for Quarry Hill Works was completed and inspected. Quantities consistent
+    with the schedule of values.
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  bill_ids:
+  - bill-00098
+- id: ev-0024
+  kind: receipt
+  date: '2026-05-12'
+  title: Receipt detail
+  text: Closing gift basket for the Northfield Quilting renovation; within the $100 gift policy; approved by the owner.
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00100
+- id: ev-0025
+  kind: approval_log
+  date: '2026-05-22'
+  title: Approval log lookup
+  text: 'Approval log: no approval entry recorded for invoice INV-5920. Invoices over $1,500 need a second approval from the
+    operations lead.'
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  bill_ids:
+  - bill-00106
+- id: ev-0026
+  kind: receipt
+  date: '2026-05-23'
+  title: Card statement detail May 25
+  text: 'Receipt summary: drill bits, saw blades, tarps, caulk, job-site first aid refill.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00108
+- id: ev-0027
+  kind: receipt
+  date: '2026-06-07'
+  title: Card statement detail Jun 9
+  text: 'Receipt summary: fleet fuel for 3 trucks, itemized by vehicle number.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00120
+- id: ev-0028
+  kind: completion_record
+  date: '2026-06-08'
+  title: Work sign-off Jun 9
+  text: Site lead confirmed the billed work for New home for Copperfield Zephyr Confections & Co. was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00004
+  bill_ids:
+  - bill-00119
+- id: ev-0029
+  kind: purchase_order
+  date: '2026-06-10'
+  title: Purchase order PO-7090
+  text: 'PO-7090: 40 pallets of lumber and sheet goods, delivery to the job site. Net 30.'
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00126
+- id: ev-0030
+  kind: vendor_message
+  date: '2026-06-16'
+  title: Email asking to update remittance
+  text: Email received from the vendor's billing mailbox asking AP to remit to an account ending 7731. The vendor master lists
+    an account ending 7291. No signed bank change form on file; no call-back performed.
+  vendor_id: vend-masonry
+  project_id: proj-00005
+  bill_ids:
+  - bill-00124
+- id: ev-0031
+  kind: receiving_record
+  date: '2026-06-21'
+  title: Delivery receipt 7090
+  text: Received 26 pallets on Jun 22; the balance was not on the truck. Driver signed for a partial delivery.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  bill_ids:
+  - bill-00126
+- id: ev-0032
+  kind: completion_record
+  date: '2026-06-24'
+  title: Work sign-off Jun 24
+  text: Site lead signed off the Copperfield Zephyr Confections & Co. work completed on Jun 23, before the cancellation notice.
+  vendor_id: vend-masonry
+  project_id: proj-00004
+  bill_ids:
+  - bill-00139
+- id: ev-0033
+  kind: project_milestone
+  date: '2026-06-29'
+  title: 'Project status: Copperfield Zephyr Confections & Co.'
+  text: Client cancelled the contract on Jun 29. Work already completed and signed off before that date remains billable.
+  vendor_id: vend-masonry
+  project_id: proj-00004
+  bill_ids:
+  - bill-00139
+- id: ev-0034
+  kind: project_milestone
+  date: '2026-06-29'
+  title: 'Project status: Copperfield Zephyr Confections & Co.'
+  text: Client cancelled the contract on Jun 29. All subcontractors were told in writing to stand down; no further work was
+    authorized after that date.
+  vendor_id: vend-sitework
+  project_id: proj-00004
+  bill_ids:
+  - bill-00110
+  - bill-00145
+- id: ev-0035
+  kind: project_milestone
+  date: '2026-07-13'
+  title: 'Notice to proceed: Keystone Hardware Holdings'
+  text: Notice to proceed issued Jul 13. No site access or work was authorized before that date.
+  vendor_id: vend-sitework
+  project_id: proj-00006
+  bill_ids:
+  - bill-00132
+- id: ev-0036
+  kind: completion_record
+  date: '2026-07-28'
+  title: Work sign-off Jul 30
+  text: Site lead confirmed the billed work for New home for Keystone Hardware Holdings was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00006
+  bill_ids:
+  - bill-00150
+- id: ev-0037
+  kind: purchase_order
+  date: '2026-07-30'
+  title: Purchase order PO-7062
+  text: 'PO-7062: Opal Granite Bay Supply package billed in two progress installments (60% and 40%).'
+  vendor_id: vend-materials
+  project_id: proj-00007
+  bill_ids:
+  - bill-00157
+  - bill-00167
+- id: ev-0038
+  kind: completion_record
+  date: '2026-08-19'
+  title: Work sign-off Aug 19
+  text: Milestone 1 (60%) signed off on site.
+  vendor_id: vend-materials
+  project_id: proj-00007
+  bill_ids:
+  - bill-00157
+- id: ev-0039
+  kind: completion_record
+  date: '2026-08-20'
+  title: Work sign-off Aug 20
+  text: Site lead confirmed the billed work for New home for Keystone Hardware Holdings was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00006
+  bill_ids:
+  - bill-00158
+- id: ev-0040
+  kind: receipt
+  date: '2026-08-23'
+  title: Card statement detail Aug 25
+  text: 'Receipt summary: fleet fuel for 3 trucks, itemized by vehicle number.'
+  vendor_id: vend-card
+  bill_ids:
+  - bill-00161
+- id: ev-0041
+  kind: ap_intake_log
+  date: '2026-09-01'
+  title: Invoice intake entry
+  text: Invoice INV-5451 received by email and entered in the intake queue; not yet posted to the ledger. Sender asked that
+    payment details be confirmed by reply email only.
+  vendor_id: vend-demolition
+  project_id: proj-00007
+  bill_ids:
+  - bill-00166
+- id: ev-0042
+  kind: completion_record
+  date: '2026-09-02'
+  title: Work sign-off Sep 2
+  text: Milestone 2 (40%) signed off on site.
+  vendor_id: vend-materials
+  project_id: proj-00007
+  bill_ids:
+  - bill-00167
+- id: ev-0043
+  kind: completion_record
+  date: '2026-09-21'
+  title: Work sign-off Sep 21
+  text: Site lead confirmed the billed work for Renovation for Opal Granite Bay Supply was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00007
+  bill_ids:
+  - bill-00175

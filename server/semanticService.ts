@@ -11,7 +11,7 @@ export class SemanticService {
   private key(companyId: string, criterion: string, row: Row) {
     // Match the business evidence sent to Jev. Task/owner changes do not consume
     // another model call, while edits to category or memo invalidate the result.
-    return crypto.createHash('sha256').update(JSON.stringify([companyId, criterion, row.id, row.date, row.vendor, row.account, row.amountCents, row.expenseKind, row.itemNames, row.description, row.memo])).digest('hex');
+    return crypto.createHash('sha256').update(JSON.stringify([companyId, criterion, row.id, row.date, row.vendor, row.account, row.amountCents, row.expenseKind, row.itemNames, row.description, row.memo, row.docNumber, row.evidence ?? null, row.related ?? null, row.vendorRecord?.payee_account_ending ?? null, row.projectRecord?.status ?? null])).digest('hex');
   }
   private async bounded<T>(work: () => Promise<T>): Promise<T> {
     if (this.active >= 3) await new Promise<void>(resolve => this.waiting.push(resolve));

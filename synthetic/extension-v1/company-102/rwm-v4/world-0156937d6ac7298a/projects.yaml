@@ -1,0 +1,152 @@
+- id: proj-00001
+  name: Landscaping for Delacroix Brewing Co.
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  project_kind: landscaping
+  contract_amount: '21250.00'
+  original_contract_amount: '21250.00'
+  change_orders: []
+  started_sim_day: 28
+  started_date: '2025-11-03'
+  planned_finish_sim_day: 74
+  planned_finish_date: '2025-12-19'
+  reschedules: []
+  completed_sim_day: 85
+  completed_date: '2025-12-30'
+  status: completed
+  status_history:
+  - date: '2025-11-03'
+    status: active
+  - date: '2025-12-30'
+    status: completed
+- id: proj-00002
+  name: New home for Quarry Hill Works
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  project_kind: new home
+  contract_amount: '443789.12'
+  original_contract_amount: '410000.00'
+  change_orders:
+  - date: '2026-01-09'
+    amount: '22924.12'
+  - date: '2026-04-29'
+    amount: '10865.00'
+  started_sim_day: 56
+  started_date: '2025-12-01'
+  planned_finish_sim_day: 247
+  planned_finish_date: '2026-06-10'
+  reschedules: []
+  completed_sim_day: 296
+  completed_date: '2026-07-29'
+  status: completed
+  status_history:
+  - date: '2025-12-01'
+    status: active
+  - date: '2026-07-29'
+    status: completed
+- id: proj-00003
+  name: Renovation for Northfield Quilting
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  project_kind: renovation
+  contract_amount: '127200.00'
+  original_contract_amount: '127200.00'
+  change_orders: []
+  started_sim_day: 84
+  started_date: '2025-12-29'
+  planned_finish_sim_day: 211
+  planned_finish_date: '2026-05-05'
+  reschedules: []
+  completed_sim_day: 226
+  completed_date: '2026-05-20'
+  status: completed
+  status_history:
+  - date: '2025-12-29'
+    status: active
+  - date: '2026-05-20'
+    status: completed
+- id: proj-00004
+  name: New home for Copperfield Zephyr Confections & Co.
+  customer_id: cust-client-4
+  customer_name: Copperfield Zephyr Confections & Co.
+  project_kind: new home
+  contract_amount: '534170.00'
+  original_contract_amount: '520000.00'
+  change_orders:
+  - date: '2026-08-19'
+    amount: '14170.00'
+  started_sim_day: 196
+  started_date: '2026-04-20'
+  planned_finish_sim_day: 429
+  planned_finish_date: '2026-12-09'
+  reschedules: []
+  status: cancelled
+  status_history:
+  - date: '2026-04-20'
+    status: active
+  - date: '2026-06-29'
+    status: cancelled
+  cancelled_date: '2026-06-29'
+- id: proj-00005
+  name: Landscaping for Northstar Elmsworth Provisions
+  customer_id: cust-client-5
+  customer_name: Northstar Elmsworth Provisions
+  project_kind: landscaping
+  contract_amount: '27498.42'
+  original_contract_amount: '25500.00'
+  change_orders:
+  - date: '2026-06-25'
+    amount: '1998.42'
+  started_sim_day: 224
+  started_date: '2026-05-18'
+  planned_finish_sim_day: 277
+  planned_finish_date: '2026-07-10'
+  reschedules: []
+  completed_sim_day: 288
+  completed_date: '2026-07-21'
+  status: completed
+  status_history:
+  - date: '2026-05-18'
+    status: active
+  - date: '2026-07-21'
+    status: completed
+- id: proj-00006
+  name: New home for Keystone Hardware Holdings
+  customer_id: cust-client-6
+  customer_name: Keystone Hardware Holdings
+  project_kind: new home
+  contract_amount: '611450.50'
+  original_contract_amount: '580000.00'
+  change_orders:
+  - date: '2026-08-28'
+    amount: '31450.50'
+  started_sim_day: 280
+  started_date: '2026-07-13'
+  planned_finish_sim_day: 540
+  planned_finish_date: '2027-03-30'
+  reschedules: []
+  completed_sim_day: null
+  completed_date: null
+  status: active
+  status_history:
+  - date: '2026-07-13'
+    status: active
+- id: proj-00007
+  name: Renovation for Opal Granite Bay Supply
+  customer_id: cust-client-7
+  customer_name: Opal Granite Bay Supply
+  project_kind: renovation
+  contract_amount: '138000.00'
+  original_contract_amount: '138000.00'
+  change_orders: []
+  started_sim_day: 308
+  started_date: '2026-08-10'
+  planned_finish_sim_day: 445
+  planned_finish_date: '2026-12-25'
+  reschedules: []
+  completed_sim_day: null
+  completed_date: null
+  status: active
+  status_history:
+  - date: '2026-08-10'
+    status: active

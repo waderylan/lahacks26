@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
-import { listCompanies } from './data.ts';
+import { demoSample, listCompanies } from './data.ts';
 import { jevConfigured, JEV_MODEL } from './jev.ts';
 import { actionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
@@ -32,11 +32,12 @@ app.get('/api/companies/:id/bills', (req, res) => {
     if (req.query.reserve === '1' && !full.company.scenario) {
       const reservedRows = full.rows.slice(-5);
       const available = full.rows.slice(0, -5);
-      const limit = Number(req.query.limit) || available.length;
-      const sampled = limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
+      const curated = Number(req.query.limit) === -1 ? demoSample(req.params.id) : null;
+      const limit = Number(req.query.limit) > 0 ? Number(req.query.limit) : available.length;
+      const sampled = curated ? available.filter(row => curated.ids.has(row.billId)) : limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
       const arrivals = rules.snapshot(req.params.id).store.arrivals[req.params.id] ?? [];
       const rows = [...sampled, ...reservedRows.filter(row => arrivals.includes(row.id))];
-      return res.json({ ...full, rows, reservedRows, sampled: rows.length < available.length, referenceOptions: { vendors: [...new Set(full.rows.map(r => r.vendor))].sort(), accounts: [...new Set(full.rows.map(r => r.account))].sort() } });
+      return res.json({ ...full, rows, reservedRows, sampled: rows.length < available.length, ...(curated && { curatedSample: true, disclosure: `${full.disclosure ?? ''} ${curated.disclosure}`.trim() }), referenceOptions: { vendors: [...new Set(full.rows.map(r => r.vendor))].sort(), accounts: [...new Set(full.rows.map(r => r.account))].sort() } });
     }
     const limit = Number(req.query.limit) || full.rows.length;
     const rows = limit < full.rows.length ? Array.from({ length: limit }, (_, index) => full.rows[Math.floor(index * full.rows.length / limit)]) : full.rows;

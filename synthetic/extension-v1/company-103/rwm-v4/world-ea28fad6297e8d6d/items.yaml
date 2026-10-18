@@ -1,0 +1,63 @@
+- id: item-demolition
+  name: Discovery and research
+  sku: DEMOLITI
+  description: Discovery and research carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-electrical
+  name: Media production
+  sku: ELECTRIC
+  description: Media production carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-finishing
+  name: Post-production
+  sku: FINISHIN
+  description: Post-production carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-landscaping
+  name: Media placement
+  sku: LANDSCAP
+  description: Media placement carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-masonry
+  name: Brand strategy
+  sku: MASONRY
+  description: Brand strategy carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-plumbing
+  name: Copywriting
+  sku: PLUMBING
+  description: Copywriting carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-sitework
+  name: Campaign planning
+  sku: SITEWORK
+  description: Campaign planning carried out as part of a contracted campaign.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip

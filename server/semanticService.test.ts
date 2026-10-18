@@ -5,6 +5,7 @@ import { WorkspaceData } from './workspaceData.ts';
 import { SemanticService } from './semanticService.ts';
 import { loadCompanyBills } from './data.ts';
 import { judgmentKey } from '../src/jevClient.ts';
+import { evaluationEvidence } from '../src/jevEvidence.ts';
 
 test('bank and invoice detail changes invalidate judgments; assignments reuse existing evidence', async t => {
   const db = new ActionStore(':memory:'); t.after(() => db.db.close());
@@ -32,4 +33,22 @@ test('bank and invoice detail changes invalidate judgments; assignments reuse ex
     assert.equal(calls, before + 1);
     assert.notEqual(judgmentKey(row, 'criterion'), judgmentKey(changed, 'criterion'));
   }
+});
+
+test('new reviewer details replace a cached uncertain judgment and reach the model context', async t => {
+  const db = new ActionStore(':memory:'); t.after(() => db.db.close());
+  const original = loadCompanyBills('company-018');
+  const data = new WorkspaceData(db, () => original, () => []);
+  const row = data.bills('company-018').rows[0];
+  let calls = 0;
+  const semantic = new SemanticService(data, async (_request, _signal, rows = []) => {
+    calls++;
+    return { results: rows.map(row => ({ id: row.id, state: row.evidence?.length ? 'no_match' as const : 'uncertain' as const, pMatch: .1 })), costNanoUsd: '0' };
+  });
+  assert.equal((await semantic.evaluateRows(row.companyId, 'This charge lacks support.', [row])).results[0].state, 'uncertain');
+  const updated = { ...row, evidence: [{ id: 'review-note', kind: 'reviewer_note', title: 'Receipt verified', date: '2026-10-17', text: 'The receipt supports the charge.' }] };
+  assert.equal((await semantic.evaluateRows(row.companyId, 'This charge lacks support.', [updated])).results[0].state, 'no_match');
+  assert.equal(calls, 2);
+  assert.notEqual(judgmentKey(row, 'criterion'), judgmentKey(updated, 'criterion'));
+  assert.deepEqual(evaluationEvidence(updated).evidence, [{ kind: 'reviewer_note', title: 'Receipt verified', date: '2026-10-17', text: 'The receipt supports the charge.' }]);
 });

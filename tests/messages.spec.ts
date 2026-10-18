@@ -24,7 +24,7 @@ test('message actions: one synthesized draft per run, routed by Jev or to a chos
   await page.getByLabel('Message recipient').last().selectOption('emp-ap');
   await expect(page.getByLabel('Message recipient').last()).toHaveValue('emp-ap');
   await page.getByLabel('Message request').last().fill('Ask them to fix the memo so it matches the line items.');
-  await page.getByRole('button', { name: 'Review matching rows', exact: true }).click();
+  await page.getByRole('button', { name: 'Review results', exact: true }).click();
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
   await expect(page.locator('.app')).toHaveAttribute('aria-busy', 'false');
   const count = Number(await page.locator('.wizard-results .count-true b').innerText());

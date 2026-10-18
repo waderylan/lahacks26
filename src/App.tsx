@@ -8,8 +8,9 @@ import { useMailbox } from './useMailbox';
 import { employeeById } from './employees';
 import { draftSender } from './rules';
 import { billEvents, billStatus, type BillStatus } from './billStatus';
-import { LocalStateEditor, MessageCard, NotificationBell, RuleEvidence, Toasts } from './RulesPanel';
-import { actionLabel, type LocalTransaction } from './rules';
+import { LocalStateEditor, MessageCard, NotificationBell, RuleEvidence, RuleIssueList, Toasts } from './RulesPanel';
+import { actionLabel, actionsForOutcome, type LocalTransaction } from './rules';
+import { SupportingDetails } from './SupportingDetails';
 import { useWorkspace, type RowPatch } from './useWorkspace';
 import { ActionPanel, TaskBoard } from './ActionPanel';
 import { RuleWizard } from './RuleWizard';
@@ -594,7 +595,9 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
         <button className="ghost" onClick={onClose} aria-label="Close detail">✕</button>
       </div>
       <div className="drawer-body">
-        {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
+        {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions for this result</h3>{actionsForOutcome(rules.draft, rules.snapshots[r.id].result).map(a => <p key={a.id}>{actionLabel(a)}</p>)}{!actionsForOutcome(rules.draft, rules.snapshots[r.id].result).length && <p className="muted">No actions configured for this result.</p>}</>}
+        <RuleIssueList issues={rules.issues.filter(issue => issue.transactionId === r.id)} />
+        <SupportingDetails key={r.id} row={r} save={rules.addEvidence} busy={rules.busy} />
         {r.dashboard && <><h3>Dashboard status · Saved in SQLite</h3><dl><dt>Status</dt><dd>{r.dashboard.reviewed ? 'Reviewed' : 'Needs review'}</dd><dt>Assigned to</dt><dd>{r.dashboard.owner || 'Unassigned'}</dd><dt>Flags</dt><dd>{r.dashboard.flags.join(', ') || 'None'}</dd><dt>Tags</dt><dd>{r.dashboard.tags.join(', ') || 'None'}</dd><dt>Tasks</dt><dd>{r.dashboard.taskIds.length}</dd></dl></>}
         <details className="legacy-metadata"><summary>Edit assignment, flags & tags</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => { void rules.updateLocal(r.id, value, r.sourceVersion); }} /></details>
         {rules.store.messages.filter(message => message.items.some(item => item.transactionId === r.id)).map(message => <MessageCard key={message.id} message={message} actor={rules.actor} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}

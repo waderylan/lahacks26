@@ -225,3 +225,11 @@ test('uncertain-only rules are valid, preserve uncertainty in drafts, and cannot
   assert.ok(validateRule({ ...rule, actions: [{ id: 'pass', type: 'pass', value: '', when: 'uncertain' }] }).length);
   assert.ok(validateRule({ ...rule, actions: [{ id: 'bad', type: 'tag', value: 'Test', when: 'error' }] }).length);
 });
+
+test('task actions require an owner and whole-day deadline; cleanup must be an explicit boolean', () => {
+  const rule = { ...exampleRule(row.companyId), actions: [{ id: 'task', type: 'task' as const, value: 'Check receipt', owner: 'Accountant', dueDays: 2 }] };
+  assert.deepEqual(validateRule(rule), []);
+  for (const dueDays of [-1, 1.5, 366, undefined]) assert.ok(validateRule({ ...rule, actions: [{ ...rule.actions[0], dueDays }] }).length);
+  assert.ok(validateRule({ ...rule, actions: [{ ...rule.actions[0], owner: '' }] }).length);
+  assert.ok(validateRule({ ...rule, autoResolve: 'yes' }).length);
+});

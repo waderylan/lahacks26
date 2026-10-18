@@ -25,7 +25,7 @@ for (const companyId of ['company-101', 'company-102', 'company-103', 'company-1
     await page.getByLabel('Rows to load').selectOption('0');
     await expect(page.getByLabel('Evaluation progress')).toContainText(`${full.rows.length}/${full.rows.length} evaluated`);
     await expect(page.getByLabel('Condition field')).toHaveValue('amountCents');
-    await step('Review matches'); await page.getByLabel('Preview rows').selectOption('all');
+    await step('Review results'); await page.getByLabel('Preview rows').selectOption('all');
     for (const type of ['bill', 'invoice', 'bank']) {
       await page.getByLabel('Transaction type filter').selectOption(type);
       const expected = full.rows.filter((row: any) => row.txnType === type);
@@ -54,7 +54,7 @@ for (const companyId of ['company-101', 'company-102', 'company-103', 'company-1
     await step('Choose actions'); await page.getByRole('button', { name: 'Add action', exact: true }).click();
     await page.getByLabel('Action type').selectOption('assign');
     await page.getByLabel('Action value').fill('Synthetic review team');
-    await step('Review matches');
+    await step('Review results');
     const matchCount = Number(await page.locator('.wizard-results .count-true b').innerText());
     expect(matchCount).toBeGreaterThan(0);
     await expect(page.locator('.wizard-table tbody tr')).toHaveCount(matchCount);
@@ -110,13 +110,13 @@ test('changing synthetic sample sizes preserves unsaved conditions, actions, and
   const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
   await step('Choose actions'); await page.getByRole('button', { name: 'Add action', exact: true }).click();
   await page.getByLabel('Action value').fill('Keep this unsaved action');
-  await step('Review matches'); await page.getByLabel('Rule name', { exact: true }).fill('Unsaved sample rule');
+  await step('Review results'); await page.getByLabel('Rule name', { exact: true }).fill('Unsaved sample rule');
   for (const limit of ['100', '-1', '0', '50']) {
     const response = page.waitForResponse(response => response.url().includes(`/api/companies/company-101/bills?limit=${limit}&`) && response.ok());
     await page.getByLabel('Rows to load').selectOption(limit);
     const rows = (await (await response).json()).rows;
     await expect(page.getByLabel('Evaluation progress')).toContainText(`${rows.length}/${rows.length} evaluated · Complete`);
-    await step('Review matches'); await expect(page.getByLabel('Rule name', { exact: true })).toHaveValue('Unsaved sample rule');
+    await step('Review results'); await expect(page.getByLabel('Rule name', { exact: true })).toHaveValue('Unsaved sample rule');
     await step('Describe conditions'); await expect(page.getByLabel('Amount in dollars')).toHaveValue('123.45');
     await step('Choose actions'); await expect(page.getByLabel('Action value')).toHaveValue('Keep this unsaved action');
   }

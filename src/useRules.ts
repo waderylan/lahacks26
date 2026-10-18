@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
+import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
-interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row }
-const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions]);
+interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[] }
+const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve)]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
 export function useRules(data: CompanyBills | null, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '') {
@@ -18,8 +18,10 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const [draft, setDraft] = useState<Rule | null>(null);
   const [message, setMessage] = useState('');
   const [automation, setAutomation] = useState<string[]>([]);
+  const [issues, setIssues] = useState<RuleIssue[]>([]);
   const [busy, setBusy] = useState(false);
   const pending = useRef(0);
+  const commandError = useRef('');
   const callbacks = useRef({ onArrival, onRows, onChange }); callbacks.current = { onArrival, onRows, onChange };
   const requestSeq = useRef(0);
   const exampleIndex = useRef(0);
@@ -27,12 +29,13 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     setStore(old => JSON.stringify(old) === JSON.stringify(reply.store) ? old : reply.store);
     storeRef.current = reply.store;
     setAutomation(reply.automation); callbacks.current.onRows?.(reply.rows);
+    setIssues(reply.issues ?? []);
     if (reply.replayed) callbacks.current.onArrival(reply.replayed);
     setStorageError('');
   }, []);
   useEffect(() => {
     const scope = companyId;
-    setReady(false); setStore(structuredClone(EMPTY_STORE)); setDraft(null); setStorageError(''); setMessage(''); setBusy(false);
+    setReady(false); setStore(structuredClone(EMPTY_STORE)); setDraft(null); setIssues([]); setStorageError(''); setMessage(''); setBusy(false);
     if (!scope) return;
     let disposed = false;
     const refresh = async (initial = false) => {
@@ -57,7 +60,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const command = async (body: Record<string, unknown>, success?: string) => {
     const scope = companyId;
     if (!scope || !ready) return;
-    pending.current++; setBusy(true); requestSeq.current++;
+    pending.current++; setBusy(true); requestSeq.current++; commandError.current = '';
     try {
       const response = await fetch(`/api/companies/${scope}/rules/commands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const reply = await response.json();
@@ -65,7 +68,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
       if (current.current !== scope) return;
       accept(reply); if (success) setMessage(success); callbacks.current.onChange?.();
       return reply as Reply;
-    } catch (error) { if (current.current === scope) setMessage((error as Error).message); }
+    } catch (error) { commandError.current = (error as Error).message; if (current.current === scope) setMessage(commandError.current); }
     finally { pending.current--; if (current.current === scope) setBusy(pending.current > 0); }
   };
 
@@ -121,7 +124,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     const next = reply?.store.rules.find(rule => rule.id === draft.id); if (next) setDraft(next);
   };
   return {
-    store, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
+    store, issues, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
     elapsed: timing.start ? Math.max(0, ((timing.end || now) - timing.start) / 1000) : 0,
     previewErrors: [...previewErrors], retry: () => setRetry(value => value + 1), save,
     toggleEnabled: () => saved && command({ type: 'toggle', id: saved.id, revision: saved.revision, enabled: !saved.enabled }, saved.enabled ? 'Automatic runs disabled.' : 'Runs automatically on new or changed bills.'),
@@ -131,6 +134,11 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     undo: (id: string) => command({ type: 'undo', id }, 'Action undone. Its execution key is retained.'),
     reset: () => command({ type: 'reset' }, 'Actions, messages, and notifications reset. Saved rules, arrivals, tasks, and review status were preserved.'),
     updateLocal: (id: string, value: import('./rules').LocalTransaction, expectedVersion?: string) => command({ type: 'metadata', id, value, expectedVersion: expectedVersion ?? data?.rows.find(row => row.id === id)?.sourceVersion }),
+    addEvidence: async (row: Row, title: string, text: string) => {
+      const reply = await command({ type: 'add-evidence', id: row.id, title, text, expectedVersion: row.sourceVersion }, 'Supporting details saved. Enabled rules will check the transaction again.');
+      if (!reply) throw new Error(commandError.current || 'Could not save these details. Try again.');
+      return true;
+    },
     processUpdate: (_row: Row, _value: boolean) => {}, // Persisted bill updates are observed by the server worker.
     retryAutomation: () => command({ type: 'retry-automation' }),
     remaining: data?.reservedRows?.filter(row => !(store.arrivals[companyId] ?? []).includes(row.id)).length ?? 0,

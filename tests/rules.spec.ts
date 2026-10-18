@@ -27,12 +27,12 @@ test('English conditions use real independent Jev judgments; AND/OR and action e
   await openRules(page); await complete(page);
   expect(new Set(requests.map(request => request.criterion)).size).toBe(2);
   expect(maximum).toBeLessThanOrEqual(3); expect(requests).toHaveLength(6);
-  await step(page, 'Review matches'); await page.getByLabel('Preview rows').selectOption('all');
+  await step(page, 'Review results'); await page.getByLabel('Preview rows').selectOption('all');
   await expect(page.locator('.wizard-table tbody tr')).toHaveCount(50);
   const order = await page.locator('.wizard-table tbody tr').evaluateAll(rows => rows.map(row => row.getAttribute('data-id')));
   await step(page, 'Describe conditions'); await page.getByLabel('Group logic').first().selectOption('any');
   await step(page, 'Choose actions'); await page.getByLabel('Action value').last().fill('Accounting team');
-  await step(page, 'Review matches'); await complete(page);
+  await step(page, 'Review results'); await complete(page);
   expect(requests).toHaveLength(6);
   expect(await page.locator('.wizard-table tbody tr').evaluateAll(rows => rows.map(row => row.getAttribute('data-id')))).toEqual(order);
   await step(page, 'Describe conditions');
@@ -60,7 +60,7 @@ test('English conditions use real independent Jev judgments; AND/OR and action e
 });
 
 test('guided save and run persist, remain idempotent, protect later edits on undo, and keep enabled replay', async ({ page }) => {
-  await openRules(page); await complete(page); await step(page, 'Review matches');
+  await openRules(page); await complete(page); await step(page, 'Review results');
   await page.getByLabel('Preview rows').selectOption('true');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
   await store(page);
@@ -81,14 +81,14 @@ test('guided save and run persist, remain idempotent, protect later edits on und
   await owner.getByRole('button', { name: 'Undo', exact: true }).click(); await expect(page.locator('.rules-notice')).toContainText('Undo conflict');
   const flag = page.locator('.history-entry').filter({ hasText: bill }).filter({ hasText: 'Add flag:' });
   await flag.getByRole('button', { name: 'Undo', exact: true }).click(); await expect(flag.getByRole('button', { name: 'Undone', exact: true })).toBeDisabled();
-  await page.reload(); await page.getByLabel('Saved rules').selectOption(ruleId); await complete(page); await step(page, 'Review matches');
+  await page.reload(); await page.getByLabel('Saved rules').selectOption(ruleId); await complete(page); await step(page, 'Review results');
   expect((await store(page)).transactions[`company-018:${bill}`].flags).toEqual([]);
   await page.getByRole('button', { name: /^Run once/ }).click(); expect((await store(page)).transactions[`company-018:${bill}`].flags).toEqual([]);
   await page.getByLabel('Run automatically', { exact: true }).click(); await expect(page.getByLabel('Run automatically', { exact: true })).toBeChecked(); await store(page);
   await step(page, 'Describe conditions');
   await page.getByLabel('Condition 1', { exact: true }).fill('The transaction has a vendor name.');
   await page.getByLabel('Condition 2', { exact: true }).fill('The transaction amount is negative.'); await complete(page);
-  await step(page, 'Review matches'); await page.getByRole('button', { name: 'Save rule', exact: true }).click();
+  await step(page, 'Review results'); await page.getByRole('button', { name: 'Save rule', exact: true }).click();
   expect((await store(page)).rules.find((rule: any) => rule.id === ruleId).revision).toBe(2);
   await page.locator('.wizard-history > summary').click();
   await page.getByRole('button', { name: /^Replay next original bill/ }).click(); await store(page); await complete(page, 51);
@@ -104,10 +104,10 @@ test('switching companies clears stale judgments, and row inspection preserves o
   await page.getByLabel('Company', { exact: true }).fill('Pistonhouse'); await page.getByLabel('Company', { exact: true }).press('Enter');
   await page.getByLabel('Company', { exact: true }).fill('Stitchform'); await page.getByLabel('Company', { exact: true }).press('Enter');
   await expect(page.getByLabel('Company', { exact: true })).toHaveValue('Stitchform Apparel Co'); await complete(page);
-  await step(page, 'Review matches'); await page.getByLabel('Preview rows').selectOption('all');
+  await step(page, 'Review results'); await page.getByLabel('Preview rows').selectOption('all');
   expect(await page.locator('.wizard-table tbody tr').evaluateAll(rows => rows.every(row => row.getAttribute('data-id')?.startsWith('company-004:')))).toBe(true);
   await page.getByLabel('Company', { exact: true }).fill('Shipwise'); await page.getByLabel('Company', { exact: true }).press('Enter');
-  await page.getByLabel('Rows to load').selectOption('0'); await complete(page, 411); await step(page, 'Review matches');
+  await page.getByLabel('Rows to load').selectOption('0'); await complete(page, 411); await step(page, 'Review results');
   await page.getByLabel('Preview rows').selectOption('all'); await page.getByLabel('Search visible bills', { exact: true }).fill('bill-00540');
   await expect(page.locator('.wizard-table tbody tr')).toHaveCount(1); await page.locator('.wizard-vendor').click();
   await expect(page.getByLabel('Transaction detail')).toContainText('Standing overhead charge for the period.');
@@ -115,7 +115,7 @@ test('switching companies clears stale judgments, and row inspection preserves o
 });
 
 test('reset remains shared and saved rules survive, while phone layouts expose the three steps', async ({ page, browser }) => {
-  await openRules(page); await complete(page); await step(page, 'Review matches');
+  await openRules(page); await complete(page); await step(page, 'Review results');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click(); await store(page);
   await page.getByRole('button', { name: /^Run once/ }).click(); await store(page);
   await page.getByLabel('Run automatically', { exact: true }).click(); await expect(page.getByLabel('Run automatically', { exact: true })).toBeChecked(); const before = await store(page);
@@ -126,14 +126,14 @@ test('reset remains shared and saved rules survive, while phone layouts expose t
   const second = await browser.newContext();
   try { const other = await second.newPage(); await other.goto(new URL('/?workspace=rules', page.url()).toString()); await complete(other); expect((await store(other)).history).toEqual([]); } finally { await second.close(); }
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const name of ['Describe conditions', 'Choose actions', 'Review matches']) {
+  for (const name of ['Describe conditions', 'Choose actions', 'Review results']) {
     await step(page, name); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.screenshot({ path: 'artifacts/verified-guided-review-mobile.png', fullPage: true });
 });
 
 test('Run once applies actions only to the matching bills in the filtered preview', async ({ page }) => {
-  await openRules(page); await complete(page); await step(page, 'Review matches');
+  await openRules(page); await complete(page); await step(page, 'Review results');
   await page.getByLabel('Preview rows').selectOption('true');
   const matchingRows = page.locator('.wizard-table tbody tr');
   expect(await matchingRows.count()).toBeGreaterThan(1);
@@ -165,7 +165,7 @@ test('guided review retains invoice and bank type filters and transaction detail
   await page.getByRole('button', { name: 'Remove condition 1', exact: true }).click();
   await page.getByLabel('Rows to load').selectOption('0');
   await expect(page.getByLabel('Evaluation progress')).toContainText('Complete');
-  await step(page, 'Review matches');
+  await step(page, 'Review results');
   await page.getByLabel('Preview rows').selectOption('all');
   for (const type of ['invoice', 'bank']) {
     await page.getByLabel('Transaction type filter').selectOption(type);

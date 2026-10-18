@@ -1,5 +1,6 @@
 import type { Row } from './types';
 import { employeeById } from './employees';
+import type { ReviewTask } from './actionTypes';
 
 export type Truth = 'true' | 'false' | 'uncertain';
 export type Outcome = Truth | 'pending' | 'error';
@@ -7,12 +8,12 @@ export type Group = { id: string; type: 'all' | 'any' | 'not'; children: RuleNod
 export type AICondition = { id: string; type: 'ai'; text: string; label: string };
 export type StandardCondition = { id: string; type: 'standard'; field: 'amountCents' | 'review' | 'vendor' | 'account'; operator: 'gt' | 'lt' | 'eq'; value: string };
 export type RuleNode = Group | AICondition | StandardCondition;
-export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message';
+export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message' | 'task';
 /**
  * For `message`, `value` is the reviewer's short request, `recipient` is an employee ID or 'jev' (Jev picks),
  * and `sender` is the employee who approves the drafts and sends them.
  */
-export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string; when?: Truth };
+export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string; when?: Truth; owner?: string; dueDays?: number };
 export const RESULT_LABELS: Record<Truth, string> = { true: 'Match', uncertain: 'Not enough information', false: 'No match' };
 /** Actions saved before outcome branches were added still run only on matches. */
 export const actionOutcome = (action: Action): Truth => action.when ?? 'true';
@@ -23,6 +24,13 @@ export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
   expression: RuleNode; actions: Action[];
+  autoResolve?: boolean;
+}
+export interface RuleIssue {
+  id: string; companyId: string; ruleId: string; ruleName: string; transactionId: string;
+  conditionKey: string; cycle: string; openedAt: string; resolvedAt?: string;
+  status: 'open' | 'resolved'; lastResult: Truth;
+  flags: { label: string; removable: boolean }[]; taskIds: string[];
 }
 export interface LocalTransaction { flags: string[]; tags: string[]; owner: string; automatedCheck: boolean }
 export type MessageStatus = 'pending' | 'approved' | 'rejected';
@@ -54,6 +62,7 @@ export interface HistoryEntry {
   companyId: string; transactionId: string; transactionVersion: string; action: Action | null;
   timestamp: string; previous: unknown; resulting: unknown; snapshot: Snapshot;
   source: 'run' | 'arrival' | 'update'; undoneAt?: string;
+  resolution?: { issueId: string; flags: string[]; taskIds: string[]; kept: string[] };
 }
 export interface RuleStore {
   rules: Rule[]; transactions: Record<string, LocalTransaction>; history: HistoryEntry[];
@@ -147,6 +156,7 @@ export function validateRule(input: unknown): string[] {
   if (typeof r.id !== 'string' || !r.id || typeof r.companyId !== 'string' || !r.companyId) errors.push('Rule and company IDs are required.');
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
+  if (r.autoResolve !== undefined && typeof r.autoResolve !== 'boolean') errors.push('Choose whether this rule clears resolved issues.');
   const checkId = (id: unknown) => { if (typeof id !== 'string' || !id || ids.has(id)) errors.push('Every block needs a unique ID.'); else ids.add(id); };
   const visit = (n: RuleNode, depth: number) => {
     if (!n || typeof n !== 'object') { errors.push('Missing condition.'); return; }
@@ -174,7 +184,8 @@ export function validateRule(input: unknown): string[] {
     checkId(a.id);
     if (a.when !== undefined && !['true', 'false', 'uncertain'].includes(a.when)) errors.push('Choose a result for each action.');
     if (a.when === 'uncertain' && a.type === 'pass') errors.push('Uncertain results cannot be marked checked.');
-    if (!['flag', 'assign', 'tag', 'pass', 'message'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
+    if (!['flag', 'assign', 'tag', 'pass', 'message', 'task'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
+    else if (a.type === 'task' && (typeof a.owner !== 'string' || !a.owner.trim() || a.owner.length > 100 || !Number.isSafeInteger(a.dueDays) || a.dueDays! < 0 || a.dueDays! > 365)) errors.push('Give each task an owner and a due date from 0 to 365 days.');
     else if (a.type === 'message' && a.value.length > 500) errors.push('Message requests must be 500 characters or fewer.');
     else if (a.type === 'message' && a.recipient !== 'jev' && !employeeById(a.recipient)) errors.push('Choose a message recipient or let Jev choose.');
     else if (a.type === 'message' && !employeeById(a.sender)) errors.push('Choose who the message is sent from.');
@@ -191,9 +202,9 @@ export function transactionVersion(row: Row, reviewed?: boolean): string {
   for (let i = 0; i < text.length; i++) { a = Math.imul(a ^ text.charCodeAt(i), 16777619); b = Math.imul(b, 33) ^ text.charCodeAt(i); }
   return `${(a >>> 0).toString(16)}${(b >>> 0).toString(16)}`;
 }
-export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
+export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' || a.type === 'task' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
 export const recipientLabel = (recipient?: string) => recipient === 'jev' ? 'Jev chooses recipient' : employeeById(recipient)?.name ?? 'No recipient';
-export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
+export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : a.type === 'task' ? `Task for ${a.owner}: ${a.value} (due in ${a.dueDays} ${a.dueDays === 1 ? 'day' : 'days'})` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
 
 export const describeCondition = (n: AICondition | StandardCondition) => n.type === 'ai' ? n.label ? `${n.label}: ${n.text}` : n.text
   : `${{ amountCents: 'Amount', review: 'Review status', vendor: 'Vendor', account: 'Account' }[n.field]} ${{ gt: 'greater than', lt: 'less than', eq: 'equals' }[n.operator]} ${n.field === 'amountCents' ? `$${n.value}` : n.value}`;
@@ -272,7 +283,7 @@ export function markNoticeToasted(store: RuleStore, id: string): RuleStore {
 
 /** Pure atomic state transition; its idempotency keys survive undo and page reloads. */
 /** Pass the same `batchId` for every row of one run so its message actions share one draft per action. */
-export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid()): RuleStore {
+export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid(), tasks: ReviewTask[] = []): RuleStore {
   if (validateRule(rule).length || row.companyId !== rule.companyId) return store;
   if (leaves(rule.expression).some(n => !['true', 'false', 'uncertain'].includes(snapshot.conditions[n.id])) || evaluateTree(rule.expression, snapshot.conditions) !== snapshot.result) return store;
   const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}`;
@@ -287,6 +298,16 @@ export function executeRule(store: RuleStore, rule: Rule, row: Row, version: str
     const key = `${prefix}:${action.id}`;
     if (next.executions.includes(key)) continue;
     next.executions.push(key);
+    if (action.type === 'task') {
+      if (tasks.some(task => task.billId === row.id && task.ruleId === rule.id && task.ruleActionId === action.id && task.status === 'open')) continue;
+      const timestamp = new Date().toISOString();
+      const due = new Date(timestamp); due.setUTCDate(due.getUTCDate() + action.dueDays!);
+      const task: ReviewTask = { id: uid(), companyId: row.companyId, billId: row.id, vendor: row.vendor, title: action.value.trim(),
+        owner: action.owner!.trim(), dueDate: due.toISOString().slice(0, 10), status: 'open', createdAt: timestamp, updatedAt: timestamp,
+        ruleId: rule.id, ruleActionId: action.id, ruleRevision: rule.revision };
+      record(key, action, null, task);
+      continue;
+    }
     if (action.type === 'message') {
       const open = next.messages.find(m => m.batchId === batchId && m.ruleId === rule.id && m.revision === rule.revision && m.actionId === action.id
         && m.status === 'pending' && m.generation === 'pending' && m.items.length < MAX_MESSAGE_ITEMS);
@@ -309,7 +330,9 @@ export function executeRule(store: RuleStore, rule: Rule, row: Row, version: str
 export function undoEntry(store: RuleStore, id: string): { store: RuleStore; error?: string } {
   const entry = store.history.find(h => h.id === id);
   if (!entry || !entry.action || entry.undoneAt) return { store, error: 'This entry cannot be undone.' };
+  if (entry.resolution) return { store, error: 'This issue was resolved after another check.' };
   const history = store.history.map(h => h.id === id ? { ...h, undoneAt: new Date().toISOString() } : h);
+  if (entry.action.type === 'task') return { store: { ...store, history } };
   if (entry.action.type === 'message') {
     const resulting = entry.resulting as { id?: string } | null;
     const message = (store.messages ?? []).find(item => item.id === resulting?.id);

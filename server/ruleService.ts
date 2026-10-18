@@ -2,7 +2,7 @@ import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
   markNoticesRead, markNoticeToasted, migrateMessage, migrateRule, resetCompanyDemo, retryDraft,
   transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome,
-  type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot,
+  type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue, type HistoryEntry,
 } from '../src/rules.ts';
 import { standardResult } from '../src/rules.ts';
 import type { Row } from '../src/types.ts';
@@ -13,6 +13,7 @@ import type { Judge } from './actionEngine.ts';
 import { draftMessage, type DraftRequest } from './messages.ts';
 import { deliverDraft } from './mailbox.ts';
 import { employeeById } from '../src/employees.ts';
+import type { ReviewTask } from '../src/actionTypes.ts';
 
 interface SavedState { companyId: string; store: RuleStore; watches: Record<string, Record<string, string>>; log: string[] }
 type Writer = (request: DraftRequest, signal?: AbortSignal) => Promise<DraftResult>;
@@ -48,6 +49,13 @@ export class RuleService {
       const row = this.data.row(saved.companyId, id);
       this.db.write({ ...row, dashboard: { ...emptyDashboard(), ...row.dashboard, ...after } }, row.sourceVersion!);
     }
+    const previousHistory = new Set(previous.history.map(entry => entry.id));
+    for (const entry of saved.store.history.filter(entry => entry.action?.type === 'task' && !entry.undoneAt && !previousHistory.has(entry.id))) {
+      const task = entry.resulting as ReviewTask;
+      this.db.put('task', task.id, saved.companyId, task);
+      const row = this.data.row(saved.companyId, entry.transactionId);
+      this.db.write({ ...row, dashboard: { ...emptyDashboard(), ...row.dashboard, taskIds: [...new Set([...(row.dashboard?.taskIds ?? []), task.id])] } }, row.sourceVersion!);
+    }
     for (const message of saved.store.messages) {
       const before = previous.messages.find(item => item.id === message.id);
       if (before && itemKey(before) === itemKey(message)) continue;
@@ -63,8 +71,65 @@ export class RuleService {
   }
   snapshot(companyId: string) {
     const saved = this.read(companyId);
-    const rows = this.data.bills(companyId).rows.map(({ id, companyId, dashboard, sourceVersion, account, memo, workspaceChanges }) => ({ id, companyId, dashboard, sourceVersion, account, memo, workspaceChanges }));
-    return { store: saved.store, automation: saved.log, rows };
+    const rows = this.data.bills(companyId).rows.map(({ id, companyId, dashboard, sourceVersion, account, memo, workspaceChanges, evidence }) => ({ id, companyId, dashboard, sourceVersion, account, memo, workspaceChanges, evidence }));
+    return { store: saved.store, automation: saved.log, rows, issues: this.db.list<RuleIssue>('rule-issue', companyId) };
+  }
+
+  private trackIssue(saved: SavedState, rule: Rule, row: Row, snapshot: Snapshot, before: RuleStore, cycle: string) {
+    if (snapshot.result !== 'true' && snapshot.result !== 'uncertain') return;
+    const all = this.db.list<RuleIssue>('rule-issue', saved.companyId);
+    const conditionKey = JSON.stringify(rule.expression);
+    let issue = all.find(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === conditionKey && issue.status === 'open');
+    const previousKeys = new Set(before.executions);
+    const ran = saved.store.executions.filter(key => !previousKeys.has(key));
+    const actions = actionsForOutcome(rule, snapshot.result).filter(action => ran.some(key => key.endsWith(`:${action.id}`)));
+    if (!issue && !actions.some(action => action.type === 'flag' || action.type === 'task')) return;
+    issue ??= { id: uid(), companyId: saved.companyId, ruleId: rule.id, ruleName: rule.name, transactionId: row.id, conditionKey, cycle,
+      openedAt: new Date().toISOString(), status: 'open', lastResult: snapshot.result, flags: [], taskIds: [] };
+    issue.lastResult = snapshot.result;
+    issue.ruleName = rule.name;
+    for (const action of actions) {
+      if (action.type === 'flag' && !issue.flags.some(flag => flag.label === action.value.trim())) {
+        const label = action.value.trim();
+        const otherClaim = all.some(other => other.status === 'open' && other.transactionId === row.id && other.flags.some(flag => flag.label === label && flag.removable));
+        issue.flags.push({ label, removable: !row.dashboard?.flags.includes(label) || otherClaim });
+      }
+      if (action.type === 'task') {
+        const tasks = [...this.db.list<ReviewTask>('task', saved.companyId), ...saved.store.history.filter(entry => entry.action?.type === 'task' && !entry.undoneAt).map(entry => entry.resulting as ReviewTask)];
+        issue.taskIds = [...new Set([...issue.taskIds, ...tasks.filter(task => task.ruleId === rule.id && task.ruleActionId === action.id && task.billId === row.id && task.status === 'open').map(task => task.id)])];
+      }
+    }
+    this.db.put('rule-issue', issue.id, saved.companyId, issue);
+  }
+
+  private resolveIssues(saved: SavedState, rule: Rule, row: Row, snapshot: Snapshot, source: HistoryEntry['source']) {
+    if (!rule.autoResolve || snapshot.result !== 'false') return;
+    const all = this.db.list<RuleIssue>('rule-issue', saved.companyId);
+    const candidates = all.filter(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === JSON.stringify(rule.expression) && issue.status === 'open');
+    for (const issue of candidates) {
+      const flags: string[] = [], taskIds: string[] = [], kept: string[] = [];
+      const transaction = { ...(saved.store.transactions[row.id] ?? emptyTransaction()) };
+      for (const flag of issue.flags) {
+        if (!transaction.flags.includes(flag.label)) continue;
+        const claimedElsewhere = all.some(other => other.id !== issue.id && other.status === 'open' && other.transactionId === row.id && other.flags.some(claim => claim.label === flag.label));
+        if (!flag.removable || claimedElsewhere) { kept.push(`Kept flag: ${flag.label}`); continue; }
+        transaction.flags = transaction.flags.filter(label => label !== flag.label); flags.push(flag.label);
+      }
+      for (const id of issue.taskIds) {
+        const task = this.db.get<ReviewTask>('task', id);
+        if (!task || task.companyId !== saved.companyId || task.ruleId !== rule.id || task.billId !== row.id || task.status !== 'open') continue;
+        if (task.updatedAt !== task.createdAt) { kept.push(`Kept task changed by a reviewer: ${task.title}`); continue; }
+        this.db.put('task', task.id, saved.companyId, { ...task, status: 'done', updatedAt: new Date().toISOString() }); taskIds.push(task.id);
+      }
+      saved.store = { ...saved.store, transactions: { ...saved.store.transactions, [row.id]: transaction }, history: [{
+        id: uid(), key: `${issue.id}:resolved`, ruleId: rule.id, ruleName: rule.name, revision: rule.revision, companyId: saved.companyId,
+        transactionId: row.id, transactionVersion: version(row), action: null, timestamp: new Date().toISOString(), source,
+        previous: issue.lastResult, resulting: 'false', snapshot: { ...structuredClone(snapshot), expression: structuredClone(rule.expression) },
+        resolution: { issueId: issue.id, flags, taskIds, kept },
+      }, ...saved.store.history] };
+      issue.status = 'resolved'; issue.lastResult = 'false'; issue.resolvedAt = new Date().toISOString();
+      this.db.put('rule-issue', issue.id, saved.companyId, issue);
+    }
   }
   save(companyId: string, input: Rule, expectedRevision: number | null, activate = false) {
     const errors = validateRule(input);
@@ -112,7 +177,15 @@ export class RuleService {
       if (rows.some(row => this.data.row(companyId, row.id).sourceVersion !== row.sourceVersion)) throw new Error('Bills changed during evaluation. Retry against the latest values.');
       const batchId = uid();
       for (const row of rows) {
-        saved.store = executeRule(saved.store, rule, row, version(row), snapshots[row.id], source, batchId);
+        const snapshot = snapshots[row.id];
+        const issues = this.db.list<RuleIssue>('rule-issue', companyId).filter(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === JSON.stringify(rule.expression));
+        const open = issues.find(issue => issue.status === 'open');
+        const cycle = open?.cycle ?? issues.filter(issue => issue.status === 'resolved').sort((a, b) => b.resolvedAt!.localeCompare(a.resolvedAt!))[0]?.id ?? '';
+        this.resolveIssues(saved, rule, row, snapshot, source);
+        const before = saved.store;
+        const executionVersion = version(row) + (snapshot.result !== 'false' && cycle ? `:cycle:${cycle}` : '');
+        saved.store = executeRule(saved.store, rule, row, executionVersion, snapshot, source, batchId, this.db.list<ReviewTask>('task', companyId));
+        this.trackIssue(saved, rule, row, snapshot, before, cycle);
         if (source !== 'run') (saved.watches[id] ??= {})[row.id] = version(row);
       }
       const counts = ['true', 'uncertain', 'false'].map(result => rows.filter(row => snapshots[row.id].result === result).length);
@@ -130,7 +203,20 @@ export class RuleService {
     return row;
   }
   undo(companyId: string, id: string) {
-    this.change(companyId, saved => { const result = undoEntry(saved.store, id); if (result.error) throw new Error(result.error); saved.store = result.store; });
+    this.change(companyId, saved => {
+      const entry = saved.store.history.find(entry => entry.id === id);
+      if (entry?.action?.type === 'task') {
+        const task = this.db.get<ReviewTask>('task', (entry.resulting as ReviewTask).id);
+        if (!task || task.companyId !== companyId || task.status !== 'open' || task.updatedAt !== task.createdAt) throw new Error('Undo conflict: this task changed after creation.');
+        this.db.put('task', task.id, companyId, { ...task, status: 'cancelled', updatedAt: new Date().toISOString() });
+        const row = this.data.row(companyId, entry.transactionId);
+        this.db.write({ ...row, dashboard: { ...emptyDashboard(), ...row.dashboard, taskIds: (row.dashboard?.taskIds ?? []).filter(id => id !== task.id) } }, row.sourceVersion!);
+      }
+      const result = undoEntry(saved.store, id); if (result.error) throw new Error(result.error); saved.store = result.store;
+      if (entry?.action?.type === 'flag') for (const issue of this.db.list<RuleIssue>('rule-issue', companyId).filter(issue => issue.transactionId === entry.transactionId && issue.ruleId === entry.ruleId && issue.status === 'open')) {
+        issue.flags = issue.flags.filter(flag => flag.label !== entry.action!.value); this.db.put('rule-issue', issue.id, companyId, issue);
+      }
+    });
     void this.drainDrafts();
   }
   updateMetadata(companyId: string, id: string, input: LocalTransaction, expectedVersion: string) {
@@ -139,6 +225,19 @@ export class RuleService {
     this.change(companyId, saved => {
       if (this.data.row(companyId, id).sourceVersion !== expectedVersion) throw new Error('Bill changed in another session. Reload before editing.');
       saved.store.transactions[id] = { owner: input.owner, flags: [...new Set(input.flags)], tags: [...new Set(input.tags)], automatedCheck: input.automatedCheck };
+      for (const issue of this.db.list<RuleIssue>('rule-issue', companyId).filter(issue => issue.transactionId === id && issue.status === 'open')) {
+        issue.flags = issue.flags.filter(flag => input.flags.includes(flag.label)); this.db.put('rule-issue', issue.id, companyId, issue);
+      }
+    });
+  }
+  addEvidence(companyId: string, id: string, title: unknown, text: unknown, expectedVersion: unknown) {
+    if (typeof title !== 'string' || !title.trim() || title.length > 160 || typeof text !== 'string' || !text.trim() || text.length > 8000) throw new Error('Add a title and supporting details (up to 8,000 characters).');
+    this.data.bills(companyId);
+    this.db.atomic(() => {
+      const row = this.data.row(companyId, id);
+      if (row.sourceVersion !== expectedVersion) throw new Error('This transaction changed. Check the latest details before saving.');
+      const evidence = { id: uid(), kind: 'reviewer_note', date: new Date().toISOString(), title: title.trim(), text: text.trim() };
+      this.db.write({ ...row, evidence: [...(row.evidence ?? []), evidence] }, row.sourceVersion!);
     });
   }
   /** Approving delivers the draft to its recipient's inbox, sent from `actor` (the employee who approved it). */
@@ -166,6 +265,7 @@ export class RuleService {
       if (full) { saved.watches = {}; for (const row of this.data.bills(companyId).rows.filter(row => row.dashboard?.reviewed)) this.db.write({ ...row, dashboard: { ...row.dashboard!, reviewed: false } }, row.sourceVersion!); }
       saved.log = [];
       this.db.removeAll('mail', companyId);
+      this.db.removeAll('rule-issue', companyId);
     });
   }
   importLegacy(companyId: string, legacy: RuleStore, reviewed: string[] = []) {

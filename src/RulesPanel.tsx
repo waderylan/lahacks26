@@ -1,10 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { actionLabel, draftSender, messageBills, emptyTransaction, evaluateTree, RESULT_LABELS, type DraftMessage, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
+import { actionLabel, draftSender, messageBills, emptyTransaction, evaluateTree, RESULT_LABELS, type DraftMessage, type LocalTransaction, type Outcome, type RuleNode, type Snapshot, type RuleIssue } from './rules';
 import type { RulesController } from './useRules';
 import { employeeById } from './employees';
 const labels = { all: 'AND', any: 'OR', not: 'NOT', ai: 'English condition', standard: 'Filter' };
 
 export function ResultBadge({ value }: { value: Outcome }) { return <span className={`result result-${value}`}>{value === 'true' ? 'Match' : value === 'false' ? 'No match' : value === 'error' ? 'Failed' : value === 'pending' ? 'Checking' : 'Uncertain'}</span>; }
+
+export function RuleIssueList({ issues, onInspect, conditionKey }: { issues: RuleIssue[]; onInspect?: (id: string) => void; conditionKey?: string }) {
+  if (!issues.length) return null;
+  const sorted = [...issues].sort((a, b) => (b.resolvedAt ?? b.openedAt).localeCompare(a.resolvedAt ?? a.openedAt));
+  return <section className="rule-follow-up" aria-label="Rule follow-up"><h3>Rule follow-up</h3>
+    <p className="wizard-help">{issues.filter(issue => issue.status === 'open').length} open · {issues.filter(issue => issue.status === 'resolved').length} resolved</p>
+    <ul>{sorted.slice(0, 20).map(issue => <li key={issue.id} data-issue-id={issue.id}><div>
+      {onInspect ? <button className="ghost" onClick={() => onInspect(issue.transactionId)}>{issue.transactionId.split(':').pop()}</button> : <b>{issue.ruleName}</b>}
+      <span className={`tag ${issue.status === 'resolved' ? 'ok' : 'warn'}`}>{issue.status === 'resolved' ? 'Resolved' : 'Open'}</span>
+    </div><p>{issue.status === 'resolved' ? 'The rule no longer matches. Cleanup is recorded in action history.' : `Last result: ${RESULT_LABELS[issue.lastResult]}.`}</p>
+      {conditionKey && issue.conditionKey !== conditionKey && issue.status === 'open' && <p>Created with earlier conditions. Kept open for review.</p>}
+    </li>)}</ul>{issues.length > 20 && <p className="wizard-help">Showing the 20 latest issues.</p>}
+  </section>;
+}
 
 export function RuleHistory({ c, companyId, onOpen }: { c: RulesController; companyId: string; onOpen?: (transactionId: string) => void }) {
   const [tab, setTab] = useState<'history' | 'replay' | 'messages'>('history');
@@ -14,7 +28,8 @@ export function RuleHistory({ c, companyId, onOpen }: { c: RulesController; comp
   const pending = messages.filter(m => m.status === 'pending').length;
   return <section className={`rule-history ${open ? 'expanded' : ''}`} aria-label="Action history"><div className="history-toolbar"><button aria-expanded={open} onClick={() => setOpen(!open)}>{open ? '▾' : '▸'} Activity <b>{history.length}</b></button><button className={tab === 'history' ? 'active' : 'ghost'} onClick={() => { setTab('history'); setOpen(true); }}>Action history</button><button className={tab === 'messages' ? 'active' : 'ghost'} onClick={() => { setTab('messages'); setOpen(true); }}>Messages{pending ? ` · ${pending}` : ''}</button><button className={tab === 'replay' ? 'active' : 'ghost'} onClick={() => { setTab('replay'); setOpen(true); }}>Replay log</button><span className="spacer" /><button disabled={c.busy || !c.remaining || Boolean(c.storageError)} onClick={() => { setTab('replay'); setOpen(true); void c.replay(); }}>{c.busy ? 'Evaluating replay…' : 'Replay next original bill'} <b>({c.remaining})</b></button><button className="ghost" disabled={c.busy || Boolean(c.storageError)} onClick={c.reset}>Reset demo action state</button></div>
     {open && <div className="history-body">{tab === 'messages' ? messages.length ? messages.map(m => <MessageCard key={m.id} message={m} actor={c.actor} onDecide={c.decideMessage} onRetry={c.retryDraft} onOpen={onOpen} />) : <p className="muted">No drafts yet. Add a Draft internal message action, save, and run the rule.</p> : tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
-      <div><b>{h.transactionId.split(':').pop()}</b> · {h.action ? actionLabel(h.action) : 'Rule evaluated'} <ResultBadge value={h.snapshot.result} /><span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
+      <div><b>{h.transactionId.split(':').pop()}</b> · {h.resolution ? 'Issue resolved' : h.action ? actionLabel(h.action) : 'Rule evaluated'} <ResultBadge value={h.snapshot.result} /><span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
+        {h.resolution && <p className="small">Cleared {h.resolution.flags.length} {h.resolution.flags.length === 1 ? 'flag' : 'flags'} and completed {h.resolution.taskIds.length} {h.resolution.taskIds.length === 1 ? 'task' : 'tasks'}.{h.resolution.kept.length > 0 && ` ${h.resolution.kept.join('. ')}.`}</p>}
         <div className="small muted">{h.action && `${JSON.stringify(h.previous)} → ${JSON.stringify(h.resulting)} · `}Version {h.transactionVersion} · Rule result: {h.snapshot.result}</div>
         {h.snapshot.expression && <details className="history-evidence"><summary>View condition results</summary><RuleEvidence node={h.snapshot.expression} snapshot={h.snapshot} /></details>}
       </div>{h.action && <button disabled={Boolean(h.undoneAt) || c.busy} onClick={() => c.undo(h.id)}>{h.undoneAt ? 'Undone' : 'Undo'}</button>}

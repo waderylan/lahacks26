@@ -10,6 +10,7 @@ export type BillAction =
 export interface ReviewTask {
   id: string; companyId: string; billId: string; vendor: string; title: string;
   owner: string; dueDate: string; status: 'open' | 'done' | 'cancelled'; createdAt: string; updatedAt: string;
+  ruleId?: string; ruleActionId?: string; ruleRevision?: number;
 }
 export interface ActionItem {
   billId: string; vendor: string; version: string; before: string; after: string;

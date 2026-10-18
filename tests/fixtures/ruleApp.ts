@@ -36,11 +36,12 @@ export async function startRuleApp() {
   const server = createServer(app);
   const vite = await createVite({ server: { middlewareMode: true, hmr: false }, appType: 'spa', logLevel: 'error' });
   app.use(vite.middlewares);
+  const timer = setInterval(() => { void rules.scan(); }, 100);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('Test server did not start.');
   return {
     url: `http://127.0.0.1:${address.port}`,
-    close: async () => { await vite.close(); server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); db.db.close(); },
+    close: async () => { clearInterval(timer); await vite.close(); server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); db.db.close(); },
   };
 }

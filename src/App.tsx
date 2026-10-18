@@ -183,11 +183,19 @@ export default function App() {
             {ROW_LIMITS.map((n) => <option key={n} value={n}>{n === 0 ? 'All records' : n === -1 ? 'Curated demo sample' : n}</option>)}
           </select>
         </label>
-        {data?.sampled && (
-          <span className="pill sample" title={data.curatedSample ? 'A hand-picked set of records that shows each starter rule' : 'Records are sampled evenly across the year'}>
+        {data && (data.sampled || data.disclosure) && <div className="data-summary">
+          {data.sampled && <span className="pill sample" title={data.curatedSample ? 'A hand-picked set of records that shows each starter rule' : 'Records are sampled evenly across the year'}>
             Sample: {data.rows.length} of {data.totalBills} transactions
-          </span>
-        )}
+          </span>}
+          {data.disclosure && <>
+            <button type="button" className="data-info" aria-label="About this data" aria-haspopup="dialog" popoverTarget="data-disclosure">i</button>
+            <div id="data-disclosure" className="data-disclosure" popover="auto" role="dialog" aria-labelledby="data-disclosure-heading">
+              <h2 id="data-disclosure-heading">About this data</h2>
+              <p>{data.disclosure}</p>
+              <button type="button" popoverTarget="data-disclosure" popoverTargetAction="hide">Close</button>
+            </div>
+          </>}
+        </div>}
         {(workspace === 'explore' || workspace === 'rules') && <label className="rows-pick">Explore / new rule model <select aria-label="Evaluation model" title="Saved rules use their recorded provider. Switching preserves the current search and unsaved rule." value={provider} onChange={event => changeProvider(event.target.value as Provider)}><option value="jev">Jev</option><option value="qwen">Qwen</option></select></label>}
         <JevBadge jev={jev} provider={provider} />
         <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
@@ -198,7 +206,6 @@ export default function App() {
       {error && <div className="rules-notice error" role="alert">{error}</div>}
       {workspace === 'rules' && rules.message && <div className="rules-notice" role="status">{rules.message}</div>}
       {workspace === 'rules' && editor !== null && rules.previewErrors.length > 0 && <div className="rules-notice error" role="alert">Some records could not be checked. <button onClick={rules.retry}>Retry failed checks</button></div>}
-      {data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
       {!data ? <main className="wizard-loading" role="status">{loadError || 'Loading transactions…'}</main> : <>
         <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} provider={exploreRule?.provider ?? provider} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} onOpenRules={() => setWorkspace('rules')} /></div>
         {workspace === 'dashboard' && <div className="insight-body"><Dashboard companyId={companyId} /></div>}

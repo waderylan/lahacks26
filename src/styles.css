@@ -212,6 +212,14 @@ input { font: inherit; }
 .pill.ok { background: var(--green-bg); border-color: #b5dcc4; color: var(--green); }
 .pill.bad { background: var(--red-bg); border-color: #efbdb8; color: var(--red); }
 .pill.sample { background: var(--amber-bg); border-color: #efd9a0; color: var(--amber); }
+.data-summary { display:flex; align-items:center; gap:8px; }
+.toolbar .data-info { display:inline-grid; place-items:center; flex-shrink:0; width:25px; height:25px; padding:0; border:1px solid #ead79f; border-radius:50%; background:#fff6d8; color:#82631b; font-family:Georgia,serif; font-size:15px; font-style:italic; font-weight:700; }
+.data-info:hover { background:#ffefbf; }
+.data-info:focus-visible { outline:2px solid #a17b21; outline-offset:3px; }
+.data-disclosure { position:fixed; inset:72px 20px auto auto; box-sizing:border-box; width:min(420px,calc(100vw - 32px)); max-height:calc(100dvh - 100px); overflow:auto; margin:0; padding:20px; border:1px solid #ead79f; border-radius:9px; background:#fffaf0; color:var(--text); box-shadow:0 8px 24px rgb(0 0 0 / 12%); }
+.data-disclosure h2 { margin:0 0 10px; font-size:14px; }
+.data-disclosure p { margin:0 0 16px; font-size:12px; line-height:1.7; }
+.data-disclosure > button { padding:6px 12px; font-size:12px; }
 
 .picker { position: relative; width: 220px; }
 .picker input { width: 100%; padding: 7px 10px; border: 1px solid var(--green); border-radius: 6px; background: #fff; font-weight: 600; }

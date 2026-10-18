@@ -12,7 +12,7 @@ test('typing must stop for a full second before checks start, including cached s
     });
     await page.goto(app.url);
     await expect(page.getByRole('table', { name: 'Explore results' }).locator('tbody tr')).toHaveCount(8);
-    await page.clock.pauseAt(new Date('2026-10-17T12:00:10Z'));
+    await page.clock.pauseAt(new Date(await page.evaluate(() => Date.now()) + 10_000));
     const input = page.getByLabel('Search transactions', { exact: true });
     await input.fill('Draft search');
     await page.clock.runFor(900);
@@ -154,12 +154,61 @@ test('combining keeps the simple search and labels each condition confidence wit
     await page.getByLabel('Condition 2', { exact: true }).fill('Receipt');
     await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked · Complete');
     await expect(page.getByRole('button', { name: 'Use simple search', exact: true })).toBeDisabled();
-    await expect(page.locator('.explore-confidence').first()).toHaveText('90% Jev match probability');
+    const firstRow = page.locator('.explore-table tbody tr').first();
+    await expect(firstRow.getByRole('group', { name: 'Condition 1 score', exact: true })).toContainText('90% Jev match probability');
+    await expect(firstRow.getByRole('group', { name: 'Condition 2 score', exact: true })).toContainText('70% Jev match probability');
     const options = page.getByLabel('Confidence condition').locator('option');
     await page.getByLabel('Confidence condition').selectOption((await options.nth(1).getAttribute('value'))!);
-    await expect(page.locator('.explore-confidence').first()).toHaveText('70% Jev match probability');
+    await expect(page.getByLabel('Explore sort').locator('option:checked')).toHaveText('Condition 2 score');
+    await expect(firstRow.getByRole('group', { name: 'Condition 1 score', exact: true })).toContainText('90% Jev match probability');
+    await expect(firstRow.getByRole('group', { name: 'Condition 2 score', exact: true })).toContainText('70% Jev match probability');
     await expect(page.locator('.explore-table tbody tr.m-match')).toHaveCount(8);
     expect(checks).toBe(2);
     await expect(page.locator('.explore-confidence-choice')).toContainText('before AND, OR, and NOT');
+  } finally { await app.close(); }
+});
+
+test('combined results show each condition score separately through AND, OR and NOT', async ({ page }) => {
+  const app = await startRuleApp();
+  try {
+    await page.route('**/api/evaluate', route => {
+      const { criterion, ids } = route.request().postDataJSON();
+      return route.fulfill({ json: { results: ids.map((id: string) => {
+        const matches = criterion === 'Electronics' && id.endsWith(':bill-1');
+        return { id, state: matches ? 'match' : 'no_match', scoreKind: 'jev_probability', pMatch: matches ? .99 : .01 };
+      }), costNanoUsd: '0' } });
+    });
+    await page.goto(app.url);
+    await page.getByLabel('Search transactions', { exact: true }).fill('Electronics');
+    await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked');
+    await page.getByRole('button', { name: 'Combine conditions', exact: true }).click();
+    await page.getByRole('button', { name: 'Add condition', exact: true }).click();
+    await page.getByLabel('Condition 2', { exact: true }).fill('Memo conflicts with description');
+    await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked');
+    const table = page.getByRole('table', { name: 'Explore results', exact: true });
+    const row = table.locator('tr[data-id="company-101:bill-1"]');
+    const combinedResult = row.locator('td').nth(5).locator('summary');
+    await expect(table.getByRole('columnheader', { name: 'Combined result', exact: true })).toBeVisible();
+    await expect(table.getByRole('columnheader', { name: 'Match confidence', exact: true })).toHaveCount(0);
+    await expect(row.locator('.explore-confidence')).toHaveCount(0);
+    await expect(combinedResult).toHaveText('No match');
+    await expect(row).not.toHaveClass(/m-match/);
+    const first = row.getByRole('group', { name: 'Condition 1 score', exact: true });
+    const second = row.getByRole('group', { name: 'Condition 2 score', exact: true });
+    await expect(first).toContainText('99% Jev match probability');
+    await expect(first.locator('.result')).toHaveText('Match');
+    await expect(second).toContainText('1% Jev match probability');
+    await expect(second.locator('.result')).toHaveText('No match');
+    const neither = table.locator('tr[data-id="company-101:bill-2"]');
+    await expect(neither.getByRole('group', { name: /Condition [12] score/ }).locator('.result')).toHaveText(['No match', 'No match']);
+    await expect(neither.locator('td').nth(5).locator('summary')).toHaveText('No match');
+    await page.getByLabel('Group logic', { exact: true }).selectOption('any');
+    await expect(combinedResult).toHaveText('Match');
+    await expect(row).toHaveClass(/m-match/);
+    await page.getByRole('button', { name: 'Remove condition 2', exact: true }).click();
+    await page.getByLabel('Group logic', { exact: true }).selectOption('not');
+    await expect(combinedResult).toHaveText('No match');
+    await expect(row).not.toHaveClass(/m-match/);
+    await expect(first).toContainText('99% Jev match probability');
   } finally { await app.close(); }
 });

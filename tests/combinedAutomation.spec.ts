@@ -34,7 +34,7 @@ test('Explore becomes an action rule; assignments, tasks, recurring checks, and 
     await page.getByLabel('Keep checking', { exact: true }).click();
     await expect(page.getByLabel('Keep checking', { exact: true })).toBeChecked();
     expect((await saved()).history).toEqual([]);
-    await page.getByRole('button', { name: /Run now/ }).click();
+    await page.getByRole('button', { name: /Run/ }).click();
     await expect(page.getByLabel('Rule follow-up')).toContainText('1 open');
     await workspace('Tasks & activity');
     await expect(page.locator('.dashboard-task')).toContainText('Verify this receipt');

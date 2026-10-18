@@ -14,8 +14,8 @@ test('the company rules table toggles, runs, edits and deletes saved rules with 
     const table = page.getByRole('table', { name: 'Company rules', exact: true });
     await expect(table.locator('tbody tr')).toHaveCount(2);
     await expect(page.locator('.rules-payment-risk')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Ask your books', exact: true })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Preview & run', exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ask your books', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Preview', exact: true }).first()).toBeVisible();
     let row = table.getByRole('row').filter({ hasText: 'Missing documentation' });
     await expect(row.getByRole('switch')).not.toBeChecked();
     await row.getByRole('button', { name: 'Run all records', exact: true }).click();

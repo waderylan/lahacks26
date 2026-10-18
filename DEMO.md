@@ -18,10 +18,11 @@ npm run dev        # http://localhost:5173
 
 1. **Explore** finds and inspects. It never changes anything. Search in English, combine conditions with AND/OR/NOT, filter by type, save a view. The suggested starter for the company sits at the top.
 2. **Rules** acts. Four starter packs are the entry points: possible duplicate charges, missing documentation, possible payment fraud, unsupported expenses. Adding one saves it with Keep checking off and runs nothing.
-3. **Preview & run** opens the results preview. **Run now** there applies each result's configured actions (Match, Not enough information, No match) to every evaluated preview record, whichever display filters are on. **Run all records** (Rules table) applies the rule to the whole company inside its record filters, after confirmation. **Keep checking** acts only on new or changed records.
+3. **Preview** opens the results preview. **Run** there applies each result's configured actions (Match, Not enough information, No match) to every evaluated preview record, whichever display filters are on. **Run all records** (Rules table) applies the rule to the whole company inside its record filters, after confirmation. **Keep checking** acts only on new or changed records.
 4. **Tasks & activity** is the one place for what happened: rule flags, assignments, tasks, messages, resolutions and manual reviews, with Undo where the source allows it. The same events appear per transaction under *What happened* in the detail drawer.
 5. **Messages**: rule drafts wait in Approvals. Only the draft's sender can approve; switch **Viewing as** (or use the *View as* button) to approve. Compose and reply are direct human mail.
 6. **Supporting details** (transaction drawer): add the receipt or explanation, recheck the rule (automatic with Keep checking on, otherwise *Recheck now*), and the issue resolves when the rule finds No match and clears resolved issues.
+7. **Ask your books** (bottom right): ask about vendor bills, select a model, inspect matching records, preview a task or assignment, or send a chart to Dashboard. Use Keep on dashboard to save the chart. Conversations are saved separately for each company and employee. Voice input remains available in supported browsers.
 
 ## Who owns what
 

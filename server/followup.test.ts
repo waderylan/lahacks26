@@ -134,7 +134,7 @@ test('production dashboard/evaluation APIs enforce revision, explicit provider a
   assert.equal((await call(url, 'PUT', { charts: [], expectedRevision: 0 })).status, 200);
   assert.equal((await call(url, 'PUT', { charts: STARTER_CHARTS, expectedRevision: 0 })).status, 409);
   assert.equal((await fetch(base + '/api/companies/company-018/dashboard')).status, 404);
-  assert.equal((await fetch(base + '/api/companies/' + company + '/chat')).status, 404);
+  assert.equal((await fetch(base + '/api/companies/' + company + '/chat')).status, 200);
 });
 
 test('frozen preparation reproduces 70/15/15 identities and explicitly assembles 800 or 1000 examples without overwrites', t => {

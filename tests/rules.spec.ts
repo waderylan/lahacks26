@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { startRuleApp } from './fixtures/ruleApp';
 
-test('Run now applies to every evaluated preview record, not only the displayed results, and remains idempotent', async ({ page }) => {
+test('Run applies to every evaluated preview record, not only the displayed results, and remains idempotent', async ({ page }) => {
   const app = await startRuleApp();
   try {
     await page.goto(`${app.url}/?workspace=rules`);
@@ -19,13 +19,13 @@ test('Run now applies to every evaluated preview record, not only the displayed 
     await expect(page.locator('.wizard-table tbody tr')).toHaveCount(1);
     await page.getByLabel('Rule name').fill('Duplicate review');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-    await page.getByRole('button', { name: /^Run now/ }).click();
+    await page.getByRole('button', { name: /^Run/ }).click();
     const state = async () => (await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store;
     await expect.poll(async () => (await state()).history.length).toBe(2);
     expect((await state()).history.length).toBe(2);
     expect(Object.keys((await state()).transactions).sort()).toEqual(['company-101:bill-1', 'company-101:bill-2']);
     expect((await state()).transactions['company-101:bill-1'].flags).toEqual(['Needs receipt']);
-    await page.getByRole('button', { name: /^Run now/ }).click();
+    await page.getByRole('button', { name: /^Run/ }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Run complete' })).toBeVisible();
     expect((await state()).history).toHaveLength(2);
   } finally { await app.close(); }

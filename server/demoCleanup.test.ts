@@ -92,10 +92,10 @@ test('production assembly exposes exactly four companies and all records without
 test('retired endpoints cannot create actions or bypass approval; saved views remain CRUD only', async t => {
   const runtime = await http(); t.after(runtime.close);
   const base = `${runtime.url}/api/companies/${a}`;
-  for (const endpoint of ['/chat', '/llm-evaluate', '/automations', '/checks/duplicates/escalate', '/rules/import', '/searches/old/toggle', '/searches/old/check', '/searches/old/seen']) {
+  for (const endpoint of ['/automations', '/checks/duplicates/escalate', '/rules/import', '/searches/old/toggle', '/searches/old/check', '/searches/old/seen']) {
     assert.equal((await post(base + endpoint, {})).status, 404, endpoint);
   }
-  assert.equal((await post(runtime.url + '/api/understand', {})).status, 404);
+  assert.equal((await post(runtime.url + '/api/understand', {})).status, 400);
   const created = await (await post(base + '/searches', { name: 'Receipts', definition: {
     query: 'Receipt missing', type: 'all', status: 'all', assignee: 'all', tab: 'all', matchesOnly: false, sort: { key: 'date', dir: -1 },
   } })).json();

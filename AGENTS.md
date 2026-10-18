@@ -4,6 +4,8 @@ Dataset setup plus a local Transaction Review demo (React + Vite + Express, one 
 
 The demo runtime exposes only synthetic companies 101–104 from `synthetic/extension-v1/`. Original dataset tools remain offline. `server/app.ts` assembles production routes; browser fixtures inject data, model responses, sampling, and timers into that assembly. Automated messages require sender approval; manual Compose/reply is explicit human mail.
 
+Keep the floating **Ask your books** assistant (`src/AskPanel.tsx`). It supports questions, voice, explicit transaction-action previews, and chart handoff to Dashboard. Conversation history lives in SQLite through `server/chat.ts`. Dashboard reads/writes must continue through the revision-checked `server/dashboard.ts` routes; do not restore the older duplicate chat dashboard routes.
+
 ## Commands
 
 - `uv sync` installs dependencies.

@@ -29,6 +29,10 @@ export async function startRuleApp(options: RuleAppOptions = {}) {
   }));
   const runtime = createReviewApp({
     database: db, configured: () => true, draftConfigured: () => true,
+    chat: { configured: model => model === 'jev',
+      understand: async question => ({ intent: /graph|chart|month/i.test(question) ? 'months' : /how many|count/i.test(question) ? 'count' : 'list', scope: /all|graph|chart/i.test(question) ? 'everything' : 'specific', period: 'none', confidence: { intent: 1, scope: 1, period: 1 }, costNanoUsd: '0', ms: 1 }),
+      route: async () => ({ employeeId: 'emp-ap', probability: .99 }),
+    },
     ...(options.mode !== 'real-four-company' && {
       companies: () => [company], load: () => ({ company, rows, totalBills: rows.length, sampled: false }),
       accounts: () => [], sample: () => null,
@@ -44,7 +48,7 @@ export async function startRuleApp(options: RuleAppOptions = {}) {
     timers: { scanMs: 100, draftMs: 100 },
   });
   const server = createServer(runtime.app);
-  const vite = await createVite({ server: { middlewareMode: true, ws: { server } }, appType: 'spa', logLevel: 'error' });
+  const vite = await createVite({ cacheDir: `node_modules/.vite-tests/${process.pid}`, server: { middlewareMode: true, ws: { server } }, appType: 'spa', logLevel: 'error' });
   runtime.app.use(vite.middlewares);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();

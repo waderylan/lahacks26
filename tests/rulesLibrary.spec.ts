@@ -9,7 +9,7 @@ const rule = (id: string): Rule => ({ id, companyId: 'company-101', name: `Revie
   expression: { id: `${id}-amount`, type: 'standard', field: 'amountCents', operator: 'gt', value: '500' },
   actions: [{ id: `${id}-flag`, type: 'flag', value: 'Check charge' }] });
 
-test('all saved rules have recurring toggles and Preview & run opens a preview without applying actions', async ({ page }) => {
+test('all saved rules have recurring toggles and Preview opens a preview without applying actions', async ({ page }) => {
   for (const id of ['receipts', 'charges']) expect((await page.request.post(`${app.url}/api/companies/company-101/rules/commands`, { data: { type: 'save', rule: rule(id), expectedRevision: null } })).ok()).toBe(true);
   await page.goto(`${app.url}/?workspace=rules`);
   await expect(page.getByRole('table', { name: 'Company rules', exact: true }).locator('tbody tr')).toHaveCount(2);
@@ -18,11 +18,11 @@ test('all saved rules have recurring toggles and Preview & run opens a preview w
   await expect(card.getByLabel('Keep checking: Review receipts')).toBeChecked();
   const state = async () => (await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store;
   expect((await state()).history).toEqual([]);
-  await card.getByRole('button', { name: 'Preview & run', exact: true }).click();
+  await card.getByRole('button', { name: 'Preview', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Review the results and actions' })).toBeVisible();
   await expect(page.getByRole('table', { name: 'Rule results and planned actions' }).locator('tbody tr')).toHaveCount(8);
   expect((await state()).history).toEqual([]);
-  await page.getByRole('button', { name: /^Run now/ }).click();
+  await page.getByRole('button', { name: /^Run/ }).click();
   await expect.poll(async () => (await state()).history.length).toBe(8);
   await page.getByRole('button', { name: 'All rules', exact: true }).click();
   await expect(card).toContainText('8 open issues');

@@ -1,3 +1,4 @@
+import { ChatWidget } from './AskPanel';
 import { providerLabel, type Provider } from './modelContext';
 import { Dashboard } from './Dashboard';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -147,6 +148,7 @@ export default function App() {
     try {
       const reply = await rules.restore();
       if (!reply) return false;
+      window.dispatchEvent(new CustomEvent('company-restored', { detail: companyId }));
       setEditor(null); setExploreRule(null); setDefinition(emptyExplore()); setDrawerId(null); setDrawerExtra(null);
       await Promise.all([refreshExplore().catch((error: Error) => setLoadError(error.message)), dashboard.refresh().catch(() => {}), mailbox.refresh()]);
       return true;
@@ -207,6 +209,7 @@ export default function App() {
           {otherDrafts.length > 0 && <section aria-label="Waiting on others"><h3>Sent from other employees</h3><p className="small muted">You cannot approve these as {employeeById(as)?.name ?? 'this employee'}. Switch to the sender to approve.</p>{otherDrafts.map(approvalCard)}</section>}
         </> : <p className="dashboard-empty">No drafts yet. Add a Draft internal message action to a rule and run it.</p>} /></div></div>}
       </>}
+      <ChatWidget companyId={companyId} as={as} jevReady={provider === 'jev' && Boolean(jev?.configured)} onOpenDashboard={() => setWorkspace('dashboard')} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={refreshAll} />
       {drawerRow && <Drawer row={drawerRow} rules={rules} readOnly={workspace === 'explore'} tasks={dashboard.tasks.filter(task => task.billId === drawerRow.id)} timeline={transactionTimeline(activity, drawerRow.id)} actor={as} busy={dashboard.busy || rules.busy}
         onClose={() => setDrawerId(null)} onUndo={undoEvent} onReview={reviewed => { void dashboard.review([drawerRow.id], reviewed, drawerRow.sourceVersion ? { [drawerRow.id]: drawerRow.sourceVersion } : undefined).catch(() => {}); }} onGoTo={goTo} onSwitch={setAs} />}
       <Toasts notices={notices} onDismiss={rules.markNoticeToasted} />

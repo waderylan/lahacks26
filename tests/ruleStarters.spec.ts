@@ -25,7 +25,7 @@ test('starters add once, stay editable, retain saved status after reload, and ru
     await step('Review results');
     await page.getByLabel('Rule name', { exact: true }).fill('Receipt review for this company');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-    await page.getByRole('button', { name: /Run now/ }).click();
+    await page.getByRole('button', { name: /Run/ }).click();
     await expect(page.getByLabel('Rule follow-up')).toContainText('2 open');
     const snapshot = await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json();
     expect(snapshot.store.rules).toHaveLength(1);

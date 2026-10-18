@@ -1,0 +1,81 @@
+import { expect, test } from '@playwright/test';
+import { startRuleApp } from './fixtures/ruleApp';
+
+test('rule assignments, tasks, saved-search notifications, and resolution work together', async ({ page }) => {
+  const app = await startRuleApp();
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
+  const workspace = (name: string) => page.getByRole('navigation', { name: 'Workspace', exact: true }).getByRole('button', { name: new RegExp(`^${name}`) }).click();
+  try {
+    await page.goto(`${app.url}/?workspace=transactions`);
+    await page.getByLabel('Bill status filter').selectOption('flagged');
+    await page.locator('.saved-search-row').getByRole('button', { name: 'Save search', exact: true }).click();
+    await page.getByLabel('Search name', { exact: true }).fill('Flagged charges');
+    await page.getByRole('form', { name: 'Save search', exact: true }).getByRole('button', { name: 'Save search', exact: true }).click();
+    await expect(page.getByLabel('Saved searches', { exact: true })).toContainText('Flagged charges');
+    await page.getByRole('button', { name: /^All saved searches/ }).click();
+    let dialog = page.getByRole('dialog', { name: 'All saved searches', exact: true });
+    await dialog.getByRole('switch', { name: 'Automatic checks for Flagged charges' }).click();
+    await expect(dialog).toContainText('Last checked');
+    await expect(dialog).toContainText('0 matches');
+    await dialog.getByRole('button', { name: 'Close saved searches', exact: true }).click();
+
+    await workspace('Rules');
+    await page.getByRole('button', { name: 'New rule', exact: true }).click();
+    await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
+    await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 evaluated · Complete');
+    await step('Choose actions');
+    const uncertain = page.getByRole('group', { name: 'When there is not enough information', exact: true });
+    const add = () => uncertain.getByRole('button', { name: 'Add action for uncertain results', exact: true }).click();
+    await add(); await uncertain.getByLabel('Action value').fill('Needs receipt');
+    await add(); await uncertain.getByLabel('Action type').last().selectOption('assign');
+    await uncertain.getByLabel('Action value').last().fill('Bookkeeper');
+    await add(); await uncertain.getByLabel('Action type').last().selectOption('task');
+    await uncertain.getByLabel('Task title').fill('Verify this receipt');
+    await uncertain.getByLabel('Task owner').fill('Bookkeeper');
+    await page.getByLabel('Clear resolved issues').check();
+    await step('Review results'); await page.getByLabel('Rule name').fill('Request missing receipt');
+    await page.getByRole('button', { name: 'Save rule', exact: true }).click();
+    await page.getByLabel('Run automatically', { exact: true }).click();
+    await expect(page.getByLabel('Run automatically', { exact: true })).toBeChecked();
+    await page.getByRole('button', { name: /Run once/ }).click();
+    await expect(page.getByLabel('Rule follow-up')).toContainText('1 open');
+
+    await workspace('Tasks & activity');
+    await expect(page.locator('.dashboard-task')).toContainText('Verify this receipt');
+    await expect(page.locator('.dashboard-task')).toContainText('Bookkeeper');
+    await workspace('Transactions');
+    await page.getByLabel('Bill assignee filter').selectOption('Bookkeeper');
+    await expect(page.locator('tbody tr[data-id]')).toHaveCount(1);
+    await page.getByRole('button', { name: /^All saved searches/ }).click();
+    dialog = page.getByRole('dialog', { name: 'All saved searches', exact: true });
+    await expect(dialog.getByRole('button', { name: 'View new (1)', exact: true })).toBeVisible();
+    await dialog.getByRole('button', { name: 'View new (1)', exact: true }).click();
+    await expect(dialog.getByRole('table', { name: 'New matching transactions' }).locator('tbody tr')).toHaveCount(1);
+    await page.screenshot({ path: 'artifacts/combined-saved-searches-desktop.png', fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(dialog.getByRole('switch')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: 'artifacts/combined-saved-searches-mobile.png', fullPage: true });
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    await dialog.getByRole('button', { name: 'Mark 1 as seen', exact: true }).click();
+    await expect(dialog.getByRole('button', { name: /^View new/ })).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Close saved searches', exact: true }).click();
+
+    await page.locator('tbody tr[data-id="company-018:bill-1"]').locator('td').nth(3).click();
+    const drawer = page.getByLabel('Transaction detail');
+    await drawer.getByLabel('Supporting details title').fill('Receipt verification');
+    await drawer.getByLabel('Supporting details text').fill('The original receipt supports this maintenance charge.');
+    await drawer.getByRole('button', { name: 'Save supporting details', exact: true }).click();
+    await expect(drawer.getByLabel('Rule follow-up')).toContainText('Resolved');
+    await page.getByLabel('Close detail', { exact: true }).click();
+    await page.getByRole('button', { name: /^All saved searches/ }).click();
+    await expect(page.getByRole('dialog', { name: 'All saved searches', exact: true })).toContainText('0 matches');
+    const state = await (await page.request.get(`${app.url}/api/companies/company-018/workspace`)).json();
+    expect(state.tasks[0].status).toBe('done');
+    const row = state.rows.find((row: any) => row.id === 'company-018:bill-1');
+    expect(row.dashboard.flags).toEqual([]);
+    expect(row.dashboard.owner).toBe('Bookkeeper');
+    expect(errors).toEqual([]);
+  } finally { await app.close(); }
+});

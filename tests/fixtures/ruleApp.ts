@@ -8,6 +8,7 @@ import { actionRoutes } from '../../server/actionRoutes';
 import { RuleService } from '../../server/ruleService';
 import { ruleRoutes } from '../../server/ruleRoutes';
 import { Mailbox, mailRoutes } from '../../server/mailbox';
+import { SavedSearchService, savedSearchRoutes } from '../../server/savedSearches';
 import type { Row } from '../../src/types';
 
 /** Real UI, routes, and SQLite; external model responses are deterministic in these workflow tests. */
@@ -26,6 +27,7 @@ export async function startRuleApp() {
   const outcome = (row: Row) => row.evidence?.length || row.memo === 'Receipt checked' ? 'no_match' as const : row.memo === 'Needs receipt' ? 'uncertain' as const : 'match' as const;
   const judge = async (_company: string, _criterion: string, rows: Row[]) => Object.fromEntries(rows.map(row => [row.id, outcome(row)]));
   const rules = new RuleService(db, data, judge, async request => ({ employeeId: request.recipient === 'jev' ? 'emp-controller' : request.recipient, subject: 'Please provide the receipt', body: 'Please attach the missing receipt so Accounting can finish reviewing this charge.' }));
+  const searches = new SavedSearchService(db, id => id === companyId, { rows: id => data.bills(id).rows, judge });
   const app = express(); app.use(express.json());
   app.get('/api/status', (_req, res) => res.json({ jev: { configured: true, model: 'test-double', via: 'Workflow test' }, gemini: { configured: true } }));
   app.get('/api/companies', (_req, res) => res.json([company]));
@@ -33,10 +35,11 @@ export async function startRuleApp() {
   app.post('/api/evaluate', (req, res) => res.json({ results: req.body.ids.map((id: string) => ({ id, state: outcome(data.row(companyId, id)), pMatch: 0.5 })), costNanoUsd: '0' }));
   actionRoutes(app, new ActionEngine(db, data, judge));
   ruleRoutes(app, rules); mailRoutes(app, new Mailbox(db, data));
+  savedSearchRoutes(app, searches);
   const server = createServer(app);
   const vite = await createVite({ server: { middlewareMode: true, hmr: false }, appType: 'spa', logLevel: 'error' });
   app.use(vite.middlewares);
-  const timer = setInterval(() => { void rules.scan(); }, 100);
+  const timer = setInterval(() => { void rules.scan(); void searches.monitor.scan(); }, 100);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('Test server did not start.');

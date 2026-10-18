@@ -143,7 +143,6 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     remaining: data?.reservedRows?.filter(row => !(store.arrivals[companyId] ?? []).includes(row.id)).length ?? 0,
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(rule => rule.id === id); if (rule) { setDraft(structuredClone(rule)); setMessage(''); } },
     presets: rulePresets(Boolean(data?.company.synthetic)),
-    presetId: draft?.presetId ?? '',
     addPreset: async (presetId: string) => {
       const reply = await command({ type: 'add-preset', presetId, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
       const rule = reply?.store.rules.find(rule => rule.id === reply.selectedRuleId);

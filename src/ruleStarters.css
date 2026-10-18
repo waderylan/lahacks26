@@ -25,6 +25,11 @@
 .starter-controls small { max-width:100%; overflow-wrap:anywhere; color:var(--muted); }
 .starter-added { color:var(--green); }
 .starter-available { color:var(--muted); }
+.starter-more { margin:0 20px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; }
+.starter-more > summary { cursor:pointer; color:var(--green); }
+.starter-more > div { display:grid; gap:8px; padding:12px 0; }
+.starter-more button { text-align:left; display:grid; gap:5px; font-size:12px; }
+.starter-more button span { color:var(--muted); font-size:11px; line-height:1.6; }
 .starter-saved { padding:14px 20px 0; }
 .starter-saved h3 { font-size:12px; margin:0 0 10px; font-weight:600; }
 .starter-saved > div { display:flex; flex-wrap:wrap; gap:8px; max-height:140px; overflow:auto; }
@@ -45,4 +50,5 @@
   .starter-controls small { flex-basis:100%; }
   .starter-footnote { padding:14px 12px; }
   .starter-saved { padding:14px 12px 0; }
+  .starter-more { margin:0 12px; }
 }

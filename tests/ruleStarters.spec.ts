@@ -7,6 +7,7 @@ test('starters add once, stay editable, retain saved status after reload, and ru
   const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
   try {
     await page.goto(`${app.url}/?workspace=rules`);
+    await expect(page.getByRole('combobox', { name: 'Start from a preset', exact: true })).toHaveCount(0);
     const starter = page.getByRole('article', { name: 'Missing documentation starter', exact: true });
     await expect(starter).toContainText('Ready to add');
     await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
@@ -32,6 +33,10 @@ test('starters add once, stay editable, retain saved status after reload, and ru
     await expect(starter).toContainText('Saved · Automatic off');
     await starter.getByRole('button', { name: 'Open rule', exact: true }).click();
     await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('This charge lacks supporting documentation.');
+    await page.locator('.starter-more > summary').click();
+    await page.locator('.starter-more').getByRole('button', { name: 'Memo needs clarification', exact: true }).click();
+    await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('The memo describes a standing overhead or monthly service charge.');
+    await starter.getByRole('button', { name: 'Open rule', exact: true }).click();
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(starter.getByRole('button', { name: 'Open rule', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

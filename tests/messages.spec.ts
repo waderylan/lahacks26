@@ -13,7 +13,8 @@ test('message actions: one synthesized draft per run, routed by Jev or to a chos
   await page.request.post('/api/companies/company-018/rules/commands', { data: { type: 'reset', full: true } });
   const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto('/?workspace=rules');
-  await page.getByLabel('Start from a preset').selectOption({ label: 'Memo needs clarification' }); await complete(page);
+  await page.locator('.starter-more > summary').click();
+  await page.locator('.starter-more').getByRole('button', { name: 'Memo needs clarification', exact: true }).click(); await complete(page);
   await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Choose actions', exact: true }).click();
   await page.getByRole('button', { name: 'Add action', exact: true }).click();
   await page.getByLabel('Action type').last().selectOption('message');

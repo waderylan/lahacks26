@@ -45,6 +45,11 @@ export function RuleStarters({ c, data, onInspect, onDemoSample }: {
         </article>;
       })}
     </div>
+    <details className="starter-more"><summary>More examples</summary><div>
+      {c.presets.filter(preset => !preset.starter).map(preset => <button key={preset.id} aria-label={preset.name} onClick={() => c.loadPreset(preset.id)}>
+        <b>{preset.name}</b><span>{preset.description}</span>
+      </button>)}
+    </div></details>
     {c.store.rules.length > 0 && <section className="starter-saved" aria-label="Saved rules in this company">
       <h3>Your saved rules ({c.store.rules.length})</h3>
       <div>{c.store.rules.map(rule => <button key={rule.id} aria-pressed={c.draft?.id === rule.id} onClick={() => c.selectRule(rule.id)}>{rule.name}<span>Automatic {rule.enabled ? 'on' : 'off'}</span></button>)}</div>

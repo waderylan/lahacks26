@@ -28,8 +28,8 @@ npm run dev
    Repeated adds reopen the existing rule and preserve edits. **Open rule**
    reopens a saved starter even after it is renamed or its conditions change.
    Older saved fraud presets with the same conditions are recognized too.
-3. Edit English conditions, then **Choose actions**. The existing preset
-   dropdown also includes the earlier examples and can start an unsaved draft.
+3. Edit English conditions, then **Choose actions**. **More examples** in the
+   same library includes the earlier examples and can start an unsaved draft.
 4. Open **Review results**. Review Match, Not enough information and No match,
    plus the planned actions. Save edits before **Run once**. The visible result
    and transaction filters limit the manual run; **All results** includes the

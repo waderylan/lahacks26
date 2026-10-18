@@ -4,7 +4,7 @@ import { paymentSignals } from '../src/paymentRisk.ts';
 import type { CheckVerdict } from '../src/reviewChecks.ts';
 import type { Row } from '../src/types.ts';
 import { JEV_MODEL } from './jev.ts';
-import { escalationLine, type CheckDefinition, type Company, type Judgment } from './reviewChecks.ts';
+import { type CheckDefinition, type Company, type Judgment } from './reviewChecks.ts';
 
 export const RISK_OPTIONS = {
   suspicious: 'The records show an unexplained payment-diversion warning sign: payment is sent, or asked to be sent, to an account that differs from the one on file (vendor master or the company\'s remit-to profile) without a documented, verified change; or the text pressures the reader to change payment details or skip verification.',
@@ -40,9 +40,4 @@ export const paymentRiskCheck: CheckDefinition = {
   kind: 'payment-risk',
   assess: (company, rows, _all, signal) => assessPayments(company, rows, signal),
   signals: row => paymentSignals(row),
-  escalation: {
-    subject: n => `Possible payment diversion: ${n} transaction${n === 1 ? '' : 's'}`,
-    ask: 'Please hold payment and confirm bank details with each vendor through a known contact before anything is released.',
-    line: (row, result) => escalationLine(row, result, 'suspicious'),
-  },
 };

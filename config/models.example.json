@@ -1,0 +1,5 @@
+{
+  "name": "Qwen",
+  "deploymentId": "replace-with-an-existing-deployment-id",
+  "calibrationFile": "calibration.json"
+}

@@ -1,3 +1,4 @@
+import { providerLabel } from './modelContext';
 import { useState, type ReactNode } from 'react';
 import type { CompanyBills } from './types';
 import type { RulesController } from './useRules';
@@ -37,7 +38,7 @@ export function CompanyRules({ c, data, onEdit, onPreview, onExplore, onInspect,
           return <tr key={rule.id} data-rule-id={rule.id}>
             <th scope="row"><button className="company-rule-name" onClick={() => edit(rule)}>{rule.name}</button>
               <small>{leaves(rule.expression).length} conditions · {rule.actions.length} actions · {open} open issues · Revision {rule.revision}</small>
-              <small>{scopeLabel(rule.scope)}</small>
+              <small>{providerLabel(rule.provider)} · {scopeLabel(rule.scope)}</small>
               <details className="company-rule-definition"><summary>Conditions and actions</summary><p>{conditionText(rule.expression)}</p>{rule.actions.map(action => <p key={action.id}><b>{RESULT_LABELS[actionOutcome(action)]}:</b> {actionLabel(action)}</p>)}</details>
             </th>
             <td><button className="company-rule-switch" role="switch" aria-checked={rule.enabled} aria-label={`Keep checking: ${rule.name}`} disabled={disabled} onClick={() => { void c.toggleRule(rule, !rule.enabled); }}>
@@ -45,7 +46,7 @@ export function CompanyRules({ c, data, onEdit, onPreview, onExplore, onInspect,
             </button></td>
             <td>{run ? <><span>{run.matches} match · {run.uncertain} uncertain · {run.nonmatches} no match</span>
               <small>{run.transactionCount} checked · {new Date(run.checkedAt).toLocaleString()}</small>
-              <small>{run.source === 'run' ? 'Manual run' : run.source === 'arrival' ? 'Arriving records' : 'Changed records'}</small>
+              <small>{run.evaluation ? providerLabel(run.evaluation.provider) + ' · ' + run.evaluation.model : 'Unknown evaluator (legacy run)'} · {run.source === 'run' ? 'Manual run' : run.source === 'arrival' ? 'Arriving records' : 'Changed records'}</small>
               {run.revision !== rule.revision && <small>Results from revision {run.revision}; run again for the current rule.</small>}
             </> : previous ? <><span>Previous activity</span><small>{new Date(previous.timestamp).toLocaleString()} · Run again to record match totals.</small></> : <span className="muted">No runs recorded</span>}</td>
             <td><div className="company-rule-actions">

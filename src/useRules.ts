@@ -1,17 +1,17 @@
-import { selectedProvider } from './jevClient';
+import { useEvaluationContext } from './useEvaluationContext';
+import type { Provider } from './modelContext';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { useConditionPreview } from './useConditionPreview';
 import { inScope } from './ruleScope';
 import { EMPTY_STORE, exampleRule, syntheticExampleRules, rulePresets, savedPreset, uid, validateRule, type Rule, type RuleStore, type RuleIssue, type RuleRunSummary } from './rules';
 import type { RowPatch } from './useWorkspace';
-import { importBrowserWorkspace } from './workspaceMigration';
 
 interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[]; runs?: RuleRunSummary[]; selectedRuleId?: string }
-const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve), rule.scope]);
+const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve), rule.scope, rule.provider ?? 'jev']);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
-export function useRules(data: CompanyBills | null, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '') {
+export function useRules(data: CompanyBills | null, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '', pageProvider: Provider = 'jev') {
   const current = useRef(companyId); current.current = companyId;
   const [store, setStore] = useState<RuleStore>(() => structuredClone(EMPTY_STORE));
   const storeRef = useRef(store); storeRef.current = store;
@@ -44,13 +44,13 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     const refresh = async (initial = false) => {
       const seq = ++requestSeq.current;
       try {
-        if (initial) await importBrowserWorkspace(scope);
+
         const response = await fetch(`/api/companies/${scope}/rules`);
         const reply = await response.json();
         if (!response.ok) throw new Error(reply.error ?? 'Could not load saved rules.');
         if (disposed || current.current !== scope || seq !== requestSeq.current) return;
         accept(reply); setReady(true);
-        setDraft(existing => existing?.companyId === scope ? existing : reply.store.rules[0] ?? exampleRule(scope));
+        setDraft(existing => existing?.companyId === scope ? existing : reply.store.rules[0] ?? { ...exampleRule(scope), provider: pageProvider });
       } catch (error) { if (!disposed && current.current === scope) setStorageError((error as Error).message); }
     };
     void refresh(true);
@@ -65,11 +65,11 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     if (!scope || !ready) return;
     pending.current++; setBusy(true); requestSeq.current++; commandError.current = '';
     try {
-      const response = await fetch(`/api/companies/${scope}/rules/commands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, model: selectedProvider() }) });
+      const response = await fetch(`/api/companies/${scope}/rules/commands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const reply = await response.json();
       if (!response.ok) throw new Error(reply.error ?? 'Could not save workspace changes.');
       if (current.current !== scope) return;
-      accept(reply); if (success) setMessage(success); callbacks.current.onChange?.();
+      accept(reply); window.dispatchEvent(new Event('workspace-changed')); if (success) setMessage(success); callbacks.current.onChange?.();
       return reply as Reply;
     } catch (error) { commandError.current = (error as Error).message; if (current.current === scope) setMessage(commandError.current); }
     finally { pending.current--; if (current.current === scope) setBusy(pending.current > 0); }
@@ -77,13 +77,14 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
 
   const validCompany = Boolean(ready && draft && draft.companyId === companyId && data?.company.companyId === companyId);
   const scopedData = useMemo(() => data ? { ...data, rows: data.rows.filter(row => inScope(row, draft?.scope)) } : null, [data, draft?.scope]);
-  const { snapshots, counts, evaluated, previewErrors, retry, elapsed } = useConditionPreview(scopedData, validCompany ? draft!.expression : null, previewEnabled);
+  const evaluation = useEvaluationContext(draft?.provider ?? 'jev');
+  const { snapshots, counts, evaluated, previewErrors, retry, elapsed } = useConditionPreview(scopedData, validCompany ? draft!.expression : null, previewEnabled && Boolean(evaluation.context), 400, evaluation.context);
   const validation = draft ? validateRule(draft) : ['Loading saved rules...'];
   const complete = validCompany && evaluated === scopedData!.rows.length && !validation.length;
   const matches = data?.rows.filter(row => snapshots[row.id]?.result === 'true') ?? [];
   const uncertain = Object.values(snapshots).filter(snapshot => snapshot.result === 'uncertain').length;
   const saved = store.rules.find(rule => rule.id === draft?.id);
-  const dirty = Boolean(draft && (!saved || signature(draft) !== signature(saved)));
+  const dirty = Boolean(draft && (!saved || signature(draft) !== signature(saved) || Boolean(saved.evaluation && evaluation.context && saved.evaluation.identity !== evaluation.context.identity)));
   const save = async (activate = false) => {
     if (!draft || validation.length || busy) return;
     const reply = await command({ type: 'save', rule: draft, expectedRevision: saved ? draft.revision : null, activate }, 'Rule saved.');
@@ -91,7 +92,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   };
   return {
     store, issues, runs, ready, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
-    elapsed, previewErrors, retry, save,
+    elapsed, previewErrors: [...previewErrors, ...(evaluation.error ? [evaluation.error] : [])], retry: () => { evaluation.retry(); retry(); }, save,
     toggleEnabled: (rule = saved) => rule && command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled: !rule.enabled }, rule.enabled ? 'Recurring checks off.' : 'Recurring checks on. Current records form the baseline; only new or changed records trigger actions.'),
     toggleRule: (rule: Rule, enabled: boolean) => command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled }, `${rule.name}: automatic runs ${enabled ? 'on' : 'off'}.`),
     runRule: (rule: Rule) => command({ type: 'run-all', id: rule.id, revision: rule.revision }, `${rule.name}: run complete. Results are shown in the table.`),
@@ -104,7 +105,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     replay: () => command({ type: 'replay' }, 'Original bill replayed. Actions are saved in SQLite.'),
     busy, automation, message, storageError, actor,
     undo: (id: string) => command({ type: 'undo', id }, 'Action undone. Its execution key is retained.'),
-    reset: () => command({ type: 'reset' }, 'Actions, messages, and notifications reset. Saved rules, arrivals, tasks, and review status were preserved.'),
+    reset: () => command({ type: 'reset', full: true }, 'Company records restored. Saved rules are disabled.'),
     updateLocal: (id: string, value: import('./rules').LocalTransaction, expectedVersion?: string) => command({ type: 'metadata', id, value, expectedVersion: expectedVersion ?? data?.rows.find(row => row.id === id)?.sourceVersion }),
     addEvidence: async (row: Row, title: string, text: string) => {
       const reply = await command({ type: 'add-evidence', id: row.id, title, text, expectedVersion: row.sourceVersion }, 'Supporting details saved. Enabled rules will check the transaction again.');
@@ -123,7 +124,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     },
     presets: rulePresets(Boolean(data?.company.synthetic)),
     addPreset: async (presetId: string) => {
-      const reply = await command({ type: 'add-preset', presetId, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
+      const reply = await command({ type: 'add-preset', presetId, model: pageProvider, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
       const rule = reply?.store.rules.find(rule => rule.id === reply.selectedRuleId);
       if (rule) setDraft(structuredClone(rule));
       return Boolean(rule);
@@ -133,10 +134,10 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
       const preset = rulePresets(Boolean(data?.company.synthetic)).find(preset => preset.id === id);
       if (!preset) return;
       const existing = savedPreset(storeRef.current.rules, preset, companyId);
-      const rule = existing ?? preset.build(companyId, actor || 'emp-ap');
+      const rule = existing ?? { ...preset.build(companyId, actor || 'emp-ap'), provider: pageProvider };
       setDraft(structuredClone(rule)); setMessage('');
     },
-    newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
+    newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, provider: pageProvider, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
     decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),
     retryDraft: (id: string) => command({ type: 'retry-draft', id }),
     markNoticesRead: () => command({ type: 'read-notices' }),

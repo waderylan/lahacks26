@@ -12,7 +12,7 @@ import type { Row } from '../src/types';
 import type { ReviewTask } from '../src/actionTypes';
 import type { Rule } from '../src/rules';
 
-const companyId = 'company-018', id = `${companyId}:bill-1`;
+const companyId = 'company-101', id = `${companyId}:bill-1`;
 const rows: Row[] = Array.from({ length: 8 }, (_, index) => ({ id: `${companyId}:bill-${index + 1}`, companyId, billId: `bill-${index + 1}`, docNumber: `B-${index + 1}`,
   date: '2026-10-01', dueDate: '2026-11-01', vendor: 'Supplier', vendorId: 'vendor-1', description: 'Services', itemNames: [], account: 'Services', amountCents: 10000,
   expenseKind: 'operating', costCategory: 'service', memo: 'Original memo', project: null, supplyRole: null, lines: [], payments: [], vendorRecord: null, projectRecord: null }));

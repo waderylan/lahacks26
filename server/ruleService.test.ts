@@ -8,7 +8,7 @@ import express from 'express';
 import { ActionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
 import { ActionEngine } from './actionEngine.ts';
-import { actionRoutes } from './actionRoutes.ts';
+import { actionRoutes, sameOriginApi } from './actionRoutes.ts';
 import { RuleService } from './ruleService.ts';
 import { ruleRoutes } from './ruleRoutes.ts';
 import { Mailbox } from './mailbox.ts';
@@ -16,7 +16,7 @@ import { EMPTY_STORE, exampleRule, type Rule, type DraftResult } from '../src/ru
 import type { CompanyBills, Row } from '../src/types.ts';
 import type { DraftRequest } from './messages.ts';
 
-const companyId = 'company-018';
+const companyId = 'company-101';
 const row = (index: number, company = companyId): Row => ({ id: `${company}:bill-${index}`, companyId: company, billId: `bill-${index}`, docNumber: `B-${index}`, date: '2026-10-01', dueDate: '2026-11-01', vendor: `Vendor ${index}`, vendorId: `vendor-${index}`, description: 'Equipment purchase', itemNames: ['Tools'], account: 'Equipment', amountCents: 10050, expenseKind: 'product', costCategory: 'goods', memo: 'Original memo', project: null, supplyRole: null, lines: [], payments: [], vendorRecord: null, projectRecord: null });
 const ids = [row(1).id, row(2).id];
 const draft: DraftResult = { employeeId: 'emp-controller', subject: 'Check coding for 2 bills', body: 'Hi Marcus, please check these bills.', routingProbability: .9 };
@@ -104,7 +104,7 @@ test('outcome actions are rechecked server-side and uncertain drafts retain thei
   assert.equal(service.snapshot(companyId).store.messages.length, 1);
 });
 
-test('rules, messages, approvals, notification flags, bill metadata and arrivals survive database reopen', async () => {
+test('rules, messages, approvals, notification flags, bill metadata survive database reopen', async () => {
   const filename = path.join(os.tmpdir(), `lahacks-rules-${crypto.randomUUID()}.sqlite`);
   const first = setup(filename), rule = makeRule();
   try {
@@ -114,14 +114,13 @@ test('rules, messages, approvals, notification flags, bill metadata and arrivals
     const message = first.service.snapshot(companyId).store.messages[0];
     first.service.decide(companyId, message.id, 'approved', 'Edited approved text', message.body, 'emp-ap');
     first.service.notices(companyId); first.service.notices(companyId, first.service.snapshot(companyId).store.notices[0].id);
-    await first.service.replay(companyId);
     first.db.db.close();
     const second = setup(filename);
     try {
       const saved = second.service.snapshot(companyId).store;
       assert.equal(saved.rules[0].id, rule.id); assert.equal(saved.messages[0].status, 'approved');
       assert.equal(saved.messages[0].body, 'Edited approved text'); assert.ok(saved.notices.every(notice => notice.read));
-      assert.ok(saved.notices[0].toasted); assert.equal(saved.arrivals[companyId].length, 1);
+      assert.ok(saved.notices[0].toasted); assert.deepEqual(saved.arrivals, {});
       assert.equal(second.data.row(companyId, ids[0]).dashboard?.owner, 'Bookkeeper');
       assert.equal(saved.history.length, 6);
     } finally { second.db.db.close(); }
@@ -207,18 +206,8 @@ test('server automations act after a persisted update without a browser, without
   assert.equal(data.row(companyId, ids[0]).dashboard?.owner, 'Bookkeeper');
 });
 
-test('legacy browser import preserves newer dashboard edits and never overwrites shared rules', t => {
-  const { db, service, data } = setup(); t.after(() => db.db.close()); const rule = makeRule();
-  const row1 = data.row(companyId, ids[0]); db.write({ ...row1, dashboard: { ...row1.dashboard!, owner: 'Current SQL owner' } }, row1.sourceVersion!);
-  const legacy = { ...structuredClone(EMPTY_STORE), rules: [rule], transactions: { [ids[0]]: { owner: 'Old browser', flags: [], tags: [], automatedCheck: false } } };
-  assert.equal(service.importLegacy(companyId, legacy, [ids[1]]), true);
-  assert.equal(service.snapshot(companyId).store.rules.length, 1); assert.equal(data.row(companyId, ids[0]).dashboard?.owner, 'Current SQL owner');
-  assert.equal(data.row(companyId, ids[1]).dashboard?.reviewed, true);
-  assert.equal(service.importLegacy(companyId, { ...legacy, rules: [] }, []), false); assert.equal(service.snapshot(companyId).store.rules.length, 1);
-});
-
 test('HTTP commands share state across clients, isolate companies, persist preferences, and reject foreign origins', async t => {
-  const { db, service, actions } = setup(); const app = express(); app.use(express.json()); actionRoutes(app, actions); ruleRoutes(app, service);
+  const { db, service, actions } = setup(); const app = express(); app.use(express.json()); app.use('/api', sameOriginApi); actionRoutes(app, actions); ruleRoutes(app, service);
   const server = app.listen(0); await new Promise<void>(resolve => server.on('listening', resolve));
   const address = server.address() as { port: number }, base = `http://127.0.0.1:${address.port}`;
   t.after(() => { server.closeAllConnections(); server.close(); db.db.close(); });
@@ -277,8 +266,8 @@ test('rule runs use the selected provider and retain it for background runs', as
     const rule: Rule = { ...makeRule(), provider: 'qwen', expression: { id: 'ai', type: 'ai', text: 'Equipment purchase', label: '' }, actions: [{ id: 'flag', type: 'flag', value: 'Needs review' }] };
     service.save(companyId, rule, null);
     await service.run(companyId, rule.id, 1, ids);
-    await service.run(companyId, rule.id, 1, ids, 'run', false, 'jev');
-    assert.deepEqual(providers, ['qwen', 'jev']);
+    await assert.rejects(service.run(companyId, rule.id, 1, ids, 'run', false, 'jev'), /Save a new rule revision/);
+    assert.deepEqual(providers, ['qwen']);
     assert.equal(service.snapshot(companyId).store.rules[0].provider, 'qwen');
   } finally { db.db.close(); }
 });

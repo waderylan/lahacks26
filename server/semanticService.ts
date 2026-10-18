@@ -1,20 +1,20 @@
 import crypto from 'node:crypto';
-import type { RecordResult } from './jev.ts';
-import { evaluateSelected, type Provider } from './evaluator.ts';
+import { evaluateSelected, evaluationRuntime } from './evaluator.ts';
+import type { EvaluationContext, Provider } from '../src/modelContext.ts';
+import { evaluateBatch, type RecordResult } from './jev.ts';
 import type { Row } from '../src/types.ts';
 import type { WorkspaceData } from './workspaceData.ts';
-import { qwenDeploymentId } from './qwen.ts';
 import { evaluationEvidence } from '../src/jevEvidence.ts';
 
 export class SemanticService {
   private cache = new Map<string, RecordResult>();
   private active = 0;
   private waiting: (() => void)[] = [];
-  constructor(private data: WorkspaceData, private evaluate: (req: Parameters<typeof evaluateSelected>[1], signal?: AbortSignal, rows?: Row[]) => Promise<{results: RecordResult[]; costNanoUsd: string}> = (req: Parameters<typeof evaluateSelected>[1], signal?: AbortSignal, rows?: Row[]) => evaluateSelected('jev', req, signal, rows)) {}
-  private key(companyId: string, criterion: string, row: Row, provider: Provider = 'jev') {
+  constructor(private data: WorkspaceData, private evaluate = evaluateBatch, private evaluateProvider = evaluateSelected) {}
+  private key(companyId: string, criterion: string, row: Row, context: EvaluationContext) {
     // Match the business evidence sent to Jev. Task/owner changes do not consume
     // another model call, while edits to category or memo invalidate the result.
-    return crypto.createHash('sha256').update(JSON.stringify([provider === 'qwen' ? `qwen:${qwenDeploymentId()}:visible-context-v2` : 'typesafe-ai/jev:visible-context-v2:choice-v1', companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
+    return crypto.createHash('sha256').update(JSON.stringify([context.identity, companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
   }
   private pump() {
     while (this.active < 3 && this.waiting.length) {
@@ -29,12 +29,14 @@ export class SemanticService {
       this.pump();
     });
   }
-  async evaluateRows(companyId: string, criterion: string, rows: Row[], signal?: AbortSignal, provider: Provider = 'jev'): Promise<{ results: RecordResult[]; costNanoUsd: string }> {
+  async evaluateRows(companyId: string, criterion: string, rows: Row[], signal?: AbortSignal, provider: Provider = 'jev', expected?: EvaluationContext): Promise<{ results: RecordResult[]; costNanoUsd: string; evaluation: EvaluationContext }> {
+    const runtime = evaluationRuntime(provider), context = runtime.context;
+    if (expected && expected.identity !== context.identity) throw new Error('Model configuration changed. Save the rule again before running.');
     const company = this.data.bills(companyId).company;
     // This call's answers are kept locally: the shared cache can evict entries while batches are awaited.
     const found = new Map<string, RecordResult>();
     for (const row of rows) {
-      const key = this.key(companyId, criterion, row, provider);
+      const key = this.key(companyId, criterion, row, context);
       const hit = this.cache.get(key) ?? this.data.store.get<RecordResult>('semantic-judgment', key);
       if (hit) { this.cache.set(key, hit); found.set(row.id, hit); }
     }
@@ -45,22 +47,23 @@ export class SemanticService {
       signal?.throwIfAborted();
       // Each batch gets its own timeout so one hung gateway call can't hold a slot (or the rule scanner) forever.
       const batchSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(90_000)]) : AbortSignal.timeout(90_000);
-      const evaluate = provider === 'jev' ? this.evaluate : (req: Parameters<typeof evaluateSelected>[1], signal?: AbortSignal, rows?: Row[]) => evaluateSelected(provider, req, signal, rows);
-      const response = await evaluate({ company: { name: company.name.replace(/ \u2014 review scenarios$/, ''), industry: company.industry }, criterion, ids: batch.map(row => row.id) }, batchSignal, batch);
+      const request = { company: { name: company.name, industry: company.industry }, criterion, ids: batch.map(row => row.id) };
+      const response = provider === 'jev' ? await this.evaluate(request, batchSignal, batch) : await this.evaluateProvider(provider, request, batchSignal, batch, runtime);
       cost += BigInt(response.costNanoUsd);
       for (const row of batch) {
-        const result = response.results.find(result => result.id === row.id);
-        if (!result || !['match', 'no_match', 'uncertain'].includes(result.state)) throw new Error('Incomplete model result. Retry the search.');
-        const key = this.key(companyId, criterion, row, provider);
+        const answer = response.results.find(result => result.id === row.id);
+        if (!answer || !['match', 'no_match', 'uncertain'].includes(answer.state) || (answer.pMatch !== null && (!Number.isFinite(answer.pMatch) || answer.pMatch < 0 || answer.pMatch > 1))) throw new Error('Incomplete model result. Retry the search.');
+        const result = { ...answer, ...(provider === 'jev' && { scoreKind: 'jev_probability' as const }), evaluation: context };
+        const key = this.key(companyId, criterion, row, context);
         this.data.store.put('semantic-judgment', key, companyId, { ...result, checkedAt: new Date().toISOString() });
         this.cache.set(key, result); found.set(row.id, result);
       }
       while (this.cache.size > 10_000) this.cache.delete(this.cache.keys().next().value!);
     })));
-    return { results: rows.map(row => found.get(row.id)!), costNanoUsd: String(cost) };
+    return { results: rows.map(row => found.get(row.id)!), costNanoUsd: String(cost), evaluation: context };
   }
-  async judge(companyId: string, criterion: string, rows: Row[], provider: Provider = 'jev') {
-    const { results } = await this.evaluateRows(companyId, criterion, rows, undefined, provider);
+  async judge(companyId: string, criterion: string, rows: Row[], provider: Provider = 'jev', context?: EvaluationContext) {
+    const { results } = await this.evaluateRows(companyId, criterion, rows, undefined, provider, context);
     return Object.fromEntries(results.map(result => [result.id, result.state]));
   }
 }

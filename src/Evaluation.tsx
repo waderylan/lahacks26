@@ -18,8 +18,19 @@ const ORIGINS: Record<string, string> = { existing_authored_demo_holdout: 'Demo 
 export function Evaluation() {
   const [data, setData] = useState<Summary | null>(null);
   const [error, setError] = useState('');
-  useEffect(() => { fetch('/api/evaluation').then(r => r.json()).then(setData, e => setError((e as Error).message)); }, []);
-  if (error) return <div className="state">Could not load evaluation results ({error}).</div>;
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    setError('');
+    fetch('/api/evaluation', { signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error(response.status === 404 ? 'Restart the app server to load evaluation results.' : `Could not load evaluation results (${response.status}).`);
+      const summary = await response.json();
+      if (!Array.isArray(summary?.models)) throw new Error('Evaluation results could not be read.');
+      return summary as Summary;
+    }).then(setData, error => { if (!controller.signal.aborted) setError((error as Error).message); });
+    return () => controller.abort();
+  }, [attempt]);
+  if (error) return <div className="state" role="alert">{error} <button onClick={() => setAttempt(value => value + 1)}>Retry</button></div>;
   if (!data) return <div className="state">Loading evaluation results…</div>;
 
   const ran = data.models.filter(m => m.ran).sort((a, b) => (b.accuracy ?? 0) - (a.accuracy ?? 0));

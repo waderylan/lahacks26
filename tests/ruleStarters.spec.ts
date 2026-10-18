@@ -7,6 +7,9 @@ test('starters add once, stay editable, retain saved status after reload, and ru
   const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
   try {
     await page.goto(`${app.url}/?workspace=rules`);
+    await expect(page.locator('label[for="saved-rule"]')).toBeVisible();
+    await expect(page.getByLabel('Saved rules', { exact: true })).toBeDisabled();
+    await expect(page.getByLabel('Saved rules', { exact: true })).toContainText('No saved rules yet');
     await expect(page.getByRole('combobox', { name: 'Start from a preset', exact: true })).toHaveCount(0);
     const starter = page.getByRole('article', { name: 'Missing documentation starter', exact: true });
     await expect(page.locator('.rule-starters')).not.toHaveAttribute('open');
@@ -15,6 +18,7 @@ test('starters add once, stay editable, retain saved status after reload, and ru
     await expect(starter).toContainText('Ready to add');
     await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
     await expect(starter).toContainText('Saved · Automatic off');
+    await expect(page.getByLabel('Saved rules', { exact: true })).toBeEnabled();
     await expect(page.getByLabel('Condition 1', { exact: true })).toContainText('unitemized receipt');
     await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
     await step('Choose actions');

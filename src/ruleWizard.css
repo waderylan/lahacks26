@@ -4,6 +4,7 @@
 .wizard-page-heading h1 { font-size:25px; line-height:1.35; font-weight:650; letter-spacing:-.6px; margin:0; }
 .wizard-page-heading p { font-size:13px; color:var(--muted); margin:7px 0 0; }
 .wizard-library { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.wizard-saved-label { font-size:12px; color:var(--muted); }
 .wizard-library select { max-width:260px; font-size:12px; }
 .wizard-library button { padding:9px 12px; }
 .wizard-layout { display:grid; grid-template-columns:210px minmax(0,1fr) 265px; max-width:1400px; margin:auto; border:1px solid var(--line); border-radius:9px; background:var(--panel); min-height:620px; }

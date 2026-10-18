@@ -12,13 +12,14 @@ import { SavedSearchService, savedSearchRoutes } from '../../server/savedSearche
 import type { Row } from '../../src/types';
 
 /** Real UI, routes, and SQLite; external model responses are deterministic in these workflow tests. */
-export async function startRuleApp() {
+export async function startRuleApp(options: { synthetic?: boolean } = {}) {
   const db = new ActionStore(':memory:');
   const companyId = 'company-018';
-  const company = { companyId, name: 'Workflow test company', industry: 'Services', profile: '', billCount: 8 };
+  const company = { companyId, name: 'Workflow test company', industry: 'Services', profile: '', billCount: 8, synthetic: options.synthetic ?? false };
   const rows: Row[] = Array.from({ length: 8 }, (_, index) => ({
     id: `${companyId}:bill-${index + 1}`, companyId, billId: `bill-${index + 1}`, docNumber: `INV-${index + 1}`,
     date: '2026-10-01', dueDate: '2026-11-01', vendor: `Supplier ${index + 1}`, vendorId: `vendor-${index + 1}`,
+    ...(options.synthetic && { txnType: (['bill', 'invoice', 'bank'] as const)[index % 3] }),
     description: 'Monthly maintenance', itemNames: [], account: 'Maintenance', amountCents: 125000,
     expenseKind: 'operating', costCategory: 'service', memo: index === 0 ? 'Needs receipt' : index === 1 ? 'Duplicate charge' : 'Receipt checked',
     project: null, supplyRole: null, lines: [], payments: [], vendorRecord: null, projectRecord: null,
@@ -39,12 +40,12 @@ export async function startRuleApp() {
   const server = createServer(app);
   const vite = await createVite({ server: { middlewareMode: true, hmr: false }, appType: 'spa', logLevel: 'error' });
   app.use(vite.middlewares);
-  const timer = setInterval(() => { void rules.scan(); void searches.monitor.scan(); }, 100);
+  const timer = setInterval(() => { void rules.scan(); }, 100);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('Test server did not start.');
   return {
     url: `http://127.0.0.1:${address.port}`,
-    close: async () => { clearInterval(timer); await vite.close(); server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); db.db.close(); },
+    close: async () => { clearInterval(timer); const closing = new Promise<void>(resolve => server.close(() => resolve())); server.closeAllConnections(); await closing; await vite.close(); db.db.close(); },
   };
 }

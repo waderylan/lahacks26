@@ -1,5 +1,8 @@
+import type { RuleNode } from './rules';
 export interface SearchDefinition {
   query: string;
+  expression?: RuleNode;
+  result?: 'all' | 'true' | 'uncertain' | 'false';
   type: 'all' | 'bill' | 'invoice' | 'bank';
   status: 'all' | 'needs_review' | 'reviewed' | 'flagged';
   assignee: string;
@@ -18,6 +21,7 @@ export interface SavedSearch {
   updatedAt: string;
   enabled: boolean;
   tracking: SearchTracking;
+  monitoringRetired?: boolean;
 }
 
 export interface SearchTracking {

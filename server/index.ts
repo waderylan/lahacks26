@@ -84,13 +84,13 @@ app.post('/api/evaluate', async (req, res) => {
 actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));
+savedSearches.retireMonitoring();
 savedSearchRoutes(app, savedSearches);
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.
 const automationTimer = setInterval(() => {
   void actions.scan().catch(error => console.error('Automation:', (error as Error).message));
   void rules.scan().catch(error => console.error('Rules:', (error as Error).message));
-  void savedSearches.monitor.scan().catch(error => console.error('Saved searches:', (error as Error).message));
 }, 10_000);
 automationTimer.unref();
 const draftTimer = setInterval(() => { void rules.drainDrafts().catch(error => console.error('Draft worker:', (error as Error).message)); }, 1000);

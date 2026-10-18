@@ -30,6 +30,17 @@ const makeRule = (): Rule => ({ id: crypto.randomUUID(), companyId, name: 'Check
   ] });
 const add = (system: ReturnType<typeof setup>, text: string) => system.rules.addEvidence(companyId, id, 'Review note', text, system.data.row(companyId, id).sourceVersion);
 
+test('adding unrestricted Explore filters preserves ownership of an older rule issue', async t => {
+  const system = setup(); t.after(() => system.db.db.close());
+  const rule = makeRule(); system.rules.save(companyId, rule, null);
+  await system.rules.run(companyId, rule.id, 1, [id]);
+  system.rules.save(companyId, { ...rule, scope: { type: 'all', status: 'all', assignee: 'all' } }, 1);
+  add(system, 'Verified');
+  await system.rules.run(companyId, rule.id, 2, [id]);
+  assert.equal(system.rules.snapshot(companyId).issues[0].status, 'resolved');
+  assert.deepEqual(system.data.row(companyId, id).dashboard?.flags, []);
+});
+
 test('supporting details trigger resolution after restart; uncertainty and unrelated flags stay intact', async () => {
   const filename = path.join(os.tmpdir(), `rule-resolution-${crypto.randomUUID()}.sqlite`);
   let system = setup(filename);

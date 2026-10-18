@@ -1,7 +1,8 @@
+import { inScope } from '../src/ruleScope.ts';
 import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
   markNoticesRead, markNoticeToasted, migrateMessage, migrateRule, resetCompanyDemo, retryDraft,
-  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome,
+  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome, ruleConditionKey,
   type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue, type HistoryEntry,
 } from '../src/rules.ts';
 import { standardResult } from '../src/rules.ts';
@@ -17,10 +18,10 @@ import type { ReviewTask } from '../src/actionTypes.ts';
 
 interface SavedState { companyId: string; store: RuleStore; watches: Record<string, Record<string, string>>; log: string[] }
 type Writer = (request: DraftRequest, signal?: AbortSignal) => Promise<DraftResult>;
-const version = (row: Row) => {
+const version = (row: Row, rule?: Rule) => {
   // Actions must not invalidate their own execution keys or trigger a message loop.
   const { dashboard, sourceVersion: _, workspaceChanges: __, ...evidence } = row;
-  return transactionVersion(evidence as Row, Boolean(dashboard?.reviewed));
+  return transactionVersion({ ...evidence, ...(rule?.scope && { scopeState: [rule.scope.assignee !== 'all' ? dashboard?.owner : '', rule.scope.status === 'flagged' ? Boolean(dashboard?.flags.length) : false] }) } as Row, Boolean(dashboard?.reviewed));
 };
 const metadata = (row: Row): LocalTransaction => {
   const d = row.dashboard ?? emptyDashboard();
@@ -78,13 +79,13 @@ export class RuleService {
   private trackIssue(saved: SavedState, rule: Rule, row: Row, snapshot: Snapshot, before: RuleStore, cycle: string) {
     if (snapshot.result !== 'true' && snapshot.result !== 'uncertain') return;
     const all = this.db.list<RuleIssue>('rule-issue', saved.companyId);
-    const conditionKey = JSON.stringify(rule.expression);
-    let issue = all.find(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === conditionKey && issue.status === 'open');
+    const key = ruleConditionKey(rule);
+    let issue = all.find(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === key && issue.status === 'open');
     const previousKeys = new Set(before.executions);
     const ran = saved.store.executions.filter(key => !previousKeys.has(key));
     const actions = actionsForOutcome(rule, snapshot.result).filter(action => ran.some(key => key.endsWith(`:${action.id}`)));
     if (!issue && !actions.some(action => action.type === 'flag' || action.type === 'task')) return;
-    issue ??= { id: uid(), companyId: saved.companyId, ruleId: rule.id, ruleName: rule.name, transactionId: row.id, conditionKey, cycle,
+    issue ??= { id: uid(), companyId: saved.companyId, ruleId: rule.id, ruleName: rule.name, transactionId: row.id, conditionKey: key, cycle,
       openedAt: new Date().toISOString(), status: 'open', lastResult: snapshot.result, flags: [], taskIds: [] };
     issue.lastResult = snapshot.result;
     issue.ruleName = rule.name;
@@ -105,7 +106,7 @@ export class RuleService {
   private resolveIssues(saved: SavedState, rule: Rule, row: Row, snapshot: Snapshot, source: HistoryEntry['source']) {
     if (!rule.autoResolve || snapshot.result !== 'false') return;
     const all = this.db.list<RuleIssue>('rule-issue', saved.companyId);
-    const candidates = all.filter(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === JSON.stringify(rule.expression) && issue.status === 'open');
+    const candidates = all.filter(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === ruleConditionKey(rule) && issue.status === 'open');
     for (const issue of candidates) {
       const flags: string[] = [], taskIds: string[] = [], kept: string[] = [];
       const transaction = { ...(saved.store.transactions[row.id] ?? emptyTransaction()) };
@@ -123,7 +124,7 @@ export class RuleService {
       }
       saved.store = { ...saved.store, transactions: { ...saved.store.transactions, [row.id]: transaction }, history: [{
         id: uid(), key: `${issue.id}:resolved`, ruleId: rule.id, ruleName: rule.name, revision: rule.revision, companyId: saved.companyId,
-        transactionId: row.id, transactionVersion: version(row), action: null, timestamp: new Date().toISOString(), source,
+        transactionId: row.id, transactionVersion: version(row, rule), action: null, timestamp: new Date().toISOString(), source,
         previous: issue.lastResult, resulting: 'false', snapshot: { ...structuredClone(snapshot), expression: structuredClone(rule.expression) },
         resolution: { issueId: issue.id, flags, taskIds, kept },
       }, ...saved.store.history] };
@@ -141,7 +142,7 @@ export class RuleService {
       const enabled = activate || Boolean(old?.enabled);
       const next = { ...structuredClone(input), enabled, revision: old ? old.revision + 1 : 1 };
       saved.store.rules = [...saved.store.rules.filter(rule => rule.id !== next.id), next];
-      if (enabled) saved.watches[next.id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row)]));
+      if (enabled) saved.watches[next.id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row, next)]));
     });
   }
   toggle(companyId: string, id: string, revision: number, enabled: boolean) {
@@ -150,10 +151,11 @@ export class RuleService {
       const rule = saved.store.rules.find(rule => rule.id === id);
       if (!rule || rule.revision !== revision) throw new Error('Saved rule changed. Refresh before enabling it.');
       rule.enabled = enabled;
-      if (enabled) saved.watches[id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row)]));
+      if (enabled) saved.watches[id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row, rule)]));
     });
   }
   private async evaluate(companyId: string, rule: Rule, rows: Row[]): Promise<Record<string, Snapshot>> {
+    if (!rows.length) return {};
     const results: Record<string, Record<string, Outcome>> = Object.fromEntries(rows.map(row => [row.id, {}]));
     await Promise.all(leaves(rule.expression).map(async node => {
       if (node.type === 'standard') rows.forEach(row => { results[row.id][node.id] = standardResult(node, row, Boolean(row.dashboard?.reviewed)); });
@@ -169,28 +171,30 @@ export class RuleService {
     if (!Array.isArray(ids) || !ids.length || ids.length > 1000) throw new Error('Choose 1-1000 bills for this run.');
     const rule = this.read(companyId).store.rules.find(rule => rule.id === id);
     if (!rule || rule.revision !== revision || (source !== 'run' && !rule.enabled)) throw new Error('Saved rule changed. Refresh before running.');
-    const rows = [...new Set(ids)].map(id => this.data.row(companyId, id));
+    const requested = [...new Set(ids)].map(id => this.data.row(companyId, id));
+    const rows = requested.filter(row => inScope(row, rule.scope));
     const snapshots = await this.evaluate(companyId, rule, rows);
     this.change(companyId, saved => {
       const current = saved.store.rules.find(item => item.id === id);
       if (!current || !same(current, rule) || (source !== 'run' && !current.enabled)) throw new Error('Rule changed during evaluation. No actions applied.');
       if (rows.some(row => this.data.row(companyId, row.id).sourceVersion !== row.sourceVersion)) throw new Error('Bills changed during evaluation. Retry against the latest values.');
+      if (source !== 'run') for (const row of requested) (saved.watches[id] ??= {})[row.id] = version(row, rule);
       const batchId = uid();
       for (const row of rows) {
         const snapshot = snapshots[row.id];
-        const issues = this.db.list<RuleIssue>('rule-issue', companyId).filter(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === JSON.stringify(rule.expression));
+        const issues = this.db.list<RuleIssue>('rule-issue', companyId).filter(issue => issue.ruleId === rule.id && issue.transactionId === row.id && issue.conditionKey === ruleConditionKey(rule));
         const open = issues.find(issue => issue.status === 'open');
         const cycle = open?.cycle ?? issues.filter(issue => issue.status === 'resolved').sort((a, b) => b.resolvedAt!.localeCompare(a.resolvedAt!))[0]?.id ?? '';
         this.resolveIssues(saved, rule, row, snapshot, source);
         const before = saved.store;
-        const executionVersion = version(row) + (snapshot.result !== 'false' && cycle ? `:cycle:${cycle}` : '');
+        const executionVersion = version(row, rule) + (snapshot.result !== 'false' && cycle ? `:cycle:${cycle}` : '');
         saved.store = executeRule(saved.store, rule, row, executionVersion, snapshot, source, batchId, this.db.list<ReviewTask>('task', companyId));
         this.trackIssue(saved, rule, row, snapshot, before, cycle);
-        if (source !== 'run') (saved.watches[id] ??= {})[row.id] = version(row);
+        if (source !== 'run') (saved.watches[id] ??= {})[row.id] = version(row, rule);
       }
       const counts = ['true', 'uncertain', 'false'].map(result => rows.filter(row => snapshots[row.id].result === result).length);
       const actedOn = rows.filter(row => actionsForOutcome(rule, snapshots[row.id].result).length).length;
-      saved.log = [`${source === 'run' ? 'Run once' : source === 'arrival' ? 'Replay' : 'Updated transactions'}: ${counts[0]} match, ${counts[1]} not enough information, ${counts[2]} no match. Actions configured for ${actedOn} transactions.`, ...saved.log].slice(0, 20);
+      saved.log = [`${source === 'run' ? 'Run now' : source === 'arrival' ? 'Replay' : 'Updated transactions'}: ${counts[0]} match, ${counts[1]} not enough information, ${counts[2]} no match. Actions configured for ${actedOn} transactions.`, ...saved.log].slice(0, 20);
     });
     void this.drainDrafts();
   }
@@ -284,7 +288,7 @@ export class RuleService {
         if (legacy.transactions?.[row.id]) saved.store.transactions[row.id] = legacy.transactions[row.id];
         if (reviewed.includes(row.id)) this.db.write({ ...row, dashboard: { ...row.dashboard!, reviewed: true } }, row.sourceVersion!);
       }
-      for (const rule of rules.filter(rule => rule.enabled)) saved.watches[rule.id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row)]));
+      for (const rule of rules.filter(rule => rule.enabled)) saved.watches[rule.id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row, rule)]));
     });
     return true;
   }
@@ -297,8 +301,8 @@ export class RuleService {
           const current = this.read(companyId), watched = current.watches[rule.id];
           const reserved = this.data.bills(companyId).rows.slice(-5).map(row => row.id);
           const rows = this.data.bills(companyId).rows.filter(row => !reserved.includes(row.id) || current.store.arrivals[companyId]?.includes(row.id));
-          if (!watched) { this.change(companyId, saved => { saved.watches[rule.id] = Object.fromEntries(rows.map(row => [row.id, version(row)])); }); continue; }
-          const changed = rows.filter(row => watched[row.id] !== version(row));
+          if (!watched) { this.change(companyId, saved => { saved.watches[rule.id] = Object.fromEntries(rows.map(row => [row.id, version(row, rule)])); }); continue; }
+          const changed = rows.filter(row => watched[row.id] !== version(row, rule));
           if (!changed.length) continue;
           try { await this.run(companyId, rule.id, rule.revision, changed.map(row => row.id), 'update'); }
           catch (error) { this.change(companyId, saved => { saved.log = [`${rule.name}: ${(error as Error).message}`, ...saved.log].slice(0, 20); }); }

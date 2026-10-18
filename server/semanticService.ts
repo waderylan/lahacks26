@@ -12,7 +12,7 @@ export class SemanticService {
   private key(companyId: string, criterion: string, row: Row) {
     // Match the business evidence sent to Jev. Task/owner changes do not consume
     // another model call, while edits to category or memo invalidate the result.
-    return crypto.createHash('sha256').update(JSON.stringify([companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
+    return crypto.createHash('sha256').update(JSON.stringify(['typesafe-ai/jev:visible-context-v2:choice-v1', companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
   }
   private pump() {
     while (this.active < 3 && this.waiting.length) {
@@ -29,6 +29,11 @@ export class SemanticService {
   }
   async evaluateRows(companyId: string, criterion: string, rows: Row[], signal?: AbortSignal): Promise<{ results: RecordResult[]; costNanoUsd: string }> {
     const company = this.data.bills(companyId).company;
+    for (const row of rows) {
+      const key = this.key(companyId, criterion, row);
+      const saved = this.data.store.get<RecordResult>('semantic-judgment', key);
+      if (saved) this.cache.set(key, saved);
+    }
     const missing = rows.filter(row => !this.cache.has(this.key(companyId, criterion, row)));
     let cost = 0n;
     const batches = Array.from({ length: Math.ceil(missing.length / 20) }, (_, index) => missing.slice(index * 20, index * 20 + 20));
@@ -39,7 +44,9 @@ export class SemanticService {
       for (const row of batch) {
         const result = response.results.find(result => result.id === row.id);
         if (!result || !['match', 'no_match', 'uncertain'].includes(result.state)) throw new Error('Incomplete model result. Retry the search.');
-        this.cache.set(this.key(companyId, criterion, row), result);
+        const key = this.key(companyId, criterion, row);
+        this.data.store.put('semantic-judgment', key, companyId, { ...result, checkedAt: new Date().toISOString() });
+        this.cache.set(key, result);
       }
       while (this.cache.size > 10_000) this.cache.delete(this.cache.keys().next().value!);
     })));

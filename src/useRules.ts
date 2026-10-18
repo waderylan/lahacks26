@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
-import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
+import { useConditionPreview } from './useConditionPreview';
+import { inScope } from './ruleScope';
+import { EMPTY_STORE, exampleRule, syntheticExampleRules, uid, validateRule, type Rule, type RuleStore, type RuleIssue } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
 interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[] }
-const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve)]);
+const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve), rule.scope]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
 export function useRules(data: CompanyBills | null, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '') {
@@ -72,48 +73,11 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     finally { pending.current--; if (current.current === scope) setBusy(pending.current > 0); }
   };
 
-  const [retry, setRetry] = useState(0);
-  const [judgments, setJudgments] = useState<Record<string, Outcome>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [timing, setTiming] = useState({ start: 0, end: 0 });
-  const [now, setNow] = useState(performance.now());
   const validCompany = Boolean(ready && draft && draft.companyId === companyId && data?.company.companyId === companyId);
-  const conditions = validCompany ? leaves(draft!.expression) : [];
-  const aiTexts = JSON.stringify([...new Set(conditions.filter(node => node.type === 'ai' && node.text.trim()).map(node => node.type === 'ai' ? node.text : ''))].sort());
-  const dataKey = useMemo(() => data ? JSON.stringify(data.rows.map(row => judgmentKey(row, ''))) : '', [data]);
-  useEffect(() => {
-    let live = true;
-    const texts: string[] = JSON.parse(aiTexts);
-    if (!data || !texts.length || !previewEnabled) { setTiming({ start: 0, end: 0 }); return; }
-    const timer = setTimeout(() => {
-      const start = performance.now(); setTiming({ start, end: 0 });
-      void Promise.all(texts.map(text => evaluateCondition(data, text, (row, outcome, error) => {
-        if (!live) return;
-        const key = judgmentKey(row, text);
-        setJudgments(old => ({ ...old, [key]: outcome }));
-        setErrors(old => { const next = { ...old }; if (error) next[key] = error; else delete next[key]; return next; });
-      }))).then(() => live && setTiming({ start, end: performance.now() }));
-    }, 400);
-    return () => { live = false; clearTimeout(timer); };
-  }, [aiTexts, dataKey, retry, previewEnabled]);
-  useEffect(() => { if (!timing.start || timing.end) return; const timer = setInterval(() => setNow(performance.now()), 100); return () => clearInterval(timer); }, [timing]);
-
-  const snapshots: Record<string, Snapshot> = {}, counts: Record<string, Record<Outcome, number>> = {};
-  const previewErrors = new Set<string>();
-  conditions.forEach(node => { counts[node.id] = { true: 0, false: 0, uncertain: 0, pending: 0, error: 0 }; });
-  let evaluated = 0;
-  if (validCompany) for (const row of data!.rows) {
-    const results: Record<string, Outcome> = {};
-    for (const condition of conditions) {
-      results[condition.id] = condition.type === 'standard' ? standardResult(condition, row, Boolean(row.dashboard?.reviewed)) : judgments[judgmentKey(row, condition.text)] ?? 'pending';
-      counts[condition.id][results[condition.id]]++;
-      if (condition.type === 'ai' && results[condition.id] === 'error') previewErrors.add(errors[judgmentKey(row, condition.text)] ?? 'Jev request failed');
-    }
-    if (Object.values(results).every(value => value !== 'pending' && value !== 'error')) evaluated++;
-    snapshots[row.id] = { conditions: results, result: evaluateTree(draft!.expression, results) };
-  }
+  const scopedData = useMemo(() => data ? { ...data, rows: data.rows.filter(row => inScope(row, draft?.scope)) } : null, [data, draft?.scope]);
+  const { snapshots, counts, evaluated, previewErrors, retry, elapsed } = useConditionPreview(scopedData, validCompany ? draft!.expression : null, previewEnabled);
   const validation = draft ? validateRule(draft) : ['Loading saved rules...'];
-  const complete = validCompany && evaluated === data!.rows.length && !validation.length;
+  const complete = validCompany && evaluated === scopedData!.rows.length && !validation.length;
   const matches = data?.rows.filter(row => snapshots[row.id]?.result === 'true') ?? [];
   const uncertain = Object.values(snapshots).filter(snapshot => snapshot.result === 'uncertain').length;
   const saved = store.rules.find(rule => rule.id === draft?.id);
@@ -125,9 +89,8 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   };
   return {
     store, issues, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
-    elapsed: timing.start ? Math.max(0, ((timing.end || now) - timing.start) / 1000) : 0,
-    previewErrors: [...previewErrors], retry: () => setRetry(value => value + 1), save,
-    toggleEnabled: () => saved && command({ type: 'toggle', id: saved.id, revision: saved.revision, enabled: !saved.enabled }, saved.enabled ? 'Automatic runs disabled.' : 'Runs automatically on new or changed bills.'),
+    elapsed, previewErrors, retry, save,
+    toggleEnabled: (rule = saved) => rule && command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled: !rule.enabled }, rule.enabled ? 'Recurring checks off.' : 'Recurring checks on. Current records form the baseline; only new or changed records trigger actions.'),
     runOnce: (ids?: string[]) => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids: ids ?? data!.rows.map(row => row.id) }, 'Run complete. View action history for details.'),
     replay: () => command({ type: 'replay' }, 'Original bill replayed. Actions are saved in SQLite.'),
     busy, automation, message, storageError, actor,

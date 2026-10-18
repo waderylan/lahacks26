@@ -1,113 +1,107 @@
-# Saved searches and rule follow-up
+# Explore, rules, and follow-up
 
-This branch combines `feat/saved-searches` (`896f256`) with
-`feat/rule-outcomes-and-resolution` (`ca9e027`).
+The combined branch contains saved views, rule actions by result, assigned tasks,
+internal message drafts, and automatic issue resolution.
 
-## Open the combined preview
+## Open the preview
 
-Open `http://localhost:5192`. Turn on **Custom data** and choose **Parcelmint Online
-Goods** (company-101). Use **All** rows for the full company or 50 for a shorter
-review. The existing **Possible duplicate charges2** rule and internal message
-were copied into the combined preview database. The other worktree's **Invoices
-needing review** and **Unassigned bank entries** searches are also available.
+Open http://localhost:5192. Turn on **Custom data** and choose **Parcelmint Online
+Goods** (company-101). Choose **50** preview records for a short review or **All
+records** for the full available company dataset.
 
-The combined database is a separate snapshot. Original worktree databases are
-unchanged. Imported search check histories start fresh because this preview uses
-the rule worktree's working transactions. Changes made in the older previews
-after the snapshot are separate from this preview.
+The preview uses its own database, `workspace/combined.sqlite`. The earlier
+worktree databases remain separate. The existing **Possible duplicate charges2**
+rule, messages, and saved views remain available in this preview.
 
-## Search and track changes
+## Explore: view and try conditions
 
-1. Open **Transactions**. Enter a question such as:
+1. Open **Explore**. Choose transaction type, review status, and assignee filters.
+2. Write a condition, for example:
 
-   > This transaction appears to charge for the same underlying work or goods as a nearby transaction, and the supporting records do not establish a separate delivery, service period, or installment.
+   > This transaction may charge for the same underlying work or goods as a nearby transaction, without supporting records showing a separate delivery, service period, or installment.
 
-2. Set Type, Status, Assigned to, and the other visible filters. **Save search**
-   stores the query, filters, and sort order for this company.
-3. Open **All saved searches** to reopen, edit, rename, copy, or delete searches.
-   **On** checks all new or changed company records every 10 seconds while the
-   server runs, including records outside the loaded spreadsheet sample. **Off**
-   stops automatic checks; **Check now** still works.
-4. The first check counts existing matches and establishes the baseline. It does
-   not mark every existing match as new. Later records that start matching appear
-   under **View new**. **Mark as seen** clears those badges.
+3. Use **Add condition**, **Add group**, and **Add a filter** to combine English
+   conditions with amount, vendor, category, and review filters. AND requires all
+   conditions; OR requires one. NOT reverses a result while preserving uncertainty.
+4. Inspect results. Expand a result to see its individual condition answers.
+   Open a transaction to read its details and supporting records. Explore never
+   changes transactions, creates tasks, or sends messages.
+5. **Save view** stores the conditions, record filters, result filter, and sort
+   order. Reopen it from **Saved views**. Use **Save view** again to rename or
+   update it, **Save as new view** to copy it, or **Delete saved view** to remove it.
+6. Jev answers are cached in SQLite for each condition and transaction evidence.
+   Reopening a view, regrouping conditions, and restarting the server reuse
+   unchanged answers. **Refresh records** loads current records; changed evidence
+   receives a new check. An assignment alone does not consume another Jev call.
 
-Saved searches report results. They do not flag transactions, assign work, or
-send messages. Use a rule when you want actions.
+Earlier saved searches open here as views. Their recurring monitoring is paused;
+the previous definition is retained in SQLite, and affected views show a notice.
+Create a rule for future recurring checks. The old `/searches` API and document
+names remain for compatibility, but the application no longer schedules their
+monitor worker.
 
-## Run actions for each result
+## Rules: choose and run actions
 
-1. Open **Rules** and choose the existing duplicate-charge rule, or **New rule**.
-2. Describe the condition in English. Use AND, OR, and NOT for grouped conditions.
-3. In **Choose actions**, each result has its own section:
-   - **Match:** flag **Possible duplicate** and assign a reviewer.
-   - **Not enough information:** create a review task or draft a clarification
-     message asking which invoice, delivery, or service period supports the charge.
-   - **No match:** leave empty unless another action is needed.
-4. **Assign transactions** sets the Assigned to column and drawer value.
-   **Create a review task** sets a title, task owner, and deadline in
-   **Tasks & activity**. These are separate controls. Jev's selected message
-   recipient is not automatically used as the assignee.
-5. In **Review results**, inspect each condition and **What will happen**. Save
-   the rule and use **Run once**. Filters limit this manual run. Enable **Run
-   automatically** for later record changes; enabling establishes a baseline
-   rather than applying the rule to all historical records.
-6. Jev can choose the message recipient; Gemini writes the draft. Under
-   **Viewing as**, choose its sender, then open **Messages → Approvals**.
-   Approval delivers to the recipient's internal inbox. Nothing is emailed.
+1. In Explore, choose **Create rule**. It copies the exact condition tree and
+   record filters into an independent draft and opens **Choose actions**. Saving
+   or editing the view later does not change the rule.
+2. Choose actions separately for **Match**, **Not enough information**, and **No
+   match**. Empty sections take no action. Available actions are flag, assign,
+   create a review task, draft an internal message, tag, and mark checked.
+3. Choose **Review results**. Read each condition result and **What will happen**.
+   Name and save the rule. Saving does not execute its actions.
+4. Choose **Run now** to act on the current preview results. The preview filters
+   limit a manual run. Display sorting, result filters, and text searches do not
+   become recurring rule conditions. The server rechecks both record scope and
+   conditions before applying any action.
+5. Open **All rules** to see every saved rule, its conditions and actions, open
+   issues, last recorded action, and **Keep checking** toggle. **Run now** from
+   this list opens the result preview before anything runs.
+6. **Keep checking** checks new or changed available company records every ten
+   seconds while the server runs, including records outside the preview sample.
+   Switching it on establishes the baseline. Use **Run now** to process existing
+   records. Switching it off stops future automatic runs.
+7. **View in Explore** or **Try in Explore** copies a rule's conditions for
+   experimentation. **Use these conditions in rule** returns the changes to its
+   draft. The saved rule changes only after **Save rule**. **Create rule** instead
+   creates a separate rule with no inherited actions.
 
-Saving a rule revision and running it can create another draft. Repeating the
-same revision on unchanged records does not duplicate its actions or messages.
+## Try assignments and resolution
 
-## Resolve a review issue
+1. Create a rule for missing supporting documents. Under **Not enough
+   information**, add a flag **Needs receipt**, assign **Bookkeeper**, and create
+   a task **Verify receipt**, also assigned to **Bookkeeper**.
+2. Enable **Clear resolved issues**, save, and run. Check **Tasks & activity** for
+   the assigned task. In Explore, filter **Assigned to** to Bookkeeper and inspect
+   the transaction's owner and flags.
+3. Return to the rule's result preview or open the task. Open the transaction and
+   add supporting details with a title and the verified information.
+4. With **Keep checking** on, the changed record is checked automatically. With
+   it off, use **Run now** again. A definite No match clears only the rule's own
+   removable flags and closes its unchanged open tasks. Uncertain results stay
+   open. Manual flags, reviewer changes, assignments, tags, and messages remain.
+5. **Rule follow-up** and action history show the resolution. Original dataset
+   files are never changed.
 
-1. For a rule that identifies a problem, check **Clear this rule's flags and close
-   its tasks when there is no match**, then save it. Add a flag or task under
-   Match or Not enough information. Run it to create the tracked issue.
-2. Open an affected transaction. **Add supporting details** accepts a receipt
-   explanation, approval, or other text; it does not upload files. Use records
-   that support the transaction rather than a generic "approved" note.
-3. Enabled rules recheck updated records. If the saved condition now returns
-   **No match**, the rule clears its flags and completes its unchanged open
-   tasks. With automatic runs off, use **Run once** again.
-4. Match and uncertain results keep the issue open. **Rule follow-up** shows open
-   and resolved issues; history records cleanup and anything preserved. Manual
-   flags, flags still claimed by other rules, edited tasks, assignments, tags,
-   messages, and human review marks are kept.
+## Try messages
 
-Adding an explanation does not guarantee resolution. Jev must judge that the
-saved condition no longer matches. A condition specifically about an empty memo
-will still require the memo itself to be corrected.
+Add a **Draft an internal message** action, choose a sender, and choose a
+recipient or let Jev choose. Set the request, save, and run. Gemini writes the
+draft server-side. In **Messages → Approvals**, the selected sender can edit,
+approve, or reject it. Approval delivers it to the recipient's internal inbox;
+no email is sent. Assignments and task owners are separate choices.
 
-## Watch the features work together
+## Validation
 
-1. In Transactions, filter Status to **Flagged** and save **Flagged charges**.
-   Turn its automatic checks On and wait for the first check.
-2. Run a rule that flags a previously unflagged transaction and assigns a review
-   task. The saved search reports the transaction as a new match. View it and
-   mark it seen. The task appears under Tasks & activity.
-3. Add supporting details to that transaction. When the rule resolves the issue,
-   the flag clears, its task completes, and the transaction leaves the Flagged
-   search on the next check. Its assignment and message history stay available.
+- `npm test`: unit/API tests, including SQLite persistence, record scope,
+  idempotency, messages, cache invalidation, and issue ownership.
+- `npm run test:browser`: isolated Express/SQLite workflow tests with controlled
+  external model responses. No live API credentials or existing preview data are
+  needed. Covers Explore, views, conversion, recurring toggles, actions, messages,
+  tasks, stale edits, mixed transaction types, and mobile layouts.
+- `npm run typecheck` and `npm run build`.
 
-## Verification
+## Next task, not implemented
 
-```powershell
-npm run typecheck
-npm test
-npm run build
-npx playwright test tests/ruleOutcomes.spec.ts tests/combinedAutomation.spec.ts
-```
-
-These workflow browser tests run the real UI, routes, SQLite, rule worker, and
-search monitor with fixed external model responses. Existing saved-search browser
-tests can also run against a separate scratch server with `RULES_TEST_URL` set.
-
-The preview uses `.env` and `workspace/combined.sqlite`, both ignored by Git.
-Start it from this worktree with:
-
-```powershell
-$env:PORT = '5192'
-$env:WORKSPACE_DB = Join-Path (Get-Location) 'workspace/combined.sqlite'
-npm run dev
-```
+Add a **Simulate** tab with periodic, timestamped transaction arrivals. Let the
+user advance through timestamps and watch enabled rules act on incoming data.

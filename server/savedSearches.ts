@@ -1,3 +1,4 @@
+import { validateRule } from '../src/rules.ts';
 import { randomUUID } from 'node:crypto';
 import type { Express, Request, Response } from 'express';
 import type { ActionStore } from './actionStore.ts';
@@ -20,14 +21,30 @@ function validate(input: unknown): { name: string; definition: SearchDefinition 
     || typeof definition.assignee !== 'string' || !definition.assignee || definition.assignee.length > 100
     || !['all', 'needs', 'reviewed'].includes(definition.tab as string) || typeof definition.matchesOnly !== 'boolean'
     || !['date', 'vendor', 'account', 'amountCents', 'match'].includes(sort.key as string) || ![1, -1].includes(sort.dir as number)) throw new SearchError('Choose valid search filters.');
-  return { name: value.name.trim(), definition: { query: definition.query, type: definition.type as SearchDefinition['type'], status: definition.status as SearchDefinition['status'], assignee: definition.assignee,
+  if (definition.result !== undefined && !['all', 'true', 'uncertain', 'false'].includes(definition.result as string)) throw new SearchError('Choose a valid result filter.');
+  if (definition.expression !== undefined) {
+    const errors = validateRule({ id: '_view_', companyId: '_view_', name: 'View', revision: 1, enabled: false, expression: definition.expression, actions: [{ id: '_view_action_', type: 'pass', value: '' }] });
+    if (errors.length) throw new SearchError(errors[0]);
+  }
+  return { name: value.name.trim(), definition: { query: definition.query, ...(definition.result !== undefined && { result: definition.result as SearchDefinition['result'] }), ...(definition.expression !== undefined && { expression: definition.expression as SearchDefinition['expression'] }), type: definition.type as SearchDefinition['type'], status: definition.status as SearchDefinition['status'], assignee: definition.assignee,
     tab: definition.tab as SearchDefinition['tab'], matchesOnly: definition.matchesOnly, sort: { key: sort.key as SearchDefinition['sort']['key'], dir: sort.dir as 1 | -1 } } };
 }
 
 export class SavedSearchService {
   readonly monitor: SearchMonitor;
   constructor(readonly db: ActionStore, private companyExists: (id: string) => boolean, source?: SearchSource) { this.monitor = new SearchMonitor(db, source); }
-  private present(search: StoredSearch): SavedSearch { return { ...search, enabled: Boolean(search.enabled), tracking: this.monitor.summary(search.id) }; }
+  retireMonitoring() {
+    this.db.atomic(() => {
+      for (const search of this.db.list<StoredSearch>(kind)) {
+        if (!search.enabled) continue;
+        this.db.put('saved-view-migration', search.id, search.companyId, { previous: search, pausedAt: new Date().toISOString(), reason: 'Recurring checks now belong to Rules.' });
+        const next = { ...search, enabled: false, revision: search.revision + 1, updatedAt: new Date().toISOString() };
+        this.db.put(kind, next.id, next.companyId, next);
+        this.monitor.reset(next);
+      }
+    });
+  }
+  private present(search: StoredSearch): SavedSearch { return { ...search, ...(Boolean(this.db.get('saved-view-migration', search.id)) && { monitoringRetired: true }), enabled: Boolean(search.enabled), tracking: this.monitor.summary(search.id) }; }
   private company(id: string) { if (!this.companyExists(id)) throw new SearchError('Company not found.', 404); }
   list(company: string) {
     this.company(company);

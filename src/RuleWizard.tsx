@@ -1,12 +1,13 @@
+import { scopeLabel } from './ruleScope';
+import { ConditionEditor, conditionText } from './ConditionEditor';
 import { useEffect, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import type { RulesController } from './useRules';
-import { actionLabel, actionOutcome, actionsForOutcome, RESULT_LABELS, DEFAULT_MESSAGE_ASK, leaves, uid, validateRule, type Action, type Group, type Outcome, type RuleNode, type StandardCondition, type Truth } from './rules';
+import { actionLabel, actionOutcome, actionsForOutcome, RESULT_LABELS, DEFAULT_MESSAGE_ASK, leaves, uid, validateRule, ruleConditionKey, type Action, type Outcome, type RuleNode, type Truth } from './rules';
 import { EMPLOYEES, employeeById } from './employees';
 import { ResultBadge, RuleHistory, RuleIssueList } from './RulesPanel';
 import './ruleWizard.css';
 
-const groupLabel = { all: 'AND', any: 'OR', not: 'NOT' };
 const steps = ['Describe conditions', 'Choose actions', 'Review results'];
 const actionNames = { flag: 'Flag transactions', assign: 'Assign transactions', task: 'Create a review task', message: 'Draft an internal message', tag: 'Add a tag', pass: 'Mark checked' };
 const branches: { result: Truth; title: string; description: string }[] = [
@@ -15,15 +16,11 @@ const branches: { result: Truth; title: string; description: string }[] = [
   { result: 'false', title: 'When there is no match', description: 'The transaction does not meet your conditions. Leave this empty to take no action.' },
 ];
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-const changeNode = (node: RuleNode, id: string, update: (node: RuleNode) => RuleNode): RuleNode => node.id === id ? update(node) : 'children' in node ? { ...node, children: node.children.map(child => changeNode(child, id, update)) } : node;
-const removeNode = (node: RuleNode, id: string): RuleNode => 'children' in node ? { ...node, children: node.children.filter(child => child.id !== id).map(child => removeNode(child, id)) } : node;
-const newCondition = (): RuleNode => ({ id: uid(), type: 'ai', text: '', label: '' });
-const conditionText = (node: RuleNode): string => node.type === 'ai' ? node.text : node.type === 'standard' ? `${node.field === 'amountCents' ? 'Amount' : node.field === 'review' ? 'Review status' : node.field} ${node.operator === 'gt' ? '>' : node.operator === 'lt' ? '<' : '='} ${node.field === 'amountCents' ? '$' : ''}${node.value}` : node.type === 'not' ? `NOT (${node.children.map(conditionText).join(' ')})` : `(${node.children.map(conditionText).join(` ${groupLabel[node.type]} `)})`;
 const directlyNegated = (node: RuleNode): string[] => 'children' in node ? node.type === 'not' && node.children[0] && !('children' in node.children[0]) ? [node.children[0].id] : node.children.flatMap(directlyNegated) : [];
 const outcomeOf = (c: RulesController, row: Row): Outcome => c.snapshots[row.id]?.result ?? 'pending';
 
-export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onMessages: () => void }) {
-  const [step, setStep] = useState(0);
+export function RuleWizard({ c, data, onInspect, onMessages, onExplore, onClose, onStepChange, initialStep = 0 }: { c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onMessages: () => void; onExplore: () => void; onClose: () => void; initialStep?: number; onStepChange: (step: number) => void }) {
+  const [step, setStep] = useState(initialStep);
   const [resultFilter, setResultFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -35,7 +32,7 @@ export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesControl
   const records = data.company.synthetic ? 'transactions' : 'bills';
   useEffect(() => {
     if (previousId.current !== draft?.id) {
-      previousId.current = draft?.id; setStep(0); setResultFilter('all'); setStatusFilter('all'); setTypeFilter('all'); setOwnerFilter('all'); setSearch('');
+      previousId.current = draft?.id; setStep(initialStep); setResultFilter('all'); setStatusFilter('all'); setTypeFilter('all'); setOwnerFilter('all'); setSearch('');
     }
   }, [draft?.id]);
   if (!draft) return <main className="wizard-loading" role="status">Loading saved rules…</main>;
@@ -52,46 +49,9 @@ export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesControl
     && (statusFilter === 'all' || (statusFilter === 'reviewed' ? row.dashboard?.reviewed : statusFilter === 'flagged' ? row.dashboard?.flags.length : !row.dashboard?.reviewed))
     && (ownerFilter === 'all' || (ownerFilter === 'unassigned' ? !row.dashboard?.owner : `owner:${row.dashboard?.owner}` === ownerFilter))
     && (!search.trim() || [row.billId, row.docNumber, row.vendor, row.description, row.memo, ...row.itemNames].join(' ').toLowerCase().includes(search.trim().toLowerCase())));
-  const needsCleanup = (row: Row) => Boolean(draft.autoResolve && outcomeOf(c, row) === 'false' && c.issues.some(issue => issue.ruleId === draft.id && issue.transactionId === row.id && issue.status === 'open' && issue.conditionKey === JSON.stringify(draft.expression)));
+  const needsCleanup = (row: Row) => Boolean(draft.autoResolve && outcomeOf(c, row) === 'false' && c.issues.some(issue => issue.ruleId === draft.id && issue.transactionId === row.id && issue.status === 'open' && issue.conditionKey === ruleConditionKey(draft)));
   const actionableIds = rows.filter(row => actionsForOutcome(draft, outcomeOf(c, row)).length || needsCleanup(row)).map(row => row.id);
-  const go = (next: number) => { setStep(next); requestAnimationFrame(() => heading.current?.focus()); };
-  const updateTree = (expression: RuleNode) => c.setDraft({ ...draft, expression });
-  const update = (id: string, transform: (node: RuleNode) => RuleNode) => updateTree(changeNode(draft.expression, id, transform));
-  const add = (id: string, type: 'ai' | 'group' | StandardCondition['field']) => {
-    const node: RuleNode = type === 'ai' ? newCondition() : type === 'group' ? { id: uid(), type: 'any', children: [newCondition()] }
-      : { id: uid(), type: 'standard', field: type, operator: type === 'amountCents' ? 'gt' : 'eq', value: type === 'amountCents' ? '500' : type === 'review' ? 'needs_review' : '' };
-    update(id, parent => 'children' in parent ? { ...parent, children: [...parent.children, node] } : { id: uid(), type: 'all', children: [parent, node] });
-  };
-  const addControls = (node: RuleNode, depth: number) => <div className="wizard-add-controls">
-    <button onClick={() => add(node.id, 'ai')}>Add condition</button>
-    <button className="ghost" disabled={depth >= 3} title={depth >= 3 ? 'At most three group levels' : undefined} onClick={() => add(node.id, 'group')}>Add group</button>
-    <details className="wizard-extra-filter"><summary>Add a filter</summary><div>{(['amountCents', 'review', 'vendor', 'account'] as const).map(field => <button key={field} onClick={() => add(node.id, field)}>{{ amountCents: 'Amount', review: 'Review status', vendor: data.company.synthetic ? 'Counterparty' : 'Vendor', account: 'Category' }[field]}</button>)}</div></details>
-  </div>;
-  const renderNode = (node: RuleNode, depth: number, parent?: Group): React.ReactNode => {
-    if ('children' in node) return <section className={`wizard-condition-group ${parent ? 'nested' : ''}`} key={node.id} data-testid={`node-${node.type}`} aria-label={parent ? 'Nested condition group' : 'Conditions'}>
-      <div className="wizard-group-heading"><select aria-label="Group logic" value={node.type} onChange={event => update(node.id, current => ({ ...current, type: event.target.value } as Group))}>
-        <option value="all">AND</option><option value="any">OR</option><option value="not" disabled={node.children.length !== 1}>NOT</option>
-      </select>{parent && <button className="ghost" onClick={() => updateTree(removeNode(draft.expression, node.id))} aria-label={`Remove ${groupLabel[node.type]} group`}>Remove group</button>}</div>
-      {node.children.map((child, index) => <div key={child.id}>{index > 0 && <div className="wizard-connector">{groupLabel[node.type]}</div>}{renderNode(child, depth + 1, node)}</div>)}
-      {!node.children.length && <p className="wizard-help">Add a condition to this group.</p>}
-      {(node.type !== 'not' || !node.children.length) && addControls(node, depth)}
-    </section>;
-    const number = conditions.findIndex(condition => condition.id === node.id) + 1;
-    const options = data.referenceOptions ?? { vendors: [...new Set(data.rows.map(row => row.vendor))].sort(), accounts: [...new Set(data.rows.map(row => row.account))].sort() };
-    return <section className="wizard-condition" key={node.id} data-testid={`node-${node.type}`}>
-      <div className="wizard-condition-heading"><label htmlFor={`condition-${node.id}`}>Condition {number}{parent?.type === 'not' && <span className="wizard-negation">NOT</span>}</label>{parent && <button className="ghost" aria-label={`Remove condition ${number}`} onClick={() => updateTree(removeNode(draft.expression, node.id))}>Remove</button>}</div>
-      {node.type === 'ai' ? <textarea id={`condition-${node.id}`} aria-label={`Condition ${number}`} rows={3} maxLength={500} placeholder="Describe what should be true about this transaction…" value={node.text} onChange={event => update(node.id, current => ({ ...current, text: event.target.value } as RuleNode))} /> : <div className="wizard-standard-condition">
-        <select id={`condition-${node.id}`} aria-label="Condition field" value={node.field} onChange={event => { const field = event.target.value as StandardCondition['field']; update(node.id, current => ({ ...current, field, operator: field === 'amountCents' ? 'gt' : 'eq', value: field === 'amountCents' ? '500' : field === 'review' ? 'needs_review' : '' } as StandardCondition)); }}>
-          <option value="amountCents">Amount</option><option value="review">Review status</option><option value="vendor">{data.company.synthetic ? 'Counterparty' : 'Vendor'}</option><option value="account">Category</option>
-        </select><select aria-label="Comparison" value={node.operator} onChange={event => update(node.id, current => ({ ...current, operator: event.target.value } as StandardCondition))}>
-          {node.field === 'amountCents' ? <><option value="gt">Over</option><option value="lt">Under</option><option value="eq">Equals</option></> : <option value="eq">Is</option>}
-        </select>{node.field === 'amountCents' ? <label className="wizard-money">$<input aria-label="Amount in dollars" inputMode="decimal" value={node.value} onChange={event => update(node.id, current => ({ ...current, value: event.target.value } as StandardCondition))} /></label>
-          : <select aria-label="Condition value" value={node.value} onChange={event => update(node.id, current => ({ ...current, value: event.target.value } as StandardCondition))}><option value="">Choose…</option>{(node.field === 'review' ? [['needs_review', 'Needs review'], ['reviewed', 'Reviewed']] : (node.field === 'vendor' ? options.vendors : options.accounts).map(value => [value, value])).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>}
-      </div>}
-      {node.type === 'ai' && <details className="wizard-condition-label"><summary>Optional label</summary><input aria-label="Condition label" value={node.label} placeholder={`Condition ${number}`} onChange={event => update(node.id, current => ({ ...current, label: event.target.value } as RuleNode))} /></details>}
-      {!parent && addControls(node, 1)}
-    </section>;
-  };
+  const go = (next: number) => { setStep(next); onStepChange(next); requestAnimationFrame(() => heading.current?.focus()); };
   const defaultAction = (type: Action['type']): Action => ({ id: uid(), type, value: type === 'message' ? DEFAULT_MESSAGE_ASK : type === 'flag' ? 'Needs clarification' : type === 'assign' ? employeeById(c.actor)?.name ?? 'Bookkeeper' : type === 'tag' ? 'Follow up' : type === 'task' ? 'Review supporting details' : '', ...(type === 'message' && { sender: c.actor, recipient: 'jev' }), ...(type === 'task' && { owner: employeeById(c.actor)?.name ?? 'Bookkeeper', dueDays: 2 }) });
   const updateAction = (id: string, patch: Partial<Action>) => c.setDraft({ ...draft, actions: draft.actions.map(action => action.id === id ? { ...action, ...patch } : action) });
   const actionSummary = (compact = false) => branches.map(branch => {
@@ -100,14 +60,14 @@ export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesControl
   });
   const saveDisabled = Boolean(c.validation.length || c.storageError || c.busy || !draft.name.trim());
   return <main className="rule-wizard" aria-label="Rule setup">
-    <header className="wizard-page-heading"><div><h1>Build a rule in plain English</h1><p>Describe what to look for. Jev checks each {data.company.synthetic ? 'transaction' : 'bill'}.</p></div><div className="wizard-library"><label className="sr-only" htmlFor="saved-rule">Saved rules</label><select id="saved-rule" aria-label="Saved rules" value={c.saved?.id ?? ''} onChange={event => c.selectRule(event.target.value)}>{!c.saved && <option value="" disabled>{draft.name} · unsaved</option>}{c.store.rules.map(rule => <option key={rule.id} value={rule.id}>{rule.name}{rule.enabled ? ' · automatic' : ''}</option>)}</select><button onClick={c.newRule}>New rule</button><button className="ghost" onClick={c.loadExample}>Load example</button></div></header>
-    <div className="wizard-layout">
+    <header className="wizard-page-heading"><div><h1>Rule setup</h1><p>Choose conditions and actions. Save first, then run now or turn on recurring checks.</p></div><div className="wizard-library"><button onClick={onClose}>All rules</button><button onClick={onExplore}>Try in Explore</button><label className="sr-only" htmlFor="saved-rule">Saved rules</label><select id="saved-rule" aria-label="Saved rules" value={c.saved?.id ?? ''} onChange={event => c.selectRule(event.target.value)}>{!c.saved && <option value="" disabled>{draft.name} · unsaved</option>}{c.store.rules.map(rule => <option key={rule.id} value={rule.id}>{rule.name}{rule.enabled ? ' · automatic' : ''}</option>)}</select><button onClick={c.newRule}>New rule</button><button className="ghost" onClick={c.loadExample}>Load example</button></div></header>
+    <p className="rule-scope-note">Record filters: {scopeLabel(draft.scope)}. <button onClick={onExplore}>Change in Explore</button></p><div className="wizard-layout">
       <nav className="wizard-steps" aria-label="Rule setup steps">{steps.map((label, index) => <button key={label} aria-current={step === index ? 'step' : undefined} onClick={() => go(index)}><span aria-hidden="true">{index + 1}</span>{label}</button>)}</nav>
       <section className="wizard-main">
         <h2 ref={heading} tabIndex={-1}>{['What should Jev look for?', 'What should happen for each result?', 'Review the results and actions'][step]}</h2>
         <p className="wizard-intro">{['Write each condition in English. Jev judges them independently.', 'Choose actions for each result. You can also clear earlier flags and tasks after a recheck.', 'Check each result and what the rule will do before running.'][step]}</p>
         <div className="wizard-step-content">
-          {step === 0 && <>{renderNode(draft.expression, 1)}{expressionErrors.length > 0 && <p className="wizard-validation" role="status">{expressionErrors.map(error => error.replace('AI conditions need criterion text.', 'Write something for each condition.').replace('Groups cannot be empty.', 'Add a condition or remove the empty group.')).join(' ')}</p>}</>}
+          {step === 0 && <><ConditionEditor expression={draft.expression} onChange={expression => c.setDraft({ ...draft, expression })} data={data} />{expressionErrors.length > 0 && <p className="wizard-validation" role="status">{expressionErrors.map(error => error.replace('AI conditions need criterion text.', 'Write something for each condition.').replace('Groups cannot be empty.', 'Add a condition or remove the empty group.')).join(' ')}</p>}</>}
           {step === 1 && <>
             {branches.map(branch => <fieldset className={`wizard-outcome outcome-${branch.result}`} key={branch.result} aria-label={branch.title}>
               <legend>{branch.title}</legend><p className="wizard-help">{branch.result === 'false' && draft.autoResolve ? 'Clear earlier flags and tasks as described below. Add any other actions here.' : branch.description}</p>
@@ -143,11 +103,11 @@ export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesControl
             {!rows.length && <p className="wizard-empty">{expressionErrors.length ? 'Complete your conditions in step 1.' : c.previewErrors.length ? 'Some checks failed. Retry them above.' : !evaluationComplete ? `Jev is checking the ${records}. Results appear as they finish.` : 'No bills in this view. Change a filter or your conditions.'}</p>}
             <p className="wizard-help">{rows.length} rows shown from {data.rows.length} loaded {records}{data.sampled ? ` (${data.totalBills} in this company)` : ''}. {actionableIds.length} have actions configured. Uncertain results only receive the actions you chose for missing information.</p>
             <div className="wizard-save"><label className="wizard-field">Rule name<input aria-label="Rule name" value={draft.name} maxLength={200} onChange={event => c.setDraft({ ...draft, name: event.target.value })} /></label><div className="wizard-action-summary"><h3>Actions by result</h3>{actionSummary()}{!draft.actions.length && <button onClick={() => go(1)}>Choose an action</button>}<p>{draft.autoResolve ? 'After a recheck finds no match: clear this rule’s earlier flags and close its tasks.' : 'Earlier flags and tasks stay in place after a recheck.'}</p></div>
-              <RuleIssueList issues={c.issues.filter(issue => issue.ruleId === draft.id)} onInspect={onInspect} conditionKey={JSON.stringify(draft.expression)} />
+              <RuleIssueList issues={c.issues.filter(issue => issue.ruleId === draft.id)} onInspect={onInspect} conditionKey={ruleConditionKey(draft)} />
               {c.validation.length > 0 && <p className="wizard-validation">{c.validation.join(' ')}</p>}
               {c.saved && draft.revision < c.saved.revision && <p className="wizard-validation">Another session saved a newer revision. <button onClick={() => c.selectRule(c.saved!.id)}>Reload saved rule</button></p>}
-              {c.saved && <label className="wizard-automatic"><input type="checkbox" aria-label="Run automatically" checked={c.saved.enabled} disabled={c.busy || Boolean(c.storageError)} onChange={() => { void c.toggleEnabled(); }} />Run automatically on new or changed {records}</label>}
-              {c.saved?.enabled && c.dirty && <p className="wizard-help">The saved revision runs until you save these changes.</p>}
+              {c.saved && <label className="wizard-automatic"><input type="checkbox" aria-label="Keep checking" checked={c.saved.enabled} disabled={c.busy || Boolean(c.storageError)} onChange={() => { void c.toggleEnabled(); }} />Keep checking new or changed records</label>}
+              {c.saved?.enabled && <p className="wizard-help">Checks every 10 seconds while the server runs. Turning this on establishes a baseline; use Run now for existing records.</p>}{c.saved?.enabled && c.dirty && <p className="wizard-help">The saved revision runs until you save these changes.</p>}
               <details className="wizard-history"><summary>Action history & advanced options</summary><RuleHistory c={c} companyId={data.company.companyId} onOpen={onInspect} /></details>
             </div>
           </>}
@@ -155,7 +115,7 @@ export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesControl
         <div className="wizard-bottom"><button disabled={step === 0} onClick={() => go(step - 1)}>Back</button><div>
           {step < 2 ? <button className="primary" disabled={step === 0 ? Boolean(expressionErrors.length) : Boolean(c.validation.length)} onClick={() => go(step + 1)}>{step === 0 ? 'Choose actions' : 'Review results'}</button>
             : c.dirty || !c.saved ? <button className="primary" disabled={saveDisabled} onClick={() => { void c.save(Boolean(c.saved?.enabled)); }}>Save rule</button>
-              : <button className="primary" disabled={!c.complete || !actionableIds.length || c.busy || Boolean(c.storageError)} onClick={() => { void c.runOnce(actionableIds); }}>{c.busy ? 'Running…' : `Run once · ${actionableIds.length} ${actionableIds.length === 1 ? 'transaction' : 'transactions'}`}</button>}
+              : <button className="primary" disabled={!c.complete || !actionableIds.length || c.busy || Boolean(c.storageError)} onClick={() => { void c.runOnce(actionableIds); }}>{c.busy ? 'Running…' : `Run now · ${actionableIds.length} ${actionableIds.length === 1 ? 'transaction' : 'transactions'}`}</button>}
           {step === 2 && c.saved && !c.dirty && <span className="wizard-help">Runs the configured actions for results in this view.</span>}
         </div></div>
       </section>

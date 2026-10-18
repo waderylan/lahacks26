@@ -1,3 +1,4 @@
+import type { RuleScope } from './ruleScope';
 import type { Row } from './types';
 import { employeeById } from './employees';
 import type { ReviewTask } from './actionTypes';
@@ -25,7 +26,11 @@ export interface Rule {
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
   expression: RuleNode; actions: Action[];
   autoResolve?: boolean;
+  scope?: RuleScope;
 }
+/** Preserve issue ownership for older rules when an unrestricted scope is added. */
+export const ruleConditionKey = (rule: Rule): string => rule.scope && (rule.scope.type !== 'all' || rule.scope.status !== 'all' || rule.scope.assignee !== 'all')
+  ? JSON.stringify([rule.expression, rule.scope]) : JSON.stringify(rule.expression);
 export interface RuleIssue {
   id: string; companyId: string; ruleId: string; ruleName: string; transactionId: string;
   conditionKey: string; cycle: string; openedAt: string; resolvedAt?: string;
@@ -157,6 +162,7 @@ export function validateRule(input: unknown): string[] {
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
   if (r.autoResolve !== undefined && typeof r.autoResolve !== 'boolean') errors.push('Choose whether this rule clears resolved issues.');
+  if (r.scope !== undefined && (!r.scope || typeof r.scope !== 'object' || !['all', 'bill', 'invoice', 'bank'].includes(r.scope.type) || !['all', 'needs_review', 'reviewed', 'flagged'].includes(r.scope.status) || typeof r.scope.assignee !== 'string' || !r.scope.assignee || r.scope.assignee.length > 100)) errors.push('Choose valid record filters.');
   const checkId = (id: unknown) => { if (typeof id !== 'string' || !id || ids.has(id)) errors.push('Every block needs a unique ID.'); else ids.add(id); };
   const visit = (n: RuleNode, depth: number) => {
     if (!n || typeof n !== 'object') { errors.push('Missing condition.'); return; }

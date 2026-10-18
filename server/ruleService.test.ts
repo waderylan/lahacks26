@@ -37,6 +37,46 @@ async function eventually(check: () => boolean) {
   assert.fail('Expected worker to settle.');
 }
 
+test('record filters exclude transactions from every outcome action, including no-match actions', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const rule: Rule = { ...makeRule(), scope: { type: 'invoice', status: 'needs_review', assignee: 'unassigned' },
+    expression: { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '1000' },
+    actions: [{ id: 'tag', type: 'tag', value: 'Checked invoice', when: 'false' }] };
+  const invoice = data.row(companyId, ids[0]);
+  db.write({ ...invoice, txnType: 'invoice' }, invoice.sourceVersion!);
+  service.save(companyId, rule, null);
+  await service.run(companyId, rule.id, 1, ids);
+  assert.deepEqual(data.row(companyId, ids[0]).dashboard?.tags, ['Checked invoice']);
+  assert.deepEqual(data.row(companyId, ids[1]).dashboard?.tags, []);
+  assert.equal(service.snapshot(companyId).store.history.length, 1);
+});
+
+test('recurring scoped rules notice a record entering the assignee filter without a business-evidence change', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const rule: Rule = { ...makeRule(), scope: { type: 'all', status: 'all', assignee: 'Bookkeeper' }, actions: [{ id: 'flag', type: 'flag', value: 'Review assigned item' }] };
+  service.save(companyId, rule, null); service.toggle(companyId, rule.id, 1, true);
+  await service.scan();
+  assert.equal(service.snapshot(companyId).store.history.length, 0);
+  const row = data.row(companyId, ids[0]);
+  db.write({ ...row, dashboard: { ...row.dashboard!, owner: 'Bookkeeper' } }, row.sourceVersion!);
+  await service.scan();
+  assert.deepEqual(data.row(companyId, ids[0]).dashboard?.flags, ['Review assigned item']);
+  await service.scan();
+  assert.equal(service.snapshot(companyId).store.history.length, 1);
+});
+
+test('adding its own flag does not make a flagged-record rule send a second message', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const rule: Rule = { ...makeRule(), scope: { type: 'all', status: 'flagged', assignee: 'all' } };
+  const row = data.row(companyId, ids[0]);
+  db.write({ ...row, dashboard: { ...row.dashboard!, flags: ['Manual hold'] } }, row.sourceVersion!);
+  service.save(companyId, rule, null); service.toggle(companyId, rule.id, 1, true);
+  await service.run(companyId, rule.id, 1, [ids[0]]);
+  await eventually(() => service.snapshot(companyId).store.messages[0]?.generation === 'ready');
+  await service.scan();
+  assert.equal(service.snapshot(companyId).store.messages.length, 1);
+});
+
 test('outcome actions are rechecked server-side and uncertain drafts retain their trigger through approval', async t => {
   const { db, data } = setup(); t.after(() => db.db.close());
   let writtenOutcome: string | undefined;

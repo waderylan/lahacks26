@@ -19,6 +19,27 @@ const setup = (filename = ':memory:') => {
   return { db, service };
 };
 
+test('views preserve grouped conditions and legacy monitoring is paused with its definition retained', t => {
+  const { db, service } = setup(); t.after(() => db.db.close());
+  const expression = { id: 'root', type: 'all', children: [
+    { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '500' },
+    { id: 'not', type: 'not', children: [{ id: 'english', type: 'ai', label: '', text: 'The receipt supports the charge.' }] },
+  ] };
+  const view = service.create(a, { name: 'Receipt review', definition: { ...definition, expression, result: 'uncertain' } });
+  assert.deepEqual(view.definition.expression, expression);
+  assert.equal(view.definition.result, 'uncertain');
+  const enabled = service.toggle(a, view.id, view.revision, true);
+  service.retireMonitoring();
+  const retired = service.get(a, view.id);
+  assert.equal(retired.enabled, false);
+  assert.equal(retired.revision, enabled.revision + 1);
+  assert.deepEqual(retired.definition, view.definition);
+  assert.ok(db.get('saved-view-migration', view.id));
+  service.retireMonitoring();
+  assert.equal(service.get(a, view.id).revision, retired.revision);
+  assert.throws(() => service.create(a, { name: 'Broken', definition: { ...definition, expression: { ...expression, children: [] } } }), /empty/);
+});
+
 test('named searches persist through reopen, can be renamed and edited, and deletion preserves other company data', t => {
   const filename = path.join(os.tmpdir(), `lahacks-searches-${randomUUID()}.sqlite`);
   let current = setup(filename);

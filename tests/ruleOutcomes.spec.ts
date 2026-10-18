@@ -35,8 +35,8 @@ test('outcome actions are explained, previewed, saved, and executed in their own
   await expect(page.locator('tr[data-id="company-018:bill-3"]')).toContainText('No issue');
   await page.getByLabel('Rule name').fill('Review charge documentation');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-  await expect(page.getByRole('button', { name: /Run once/ })).toContainText('8 transactions');
-  await page.getByRole('button', { name: /Run once/ }).click();
+  await expect(page.getByRole('button', { name: /Run now/ })).toContainText('8 transactions');
+  await page.getByRole('button', { name: /Run now/ }).click();
   const saved = async () => (await (await page.request.get(`${app.url}/api/companies/company-018/rules`)).json()).store;
   await expect.poll(async () => (await saved()).messages[0]?.generation).toBe('ready');
   const state = await saved();
@@ -46,9 +46,9 @@ test('outcome actions are explained, previewed, saved, and executed in their own
   expect(state.messages[0].outcome).toBe('uncertain');
   expect(state.messages[0].status).toBe('pending');
   const count = state.history.length;
-  await page.getByRole('button', { name: /Run once/ }).click();
+  await page.getByRole('button', { name: /Run now/ }).click();
   await expect.poll(async () => (await saved()).history.length).toBe(count);
-  await page.reload(); await step(page, 'Choose actions');
+  await page.reload(); await page.getByRole('button', { name: 'Edit rule', exact: true }).click(); await step(page, 'Choose actions');
   await expect(uncertain.getByLabel('Message request')).toHaveValue('Ask for the missing receipt.');
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('heading', { name: 'What should happen for each result?' })).toBeVisible();
@@ -80,11 +80,11 @@ test('supporting details clear a tracked flag and complete its task after an aut
   await step(page, 'Review results');
   await page.getByLabel('Rule name').fill('Request missing receipt');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-  await page.getByLabel('Run automatically', { exact: true }).click();
-  await expect(page.getByLabel('Run automatically', { exact: true })).toBeChecked();
+  await page.getByLabel('Keep checking', { exact: true }).click();
+  await expect(page.getByLabel('Keep checking', { exact: true })).toBeChecked();
   const ruleId = await page.getByLabel('Saved rules').inputValue();
-  await expect(page.getByRole('button', { name: /Run once/ })).toContainText('1 transaction');
-  await page.getByRole('button', { name: /Run once/ }).click();
+  await expect(page.getByRole('button', { name: /Run now/ })).toContainText('1 transaction');
+  await page.getByRole('button', { name: /Run now/ }).click();
   await expect(page.getByLabel('Rule follow-up')).toContainText('1 open · 0 resolved');
   await page.locator('tr[data-id="company-018:bill-1"] .wizard-vendor').click();
   const drawer = page.getByLabel('Transaction detail');
@@ -107,7 +107,7 @@ test('supporting details clear a tracked flag and complete its task after an aut
   await page.locator('.wizard-history > summary').click();
   await page.getByRole('button', { name: 'Action history', exact: true }).click();
   await expect(page.locator('.history-entry').filter({ hasText: 'Issue resolved' })).toContainText('Cleared 1 flag and completed 1 task.');
-  await page.reload(); await page.getByLabel('Saved rules').selectOption(ruleId); await step(page, 'Choose actions');
+  await page.reload(); await page.getByRole('button', { name: 'Edit rule', exact: true }).click(); await page.getByLabel('Saved rules').selectOption(ruleId); await step(page, 'Choose actions');
   await expect(page.getByLabel('Clear resolved issues')).toBeChecked();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('.wizard-resolution').scrollIntoViewIfNeeded();
@@ -129,8 +129,8 @@ test('manual rechecks preview cleanup even when the No match action section is e
   await step(page, 'Review results');
   await page.getByLabel('Rule name').fill('Manual receipt review');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-  await expect(page.getByLabel('Run automatically', { exact: true })).not.toBeChecked();
-  await page.getByRole('button', { name: /Run once/ }).click();
+  await expect(page.getByLabel('Keep checking', { exact: true })).not.toBeChecked();
+  await page.getByRole('button', { name: /Run now/ }).click();
   await expect(page.getByLabel('Rule follow-up')).toContainText('1 open');
   await page.locator('tr[data-id="company-018:bill-1"] .wizard-vendor').click();
   await page.getByLabel('Supporting details title').fill('Receipt checked');
@@ -140,7 +140,7 @@ test('manual rechecks preview cleanup even when the No match action section is e
   await page.getByLabel('Close detail', { exact: true }).click();
   await expect(page.locator('tr[data-id="company-018:bill-1"]')).toContainText("Clear this rule's earlier flags and close its tasks");
   await expect(page.getByLabel('Rule follow-up')).toContainText('1 open');
-  await expect(page.getByRole('button', { name: /Run once/ })).toContainText('1 transaction');
-  await page.getByRole('button', { name: /Run once/ }).click();
+  await expect(page.getByRole('button', { name: /Run now/ })).toContainText('1 transaction');
+  await page.getByRole('button', { name: /Run now/ }).click();
   await expect(page.getByLabel('Rule follow-up')).toContainText('0 open · 1 resolved');
 });

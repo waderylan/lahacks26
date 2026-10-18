@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
+import { EMPTY_STORE, evaluateTree, exampleRule, rulePresets, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
@@ -16,6 +16,8 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const [ready, setReady] = useState(false);
   const [storageError, setStorageError] = useState('');
   const [draft, setDraft] = useState<Rule | null>(null);
+  // Which preset the current draft was started from; tied to the draft's id so switching rules clears it.
+  const [fromPreset, setFromPreset] = useState<{ presetId: string; draftId: string } | null>(null);
   const [message, setMessage] = useState('');
   const [automation, setAutomation] = useState<string[]>([]);
   const [issues, setIssues] = useState<RuleIssue[]>([]);
@@ -24,7 +26,6 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const commandError = useRef('');
   const callbacks = useRef({ onArrival, onRows, onChange }); callbacks.current = { onArrival, onRows, onChange };
   const requestSeq = useRef(0);
-  const exampleIndex = useRef(0);
   const accept = useCallback((reply: Reply) => {
     setStore(old => JSON.stringify(old) === JSON.stringify(reply.store) ? old : reply.store);
     storeRef.current = reply.store;
@@ -143,11 +144,14 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     retryAutomation: () => command({ type: 'retry-automation' }),
     remaining: data?.reservedRows?.filter(row => !(store.arrivals[companyId] ?? []).includes(row.id)).length ?? 0,
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(rule => rule.id === id); if (rule) { setDraft(structuredClone(rule)); setMessage(''); } },
-    loadExample: () => {
-      // Synthetic extension companies cycle through four draft review policies; others keep the single example.
-      const examples = data?.company.synthetic ? syntheticExampleRules(companyId) : [exampleRule(companyId)];
-      const next = examples[exampleIndex.current++ % examples.length];
-      setDraft(next); setMessage('');
+    presets: rulePresets(Boolean(data?.company.synthetic)),
+    presetId: fromPreset && fromPreset.draftId === draft?.id ? fromPreset.presetId : '',
+    /** Replaces the draft with a fresh, unsaved copy of a preset so its criteria can be read and edited. */
+    loadPreset: (id: string) => {
+      const preset = rulePresets(Boolean(data?.company.synthetic)).find(preset => preset.id === id);
+      if (!preset) return;
+      const rule = preset.build(companyId, actor || 'emp-ap');
+      setDraft(rule); setFromPreset({ presetId: preset.id, draftId: rule.id }); setMessage('');
     },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
     decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),

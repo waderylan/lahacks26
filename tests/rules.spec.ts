@@ -11,7 +11,7 @@ const store = async (page: Page) => {
 };
 const openRules = async (page: Page) => {
   await page.goto('/?workspace=rules');
-  await page.getByRole('button', { name: 'Load example', exact: true }).click();
+  await page.getByLabel('Start from a preset').selectOption({ label: 'Memo needs clarification' });
 };
 test.beforeEach(async ({ request }) => {
   await request.patch('/api/settings', { data: { limit: 50, set: 'plain' } });
@@ -53,7 +53,7 @@ test('English conditions use real independent Jev judgments; AND/OR and action e
   await page.getByRole('button', { name: 'Remove NOT group', exact: true }).click();
   await expect(page.locator('.wizard-validation')).toContainText('Add a condition');
   await expect(page.locator('.wizard-bottom').getByRole('button', { name: 'Choose actions', exact: true })).toBeDisabled();
-  await page.getByRole('button', { name: 'Load example', exact: true }).click(); await complete(page);
+  await page.getByLabel('Start from a preset').selectOption({ label: 'Memo needs clarification' }); await complete(page);
   expect(requests).toHaveLength(9);
   await page.screenshot({ path: 'artifacts/verified-guided-conditions.png', fullPage: true });
   expect(errors).toEqual([]);

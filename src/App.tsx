@@ -13,6 +13,8 @@ import { actionLabel, type LocalTransaction } from './rules';
 import { useWorkspace, type RowPatch } from './useWorkspace';
 import { ActionPanel, TaskBoard } from './ActionPanel';
 import { RuleWizard } from './RuleWizard';
+import { SavedSearches } from './SavedSearches';
+import type { SearchDefinition } from './savedSearchTypes';
 
 const DEFAULT_COMPANY = 'company-018';
 
@@ -114,6 +116,11 @@ export default function App() {
   const [reviewed, setReviewed] = useState<Set<string>>(() => new Set());
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [widths, setWidths] = useState(DEFAULT_WIDTHS);
+  const openSavedSearch = (search: SearchDefinition) => {
+    setInput(search.query); setQuery(search.query); setTypeFilter(search.type); setStatusFilter(search.status);
+    setAssigneeFilter(search.assignee); setTab(search.tab); setMatchesOnly(search.matchesOnly); setSort(search.sort);
+    setSelected(new Set()); setDrawerId(null);
+  };
   const [now, setNow] = useState(performance.now());
   const [prefs, setPrefs] = useState({ set: 'plain', limit: 50 });
   const [prefsReady, setPrefsReady] = useState(false);
@@ -376,6 +383,7 @@ export default function App() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Purchases related to tools or equipment…"
+            maxLength={500}
             autoComplete="off"
           />
           {input && (
@@ -402,6 +410,7 @@ export default function App() {
             )}
           </div>
         </div>
+        <SavedSearches key={companyId} companyId={companyId} companyName={company?.name ?? companyId} definition={{ query: input, type: typeFilter as SearchDefinition['type'], status: statusFilter as SearchDefinition['status'], assignee: assigneeFilter, tab, matchesOnly, sort }} onOpen={openSavedSearch} />
         <div className="chips">
           <label className="chip-set">
             Examples
@@ -435,7 +444,7 @@ export default function App() {
       {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
       {workspace === 'transactions' && <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} />}
       <div className="ledger-column">
-      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
+      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{[...new Set([...dashboard.owners, ...(!['all', 'unassigned'].includes(assigneeFilter) ? [assigneeFilter] : [])])].sort().map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
 
       {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
         {loadError ? (

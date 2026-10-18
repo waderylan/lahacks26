@@ -12,6 +12,7 @@ import { geminiConfigured, GEMINI_MODEL } from './messages.ts';
 import { RuleService } from './ruleService.ts';
 import { ruleRoutes } from './ruleRoutes.ts';
 import { Mailbox, mailRoutes } from './mailbox.ts';
+import { SavedSearchService, savedSearchRoutes } from './savedSearches.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -73,6 +74,7 @@ app.post('/api/evaluate', async (req, res) => {
 actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));
+savedSearchRoutes(app, new SavedSearchService(database, id => listCompanies().some(company => company.companyId === id)));
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.
 const automationTimer = setInterval(() => {

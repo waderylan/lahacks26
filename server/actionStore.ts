@@ -15,7 +15,16 @@ export class ActionStore {
       CREATE TABLE IF NOT EXISTS documents (kind TEXT NOT NULL, id TEXT NOT NULL, company TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id));
       CREATE INDEX IF NOT EXISTS company_documents ON documents(company,kind);`);
   }
-  seed(company: string, rows: Row[]) {
+  /**
+   * Copy a company's rows into the workspace once. A `version` (a hash of the source files, passed for generated
+   * datasets) makes the copy self-healing: when the source changes, that company's cached rows are replaced so a
+   * regenerated dataset never shows stale rows. Dashboard state on replaced rows resets.
+   */
+  seed(company: string, rows: Row[], version?: string) {
+    if (version && this.get<{ version: string }>('dataset', company)?.version !== version) {
+      this.db.prepare('DELETE FROM bills WHERE company=?').run(company);
+      this.put('dataset', company, company, { version });
+    }
     const insert = this.db.prepare('INSERT OR IGNORE INTO bills(company,id,original,body) VALUES(?,?,?,?)');
     this.atomic(() => { for (const row of rows) {
       if (row.companyId !== company || !row.id.startsWith(`${company}:`)) throw new Error('Cross-company import refused.');

@@ -1,0 +1,800 @@
+- id: rcpt-00001
+  customer_id: cust-customer-23
+  customer_name: Lanternwood Removals
+  txn_date: '2025-10-31'
+  amount: '448.00'
+  applications:
+  - document_id: inv-00001
+    amount: '448.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00002
+  customer_id: cust-customer-96
+  customer_name: Bellrock Provisions
+  txn_date: '2025-11-15'
+  amount: '400.00'
+  applications:
+  - document_id: inv-00003
+    amount: '400.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00003
+  customer_id: cust-customer-47
+  customer_name: Timberline Bindery Inc.
+  txn_date: '2025-11-16'
+  amount: '464.00'
+  applications:
+  - document_id: inv-00002
+    amount: '464.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00004
+  customer_id: cust-customer-11
+  customer_name: Foxglove Textiles Co.
+  txn_date: '2025-11-24'
+  amount: '272.00'
+  applications:
+  - document_id: inv-00005
+    amount: '272.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00005
+  customer_id: cust-customer-92
+  customer_name: Driftwood Textiles Partners
+  txn_date: '2025-12-07'
+  amount: '576.00'
+  applications:
+  - document_id: inv-00006
+    amount: '576.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00006
+  customer_id: cust-customer-18
+  customer_name: Vale Crossing Stationers LLC
+  txn_date: '2025-12-18'
+  amount: '336.00'
+  applications:
+  - document_id: inv-00007
+    amount: '336.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00007
+  customer_id: cust-customer-92
+  customer_name: Driftwood Textiles Partners
+  txn_date: '2025-12-21'
+  amount: '537.28'
+  applications:
+  - document_id: inv-00008
+    amount: '537.28'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00008
+  customer_id: cust-customer-12
+  customer_name: Hollyhock Grocers Partners
+  txn_date: '2026-01-03'
+  amount: '251.85'
+  applications:
+  - document_id: inv-00009
+    amount: '251.85'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00009
+  customer_id: cust-customer-69
+  customer_name: Mbeki & Sons Orchards
+  txn_date: '2026-01-08'
+  amount: '789.13'
+  applications:
+  - document_id: inv-00010
+    amount: '789.13'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00010
+  customer_id: cust-customer-45
+  customer_name: Westmarch Stationers
+  txn_date: '2026-01-12'
+  amount: '453.33'
+  applications:
+  - document_id: inv-00011
+    amount: '453.33'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00011
+  customer_id: cust-customer-52
+  customer_name: Nakamura & Daughters Goods
+  txn_date: '2026-01-18'
+  amount: '296.65'
+  applications:
+  - document_id: inv-00012
+    amount: '296.65'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00012
+  customer_id: cust-customer-81
+  customer_name: Millbrook Brewing Company
+  txn_date: '2026-01-20'
+  amount: '628.20'
+  applications:
+  - document_id: inv-00013
+    amount: '628.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00013
+  customer_id: cust-customer-14
+  customer_name: Meridian Westmarch Pottery
+  txn_date: '2026-01-25'
+  amount: '802.70'
+  applications:
+  - document_id: inv-00014
+    amount: '802.70'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00014
+  customer_id: cust-customer-85
+  customer_name: Union Glenmoor Bindery
+  txn_date: '2026-01-28'
+  amount: '349.00'
+  applications:
+  - document_id: inv-00015
+    amount: '349.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00015
+  customer_id: cust-customer-43
+  customer_name: Inlet Cove Lantern Quilting & Co.
+  txn_date: '2026-02-02'
+  amount: '296.65'
+  applications:
+  - document_id: inv-00017
+    amount: '296.65'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00016
+  customer_id: cust-customer-67
+  customer_name: Alder Creek Joinery
+  txn_date: '2026-02-04'
+  amount: '436.25'
+  applications:
+  - document_id: inv-00016
+    amount: '436.25'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00017
+  customer_id: cust-customer-46
+  customer_name: Amber Works & Co.
+  txn_date: '2026-02-10'
+  amount: '1169.15'
+  applications:
+  - document_id: inv-00018
+    amount: '1169.15'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00018
+  customer_id: cust-customer-46
+  customer_name: Amber Works & Co.
+  txn_date: '2026-02-17'
+  amount: '1123.62'
+  applications:
+  - document_id: inv-00020
+    amount: '1123.62'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00019
+  customer_id: cust-customer-33
+  customer_name: Northstar Oakhurst Textiles
+  txn_date: '2026-02-23'
+  amount: '523.50'
+  applications:
+  - document_id: inv-00019
+    amount: '523.50'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00020
+  customer_id: cust-customer-19
+  customer_name: Union Pottery & Co.
+  txn_date: '2026-03-02'
+  amount: '488.60'
+  applications:
+  - document_id: inv-00021
+    amount: '488.60'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00021
+  customer_id: cust-customer-50
+  customer_name: Alder Creek Removals
+  txn_date: '2026-03-04'
+  amount: '626.28'
+  applications:
+  - document_id: inv-00023
+    amount: '626.28'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00022
+  customer_id: cust-customer-104
+  customer_name: Kiln Hollow Nursery LLC
+  txn_date: '2026-03-06'
+  amount: '810.48'
+  applications:
+  - document_id: inv-00022
+    amount: '810.48'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00023
+  customer_id: cust-customer-78
+  customer_name: Mbeki & Daughters Stationers
+  txn_date: '2026-03-14'
+  amount: '796.74'
+  applications:
+  - document_id: inv-00024
+    amount: '796.74'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00024
+  customer_id: cust-customer-56
+  customer_name: Delacroix & Daughters Supply
+  txn_date: '2026-03-15'
+  amount: '436.31'
+  applications:
+  - document_id: inv-00025
+    amount: '436.31'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00025
+  customer_id: cust-customer-111
+  customer_name: Yamada Roasters Group
+  txn_date: '2026-03-16'
+  amount: '362.88'
+  applications:
+  - document_id: inv-00026
+    amount: '362.88'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00026
+  customer_id: cust-customer-34
+  customer_name: Grimaldi & Daughters Textiles
+  txn_date: '2026-03-23'
+  amount: '190.08'
+  applications:
+  - document_id: inv-00027
+    amount: '190.08'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00027
+  customer_id: cust-customer-35
+  customer_name: Kestrel Ridge Hardware LLC
+  txn_date: '2026-03-29'
+  amount: '360.43'
+  applications:
+  - document_id: inv-00029
+    amount: '360.43'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00028
+  customer_id: cust-customer-58
+  customer_name: Stonegate Hardware
+  txn_date: '2026-03-30'
+  amount: '224.64'
+  applications:
+  - document_id: inv-00028
+    amount: '224.64'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00029
+  customer_id: cust-customer-71
+  customer_name: Xiong & Daughters Roasters
+  txn_date: '2026-04-07'
+  amount: '815.71'
+  applications:
+  - document_id: inv-00030
+    amount: '815.71'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00030
+  customer_id: cust-customer-111
+  customer_name: Yamada Roasters Group
+  txn_date: '2026-04-07'
+  amount: '797.76'
+  applications:
+  - document_id: inv-00032
+    amount: '797.76'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00031
+  customer_id: cust-customer-10
+  customer_name: Ibarra Fulfillment Co.
+  txn_date: '2026-04-12'
+  amount: '670.60'
+  applications:
+  - document_id: inv-00034
+    amount: '670.60'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00032
+  customer_id: cust-customer-25
+  customer_name: Amber Glenmoor Orchards
+  txn_date: '2026-04-13'
+  amount: '279.14'
+  applications:
+  - document_id: inv-00031
+    amount: '279.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00033
+  customer_id: cust-customer-59
+  customer_name: Keaton & Daughters Goods
+  txn_date: '2026-04-13'
+  amount: '623.96'
+  applications:
+  - document_id: inv-00033
+    amount: '623.96'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00034
+  customer_id: cust-customer-87
+  customer_name: Whitlock & Sons Fulfillment
+  txn_date: '2026-04-19'
+  amount: '753.44'
+  applications:
+  - document_id: inv-00036
+    amount: '753.44'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00035
+  customer_id: cust-customer-110
+  customer_name: Harbor Point Creamery Inc.
+  txn_date: '2026-04-24'
+  amount: '651.44'
+  applications:
+  - document_id: inv-00035
+    amount: '651.44'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00036
+  customer_id: cust-customer-46
+  customer_name: Amber Works & Co.
+  txn_date: '2026-04-27'
+  amount: '764.40'
+  applications:
+  - document_id: inv-00038
+    amount: '764.40'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00037
+  customer_id: cust-customer-81
+  customer_name: Millbrook Brewing Company
+  txn_date: '2026-05-08'
+  amount: '684.08'
+  applications:
+  - document_id: inv-00040
+    amount: '684.08'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00038
+  customer_id: cust-customer-61
+  customer_name: Evergreen Bellrock Textiles
+  txn_date: '2026-05-13'
+  amount: '421.20'
+  applications:
+  - document_id: inv-00041
+    amount: '421.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00039
+  customer_id: cust-customer-8
+  customer_name: Rasmussen & Daughters Textiles
+  txn_date: '2026-05-13'
+  amount: '265.20'
+  applications:
+  - document_id: inv-00043
+    amount: '265.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00040
+  customer_id: cust-customer-84
+  customer_name: Evergreen Elmsworth Trading
+  txn_date: '2026-05-16'
+  amount: '312.00'
+  applications:
+  - document_id: inv-00044
+    amount: '312.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00041
+  customer_id: cust-customer-93
+  customer_name: Gallagher & Sons Apothecary
+  txn_date: '2026-05-19'
+  amount: '686.40'
+  applications:
+  - document_id: inv-00042
+    amount: '686.40'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00042
+  customer_id: cust-customer-131
+  customer_name: Ibarra & Daughters Hardware
+  txn_date: '2026-05-23'
+  amount: '180.56'
+  applications:
+  - document_id: inv-00046
+    amount: '180.56'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00043
+  customer_id: cust-customer-45
+  customer_name: Westmarch Stationers
+  txn_date: '2026-05-24'
+  amount: '896.00'
+  applications:
+  - document_id: inv-00045
+    amount: '896.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00044
+  customer_id: cust-customer-102
+  customer_name: Fitzgerald & Sons Mercantile
+  txn_date: '2026-06-03'
+  amount: '273.14'
+  applications:
+  - document_id: inv-00048
+    amount: '273.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00045
+  customer_id: cust-customer-32
+  customer_name: Kingsmere Nursery Group
+  txn_date: '2026-06-04'
+  amount: '546.28'
+  applications:
+  - document_id: inv-00047
+    amount: '546.28'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00046
+  customer_id: cust-customer-59
+  customer_name: Keaton & Daughters Goods
+  txn_date: '2026-06-09'
+  amount: '214.61'
+  applications:
+  - document_id: inv-00049
+    amount: '214.61'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00047
+  customer_id: cust-customer-118
+  customer_name: Clearwater Roasters Holdings
+  txn_date: '2026-06-09'
+  amount: '824.91'
+  applications:
+  - document_id: inv-00050
+    amount: '824.91'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00048
+  customer_id: cust-customer-66
+  customer_name: Opal Havenwood Mercantile
+  txn_date: '2026-06-20'
+  amount: '582.61'
+  applications:
+  - document_id: inv-00053
+    amount: '582.61'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00049
+  customer_id: cust-customer-59
+  customer_name: Keaton & Daughters Goods
+  txn_date: '2026-06-21'
+  amount: '602.16'
+  applications:
+  - document_id: inv-00052
+    amount: '602.16'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00050
+  customer_id: cust-customer-78
+  customer_name: Mbeki & Daughters Stationers
+  txn_date: '2026-06-23'
+  amount: '574.70'
+  applications:
+  - document_id: inv-00037
+    amount: '574.70'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00051
+  customer_id: cust-customer-60
+  customer_name: Westmarch Fulfillment
+  txn_date: '2026-06-25'
+  amount: '1038.22'
+  applications:
+  - document_id: inv-00051
+    amount: '1038.22'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00052
+  customer_id: cust-customer-126
+  customer_name: Havenwood Sterling Warehousing Company
+  txn_date: '2026-06-30'
+  amount: '1061.72'
+  applications:
+  - document_id: inv-00055
+    amount: '1061.72'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00053
+  customer_id: cust-customer-93
+  customer_name: Gallagher & Sons Apothecary
+  txn_date: '2026-07-03'
+  amount: '1369.06'
+  applications:
+  - document_id: inv-00054
+    amount: '1369.06'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00054
+  customer_id: cust-customer-52
+  customer_name: Nakamura & Daughters Goods
+  txn_date: '2026-07-05'
+  amount: '557.70'
+  applications:
+  - document_id: inv-00056
+    amount: '557.70'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00055
+  customer_id: cust-customer-17
+  customer_name: Golden Textiles Partners
+  txn_date: '2026-07-07'
+  amount: '266.76'
+  applications:
+  - document_id: inv-00058
+    amount: '266.76'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00056
+  customer_id: cust-customer-61
+  customer_name: Evergreen Bellrock Textiles
+  txn_date: '2026-07-08'
+  amount: '192.66'
+  applications:
+  - document_id: inv-00057
+    amount: '192.66'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00057
+  customer_id: cust-customer-62
+  customer_name: Eastgate Toyworks
+  txn_date: '2026-07-17'
+  amount: '835.20'
+  applications:
+  - document_id: inv-00059
+    amount: '835.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00058
+  customer_id: cust-customer-99
+  customer_name: Copper Glenmoor Outfitters
+  txn_date: '2026-07-21'
+  amount: '305.44'
+  applications:
+  - document_id: inv-00061
+    amount: '305.44'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00059
+  customer_id: cust-customer-32
+  customer_name: Kingsmere Nursery Group
+  txn_date: '2026-07-24'
+  amount: '1173.48'
+  applications:
+  - document_id: inv-00060
+    amount: '1173.48'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00060
+  customer_id: cust-customer-121
+  customer_name: Delacroix & Daughters Quilting
+  txn_date: '2026-07-26'
+  amount: '190.90'
+  applications:
+  - document_id: inv-00063
+    amount: '190.90'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00061
+  customer_id: cust-customer-106
+  customer_name: Jankowski & Sons Florals
+  txn_date: '2026-07-31'
+  amount: '800.55'
+  applications:
+  - document_id: inv-00062
+    amount: '800.55'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00062
+  customer_id: cust-customer-57
+  customer_name: Redwood Bellrock Florals
+  txn_date: '2026-08-04'
+  amount: '237.20'
+  applications:
+  - document_id: inv-00064
+    amount: '237.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00063
+  customer_id: cust-customer-124
+  customer_name: Juniper Flats Printworks
+  txn_date: '2026-08-08'
+  amount: '554.58'
+  applications:
+  - document_id: inv-00068
+    amount: '554.58'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00064
+  customer_id: cust-customer-81
+  customer_name: Millbrook Brewing Company
+  txn_date: '2026-08-10'
+  amount: '1067.40'
+  applications:
+  - document_id: inv-00066
+    amount: '1067.40'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00065
+  customer_id: cust-customer-100
+  customer_name: Kiln Hollow Pottery
+  txn_date: '2026-08-12'
+  amount: '554.58'
+  applications:
+  - document_id: inv-00065
+    amount: '554.58'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00066
+  customer_id: cust-customer-140
+  customer_name: Foxglove Sterling Provisions LLC
+  txn_date: '2026-08-21'
+  amount: '142.20'
+  applications:
+  - document_id: inv-00067
+    amount: '142.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00067
+  customer_id: cust-customer-50
+  customer_name: Alder Creek Removals
+  txn_date: '2026-08-22'
+  amount: '310.20'
+  applications:
+  - document_id: inv-00070
+    amount: '310.20'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00068
+  customer_id: cust-customer-150
+  customer_name: Brennan Apothecary Partners
+  txn_date: '2026-09-02'
+  amount: '591.57'
+  applications:
+  - document_id: inv-00072
+    amount: '591.57'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00069
+  customer_id: cust-customer-38
+  customer_name: Kingsmere Nursery
+  txn_date: '2026-09-05'
+  amount: '354.60'
+  applications:
+  - document_id: inv-00071
+    amount: '354.60'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00070
+  customer_id: cust-customer-125
+  customer_name: Amber Pottery Partners
+  txn_date: '2026-09-07'
+  amount: '732.42'
+  applications:
+  - document_id: inv-00073
+    amount: '732.42'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00071
+  customer_id: cust-customer-120
+  customer_name: Pioneer Bindery Inc.
+  txn_date: '2026-09-09'
+  amount: '625.68'
+  applications:
+  - document_id: inv-00069
+    amount: '625.68'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00072
+  customer_id: cust-customer-95
+  customer_name: Delacroix Hardware Inc.
+  txn_date: '2026-09-14'
+  amount: '478.72'
+  applications:
+  - document_id: inv-00075
+    amount: '478.72'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00073
+  customer_id: cust-customer-75
+  customer_name: Stonegate Evergreen Brewing Holdings
+  txn_date: '2026-09-17'
+  amount: '774.40'
+  applications:
+  - document_id: inv-00074
+    amount: '774.40'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00074
+  customer_id: cust-customer-135
+  customer_name: Quicksilver Ridgeline Pottery
+  txn_date: '2026-09-18'
+  amount: '258.18'
+  applications:
+  - document_id: inv-00076
+    amount: '258.18'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00075
+  customer_id: cust-customer-17
+  customer_name: Golden Textiles Partners
+  txn_date: '2026-09-20'
+  amount: '579.18'
+  applications:
+  - document_id: inv-00079
+    amount: '579.18'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00076
+  customer_id: cust-customer-10
+  customer_name: Ibarra Fulfillment Co.
+  txn_date: '2026-09-21'
+  amount: '1123.57'
+  applications:
+  - document_id: inv-00080
+    amount: '1123.57'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00077
+  customer_id: cust-customer-12
+  customer_name: Hollyhock Grocers Partners
+  txn_date: '2026-09-24'
+  amount: '768.00'
+  applications:
+  - document_id: inv-00077
+    amount: '768.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00078
+  customer_id: cust-customer-148
+  customer_name: Kingsmere Juniper Mercantile LLC
+  txn_date: '2026-10-02'
+  amount: '717.08'
+  applications:
+  - document_id: inv-00081
+    amount: '717.08'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00079
+  customer_id: cust-customer-23
+  customer_name: Lanternwood Removals
+  txn_date: '2026-10-03'
+  amount: '690.00'
+  applications:
+  - document_id: inv-00082
+    amount: '690.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00080
+  customer_id: cust-customer-126
+  customer_name: Havenwood Sterling Warehousing Company
+  txn_date: '2026-10-06'
+  amount: '750.60'
+  applications:
+  - document_id: inv-00083
+    amount: '750.60'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.

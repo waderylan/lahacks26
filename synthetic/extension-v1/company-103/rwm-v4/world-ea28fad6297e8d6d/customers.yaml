@@ -1,0 +1,92 @@
+- id: cust-client-1
+  display_name: Ibarra & Daughters Pottery
+  company_name: Ibarra & Daughters Pottery
+  contact_given_name: Noor
+  contact_family_name: Ashworth
+  email: noor.ashworth@ibarradaughterspottery.example
+  phone: (555) 395-6258
+  address:
+    line1: 9750 Quire Street
+    city: Fresno
+    state: CA
+    postal_code: '93743'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-2
+  display_name: Quarry Hill Creamery
+  company_name: Quarry Hill Creamery
+  contact_given_name: Rosalind
+  contact_family_name: Sorrentino
+  email: rosalind.sorrentino@quarryhillcreamery.example
+  phone: (555) 520-8251
+  address:
+    line1: 9472 Handcart Way
+    city: Kalamazoo
+    state: MI
+    postal_code: '49026'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 28
+  joined_date: '2025-11-03'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-3
+  display_name: Balewa & Sons Warehousing
+  company_name: Balewa & Sons Warehousing
+  contact_given_name: Beatriz
+  contact_family_name: Grabowski
+  email: beatriz.grabowski@balewasonswarehousing.example
+  phone: (555) 328-2114
+  address:
+    line1: 2098 Inkhouse Street
+    city: Pueblo
+    state: CO
+    postal_code: '81041'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 252
+  joined_date: '2026-06-15'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-4
+  display_name: Sandoval Movers Co.
+  company_name: Sandoval Movers Co.
+  contact_given_name: Halle
+  contact_family_name: Ikeda
+  email: halle.ikeda@sandovalmoversco.example
+  phone: (555) 739-5754
+  address:
+    line1: 4097 Loading Dock Road
+    city: Greensboro
+    state: NC
+    postal_code: '27474'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 308
+  joined_date: '2026-08-10'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''

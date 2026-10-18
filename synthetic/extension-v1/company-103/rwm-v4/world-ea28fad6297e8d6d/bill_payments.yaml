@@ -119,6 +119,16 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00013
+  vendor_id: vend-card
+  vendor_name: Pinnacle Card
+  txn_date: '2025-12-06'
+  amount: '783.82'
+  applications:
+  - document_id: bill-00015
+    amount: '783.82'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00014
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-07'
@@ -128,7 +138,7 @@
     amount: '1699.76'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00014
+- id: bpay-00015
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-12'
@@ -138,200 +148,190 @@
     amount: '1699.77'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00015
+- id: bpay-00016
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-17'
   amount: '1458.00'
   applications:
-  - document_id: bill-00015
+  - document_id: bill-00016
     amount: '1458.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00016
+- id: bpay-00017
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2025-12-17'
   amount: '500.00'
   applications:
-  - document_id: bill-00016
+  - document_id: bill-00017
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00017
+- id: bpay-00018
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-19'
   amount: '1458.00'
   applications:
-  - document_id: bill-00017
+  - document_id: bill-00018
     amount: '1458.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00018
+- id: bpay-00019
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
   txn_date: '2025-12-21'
   amount: '1573.46'
   applications:
-  - document_id: bill-00018
+  - document_id: bill-00019
     amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00019
+- id: bpay-00020
   vendor_id: vend-materials
   vendor_name: Kingsmere Mercantile
   txn_date: '2025-12-21'
   amount: '38700.00'
   applications:
-  - document_id: bill-00019
+  - document_id: bill-00020
     amount: '38700.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00020
+- id: bpay-00021
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-24'
   amount: '1458.00'
   applications:
-  - document_id: bill-00020
+  - document_id: bill-00021
     amount: '1458.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00021
+- id: bpay-00022
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
   txn_date: '2025-12-25'
   amount: '1573.46'
   applications:
-  - document_id: bill-00021
+  - document_id: bill-00022
     amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00022
+- id: bpay-00023
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-27'
   amount: '1458.00'
   applications:
-  - document_id: bill-00022
+  - document_id: bill-00023
     amount: '1458.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00023
+- id: bpay-00024
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
   txn_date: '2025-12-28'
   amount: '1573.46'
   applications:
-  - document_id: bill-00023
+  - document_id: bill-00024
     amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00024
+- id: bpay-00025
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2025-12-31'
   amount: '500.00'
   applications:
-  - document_id: bill-00025
+  - document_id: bill-00026
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00025
+- id: bpay-00026
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2025-12-31'
   amount: '1458.00'
   applications:
-  - document_id: bill-00026
+  - document_id: bill-00027
     amount: '1458.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00026
+- id: bpay-00027
+  vendor_id: vend-card
+  vendor_name: Pinnacle Card
+  txn_date: '2025-12-31'
+  amount: '242.36'
+  applications:
+  - document_id: bill-00032
+    amount: '242.36'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00028
   vendor_id: vend-card
   vendor_name: Pinnacle Card
   txn_date: '2025-12-31'
   amount: '691.37'
   applications:
-  - document_id: bill-00031
+  - document_id: bill-00033
     amount: '691.37'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00027
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-01'
-  amount: '1573.46'
-  applications:
-  - document_id: bill-00027
-    amount: '1573.46'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00028
-  vendor_id: vend-sitework
-  vendor_name: Novotny Planning LLC
-  txn_date: '2026-01-04'
-  amount: '1458.00'
-  applications:
-  - document_id: bill-00028
-    amount: '1458.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00029
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-04'
+  txn_date: '2026-01-01'
   amount: '1573.46'
   applications:
-  - document_id: bill-00029
+  - document_id: bill-00028
     amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00030
+  vendor_id: vend-sitework
+  vendor_name: Novotny Planning LLC
+  txn_date: '2026-01-04'
+  amount: '1458.00'
+  applications:
+  - document_id: bill-00029
+    amount: '1458.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00031
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-08'
+  txn_date: '2026-01-04'
   amount: '1573.46'
   applications:
   - document_id: bill-00030
     amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00031
+- id: bpay-00032
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-01-08'
+  amount: '1573.46'
+  applications:
+  - document_id: bill-00031
+    amount: '1573.46'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00033
   vendor_id: vend-card
   vendor_name: Pinnacle Card
   txn_date: '2026-01-09'
   amount: '463.25'
   applications:
-  - document_id: bill-00035
+  - document_id: bill-00037
     amount: '463.25'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00032
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-11'
-  amount: '1573.46'
-  applications:
-  - document_id: bill-00032
-    amount: '1573.46'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00033
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-16'
-  amount: '1573.47'
-  applications:
-  - document_id: bill-00033
-    amount: '1573.47'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00034
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-18'
+  txn_date: '2026-01-11'
   amount: '1573.46'
   applications:
   - document_id: bill-00034
@@ -339,49 +339,49 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00035
-  vendor_id: vend-landlord
-  vendor_name: Farrow Property Management
-  txn_date: '2026-01-21'
-  amount: '500.00'
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-01-16'
+  amount: '1573.47'
   applications:
-  - document_id: bill-00036
-    amount: '500.00'
+  - document_id: bill-00035
+    amount: '1573.47'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00036
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-21'
-  amount: '1412.44'
+  txn_date: '2026-01-18'
+  amount: '1573.46'
   applications:
-  - document_id: bill-00037
-    amount: '1412.44'
+  - document_id: bill-00036
+    amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00037
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-22'
-  amount: '1412.44'
+  vendor_id: vend-landlord
+  vendor_name: Farrow Property Management
+  txn_date: '2026-01-21'
+  amount: '500.00'
   applications:
   - document_id: bill-00038
-    amount: '1412.44'
+    amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00038
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-24'
-  amount: '1573.46'
+  txn_date: '2026-01-21'
+  amount: '1412.44'
   applications:
   - document_id: bill-00039
-    amount: '1573.46'
+    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00039
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-25'
+  txn_date: '2026-01-22'
   amount: '1412.44'
   applications:
   - document_id: bill-00040
@@ -391,107 +391,107 @@
 - id: bpay-00040
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-28'
-  amount: '1412.44'
+  txn_date: '2026-01-24'
+  amount: '1573.46'
   applications:
   - document_id: bill-00041
-    amount: '1412.44'
+    amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00041
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-30'
-  amount: '1573.46'
+  txn_date: '2026-01-25'
+  amount: '1412.44'
   applications:
   - document_id: bill-00042
-    amount: '1573.46'
+    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00042
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-01-31'
-  amount: '1573.46'
+  txn_date: '2026-01-28'
+  amount: '1412.44'
   applications:
   - document_id: bill-00043
-    amount: '1573.46'
+    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00043
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-01'
-  amount: '1412.44'
+  txn_date: '2026-01-30'
+  amount: '1573.46'
   applications:
   - document_id: bill-00044
-    amount: '1412.44'
+    amount: '1573.46'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00044
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-01-31'
+  amount: '1573.46'
+  applications:
+  - document_id: bill-00045
+    amount: '1573.46'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00045
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-02-01'
+  amount: '1412.44'
+  applications:
+  - document_id: bill-00046
+    amount: '1412.44'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00046
   vendor_id: vend-utilities
   vendor_name: Riverbend Water District
   txn_date: '2026-02-02'
   amount: '1100.00'
   applications:
-  - document_id: bill-00045
+  - document_id: bill-00047
     amount: '1100.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00045
+- id: bpay-00047
   vendor_id: vend-insurer
   vendor_name: Driftwood Insurance Group
   txn_date: '2026-02-02'
   amount: '690.41'
   applications:
-  - document_id: bill-00046
+  - document_id: bill-00048
     amount: '690.41'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00046
+- id: bpay-00048
   vendor_id: vend-card
   vendor_name: Pinnacle Card
   txn_date: '2026-02-03'
   amount: '339.10'
   applications:
-  - document_id: bill-00052
+  - document_id: bill-00055
     amount: '339.10'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00047
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-05'
-  amount: '1412.43'
-  applications:
-  - document_id: bill-00047
-    amount: '1412.43'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00048
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-06'
-  amount: '1412.44'
-  applications:
-  - document_id: bill-00048
-    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00049
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-08'
-  amount: '1573.46'
+  txn_date: '2026-02-05'
+  amount: '1412.43'
   applications:
   - document_id: bill-00049
-    amount: '1573.46'
+    amount: '1412.43'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00050
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-11'
+  txn_date: '2026-02-06'
   amount: '1412.44'
   applications:
   - document_id: bill-00050
@@ -499,139 +499,139 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00051
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-02-08'
+  amount: '1573.46'
+  applications:
+  - document_id: bill-00051
+    amount: '1573.46'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00052
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-02-11'
+  amount: '1412.44'
+  applications:
+  - document_id: bill-00052
+    amount: '1412.44'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00053
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-02-11'
   amount: '500.00'
   applications:
-  - document_id: bill-00051
+  - document_id: bill-00053
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00052
+- id: bpay-00054
   vendor_id: vend-card
   vendor_name: Pinnacle Card
   txn_date: '2026-02-12'
   amount: '212.60'
   applications:
-  - document_id: bill-00056
+  - document_id: bill-00058
     amount: '212.60'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00053
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-13'
-  amount: '1412.43'
-  applications:
-  - document_id: bill-00053
-    amount: '1412.43'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00054
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-18'
-  amount: '1412.44'
-  applications:
-  - document_id: bill-00054
-    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00055
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-20'
-  amount: '1412.44'
+  txn_date: '2026-02-13'
+  amount: '1412.43'
   applications:
-  - document_id: bill-00055
-    amount: '1412.44'
+  - document_id: bill-00054
+    amount: '1412.43'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00056
-  vendor_id: vend-landlord
-  vendor_name: Farrow Property Management
-  txn_date: '2026-02-25'
-  amount: '500.00'
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-02-18'
+  amount: '1412.44'
   applications:
-  - document_id: bill-00057
-    amount: '500.00'
+  - document_id: bill-00056
+    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00057
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-25'
-  amount: '1412.43'
+  txn_date: '2026-02-20'
+  amount: '1412.44'
   applications:
-  - document_id: bill-00058
-    amount: '1412.43'
+  - document_id: bill-00057
+    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00058
+  vendor_id: vend-landlord
+  vendor_name: Farrow Property Management
+  txn_date: '2026-02-25'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00059
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00059
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-02-25'
+  amount: '1412.43'
+  applications:
+  - document_id: bill-00060
+    amount: '1412.43'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00060
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
   txn_date: '2026-02-26'
   amount: '1812.88'
   applications:
-  - document_id: bill-00059
-    amount: '1812.88'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00059
-  vendor_id: vend-plumbing
-  vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-02-28'
-  amount: '1812.88'
-  applications:
-  - document_id: bill-00060
-    amount: '1812.88'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00060
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-02-28'
-  amount: '1412.44'
-  applications:
   - document_id: bill-00061
-    amount: '1412.44'
+    amount: '1812.88'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00061
-  vendor_id: vend-card
-  vendor_name: Pinnacle Card
-  txn_date: '2026-03-01'
-  amount: '665.68'
-  applications:
-  - document_id: bill-00065
-    amount: '665.68'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00062
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-03-05'
+  txn_date: '2026-02-28'
   amount: '1812.88'
   applications:
   - document_id: bill-00062
     amount: '1812.88'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00063
+- id: bpay-00062
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-03-06'
+  txn_date: '2026-02-28'
   amount: '1412.44'
   applications:
   - document_id: bill-00063
     amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
+- id: bpay-00063
+  vendor_id: vend-card
+  vendor_name: Pinnacle Card
+  txn_date: '2026-03-01'
+  amount: '817.63'
+  applications:
+  - document_id: bill-00067
+    amount: '817.63'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
 - id: bpay-00064
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-03-07'
+  txn_date: '2026-03-05'
   amount: '1812.88'
   applications:
   - document_id: bill-00064
@@ -641,77 +641,77 @@
 - id: bpay-00065
   vendor_id: vend-masonry
   vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-03-12'
-  amount: '1412.43'
+  txn_date: '2026-03-06'
+  amount: '1412.44'
   applications:
-  - document_id: bill-00066
-    amount: '1412.43'
+  - document_id: bill-00065
+    amount: '1412.44'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00066
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-03-13'
+  txn_date: '2026-03-07'
   amount: '1812.88'
   applications:
-  - document_id: bill-00067
+  - document_id: bill-00066
     amount: '1812.88'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00067
-  vendor_id: vend-card
-  vendor_name: Pinnacle Card
-  txn_date: '2026-03-13'
-  amount: '165.07'
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-03-12'
+  amount: '1412.43'
   applications:
-  - document_id: bill-00073
-    amount: '165.07'
+  - document_id: bill-00068
+    amount: '1412.43'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00068
-  vendor_id: vend-masonry
-  vendor_name: Gallagher Strategy Contractors
-  txn_date: '2026-03-14'
-  amount: '1412.44'
-  applications:
-  - document_id: bill-00068
-    amount: '1412.44'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00069
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-03-15'
+  txn_date: '2026-03-13'
   amount: '1812.88'
   applications:
   - document_id: bill-00069
     amount: '1812.88'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
+- id: bpay-00069
+  vendor_id: vend-masonry
+  vendor_name: Gallagher Strategy Contractors
+  txn_date: '2026-03-14'
+  amount: '1412.44'
+  applications:
+  - document_id: bill-00070
+    amount: '1412.44'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
 - id: bpay-00070
+  vendor_id: vend-plumbing
+  vendor_name: Gallagher Copywriting Contractors
+  txn_date: '2026-03-15'
+  amount: '1812.88'
+  applications:
+  - document_id: bill-00071
+    amount: '1812.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00071
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-03-18'
   amount: '500.00'
   applications:
-  - document_id: bill-00070
-    amount: '500.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00071
-  vendor_id: vend-plumbing
-  vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-03-20'
-  amount: '1812.88'
-  applications:
   - document_id: bill-00072
-    amount: '1812.88'
+    amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00072
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-03-25'
+  txn_date: '2026-03-20'
   amount: '1812.88'
   applications:
   - document_id: bill-00074
@@ -719,49 +719,49 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00073
+  vendor_id: vend-plumbing
+  vendor_name: Gallagher Copywriting Contractors
+  txn_date: '2026-03-25'
+  amount: '1812.88'
+  applications:
+  - document_id: bill-00075
+    amount: '1812.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00074
   vendor_id: vend-materials
   vendor_name: Kingsmere Mercantile
   txn_date: '2026-03-27'
   amount: '16200.00'
   applications:
-  - document_id: bill-00075
+  - document_id: bill-00076
     amount: '16200.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00074
+- id: bpay-00075
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
   txn_date: '2026-03-27'
   amount: '1427.62'
   applications:
-  - document_id: bill-00076
+  - document_id: bill-00077
     amount: '1427.62'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00075
+- id: bpay-00076
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-04-01'
   amount: '500.00'
   applications:
-  - document_id: bill-00077
-    amount: '500.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00076
-  vendor_id: vend-plumbing
-  vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-04-01'
-  amount: '1427.63'
-  applications:
   - document_id: bill-00078
-    amount: '1427.63'
+    amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00077
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
-  txn_date: '2026-04-03'
+  txn_date: '2026-04-01'
   amount: '1427.63'
   applications:
   - document_id: bill-00079
@@ -769,59 +769,59 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00078
+  vendor_id: vend-plumbing
+  vendor_name: Gallagher Copywriting Contractors
+  txn_date: '2026-04-03'
+  amount: '1427.63'
+  applications:
+  - document_id: bill-00080
+    amount: '1427.63'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00079
   vendor_id: vend-electrical
   vendor_name: Zielinski Production Contractors
   txn_date: '2026-04-04'
   amount: '1921.24'
   applications:
-  - document_id: bill-00080
+  - document_id: bill-00081
     amount: '1921.24'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00079
+- id: bpay-00080
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
   txn_date: '2026-04-08'
   amount: '1427.62'
   applications:
-  - document_id: bill-00081
+  - document_id: bill-00082
     amount: '1427.62'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00080
+- id: bpay-00081
   vendor_id: vend-electrical
   vendor_name: Zielinski Production Contractors
   txn_date: '2026-04-08'
   amount: '1921.24'
   applications:
-  - document_id: bill-00082
+  - document_id: bill-00083
     amount: '1921.24'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00081
+- id: bpay-00082
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
   txn_date: '2026-04-10'
   amount: '1427.62'
   applications:
-  - document_id: bill-00083
-    amount: '1427.62'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00082
-  vendor_id: vend-electrical
-  vendor_name: Zielinski Production Contractors
-  txn_date: '2026-04-12'
-  amount: '1921.24'
-  applications:
   - document_id: bill-00085
-    amount: '1921.24'
+    amount: '1427.62'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00083
   vendor_id: vend-electrical
   vendor_name: Zielinski Production Contractors
-  txn_date: '2026-04-16'
+  txn_date: '2026-04-12'
   amount: '1921.24'
   applications:
   - document_id: bill-00086
@@ -829,43 +829,43 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00084
+  vendor_id: vend-electrical
+  vendor_name: Zielinski Production Contractors
+  txn_date: '2026-04-16'
+  amount: '1921.24'
+  applications:
+  - document_id: bill-00087
+    amount: '1921.24'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00085
   vendor_id: vend-plumbing
   vendor_name: Gallagher Copywriting Contractors
   txn_date: '2026-04-16'
   amount: '1427.63'
   applications:
-  - document_id: bill-00087
+  - document_id: bill-00088
     amount: '1427.63'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00085
+- id: bpay-00086
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-04-22'
   amount: '500.00'
   applications:
-  - document_id: bill-00089
+  - document_id: bill-00090
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00086
+- id: bpay-00087
   vendor_id: vend-electrical
   vendor_name: Zielinski Production Contractors
   txn_date: '2026-04-22'
   amount: '1921.24'
   applications:
-  - document_id: bill-00090
+  - document_id: bill-00091
     amount: '1921.24'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00087
-  vendor_id: vend-card
-  vendor_name: Pinnacle Card
-  txn_date: '2026-04-22'
-  amount: '698.29'
-  applications:
-  - document_id: bill-00096
-    amount: '698.29'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00088
@@ -874,7 +874,7 @@
   txn_date: '2026-04-24'
   amount: '1921.24'
   applications:
-  - document_id: bill-00091
+  - document_id: bill-00092
     amount: '1921.24'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -894,7 +894,7 @@
   txn_date: '2026-04-26'
   amount: '16200.00'
   applications:
-  - document_id: bill-00092
+  - document_id: bill-00093
     amount: '16200.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -904,7 +904,7 @@
   txn_date: '2026-04-29'
   amount: '1921.24'
   applications:
-  - document_id: bill-00093
+  - document_id: bill-00094
     amount: '1921.24'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -914,7 +914,7 @@
   txn_date: '2026-04-30'
   amount: '1488.38'
   applications:
-  - document_id: bill-00094
+  - document_id: bill-00095
     amount: '1488.38'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -924,7 +924,7 @@
   txn_date: '2026-05-01'
   amount: '1488.37'
   applications:
-  - document_id: bill-00095
+  - document_id: bill-00096
     amount: '1488.37'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1044,7 +1044,7 @@
   txn_date: '2026-05-27'
   amount: '500.00'
   applications:
-  - document_id: bill-00110
+  - document_id: bill-00109
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1089,6 +1089,16 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00110
+  vendor_id: vend-card
+  vendor_name: Pinnacle Card
+  txn_date: '2026-06-06'
+  amount: '673.69'
+  applications:
+  - document_id: bill-00120
+    amount: '673.69'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00111
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-07'
@@ -1098,7 +1108,7 @@
     amount: '1702.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00111
+- id: bpay-00112
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-11'
@@ -1108,7 +1118,7 @@
     amount: '1640.45'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00112
+- id: bpay-00113
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-12'
@@ -1116,16 +1126,6 @@
   applications:
   - document_id: bill-00117
     amount: '1640.45'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00113
-  vendor_id: vend-card
-  vendor_name: Pinnacle Card
-  txn_date: '2026-06-12'
-  amount: '418.55'
-  applications:
-  - document_id: bill-00124
-    amount: '418.55'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00114
@@ -1154,7 +1154,7 @@
   txn_date: '2026-06-17'
   amount: '500.00'
   applications:
-  - document_id: bill-00120
+  - document_id: bill-00121
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1164,7 +1164,7 @@
   txn_date: '2026-06-18'
   amount: '1640.45'
   applications:
-  - document_id: bill-00121
+  - document_id: bill-00122
     amount: '1640.45'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1174,7 +1174,7 @@
   txn_date: '2026-06-19'
   amount: '1702.72'
   applications:
-  - document_id: bill-00122
+  - document_id: bill-00123
     amount: '1702.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1184,11 +1184,21 @@
   txn_date: '2026-06-20'
   amount: '1702.72'
   applications:
-  - document_id: bill-00123
+  - document_id: bill-00124
     amount: '1702.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00120
+  vendor_id: vend-card
+  vendor_name: Pinnacle Card
+  txn_date: '2026-06-23'
+  amount: '393.07'
+  applications:
+  - document_id: bill-00135
+    amount: '393.07'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00121
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-24'
@@ -1198,7 +1208,7 @@
     amount: '1640.45'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00121
+- id: bpay-00122
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-25'
@@ -1208,7 +1218,7 @@
     amount: '1702.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00122
+- id: bpay-00123
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-26'
@@ -1218,7 +1228,7 @@
     amount: '1702.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00123
+- id: bpay-00124
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-06-28'
@@ -1228,7 +1238,7 @@
     amount: '1640.45'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00124
+- id: bpay-00125
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-07-01'
@@ -1238,7 +1248,7 @@
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00125
+- id: bpay-00126
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-07-01'
@@ -1248,7 +1258,7 @@
     amount: '1640.45'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00126
+- id: bpay-00127
   vendor_id: vend-utilities
   vendor_name: Riverbend Water District
   txn_date: '2026-07-02'
@@ -1258,7 +1268,7 @@
     amount: '1085.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00127
+- id: bpay-00128
   vendor_id: vend-insurer
   vendor_name: Driftwood Insurance Group
   txn_date: '2026-07-02'
@@ -1268,7 +1278,7 @@
     amount: '690.41'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00128
+- id: bpay-00129
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-07-03'
@@ -1278,80 +1288,70 @@
     amount: '1702.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00129
+- id: bpay-00130
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-07-08'
   amount: '1702.72'
   applications:
-  - document_id: bill-00135
+  - document_id: bill-00136
     amount: '1702.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00130
+- id: bpay-00131
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-07-10'
   amount: '1702.71'
   applications:
-  - document_id: bill-00136
+  - document_id: bill-00137
     amount: '1702.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00131
+- id: bpay-00132
   vendor_id: vend-government
   vendor_name: Havenwood Department of Revenue
   txn_date: '2026-07-15'
   amount: '1000.00'
   applications:
-  - document_id: bill-00137
+  - document_id: bill-00138
     amount: '1000.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00132
+- id: bpay-00133
   vendor_id: vend-finishing
   vendor_name: Castellano Post Production LLC
   txn_date: '2026-07-15'
   amount: '1702.72'
   applications:
-  - document_id: bill-00138
+  - document_id: bill-00139
     amount: '1702.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00133
+- id: bpay-00134
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-07-22'
   amount: '500.00'
   applications:
-  - document_id: bill-00139
+  - document_id: bill-00140
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00134
+- id: bpay-00135
   vendor_id: vend-materials
   vendor_name: Kingsmere Mercantile
   txn_date: '2026-07-24'
   amount: '4393.84'
   applications:
-  - document_id: bill-00140
-    amount: '4393.84'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00135
-  vendor_id: vend-demolition
-  vendor_name: Espinoza Research LLC
-  txn_date: '2026-07-24'
-  amount: '832.08'
-  applications:
   - document_id: bill-00141
-    amount: '832.08'
+    amount: '4393.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00136
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-07-25'
+  txn_date: '2026-07-24'
   amount: '832.08'
   applications:
   - document_id: bill-00142
@@ -1361,27 +1361,27 @@
 - id: bpay-00137
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-07-26'
-  amount: '832.09'
+  txn_date: '2026-07-25'
+  amount: '832.08'
   applications:
   - document_id: bill-00143
-    amount: '832.09'
+    amount: '832.08'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00138
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-07-29'
-  amount: '832.08'
+  txn_date: '2026-07-26'
+  amount: '832.09'
   applications:
   - document_id: bill-00144
-    amount: '832.08'
+    amount: '832.09'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00139
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-07-30'
+  txn_date: '2026-07-29'
   amount: '832.08'
   applications:
   - document_id: bill-00145
@@ -1391,41 +1391,41 @@
 - id: bpay-00140
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-07-31'
-  amount: '832.09'
+  txn_date: '2026-07-30'
+  amount: '832.08'
   applications:
   - document_id: bill-00146
-    amount: '832.09'
+    amount: '832.08'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00141
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-08-01'
-  amount: '832.08'
+  txn_date: '2026-07-31'
+  amount: '832.09'
   applications:
   - document_id: bill-00147
-    amount: '832.08'
+    amount: '832.09'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00142
   vendor_id: vend-demolition
   vendor_name: Espinoza Research LLC
-  txn_date: '2026-08-02'
-  amount: '832.09'
+  txn_date: '2026-08-01'
+  amount: '832.08'
   applications:
   - document_id: bill-00148
-    amount: '832.09'
+    amount: '832.08'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00143
-  vendor_id: vend-card
-  vendor_name: Pinnacle Card
-  txn_date: '2026-08-11'
-  amount: '291.64'
+  vendor_id: vend-demolition
+  vendor_name: Espinoza Research LLC
+  txn_date: '2026-08-02'
+  amount: '832.09'
   applications:
-  - document_id: bill-00151
-    amount: '291.64'
+  - document_id: bill-00149
+    amount: '832.09'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00144
@@ -1434,7 +1434,7 @@
   txn_date: '2026-08-12'
   amount: '500.00'
   applications:
-  - document_id: bill-00149
+  - document_id: bill-00150
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1444,7 +1444,7 @@
   txn_date: '2026-08-20'
   amount: '782.65'
   applications:
-  - document_id: bill-00150
+  - document_id: bill-00151
     amount: '782.65'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -1529,6 +1529,16 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00154
+  vendor_id: vend-card
+  vendor_name: Pinnacle Card
+  txn_date: '2026-09-20'
+  amount: '698.29'
+  applications:
+  - document_id: bill-00167
+    amount: '698.29'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00155
   vendor_id: vend-sitework
   vendor_name: Novotny Planning LLC
   txn_date: '2026-09-24'
@@ -1538,7 +1548,7 @@
     amount: '473.60'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00155
+- id: bpay-00156
   vendor_id: vend-insurer
   vendor_name: Driftwood Insurance Group
   txn_date: '2026-09-30'
@@ -1548,7 +1558,7 @@
     amount: '690.42'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00156
+- id: bpay-00157
   vendor_id: vend-landlord
   vendor_name: Farrow Property Management
   txn_date: '2026-09-30'
@@ -1558,7 +1568,7 @@
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00157
+- id: bpay-00158
   vendor_id: vend-utilities
   vendor_name: Riverbend Water District
   txn_date: '2026-09-30'
@@ -1566,15 +1576,5 @@
   applications:
   - document_id: bill-00166
     amount: '980.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00158
-  vendor_id: vend-card
-  vendor_name: Pinnacle Card
-  txn_date: '2026-10-09'
-  amount: '373.18'
-  applications:
-  - document_id: bill-00170
-    amount: '373.18'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.

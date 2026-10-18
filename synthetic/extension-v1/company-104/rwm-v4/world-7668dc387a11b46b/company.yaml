@@ -16,3 +16,5 @@
   fiscal_year_start_month: 1
   opening_sim_day: 0
   opening_date: '2025-10-06'
+  remit_bank: Northmark Savings
+  remit_account_ending: '6293'

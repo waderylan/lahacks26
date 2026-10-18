@@ -410,3 +410,5 @@ table.sheet { border-collapse: separate; border-spacing: 0; table-layout: fixed;
 .tag.status-info { color: #2d5f86; border-color: #b9d1e4; }
 .tag.status-muted { color: var(--muted); text-decoration: line-through; }
 .status-reviewed { color: var(--green); font-weight: 700; }
+
+.type-pill { font-style: normal; font-weight: 700; font-size: 9px; letter-spacing: .04em; text-transform: uppercase; margin-right: 6px; padding: 1px 5px; border-radius: 4px; background: var(--green-bg); color: var(--green); border: 1px solid var(--line); vertical-align: 1px; }

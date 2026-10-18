@@ -150,3 +150,32 @@ test('Run once applies actions only to the matching bills in the filtered previe
   await expect(matchingRows).toHaveCount(1);
   await expect(matchingRows.first()).toHaveAttribute('data-id', firstId);
 });
+
+test('guided review retains invoice and bank type filters and transaction details', async ({ page, request }) => {
+  const companies = await (await request.get('/api/companies')).json();
+  const company = companies.find((item: any) => item.companyId === 'company-101');
+  await page.goto('/?workspace=rules');
+  await page.getByLabel('Company', { exact: true }).fill(company.name);
+  await page.getByLabel('Company', { exact: true }).press('Enter');
+  await page.getByRole('button', { name: 'New rule', exact: true }).click();
+  await page.locator('.wizard-extra-filter').first().locator('summary').click();
+  await page.locator('.wizard-extra-filter').first().getByRole('button', { name: 'Amount', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove condition 1', exact: true }).click();
+  await page.getByLabel('Rows to load').selectOption('0');
+  await expect(page.getByLabel('Evaluation progress')).toContainText('Complete');
+  await step(page, 'Review matches');
+  await page.getByLabel('Preview rows').selectOption('all');
+  for (const type of ['invoice', 'bank']) {
+    await page.getByLabel('Transaction type filter').selectOption(type);
+    await expect(page.locator('.wizard-table tbody tr').first()).toBeVisible();
+    expect(await page.locator('.wizard-table .type-pill').allTextContents()).toEqual(expect.arrayContaining([type === 'invoice' ? 'Invoice' : 'Bank']));
+    const expected = (await (await request.get('/api/companies/company-101/bills?limit=0&reserve=1')).json()).rows.filter((row: any) => row.txnType === type);
+    await expect(page.locator('.wizard-table tbody tr')).toHaveCount(expected.length);
+    await page.locator('.wizard-vendor').first().click();
+    await expect(page.getByLabel('Transaction detail')).toContainText('Details');
+    await page.getByLabel('Close detail', { exact: true }).click();
+  }
+  await page.getByRole('button', { name: 'Transactions', exact: true }).click();
+  await page.getByLabel('Transaction type filter').selectOption('invoice');
+  await expect(page.locator('tbody tr[data-id]').first()).toContainText('Invoice');
+});

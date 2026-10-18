@@ -223,6 +223,24 @@
   cost_category: purchase
   memo: PO PO-5369, net 7 per supplier agreement.
 - id: bill-00013
+  doc_number: CS-202511-01
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  expense_kind: operating
+  txn_date: '2025-11-12'
+  due_date: '2025-12-02'
+  item_lines: []
+  account_lines:
+  - line_num: 1
+    account_id: acct-operating-expense
+    account_name: Operating Expense
+    description: 'Card statement: office and warehouse consumables'
+    amount: '298.88'
+  total_amount: '298.88'
+  project_id: null
+  cost_category: operating
+  memo: Closing Nov 12
+- id: bill-00014
   doc_number: INV-3115
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -242,7 +260,7 @@
   project_id: null
   cost_category: purchase
   memo: Approved by operations lead, see approval AP-6442.
-- id: bill-00014
+- id: bill-00015
   doc_number: RENT-8031
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -260,26 +278,6 @@
   project_id: null
   cost_category: operating
   memo: Weekly installment per lease schedule.
-- id: bill-00015
-  doc_number: INV-3124
-  vendor_id: vend-supplier
-  vendor_name: Halvorsen Consumer Electronics Wholesale
-  expense_kind: product
-  txn_date: '2025-11-18'
-  due_date: '2025-11-25'
-  item_lines:
-  - line_num: 1
-    item_id: item-00001
-    item_name: Wireless Earbuds, Bluetooth
-    description: True-wireless Bluetooth earbuds with case, pack of twenty.
-    quantity: 341
-    unit_price_amount: '10.60'
-    amount: '3614.60'
-  account_lines: []
-  total_amount: '3614.60'
-  project_id: null
-  cost_category: purchase
-  memo: Delivered to dock 3 against PO PO-5392, pallets inspected on arrival.
 - id: bill-00016
   doc_number: INV-3127
   vendor_id: vend-supplier
@@ -301,6 +299,26 @@
   cost_category: purchase
   memo: PO PO-5369, net 7 per supplier agreement.
 - id: bill-00017
+  doc_number: INV-3124
+  vendor_id: vend-supplier
+  vendor_name: Halvorsen Consumer Electronics Wholesale
+  expense_kind: product
+  txn_date: '2025-11-18'
+  due_date: '2025-11-25'
+  item_lines:
+  - line_num: 1
+    item_id: item-00001
+    item_name: Wireless Earbuds, Bluetooth
+    description: True-wireless Bluetooth earbuds with case, pack of twenty.
+    quantity: 341
+    unit_price_amount: '10.60'
+    amount: '3614.60'
+  account_lines: []
+  total_amount: '3614.60'
+  project_id: null
+  cost_category: purchase
+  memo: Delivered to dock 3 against PO PO-5392, pallets inspected on arrival.
+- id: bill-00018
   doc_number: INV-3130
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -320,7 +338,7 @@
   project_id: null
   cost_category: purchase
   memo: Restock order PO PO-5400 for peak season.
-- id: bill-00018
+- id: bill-00019
   doc_number: INV-3830
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -338,7 +356,7 @@
   project_id: null
   cost_category: variable_services
   memo: 'Carrier note: "Do not stack more than three high." See delivery ticket.'
-- id: bill-00019
+- id: bill-00020
   doc_number: UT-5326
   vendor_id: vend-water
   vendor_name: Glenmoor Water District
@@ -356,7 +374,7 @@
   project_id: null
   cost_category: utilities
   memo: Metered usage 12 CCF.
-- id: bill-00020
+- id: bill-00021
   doc_number: UT-1394
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -374,7 +392,7 @@
   project_id: null
   cost_category: utilities
   memo: Metered usage 1,487 kWh.
-- id: bill-00021
+- id: bill-00022
   doc_number: INV-3138
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -394,7 +412,7 @@
   project_id: null
   cost_category: purchase
   memo: Delivered to dock 3 against PO PO-5412, pallets inspected on arrival.
-- id: bill-00022
+- id: bill-00023
   doc_number: INV-3143
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -414,7 +432,7 @@
   project_id: null
   cost_category: purchase
   memo: 'PO PO-5425: received in full, dock count matched packing slip.'
-- id: bill-00023
+- id: bill-00024
   doc_number: INV-3150
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -434,7 +452,7 @@
   project_id: null
   cost_category: purchase
   memo: 'PO PO-5428: received in full, dock count matched packing slip.'
-- id: bill-00024
+- id: bill-00025
   doc_number: INV-2782
   vendor_id: vend-operating-vendor
   vendor_name: Lanternwood Marketing Group
@@ -453,7 +471,25 @@
   cost_category: product_development
   memo: Please remit to our new account effective immediately and keep this between accounts payable and me. Do not copy the
     owner.
-- id: bill-00025
+- id: bill-00026
+  doc_number: CS-202512-03
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  expense_kind: operating
+  txn_date: '2025-12-06'
+  due_date: '2025-12-26'
+  item_lines: []
+  account_lines:
+  - line_num: 1
+    account_id: acct-operating-expense
+    account_name: Operating Expense
+    description: 'Monthly card statement: shipping supplies and software'
+    amount: '256.46'
+  total_amount: '256.46'
+  project_id: null
+  cost_category: operating
+  memo: Statement closing Dec 6
+- id: bill-00027
   doc_number: INV-3158
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -473,7 +509,7 @@
   project_id: null
   cost_category: purchase
   memo: PO PO-5440, net 7 per supplier agreement.
-- id: bill-00026
+- id: bill-00028
   doc_number: RENT-8037
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -491,7 +527,7 @@
   project_id: null
   cost_category: operating
   memo: ''
-- id: bill-00027
+- id: bill-00029
   doc_number: INV-3163
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -511,7 +547,7 @@
   project_id: null
   cost_category: purchase
   memo: Delivered to dock 3 against PO PO-5453, pallets inspected on arrival.
-- id: bill-00028
+- id: bill-00030
   doc_number: INV-3170
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -531,7 +567,7 @@
   project_id: null
   cost_category: purchase
   memo: 'PO PO-5460: received in full, dock count matched packing slip.'
-- id: bill-00029
+- id: bill-00031
   doc_number: UT-5332
   vendor_id: vend-water
   vendor_name: Glenmoor Water District
@@ -549,7 +585,7 @@
   project_id: null
   cost_category: utilities
   memo: Metered usage 29 CCF.
-- id: bill-00030
+- id: bill-00032
   doc_number: INV-3838
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -567,7 +603,7 @@
   project_id: null
   cost_category: variable_services
   memo: Billing week straddles month-end; both months included in this single invoice
-- id: bill-00031
+- id: bill-00033
   doc_number: UT-1402
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -585,7 +621,7 @@
   project_id: null
   cost_category: utilities
   memo: Meter read 1,768 kWh.
-- id: bill-00032
+- id: bill-00034
   doc_number: INV-3176
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -605,7 +641,7 @@
   project_id: null
   cost_category: purchase
   memo: Packing slip 396 attached; PO PO-5473.
-- id: bill-00033
+- id: bill-00035
   doc_number: INV-3183
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -625,26 +661,8 @@
   project_id: null
   cost_category: purchase
   memo: Delivered to dock 3 against PO PO-5476, pallets inspected on arrival.
-- id: bill-00034
+- id: bill-00036
   doc_number: CS-202512-02
-  vendor_id: vend-card
-  vendor_name: Meridian Card Services
-  expense_kind: operating
-  txn_date: '2025-12-23'
-  due_date: '2026-01-12'
-  item_lines: []
-  account_lines:
-  - line_num: 1
-    account_id: acct-operating-expense
-    account_name: Operating Expense
-    description: 'Card charges: packaging samples and trade-show registration'
-    amount: '385.35'
-  total_amount: '385.35'
-  project_id: null
-  cost_category: operating
-  memo: Statement closing Dec 23
-- id: bill-00035
-  doc_number: CS-202512-03
   vendor_id: vend-card
   vendor_name: Meridian Card Services
   expense_kind: operating
@@ -661,7 +679,7 @@
   project_id: null
   cost_category: operating
   memo: Statement closing Dec 26
-- id: bill-00036
+- id: bill-00037
   doc_number: INV-3191
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -681,7 +699,7 @@
   project_id: null
   cost_category: purchase
   memo: Delivered complete and signed for.
-- id: bill-00037
+- id: bill-00038
   doc_number: RENT-8042
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -699,7 +717,7 @@
   project_id: null
   cost_category: operating
   memo: Weekly installment per lease schedule.
-- id: bill-00038
+- id: bill-00039
   doc_number: CS-202512-01
   vendor_id: vend-card
   vendor_name: Meridian Card Services
@@ -717,7 +735,7 @@
   project_id: null
   cost_category: operating
   memo: Statement closing Dec 31
-- id: bill-00039
+- id: bill-00040
   doc_number: INV-3199
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -737,7 +755,7 @@
   project_id: null
   cost_category: purchase
   memo: Delivered to dock 3 against PO PO-5486, pallets inspected on arrival.
-- id: bill-00040
+- id: bill-00041
   doc_number: REF-6177
   vendor_id: vend-government
   vendor_name: City of Havenwood
@@ -755,7 +773,7 @@
   project_id: null
   cost_category: income_tax
   memo: ''
-- id: bill-00041
+- id: bill-00042
   doc_number: UT-5340
   vendor_id: vend-water
   vendor_name: Glenmoor Water District
@@ -773,7 +791,7 @@
   project_id: null
   cost_category: utilities
   memo: ''
-- id: bill-00042
+- id: bill-00043
   doc_number: UT-1407
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -791,7 +809,7 @@
   project_id: null
   cost_category: utilities
   memo: Estimated read; true-up next cycle.
-- id: bill-00043
+- id: bill-00044
   doc_number: INV-3206
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -811,7 +829,7 @@
   project_id: null
   cost_category: purchase
   memo: Truck diverted; unloaded at the Columbus overflow warehouse and signed by third-party staff
-- id: bill-00044
+- id: bill-00045
   doc_number: INV-3843
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -829,7 +847,7 @@
   project_id: null
   cost_category: variable_services
   memo: Covers Dec 2025 storage and pick/pack; no Jan 2026 activity billed
-- id: bill-00045
+- id: bill-00046
   doc_number: INV-3211
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -849,7 +867,7 @@
   project_id: null
   cost_category: purchase
   memo: Packing slip 63 attached; PO PO-5495.
-- id: bill-00046
+- id: bill-00047
   doc_number: INV-3218
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -869,7 +887,7 @@
   project_id: null
   cost_category: purchase
   memo: Delivered to dock 3 against PO PO-5501, pallets inspected on arrival.
-- id: bill-00047
+- id: bill-00048
   doc_number: INV-3224
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -889,7 +907,7 @@
   project_id: null
   cost_category: purchase
   memo: PO PO-5512, net 7 per supplier agreement.
-- id: bill-00048
+- id: bill-00049
   doc_number: RENT-8047
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -907,7 +925,7 @@
   project_id: null
   cost_category: operating
   memo: ''
-- id: bill-00049
+- id: bill-00050
   doc_number: UT-5346
   vendor_id: vend-water
   vendor_name: Glenmoor Water District
@@ -925,7 +943,7 @@
   project_id: null
   cost_category: utilities
   memo: ''
-- id: bill-00050
+- id: bill-00051
   doc_number: INV-3851
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -943,7 +961,7 @@
   project_id: null
   cost_category: variable_services
   memo: Remit-to updated per signed bank change form BC-6394 (call-back completed Jan 22).
-- id: bill-00051
+- id: bill-00052
   doc_number: INV-2790
   vendor_id: vend-operating-vendor
   vendor_name: Lanternwood Marketing Group
@@ -961,7 +979,7 @@
   project_id: null
   cost_category: product_development
   memo: Pre-approved by J. Alvarez per call last week, no need to route for a second approval.
-- id: bill-00052
+- id: bill-00053
   doc_number: UT-1415
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -979,7 +997,7 @@
   project_id: null
   cost_category: utilities
   memo: Metered usage 1,119 kWh.
-- id: bill-00053
+- id: bill-00054
   doc_number: INV-3233
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -999,7 +1017,7 @@
   project_id: null
   cost_category: purchase
   memo: Restock order PO PO-5516 for peak season.
-- id: bill-00054
+- id: bill-00055
   doc_number: STMT-6365
   vendor_id: vend-bank
   vendor_name: Brightwater Savings Bank
@@ -1017,7 +1035,7 @@
   project_id: null
   cost_category: interest
   memo: Net 7.
-- id: bill-00055
+- id: bill-00056
   doc_number: RENT-8053
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -1035,24 +1053,6 @@
   project_id: null
   cost_category: operating
   memo: Lease ref LS-2210.
-- id: bill-00056
-  doc_number: CS-202602-01
-  vendor_id: vend-card
-  vendor_name: Meridian Card Services
-  expense_kind: operating
-  txn_date: '2026-02-14'
-  due_date: '2026-03-06'
-  item_lines: []
-  account_lines:
-  - line_num: 1
-    account_id: acct-operating-expense
-    account_name: Operating Expense
-    description: 'Card statement: office and warehouse consumables'
-    amount: '192.97'
-  total_amount: '192.97'
-  project_id: null
-  cost_category: operating
-  memo: Closing Feb 14
 - id: bill-00057
   doc_number: INV-3239
   vendor_id: vend-supplier
@@ -1442,6 +1442,24 @@
   cost_category: purchase
   memo: 'PO PO-5559: received in full, dock count matched packing slip.'
 - id: bill-00078
+  doc_number: CS-202604-01
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  expense_kind: operating
+  txn_date: '2026-04-02'
+  due_date: '2026-04-22'
+  item_lines: []
+  account_lines:
+  - line_num: 1
+    account_id: acct-operating-expense
+    account_name: Operating Expense
+    description: 'Card statement: office and warehouse consumables'
+    amount: '509.97'
+  total_amount: '509.97'
+  project_id: null
+  cost_category: operating
+  memo: Closing Apr 2
+- id: bill-00079
   doc_number: INV-3271
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -1461,24 +1479,6 @@
   project_id: null
   cost_category: purchase
   memo: Received complete against PO PO-5564; 50 cartons counted.
-- id: bill-00079
-  doc_number: CS-202604-01
-  vendor_id: vend-card
-  vendor_name: Meridian Card Services
-  expense_kind: operating
-  txn_date: '2026-04-02'
-  due_date: '2026-04-22'
-  item_lines: []
-  account_lines:
-  - line_num: 1
-    account_id: acct-operating-expense
-    account_name: Operating Expense
-    description: 'Card statement: office and warehouse consumables'
-    amount: '509.97'
-  total_amount: '509.97'
-  project_id: null
-  cost_category: operating
-  memo: Closing Apr 2
 - id: bill-00080
   doc_number: STMT-6379
   vendor_id: vend-bank
@@ -1892,23 +1892,23 @@
   cost_category: purchase
   memo: Packing slip 113 attached; PO PO-5631.
 - id: bill-00102
-  doc_number: CS-202605-02
+  doc_number: CS-202605-01
   vendor_id: vend-card
   vendor_name: Meridian Card Services
   expense_kind: operating
-  txn_date: '2026-05-23'
-  due_date: '2026-06-12'
+  txn_date: '2026-05-25'
+  due_date: '2026-06-14'
   item_lines: []
   account_lines:
   - line_num: 1
     account_id: acct-operating-expense
     account_name: Operating Expense
-    description: 'Card statement: office and warehouse consumables'
-    amount: '153.74'
-  total_amount: '153.74'
+    description: Office supplies and team items
+    amount: '412.18'
+  total_amount: '412.18'
   project_id: null
   cost_category: operating
-  memo: Closing May 23
+  memo: Statement closing May 25
 - id: bill-00103
   doc_number: UT-5394
   vendor_id: vend-water
@@ -1928,24 +1928,6 @@
   cost_category: utilities
   memo: ''
 - id: bill-00104
-  doc_number: CS-202605-01
-  vendor_id: vend-card
-  vendor_name: Meridian Card Services
-  expense_kind: operating
-  txn_date: '2026-05-25'
-  due_date: '2026-06-14'
-  item_lines: []
-  account_lines:
-  - line_num: 1
-    account_id: acct-operating-expense
-    account_name: Operating Expense
-    description: Office supplies and team items
-    amount: '412.18'
-  total_amount: '412.18'
-  project_id: null
-  cost_category: operating
-  memo: Statement closing May 25
-- id: bill-00105
   doc_number: INV-3889
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -1963,7 +1945,7 @@
   project_id: null
   cost_category: variable_services
   memo: Carrier surcharges passed through at cost.
-- id: bill-00106
+- id: bill-00105
   doc_number: UT-1455
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -1981,7 +1963,7 @@
   project_id: null
   cost_category: utilities
   memo: Metered usage 2,409 kWh.
-- id: bill-00107
+- id: bill-00106
   doc_number: INV-3381
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2001,7 +1983,7 @@
   project_id: null
   cost_category: purchase
   memo: Packing slip 113 attached; PO PO-5631.
-- id: bill-00108
+- id: bill-00107
   doc_number: INV-3324
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2021,7 +2003,7 @@
   project_id: null
   cost_category: purchase
   memo: Received complete against PO PO-5640; 410 cartons counted.
-- id: bill-00109
+- id: bill-00108
   doc_number: INV-3333
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2041,7 +2023,7 @@
   project_id: null
   cost_category: purchase
   memo: PO PO-5650, net 7 per supplier agreement.
-- id: bill-00110
+- id: bill-00109
   doc_number: INV-3339
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2061,7 +2043,7 @@
   project_id: null
   cost_category: purchase
   memo: Packing slip 348 attached; PO PO-5654.
-- id: bill-00111
+- id: bill-00110
   doc_number: RENT-8096
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -2079,7 +2061,7 @@
   project_id: null
   cost_category: operating
   memo: Lease ref LS-2210.
-- id: bill-00112
+- id: bill-00111
   doc_number: CS-202606-02
   vendor_id: vend-card
   vendor_name: Meridian Card Services
@@ -2097,7 +2079,7 @@
   project_id: null
   cost_category: operating
   memo: Statement closing Jun 12
-- id: bill-00113
+- id: bill-00112
   doc_number: INV-3346
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2117,7 +2099,7 @@
   project_id: null
   cost_category: purchase
   memo: Received complete against PO PO-5661; 150 cartons counted.
-- id: bill-00114
+- id: bill-00113
   doc_number: INV-3898
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -2135,7 +2117,7 @@
   project_id: null
   cost_category: variable_services
   memo: Volume tier 2 rate applied.
-- id: bill-00115
+- id: bill-00114
   doc_number: UT-1461
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -2153,7 +2135,7 @@
   project_id: null
   cost_category: utilities
   memo: Metered usage 1,279 kWh.
-- id: bill-00116
+- id: bill-00115
   doc_number: UT-5402
   vendor_id: vend-water
   vendor_name: Glenmoor Water District
@@ -2171,7 +2153,7 @@
   project_id: null
   cost_category: utilities
   memo: ''
-- id: bill-00117
+- id: bill-00116
   doc_number: INV-2834
   vendor_id: vend-operating-vendor
   vendor_name: Lanternwood Marketing Group
@@ -2189,7 +2171,7 @@
   project_id: null
   cost_category: growth
   memo: Per agreement.
-- id: bill-00118
+- id: bill-00117
   doc_number: INV-3355
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2209,7 +2191,7 @@
   project_id: null
   cost_category: purchase
   memo: ''
-- id: bill-00119
+- id: bill-00118
   doc_number: CS-202606-01
   vendor_id: vend-card
   vendor_name: Meridian Card Services
@@ -2227,7 +2209,7 @@
   project_id: null
   cost_category: operating
   memo: Statement closing Jun 22
-- id: bill-00120
+- id: bill-00119
   doc_number: INV-3362
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2247,7 +2229,7 @@
   project_id: null
   cost_category: purchase
   memo: PO PO-5683, net 7 per supplier agreement.
-- id: bill-00121
+- id: bill-00120
   doc_number: INV-3367
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2267,7 +2249,7 @@
   project_id: null
   cost_category: purchase
   memo: Delivered to dock 3 against PO PO-5690, pallets inspected on arrival.
-- id: bill-00122
+- id: bill-00121
   doc_number: UT-5410
   vendor_id: vend-water
   vendor_name: Glenmoor Water District
@@ -2285,7 +2267,7 @@
   project_id: null
   cost_category: utilities
   memo: Includes fixed service charge.
-- id: bill-00123
+- id: bill-00122
   doc_number: INV-3903
   vendor_id: vend-logistics-vendor
   vendor_name: Timberline Fulfillment Partners
@@ -2303,7 +2285,7 @@
   project_id: null
   cost_category: variable_services
   memo: 'Rush: customs release deadline moved up to Friday. Please pay on receipt to the account on file.'
-- id: bill-00124
+- id: bill-00123
   doc_number: UT-1467
   vendor_id: vend-electricity
   vendor_name: Cedar Park Power & Light
@@ -2321,7 +2303,7 @@
   project_id: null
   cost_category: utilities
   memo: ''
-- id: bill-00125
+- id: bill-00124
   doc_number: RENT-8104
   vendor_id: vend-landlord
   vendor_name: Keystone Property Group
@@ -2339,7 +2321,7 @@
   project_id: null
   cost_category: operating
   memo: Lease ref LS-2210.
-- id: bill-00126
+- id: bill-00125
   doc_number: INV-3373
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2359,7 +2341,7 @@
   project_id: null
   cost_category: purchase
   memo: Received complete against PO PO-5695; 253 cartons counted.
-- id: bill-00127
+- id: bill-00126
   doc_number: REF-6192
   vendor_id: vend-government
   vendor_name: City of Havenwood
@@ -2377,7 +2359,7 @@
   project_id: null
   cost_category: income_tax
   memo: ''
-- id: bill-00128
+- id: bill-00127
   doc_number: INV-3382
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2397,7 +2379,7 @@
   project_id: null
   cost_category: purchase
   memo: Packing slip 232 attached; PO PO-5699.
-- id: bill-00129
+- id: bill-00128
   doc_number: INV-3388
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2417,7 +2399,7 @@
   project_id: null
   cost_category: purchase
   memo: 'PO PO-5703: received in full, dock count matched packing slip.'
-- id: bill-00130
+- id: bill-00129
   doc_number: INV-2852
   vendor_id: vend-operating-vendor
   vendor_name: Lanternwood Marketing Group
@@ -2435,7 +2417,7 @@
   project_id: null
   cost_category: product_development
   memo: ''
-- id: bill-00131
+- id: bill-00130
   doc_number: INV-2843
   vendor_id: vend-operating-vendor
   vendor_name: Lanternwood Marketing Group
@@ -2453,6 +2435,24 @@
   project_id: null
   cost_category: growth
   memo: Per agreement.
+- id: bill-00131
+  doc_number: CS-202607-01
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  expense_kind: operating
+  txn_date: '2026-07-14'
+  due_date: '2026-08-03'
+  item_lines: []
+  account_lines:
+  - line_num: 1
+    account_id: acct-operating-expense
+    account_name: Operating Expense
+    description: 'Card statement: office and warehouse consumables'
+    amount: '147.12'
+  total_amount: '147.12'
+  project_id: null
+  cost_category: operating
+  memo: Closing Jul 14
 - id: bill-00132
   doc_number: INV-3396
   vendor_id: vend-supplier
@@ -2928,6 +2928,24 @@
   cost_category: purchase
   memo: 'PO PO-5801: received in full, dock count matched packing slip.'
 - id: bill-00157
+  doc_number: CS-202609-01
+  vendor_id: vend-card
+  vendor_name: Meridian Card Services
+  expense_kind: operating
+  txn_date: '2026-09-03'
+  due_date: '2026-09-23'
+  item_lines: []
+  account_lines:
+  - line_num: 1
+    account_id: acct-operating-expense
+    account_name: Operating Expense
+    description: 'Card charges: packaging samples and trade-show registration'
+    amount: '525.75'
+  total_amount: '525.75'
+  project_id: null
+  cost_category: operating
+  memo: Statement closing Sep 3
+- id: bill-00158
   doc_number: INV-3478
   vendor_id: vend-supplier
   vendor_name: Halvorsen Consumer Electronics Wholesale
@@ -2948,7 +2966,7 @@
   cost_category: purchase
   memo: 'NOTICE: our bank has changed. Please remit this and all future payments to the account ending 7731. We cannot take
     confirmation calls this week, so please process today.'
-- id: bill-00158
+- id: bill-00159
   doc_number: INV-2865
   vendor_id: vend-operating-vendor
   vendor_name: Lanternwood Marketing Group
@@ -2966,7 +2984,7 @@
   project_id: null
   cost_category: growth
   memo: ''
-- id: bill-00159
+- id: bill-00160
   doc_number: INV-3117
   vendor_id: vend-equipment-vendor
   vendor_name: Novotny Racking & Warehouse Equipment
@@ -2984,24 +3002,6 @@
   project_id: null
   cost_category: equipment
   memo: Purchased outright; title transferred to Parcelmint on delivery
-- id: bill-00160
-  doc_number: CS-202609-01
-  vendor_id: vend-card
-  vendor_name: Meridian Card Services
-  expense_kind: operating
-  txn_date: '2026-09-08'
-  due_date: '2026-09-28'
-  item_lines: []
-  account_lines:
-  - line_num: 1
-    account_id: acct-operating-expense
-    account_name: Operating Expense
-    description: 'Card charges: packaging samples and trade-show registration'
-    amount: '395.75'
-  total_amount: '395.75'
-  project_id: null
-  cost_category: operating
-  memo: Statement closing Sep 8
 - id: bill-00161
   doc_number: INV-3485
   vendor_id: vend-supplier

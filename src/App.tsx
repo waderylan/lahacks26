@@ -97,6 +97,7 @@ export default function App() {
   const setAs = (id: string) => { const url = new URL(location.href); url.searchParams.set('as', id); history.replaceState(null, '', url); setAsState(id); };
   const mailbox = useMailbox(companyId, as);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [drawerExtra, setDrawerExtra] = useState<Row | null>(null);
   const [data, setData] = useState<CompanyBills | null>(null);
@@ -154,7 +155,7 @@ export default function App() {
     setLoadError(null);
     setSelected(new Set());
     setDrawerId(null);
-    setDrawerExtra(null); setStatusFilter('all'); setAssigneeFilter('all');
+    setDrawerExtra(null); setStatusFilter('all'); setTypeFilter('all'); setAssigneeFilter('all');
     fetch(`/api/companies/${companyId}/bills?limit=${rowLimit}&reserve=1`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: CompanyBills) => {
@@ -217,7 +218,7 @@ export default function App() {
     sort.key === 'match' && active ? sortByMatch(filtered, (id) => evalState.results[id], sort.dir) : filtered;
   // Matches rise to the top while a query is active; with no query the original order returns.
   const workspaceRows = arrangeRows(shownBase, isMatch, active);
-  const visibleRows = workspaceRows.filter(row => (statusFilter === 'all' || (statusFilter === 'reviewed' ? reviewed.has(row.id) : statusFilter === 'flagged' ? Boolean(row.dashboard?.flags.length) : !reviewed.has(row.id))) && (assigneeFilter === 'all' || (assigneeFilter === 'unassigned' ? !row.dashboard?.owner : row.dashboard?.owner === assigneeFilter)));
+  const visibleRows = workspaceRows.filter(row => (typeFilter === 'all' || (row.txnType ?? 'bill') === typeFilter) && (statusFilter === 'all' || (statusFilter === 'reviewed' ? reviewed.has(row.id) : statusFilter === 'flagged' ? Boolean(row.dashboard?.flags.length) : !reviewed.has(row.id))) && (assigneeFilter === 'all' || (assigneeFilter === 'unassigned' ? !row.dashboard?.owner : row.dashboard?.owner === assigneeFilter)));
 
   // Animate rows to their new positions (FLIP) so the reordering is visible.
   const bodyRef = useRef<HTMLTableSectionElement>(null);
@@ -345,7 +346,7 @@ export default function App() {
         </label>
         {data?.sampled && (
           <span className="pill sample" title="Bills are sampled evenly across the year">
-            Sample: {data.rows.length} of {data.totalBills} bills
+            Sample: {data.rows.length} of {data.totalBills} {isSynthetic ? 'transactions' : 'bills'}
           </span>
         )}
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
@@ -423,7 +424,7 @@ export default function App() {
       {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
       {workspace === 'transactions' && <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} />}
       <div className="ledger-column">
-      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span></div>}
+      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
 
       {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
         {loadError ? (
@@ -544,7 +545,7 @@ function SheetRow(p: {
         <input type="checkbox" aria-label={`Select row ${p.n}`} checked={p.selected} onChange={p.onToggle} />
       </td>
       <td>{r.date}</td>
-      <td title={r.vendor}>{r.vendor}</td>
+      <td title={r.vendor}>{r.txnType && r.txnType !== 'bill' && <em className="type-pill">{r.txnType === 'invoice' ? 'Invoice' : 'Bank'}</em>}{r.vendor}</td>
       <td title={r.itemNames.join(', ')}>{r.itemNames.join(', ')}</td>
       <td title={r.description.trim() ? r.description : '(blank)'} className="pre">{r.description}</td>
       <td title={r.workspaceChanges?.memo !== undefined ? `Original memo: ${r.workspaceChanges.memo}` : r.memo.trim() ? r.memo : '(blank)'} className={`pre ${r.workspaceChanges?.memo !== undefined ? 'workspace-edited' : ''}`}>{r.memo}</td>
@@ -575,7 +576,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
       <div className="drawer-head">
         <div>
           <b>{r.vendor}</b>
-          <div className="muted">{r.docNumber} · {r.billId}</div>
+          <div className="muted">{r.txnType === 'invoice' ? 'Customer invoice' : r.txnType === 'bank' ? 'Bank transaction' : r.txnType === 'bill' ? 'Vendor bill' : null}{r.txnType ? ' · ' : ''}{r.docNumber} · {r.billId}</div>
         </div>
         <button className="ghost" onClick={onClose} aria-label="Close detail">✕</button>
       </div>
@@ -615,6 +616,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
             <p className="muted small">Shown for disclosure only; never sent to Jev.</p>
           </>
         )}
+        {r.details && (<><h3>Details</h3><dl>{Object.entries(r.details).filter(([, v]) => v !== '').map(([k, v]) => (<Fragment key={k}><dt>{k.replace(/_/g, ' ')}</dt><dd>{String(v)}</dd></Fragment>))}</dl></>)}
         {r.evidence && (<><h3>Related records</h3>{r.evidence.length === 0 ? <p className="muted">No supporting records on file for this bill.</p> : r.evidence.map((e) => (
           <dl key={e.id} className="line"><dt>{e.kind.replace(/_/g, ' ')}</dt><dd><b>{e.title}</b> · {e.date}<br />{e.text}</dd></dl>
         ))}</>)}
@@ -679,7 +681,7 @@ function CompanyPicker({ companies, value, onChange }: { companies: CompanySumma
           {list.map((c) => (
             <li key={c.companyId} role="option" aria-selected={c.companyId === value} onMouseDown={() => pick(c.companyId)}>
               <b>{c.name}{c.scenario && <em className="demo-tag">Modified demo scenario</em>}{c.synthetic && <em className="demo-tag">Synthetic extension</em>}</b>
-              <span>{c.industry} · {c.billCount} bills</span>
+              <span>{c.industry} · {c.billCount} {c.synthetic ? 'transactions' : 'bills'}</span>
             </li>
           ))}
         </ul>

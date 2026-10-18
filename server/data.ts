@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { parse } from 'yaml';
 
 const ROOT = path.resolve('data/raw/hackathon-100');
@@ -49,6 +50,9 @@ export interface Row {
   /** Synthetic extension only: supporting business records linked to this bill, and nearby bills from the same vendor. */
   evidence?: Evidence[];
   related?: RelatedBill[];
+  /** Synthetic extension only: which kind of transaction this row is, plus type-specific fields. */
+  txnType?: 'bill' | 'invoice' | 'bank';
+  details?: Record<string, string>;
   /** Scenario fixture only: the unmodified original text, for the disclosure view. Never sent to Jev. */
   provenance?: { description: string; memo: string } | null;
 }
@@ -59,6 +63,8 @@ export interface CompanyBills {
   sampled: boolean;
   rows: Row[];
   disclosure?: string;
+  /** Hash of a generated dataset's files; the workspace re-seeds the company when it changes. */
+  datasetVersion?: string;
 }
 
 let index: Record<string, any>[] | null = null;
@@ -76,6 +82,11 @@ export function demoSample(companyId: string): { ids: Set<string>; disclosure: s
   if (!isSynthetic(companyId) || !fs.existsSync(file)) return null;
   const sample = JSON.parse(fs.readFileSync(file, 'utf8'));
   return sample.samples?.[companyId] ? { ids: new Set<string>(sample.samples[companyId]), disclosure: sample.disclosure } : null;
+}
+function datasetVersion(dir: string): string {
+  const hash = crypto.createHash('sha1');
+  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.yaml')).sort()) hash.update(file).update(fs.readFileSync(path.join(dir, file)));
+  return hash.digest('hex');
 }
 function syntheticDisclosure(): string {
   const file = path.join(SYN_ROOT, 'DISCLOSURE.json');
@@ -113,7 +124,7 @@ export function listCompanies(): CompanySummary[] {
       name: r.display_name,
       industry: r.industry_title,
       profile: r.profile,
-      billCount: r.entity_counts.bills,
+      billCount: r.entity_counts.transactions ?? r.entity_counts.bills,
       synthetic: true,
       derivedFrom: r.derived_from,
     })),
@@ -308,25 +319,57 @@ export function loadCompanyBills(companyId: string): CompanyBills {
   });
 
   if (summary.synthetic) {
-    const evidenceByBill = new Map<string, Evidence[]>();
+    // Synthetic extensions also carry customer invoices and bank transactions as reviewable rows.
+    const customers = new Map(loadYaml(dir, 'customers').map((c) => [c.id, c]));
+    const company = loadYaml(dir, 'company')[0] ?? {};
+    const receipts = new Map<string, Row['payments']>();
+    for (const p of loadYaml(dir, 'customer_payments')) {
+      for (const app of p.applications ?? []) receipts.set(app.document_id, [...(receipts.get(app.document_id) ?? []), { id: p.id, date: p.txn_date, amountCents: toCents(app.amount), account: accounts.get(p.deposit_account_id)?.name ?? p.deposit_account_id }]);
+    }
+    for (const row of rows) row.txnType = 'bill';
+    for (const inv of loadYaml(dir, 'invoices')) {
+      const project = inv.project_id ? projects.get(inv.project_id) : null;
+      rows.push({
+        id: `${companyId}:${inv.id}`, companyId, billId: inv.id, docNumber: inv.doc_number, date: inv.txn_date, dueDate: inv.due_date,
+        vendor: inv.customer_name, vendorId: inv.customer_id, description: inv.lines.map((l: any) => l.description).filter(Boolean).join(' | '),
+        itemNames: inv.lines.map((l: any) => l.item_name).filter(Boolean), account: accounts.get(inv.income_account_id)?.name ?? 'Income', amountCents: toCents(inv.total_amount),
+        expenseKind: 'revenue', costCategory: 'sales', memo: inv.memo ?? '', project: project?.name ?? null, supplyRole: 'customer', lines: strip(inv.lines),
+        payments: receipts.get(inv.id) ?? [], vendorRecord: customers.has(inv.customer_id) ? strip(customers.get(inv.customer_id)) : null,
+        projectRecord: project ? strip({ ...project, status_history: undefined, change_orders: undefined, reschedules: undefined }) : null, txnType: 'invoice',
+        details: { remit_to_account_ending: String(inv.remit_to_account_ending), company_remit_account_ending: String(company.remit_account_ending ?? ''), deposit_applied: inv.deposit_applied_amount, retainage_held: inv.retainage_amount },
+      });
+    }
+    for (const t of loadYaml(dir, 'bank_transactions')) {
+      const party = t.counterparty_id ? (vendors.get(t.counterparty_id) ?? customers.get(t.counterparty_id)) : null;
+      rows.push({
+        id: `${companyId}:${t.id}`, companyId, billId: t.id, docNumber: t.reference, date: t.date, dueDate: t.date, vendor: t.counterparty ?? '', vendorId: t.counterparty_id ?? '',
+        description: t.description ?? '', itemNames: [], account: accounts.get(t.account_id)?.name ?? 'Business Checking', amountCents: toCents(t.amount), expenseKind: 'bank',
+        costCategory: t.direction, memo: t.memo ?? '', project: null, supplyRole: null, lines: [], payments: [], vendorRecord: party ? strip(party) : null, projectRecord: null,
+        txnType: 'bank', details: { direction: t.direction, channel: t.channel, counterparty_account_ending: String(t.counterparty_account_ending ?? ''), reference: t.reference },
+      });
+    }
+    rows.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+    const evidenceByTx = new Map<string, Evidence[]>();
     for (const e of loadYaml(dir, 'evidence')) {
-      for (const billId of e.bill_ids ?? []) {
-        const list = evidenceByBill.get(billId) ?? [];
+      for (const txId of e.transaction_ids ?? e.bill_ids ?? []) {
+        const list = evidenceByTx.get(txId) ?? [];
         list.push({ id: e.id, kind: e.kind, date: e.date, title: e.title, text: e.text });
-        evidenceByBill.set(billId, list);
+        evidenceByTx.set(txId, list);
       }
     }
     const day = (iso: string) => Date.parse(`${iso}T12:00:00Z`) / 86_400_000;
+    const party = (r: Row) => r.vendorId || r.vendor;
     for (const row of rows) {
-      row.evidence = (evidenceByBill.get(row.billId) ?? []).sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+      row.evidence = (evidenceByTx.get(row.billId) ?? []).sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+      const window = row.txnType === 'bank' ? 30 : 60;
       row.related = rows
-        .filter(o => o.vendorId === row.vendorId && o.billId !== row.billId && Math.abs(day(o.date) - day(row.date)) <= 60)
+        .filter(o => o.txnType === row.txnType && party(o) === party(row) && o.billId !== row.billId && Math.abs(day(o.date) - day(row.date)) <= window)
         .sort((a, b) => Math.abs(day(a.date) - day(row.date)) - Math.abs(day(b.date) - day(row.date)) || a.billId.localeCompare(b.billId))
         .slice(0, 3)
         .map(o => ({ id: o.billId, docNumber: o.docNumber, vendor: o.vendor, date: o.date, amountCents: o.amountCents, description: o.description.slice(0, 90), memo: o.memo.slice(0, 90) }));
     }
   }
-  const result: CompanyBills = { company: summary, totalBills: bills.length, sampled, rows, ...(summary.synthetic && { disclosure: syntheticDisclosure() }) };
+  const result: CompanyBills = { company: summary, totalBills: summary.synthetic ? rows.length : bills.length, sampled, rows, ...(summary.synthetic && { disclosure: syntheticDisclosure(), datasetVersion: datasetVersion(dir) }) };
   cache.set(companyId, result);
   for (const r of rows) rowById.set(r.id, r);
   return result;

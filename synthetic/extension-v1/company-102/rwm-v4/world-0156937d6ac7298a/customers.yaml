@@ -1,0 +1,161 @@
+- id: cust-client-1
+  display_name: Delacroix Brewing Co.
+  company_name: Delacroix Brewing Co.
+  contact_given_name: Priya
+  contact_family_name: Ellingsworth
+  email: priya.ellingsworth@delacroixbrewingco.example
+  phone: (555) 236-3962
+  address:
+    line1: 4041 Anvil Court
+    city: Lubbock
+    state: TX
+    postal_code: '79492'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 28
+  joined_date: '2025-11-03'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-2
+  display_name: Quarry Hill Works
+  company_name: Quarry Hill Works
+  contact_given_name: Yusuf
+  contact_family_name: Ironside
+  email: yusuf.ironside@quarryhillworks.example
+  phone: (555) 360-3293
+  address:
+    line1: 2257 Kiln Road
+    city: Springfield
+    state: MO
+    postal_code: '65883'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 56
+  joined_date: '2025-12-01'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-3
+  display_name: Northfield Quilting
+  company_name: Northfield Quilting
+  contact_given_name: Amara
+  contact_family_name: Wickramasinghe
+  email: amara.wickramasinghe@northfieldquilting.example
+  phone: (555) 946-9776
+  address:
+    line1: 8380 Loading Dock Road
+    city: Davenport
+    state: IA
+    postal_code: '52819'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 84
+  joined_date: '2025-12-29'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-4
+  display_name: Copperfield Zephyr Confections & Co.
+  company_name: Copperfield Zephyr Confections & Co.
+  contact_given_name: Gideon
+  contact_family_name: Uddin
+  email: gideon.uddin@copperfieldzephyrconfect.example
+  phone: (555) 451-5529
+  address:
+    line1: 6924 Interlock Drive
+    city: Spokane
+    state: WA
+    postal_code: '99280'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 196
+  joined_date: '2026-04-20'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-5
+  display_name: Northstar Elmsworth Provisions
+  company_name: Northstar Elmsworth Provisions
+  contact_given_name: Beatriz
+  contact_family_name: Ironside
+  email: beatriz.ironside@northstarelmsworthprovis.example
+  phone: (555) 037-0549
+  address:
+    line1: 4113 Drayman Court
+    city: Eugene
+    state: OR
+    postal_code: '97453'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 224
+  joined_date: '2026-05-18'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-6
+  display_name: Keystone Hardware Holdings
+  company_name: Keystone Hardware Holdings
+  contact_given_name: Soren
+  contact_family_name: Zabala
+  email: soren.zabala@keystonehardwareholdings.example
+  phone: (555) 012-1165
+  address:
+    line1: 6989 Inkhouse Street
+    city: Eugene
+    state: OR
+    postal_code: '97477'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 280
+  joined_date: '2026-07-13'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-7
+  display_name: Opal Granite Bay Supply
+  company_name: Opal Granite Bay Supply
+  contact_given_name: Clarisse
+  contact_family_name: Ashworth
+  email: clarisse.ashworth@opalgranitebaysupply.example
+  phone: (555) 051-2534
+  address:
+    line1: 518 Jobbing Road
+    city: Boise
+    state: ID
+    postal_code: '83702'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 308
+  joined_date: '2026-08-10'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''

@@ -20,6 +20,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import synth_ar as ar  # noqa: E402
 from synth_cases import PROFILES, roster_ecom, roster_projects  # noqa: E402
 from synth_core import ROOT, Ctx, cents, digest, money  # noqa: E402
 from synth_text import COMPANIES  # noqa: E402
@@ -42,7 +43,22 @@ PROMPTS = [
     ("P11", "Find goods bills where the receiving record shows fewer units than were billed.", "D", "narrow"),
     ("P12", "Find one-time fees that were billed more than once for the same period.", "C", "narrow"),
     ("P13", "Find urgent or secretive requests combined with a change of payment details.", "F", "narrow"),
+    ("P14", "Find invoices for work, projects or orders that were cancelled before the invoice date.", "D", "invoice"),
+    ("P15", "Find invoices that ask the customer to pay a different account than the company's own remittance details.", "F", "invoice"),
+    ("P16", "Find bank payments sent to an account that doesn't match the vendor's records.", "F", "bank"),
+    ("P17", "Find bank payments that may have paid the same bill twice.", "C", "bank"),
+    ("P18", "Find bank payments to a payee with no vendor record, purchase order or open bill.", "D", "bank"),
+    ("P19", "Find bank transfers to personal accounts that are described as business expenses.", "E", "bank"),
+    ("P20", "Find invoices that may bill the same stage or order twice.", "C", "invoice"),
+    ("P21", "Find bank deposits that don't match any customer invoice.", "D", "bank"),
 ]
+
+
+TYPE_NAMES = {"bill": "vendor_bill", "inv": "customer_invoice", "bank": "bank_transaction"}
+
+
+def clean_record(rec: dict) -> dict:
+    return {k: v for k, v in rec.items() if not k.startswith("sim_") and k != "provenance_note"}
 
 
 def dump(path: Path, data) -> None:
@@ -57,23 +73,33 @@ def jdump(path: Path, data) -> None:
 
 def build_company(cfg: dict, seed: int) -> Ctx:
     c = Ctx(cfg, seed)
+    ar.attach(c)
     if cfg["kind"] == "ecom":
         roster_ecom(c)
     else:
         roster_projects(c, PROFILES[cfg["kind"]])
+    ar.roster_invoices(c)
     c.ordinary_extras()
+    ar.make_bank(c)
+    ar.roster_bank(c)
     return c
 
 
 def finalize(c: Ctx):
-    order = sorted(c.bills, key=lambda b: (b["txn_date"], digest(c.seed, c.cid, b["_k"])))
+    """Assign ids by date for each transaction type; ids carry no information about how a row was made."""
+    def sort_key(t):
+        return (ar.tdate(t), digest(c.seed, c.cid, t["_k"]))
     kmap = {}
-    for i, b in enumerate(order, 1):
-        b["id"] = f"bill-{i:05d}"
-        kmap[b["_k"]] = b["id"]
-    # the five latest bills stay ordinary: the app reserves them for replay
+    for prefix, rows, width in (("bill", c.bills, 5), ("inv", c.invoices, 5), ("bank", c.bank, 5)):
+        for i, t in enumerate(sorted(rows, key=sort_key), 1):
+            t["id"] = f"{prefix}-{i:0{width}d}"
+            kmap[t["_k"]] = t["id"]
+    everything = [*c.bills, *c.invoices, *c.bank]
+    # the five latest rows (any type, in the app's date-then-id order) are reserved for replay and stay ordinary
+    latest = sorted(everything, key=lambda t: (ar.tdate(t), t["id"]))[-5:]
     case_keys = {k for case in c.cases for k in [case["primary"], *case["related"]]}
-    assert not (set(b["_k"] for b in order[-5:]) & case_keys) and not any(b["_touched"] for b in order[-5:]), f"{c.cid}: reserved bills touched"
+    assert not ({t["_k"] for t in latest} & case_keys) and not any(t["_touched"] for t in latest), f"{c.cid}: reserved rows touched"
+    order = sorted(c.bills, key=lambda b: b["id"])
     pay_order = sorted((b for b in order if b["_pay"]), key=lambda b: (b["_pay"]["date"], b["id"]))
     pays = []
     for i, b in enumerate(pay_order, 1):
@@ -89,32 +115,42 @@ def finalize(c: Ctx):
             rec["vendor_id"] = e["vendor_id"]
         if e["project_id"]:
             rec["project_id"] = e["project_id"]
-        rec["bill_ids"] = sorted(kmap[k] for k in e["bills"])
+        rec["transaction_ids"] = sorted(kmap[k] for k in e["bills"])
         evidence.append(rec)
-    bills = []
-    for b in order:
-        bills.append({k: b[k] for k in ("id", "doc_number", "vendor_id", "vendor_name", "expense_kind", "txn_date", "due_date", "item_lines", "account_lines",
-                                        "total_amount", "project_id", "cost_category", "memo")})
-    return order, kmap, bills, pays, evidence, emap
+    bills = [{k: b[k] for k in ("id", "doc_number", "vendor_id", "vendor_name", "expense_kind", "txn_date", "due_date", "item_lines", "account_lines",
+                                "total_amount", "project_id", "cost_category", "memo")} for b in order]
+    invs = sorted(c.invoices, key=lambda t: t["id"])
+    invoices = [{k: t[k] for k in ("id", "doc_number", "customer_id", "customer_name", "txn_date", "due_date", "lines", "total_amount", "project_id", "memo", "income_account_id",
+                                   "deposit_applied_amount", "retainage_amount", "remit_to_account_ending")} for t in invs]
+    cpay = []
+    for i, t in enumerate(sorted((t for t in invs if t["_pay"]), key=lambda t: (t["_pay"]["date"], t["id"])), 1):
+        cust = c.src_customers[t["customer_id"]]
+        cpay.append({"id": f"rcpt-{i:05d}", "customer_id": t["customer_id"], "customer_name": cust["display_name"], "txn_date": t["_pay"]["date"], "amount": t["_pay"]["amount"],
+                     "applications": [{"document_id": t["id"], "amount": t["_pay"]["amount"]}], "deposit_account_id": "acct-checking", "memo": "Payment received against invoice."})
+    bank = [{k: t[k] for k in ("id", "date", "direction", "amount", "description", "memo", "counterparty", "counterparty_id", "reference", "channel", "counterparty_account_ending", "account_id")}
+            for t in sorted(c.bank, key=lambda t: t["id"])]
+    return everything, kmap, bills, invoices, bank, pays, cpay, evidence, emap
 
 
-def check(c: Ctx, order, evidence):
-    ids = [b["id"] for b in order]
-    assert len(ids) == len(set(ids)), "duplicate bill ids"
-    docs = [(b["vendor_id"], b["doc_number"]) for b in order]
+def check(c: Ctx, bills, invoices, bank, evidence):
+    ids = [t["id"] for t in [*bills, *invoices, *bank]]
+    assert len(ids) == len(set(ids)), "duplicate transaction ids"
+    docs = [(b["vendor_id"], b["doc_number"]) for b in bills]
     assert len(docs) == len(set(docs)), f"{c.cid}: duplicate vendor/doc number"
+    assert len({i["doc_number"] for i in invoices}) == len(invoices), f"{c.cid}: duplicate invoice numbers"
     vendors = {v["id"] for v in c.vendors_out()}
-    projects = set(c.projects)
-    for b in order:
+    for b in bills:
         lines = b["item_lines"] + b["account_lines"]
         assert sum(cents(l["amount"]) for l in lines) == cents(b["total_amount"]), f"{b['id']}: line total mismatch"
         for l in b["item_lines"]:
             assert l["quantity"] * cents(l["unit_price_amount"]) == cents(l["amount"]), f"{b['id']}: qty*price mismatch"
-        assert b["vendor_id"] in vendors and (not b["project_id"] or b["project_id"] in projects)
-        assert b["due_date"] >= b["txn_date"]
-    bill_ids = set(ids)
-    for e in evidence:
-        assert set(e["bill_ids"]) <= bill_ids
+        assert b["vendor_id"] in vendors and (not b["project_id"] or b["project_id"] in c.projects) and b["due_date"] >= b["txn_date"]
+    for i in invoices:
+        assert sum(cents(l["amount"]) for l in i["lines"]) == cents(i["total_amount"]), f"{i['id']}: invoice line total mismatch"
+        assert i["due_date"] >= i["txn_date"] and (not i["project_id"] or i["project_id"] in c.projects)
+    for t in bank:
+        assert cents(t["amount"]) > 0 and t["direction"] in ("deposit", "withdrawal")
+    assert set(ids) >= {x for e in evidence for x in e["transaction_ids"]}, "evidence points at a missing transaction"
 
 
 def main() -> None:
@@ -130,64 +166,76 @@ def main() -> None:
     expected: dict[str, dict] = {}
     for cfg in COMPANIES:
         c = build_company(cfg, args.seed)
-        order, kmap, bills, pays, evidence, emap = finalize(c)
-        check(c, order, evidence)
+        everything, kmap, bills, invoices, bank, pays, cpay, evidence, emap = finalize(c)
+        check(c, bills, invoices, bank, evidence)
         world = "world-" + digest(args.seed, cfg["new"], "world")[:16]
         wd = app_dir / cfg["new"] / "rwm-v4" / world
         projects = list(c.projects.values())
         vendors = c.vendors_out()
-        dump(wd / "company.yaml", c.company_out())
+        company = c.company_out()
+        company[0].update({"remit_bank": c.company_remit[0], "remit_account_ending": c.company_remit[1]})
+        customers = [clean_record(v) for k, v in sorted(c.src_customers.items()) if c.kind != "ecom" or k in {i["customer_id"] for i in invoices}]
+        dump(wd / "company.yaml", company)
         dump(wd / "accounts.yaml", c.accounts)
         dump(wd / "items.yaml", c.items)
         dump(wd / "terms.yaml", c.terms)
         dump(wd / "vendors.yaml", vendors)
+        dump(wd / "customers.yaml", customers)
         dump(wd / "projects.yaml", projects)
         dump(wd / "bills.yaml", bills)
         dump(wd / "bill_payments.yaml", pays)
+        dump(wd / "invoices.yaml", invoices)
+        dump(wd / "customer_payments.yaml", cpay)
+        dump(wd / "bank_transactions.yaml", bank)
         dump(wd / "evidence.yaml", evidence)
         src_entry = next(r for r in json.loads((ROOT / "data/raw/hackathon-100/index.json").read_text(encoding="utf-8")) if r["company_id"] == cfg["src"])
+        total = len(bills) + len(invoices) + len(bank)
         index.append({
             "company_id": cfg["new"], "display_name": cfg["name"], "industry_naics": src_entry["industry_naics"], "industry_title": src_entry["industry_title"],
             "profile": src_entry["profile"], "archetype": "synthetic_extension", "size_tier": src_entry["size_tier"], "dataset_id": world,
             "business_status": "open", "distressed": False, "synthetic_extension": True, "derived_from": cfg["src"],
-            "entity_counts": {"bills": len(bills), "bill_payments": len(pays), "vendors": len(vendors), "projects": len(projects), "evidence": len(evidence)},
+            "entity_counts": {"bills": len(bills), "invoices": len(invoices), "bank_transactions": len(bank), "transactions": total, "bill_payments": len(pays),
+                              "vendors": len(vendors), "projects": len(projects), "evidence": len(evidence)},
         })
         # --- evaluation-only outputs ---
-        by_key = {b["_k"]: b for b in order}
-        case_rows = {}
+        by_key = {t["_k"]: t for t in everything}
         for case in c.cases:
             case_id = digest(args.seed, cfg["new"], case["_k"])[:10]
             tx = kmap[case["primary"]]
-            case_rows[tx] = case
             manifest.append({
-                "case_id": case_id, "company_id": cfg["new"], "transaction_id": f"{cfg['new']}:{tx}", "related_transaction_ids": [f"{cfg['new']}:{kmap[k]}" for k in case["related"]],
+                "case_id": case_id, "company_id": cfg["new"], "transaction_id": f"{cfg['new']}:{tx}", "transaction_type": TYPE_NAMES[tx.split("-")[0]],
+                "related_transaction_ids": [f"{cfg['new']}:{kmap[k]}" for k in case["related"]],
                 "family": f"{case['family']}.{FAMILIES[case['family']]}", "variant": case["variant"], "label": case["label"], "expected_review_action": case["action"],
                 "evidence_ids": sorted(emap[k] for k in case["evidence"]), "posting_state": case["posting"], "ledger_effect": case["ledger_effect"],
                 "rationale": case["rationale"], "injection": case["injection"], "prompt_expectations": case["expect"],
                 "related_prompt_expectations": {f"{cfg['new']}:{kmap[k]}": case["rel_expect"] for k in case["related"]} if case["rel_expect"] else {},
             })
-        prov_bills = []
         involved = {k for case in c.cases for k in [case["primary"], *case["related"]]}
-        for b in order:
-            kind = ("added_for_case" if b["_added"] and b["_k"] in involved else "added_ordinary" if b["_added"] else
-                    "case_modified" if b["_touched"] else "ordinary_text_authored")
-            prov_bills.append({"transaction_id": f"{cfg['new']}:{b['id']}", "source_bill_id": f"{cfg['src']}:{b['_src']}" if b["_src"] else None, "kind": kind,
-                               "original_description": b["_orig"]["description"], "original_memo": b["_orig"]["memo"],
-                               "description": " | ".join(dict.fromkeys(l["description"] for l in b["item_lines"] + b["account_lines"])), "memo": b["memo"]})
-        provenance[cfg["new"]] = {"name": cfg["name"], "derived_from": cfg["src"], "vendor_renames": cfg["vendors"],
-                                  "cancelled_project": c.cancelled, "source_bills_selected": sum(1 for b in order if b["_src"]), "bills_added": sum(1 for b in order if b["_added"]),
-                                  "notes": "Ordinary bill text is authored; amounts, dates, vendors and payments come from the source company. Journal entries, reports and balances are not included.",
-                                  "bills": prov_bills}
-        # curated demo sample: every case row plus ordinary look-alike decoys from the same vendors
+        prov = []
+        for t in sorted(everything, key=lambda t: t["id"]):
+            kind = ("added_for_case" if t["_added"] and t["_k"] in involved else "added_ordinary" if t["_added"] else "case_modified" if t["_touched"] else "ordinary_text_authored")
+            if t.get("_type") == "bank":
+                new_d, new_m = t["description"], t["memo"]
+            elif t.get("_type") == "invoice":
+                new_d, new_m = " | ".join(l["description"] for l in t["lines"]), t["memo"]
+            else:
+                new_d, new_m = " | ".join(dict.fromkeys(l["description"] for l in t["item_lines"] + t["account_lines"])), t["memo"]
+            prov.append({"transaction_id": f"{cfg['new']}:{t['id']}", "type": TYPE_NAMES[t["id"].split("-")[0]], "source_id": f"{cfg['src']}:{t['_src']}" if t.get("_src") else None, "kind": kind,
+                         "original_description": t["_orig"]["description"], "original_memo": t["_orig"]["memo"], "description": new_d, "memo": new_m})
+        provenance[cfg["new"]] = {"name": cfg["name"], "derived_from": cfg["src"], "vendor_renames": cfg["vendors"], "cancelled_project": c.cancelled,
+                                  "counts": {"bills": len(bills), "invoices": len(invoices), "bank_transactions": len(bank)},
+                                  "notes": "Ordinary text is authored; amounts, dates, parties and payments come from the source company (invoices and customer payments directly, bank rows from payments and payroll). Journal entries, reports and balances are not included.",
+                                  "transactions": prov}
+        # curated demo sample: every case row plus ordinary look-alike decoys of each type
         ids = {kmap[k] for k in involved}
-        reserved = {b["id"] for b in order[-5:]}
-        vendors_in_cases = {by_key[k]["vendor_id"] for k in involved}
-        decoys = [b["id"] for b in order if not b["_touched"] and b["vendor_id"] in vendors_in_cases and b["id"] not in reserved]
-        step = max(1, len(decoys) // 16)
-        ids |= set(decoys[::step][:16])
+        reserved = {t["id"] for t in sorted(everything, key=lambda t: (ar.tdate(t), t["id"]))[-5:]}
+        for prefix, quota in (("bill", 16), ("inv", 8), ("bank", 10)):
+            decoys = [t["id"] for t in sorted(everything, key=lambda t: t["id"]) if t["id"].startswith(prefix + "-") and not t["_touched"] and t["id"] not in reserved]
+            step = max(1, len(decoys) // quota)
+            ids |= set(decoys[::step][:quota])
         samples[cfg["new"]] = sorted(ids)
-        expected[cfg["new"]] = {"rows": len(bills), "sample_rows": len(ids), "reserved_last_five": sorted(reserved)}
-        print(f"{cfg['new']} {cfg['name']}: {len(bills)} bills, {len(evidence)} evidence, {len(c.cases)} cases, sample {len(ids)}")
+        expected[cfg["new"]] = {"rows": total, "sample_rows": len(ids), "reserved_last_five": sorted(reserved)}
+        print(f"{cfg['new']} {cfg['name']}: {len(bills)} bills + {len(invoices)} invoices + {len(bank)} bank = {total}, {len(evidence)} evidence, {len(c.cases)} cases, sample {len(ids)}")
 
     jdump(app_dir / "index.json", index)
     jdump(app_dir / "demo_sample.json", {

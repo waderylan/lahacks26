@@ -1,0 +1,1449 @@
+- id: cust-customer-10
+  display_name: Ibarra Fulfillment Co.
+  company_name: Ibarra Fulfillment Co.
+  contact_given_name: Joaquin
+  contact_family_name: Halvorsen
+  email: joaquin.halvorsen@ibarrafulfillmentco.example
+  phone: (555) 264-9122
+  address:
+    line1: 4170 Reelwright Road
+    city: Albany
+    state: NY
+    postal_code: '12252'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2723.74'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-100
+  display_name: Kiln Hollow Pottery
+  company_name: Kiln Hollow Pottery
+  contact_given_name: Liesel
+  contact_family_name: Fairbairn
+  email: liesel.fairbairn@kilnhollowpottery.example
+  phone: (555) 445-5405
+  address:
+    line1: 3423 Bailer Street
+    city: Lubbock
+    state: TX
+    postal_code: '79491'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4301.68'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-102
+  display_name: Fitzgerald & Sons Mercantile
+  company_name: Fitzgerald & Sons Mercantile
+  contact_given_name: Tamsin
+  contact_family_name: Wexler
+  email: tamsin.wexler@fitzgeraldsonsmercantile.example
+  phone: (555) 062-1843
+  address:
+    line1: 1431 Bailer Street
+    city: Lubbock
+    state: TX
+    postal_code: '79461'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3505.57'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-104
+  display_name: Kiln Hollow Nursery LLC
+  company_name: Kiln Hollow Nursery LLC
+  contact_given_name: Yusuf
+  contact_family_name: Hawthorne
+  email: yusuf.hawthorne@kilnhollownurseryllc.example
+  phone: (555) 217-9038
+  address:
+    line1: 7349 Brickworks Road
+    city: Fresno
+    state: CA
+    postal_code: '93759'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4353.16'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 196
+  ended_date: '2026-04-20'
+  ended_sim_event_id: event-26610
+  notes: ''
+- id: cust-customer-106
+  display_name: Jankowski & Sons Florals
+  company_name: Jankowski & Sons Florals
+  contact_given_name: Beatriz
+  contact_family_name: Lindholm
+  email: beatriz.lindholm@jankowskisonsflorals.example
+  phone: (555) 433-3389
+  address:
+    line1: 7011 Underbeam Street
+    city: Mobile
+    state: AL
+    postal_code: '36672'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4247.50'
+  joined_sim_day: 7
+  joined_date: '2025-10-13'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-11
+  display_name: Foxglove Textiles Co.
+  company_name: Foxglove Textiles Co.
+  contact_given_name: Darius
+  contact_family_name: Goddard
+  email: darius.goddard@foxglovetextilesco.example
+  phone: (555) 532-7696
+  address:
+    line1: 6418 Crateman Way
+    city: Boise
+    state: ID
+    postal_code: '83740'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3696.95'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-110
+  display_name: Harbor Point Creamery Inc.
+  company_name: Harbor Point Creamery Inc.
+  contact_given_name: Kaveh
+  contact_family_name: Quiroga
+  email: kaveh.quiroga@harborpointcreameryinc.example
+  phone: (555) 064-2425
+  address:
+    line1: 3890 Gantry Lane
+    city: Duluth
+    state: MN
+    postal_code: '55811'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2700.46'
+  joined_sim_day: 42
+  joined_date: '2025-11-17'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-111
+  display_name: Yamada Roasters Group
+  company_name: Yamada Roasters Group
+  contact_given_name: Hideo
+  contact_family_name: Rosenthal
+  email: hideo.rosenthal@yamadaroastersgroup.example
+  phone: (555) 842-4231
+  address:
+    line1: 8866 Nailhouse Lane
+    city: Fresno
+    state: CA
+    postal_code: '93709'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2585.06'
+  joined_sim_day: 56
+  joined_date: '2025-12-01'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-118
+  display_name: Clearwater Roasters Holdings
+  company_name: Clearwater Roasters Holdings
+  contact_given_name: Giselle
+  contact_family_name: Duvall
+  email: giselle.duvall@clearwaterroastersholdin.example
+  phone: (555) 239-4012
+  address:
+    line1: 8576 Keelson Lane
+    city: Akron
+    state: OH
+    postal_code: '44389'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3429.76'
+  joined_sim_day: 184
+  joined_date: '2026-04-08'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-12
+  display_name: Hollyhock Grocers Partners
+  company_name: Hollyhock Grocers Partners
+  contact_given_name: Kenji
+  contact_family_name: Ferreira
+  email: kenji.ferreira@hollyhockgrocerspartners.example
+  phone: (555) 661-7597
+  address:
+    line1: 9395 Yardarm Drive
+    city: Spokane
+    state: WA
+    postal_code: '99254'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3891.36'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-120
+  display_name: Pioneer Bindery Inc.
+  company_name: Pioneer Bindery Inc.
+  contact_given_name: Emeka
+  contact_family_name: Jemison
+  email: emeka.jemison@pioneerbinderyinc.example
+  phone: (555) 834-5808
+  address:
+    line1: 3090 Handcart Way
+    city: Manchester
+    state: NH
+    postal_code: '03110'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4035.03'
+  joined_sim_day: 184
+  joined_date: '2026-04-08'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-121
+  display_name: Delacroix & Daughters Quilting
+  company_name: Delacroix & Daughters Quilting
+  contact_given_name: Quentin
+  contact_family_name: Cavanaugh
+  email: quentin.cavanaugh@delacroixdaughtersquilti.example
+  phone: (555) 290-9580
+  address:
+    line1: 3478 Nailhouse Lane
+    city: Grand Rapids
+    state: MI
+    postal_code: '49591'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2398.80'
+  joined_sim_day: 184
+  joined_date: '2026-04-08'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-124
+  display_name: Juniper Flats Printworks
+  company_name: Juniper Flats Printworks
+  contact_given_name: Noor
+  contact_family_name: Ulloa
+  email: noor.ulloa@juniperflatsprintworks.example
+  phone: (555) 490-0880
+  address:
+    line1: 6100 Palletier Drive
+    city: Toledo
+    state: OH
+    postal_code: '43608'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4297.45'
+  joined_sim_day: 189
+  joined_date: '2026-04-13'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-125
+  display_name: Amber Pottery Partners
+  company_name: Amber Pottery Partners
+  contact_given_name: Halle
+  contact_family_name: Eriksdottir
+  email: halle.eriksdottir@amberpotterypartners.example
+  phone: (555) 428-1436
+  address:
+    line1: 8872 Offcut Avenue
+    city: Pueblo
+    state: CO
+    postal_code: '81069'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3996.95'
+  joined_sim_day: 196
+  joined_date: '2026-04-20'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-126
+  display_name: Havenwood Sterling Warehousing Company
+  company_name: Havenwood Sterling Warehousing Company
+  contact_given_name: Ingrid
+  contact_family_name: Radulescu
+  email: ingrid.radulescu@havenwoodsterlingwarehou.example
+  phone: (555) 098-6481
+  address:
+    line1: 4128 Grommet Lane
+    city: Manchester
+    state: NH
+    postal_code: 03191
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4321.27'
+  joined_sim_day: 203
+  joined_date: '2026-04-27'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-131
+  display_name: Ibarra & Daughters Hardware
+  company_name: Ibarra & Daughters Hardware
+  contact_given_name: Esperanza
+  contact_family_name: Choudhury
+  email: esperanza.choudhury@ibarradaughtershardware.example
+  phone: (555) 983-8841
+  address:
+    line1: 2518 Strapping Lane
+    city: Greensboro
+    state: NC
+    postal_code: '27411'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3428.38'
+  joined_sim_day: 211
+  joined_date: '2026-05-05'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-135
+  display_name: Quicksilver Ridgeline Pottery
+  company_name: Quicksilver Ridgeline Pottery
+  contact_given_name: Viktor
+  contact_family_name: Eskildsen
+  email: viktor.eskildsen@quicksilverridgelinepott.example
+  phone: (555) 922-7590
+  address:
+    line1: 3099 Strapping Lane
+    city: Peoria
+    state: IL
+    postal_code: '61672'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2799.15'
+  joined_sim_day: 240
+  joined_date: '2026-06-03'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-14
+  display_name: Meridian Westmarch Pottery
+  company_name: Meridian Westmarch Pottery
+  contact_given_name: Oskar
+  contact_family_name: Fontaine
+  email: oskar.fontaine@meridianwestmarchpottery.example
+  phone: (555) 684-5886
+  address:
+    line1: 7404 Grommet Lane
+    city: Roanoke
+    state: VA
+    postal_code: '24063'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4323.14'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-140
+  display_name: Foxglove Sterling Provisions LLC
+  company_name: Foxglove Sterling Provisions LLC
+  contact_given_name: Esperanza
+  contact_family_name: Vandenberg
+  email: esperanza.vandenberg@foxglovesterlingprovisio.example
+  phone: (555) 076-9368
+  address:
+    line1: 8470 Quire Street
+    city: Erie
+    state: PA
+    postal_code: '16511'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2394.48'
+  joined_sim_day: 267
+  joined_date: '2026-06-30'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-141
+  display_name: Kestrel Ridge Cyclery & Co.
+  company_name: Kestrel Ridge Cyclery & Co.
+  contact_given_name: Liesel
+  contact_family_name: Kirkland
+  email: liesel.kirkland@kestrelridgecycleryco.example
+  phone: (555) 732-6419
+  address:
+    line1: 326 Loading Dock Road
+    city: Pueblo
+    state: CO
+    postal_code: '81033'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3271.60'
+  joined_sim_day: 267
+  joined_date: '2026-06-30'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-148
+  display_name: Kingsmere Juniper Mercantile LLC
+  company_name: Kingsmere Juniper Mercantile LLC
+  contact_given_name: Camille
+  contact_family_name: Gustafsson
+  email: camille.gustafsson@kingsmerejunipermercanti.example
+  phone: (555) 366-3706
+  address:
+    line1: 8166 Reelwright Road
+    city: Duluth
+    state: MN
+    postal_code: '55896'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3640.46'
+  joined_sim_day: 295
+  joined_date: '2026-07-28'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-150
+  display_name: Brennan Apothecary Partners
+  company_name: Brennan Apothecary Partners
+  contact_given_name: Joaquin
+  contact_family_name: Mwangi
+  email: joaquin.mwangi@brennanapothecarypartner.example
+  phone: (555) 965-2365
+  address:
+    line1: 2084 Anvil Court
+    city: Akron
+    state: OH
+    postal_code: '44338'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2659.65'
+  joined_sim_day: 308
+  joined_date: '2026-08-10'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-151
+  display_name: Keystone Grocers Holdings
+  company_name: Keystone Grocers Holdings
+  contact_given_name: Amara
+  contact_family_name: Goddard
+  email: amara.goddard@keystonegrocersholdings.example
+  phone: (555) 130-1241
+  address:
+    line1: 580 Tannery Street
+    city: Pueblo
+    state: CO
+    postal_code: '81023'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3018.19'
+  joined_sim_day: 315
+  joined_date: '2026-08-17'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-17
+  display_name: Golden Textiles Partners
+  company_name: Golden Textiles Partners
+  contact_given_name: Sigrid
+  contact_family_name: Ellingsworth
+  email: sigrid.ellingsworth@goldentextilespartners.example
+  phone: (555) 712-4932
+  address:
+    line1: 7161 Crateman Way
+    city: Roanoke
+    state: VA
+    postal_code: '24034'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2727.21'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-18
+  display_name: Vale Crossing Stationers LLC
+  company_name: Vale Crossing Stationers LLC
+  contact_given_name: Clarisse
+  contact_family_name: Bramble
+  email: clarisse.bramble@valecrossingstationersll.example
+  phone: (555) 131-6588
+  address:
+    line1: 1130 Quire Street
+    city: Spokane
+    state: WA
+    postal_code: '99299'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3695.85'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 56
+  ended_date: '2025-12-01'
+  ended_sim_event_id: event-04967
+  notes: ''
+- id: cust-customer-19
+  display_name: Union Pottery & Co.
+  company_name: Union Pottery & Co.
+  contact_given_name: Beatriz
+  contact_family_name: Ironside
+  email: beatriz.ironside@unionpotteryco.example
+  phone: (555) 386-1031
+  address:
+    line1: 3840 Grommet Lane
+    city: Roanoke
+    state: VA
+    postal_code: '24083'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3852.81'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-23
+  display_name: Lanternwood Removals
+  company_name: Lanternwood Removals
+  contact_given_name: Cormac
+  contact_family_name: Zaragoza
+  email: cormac.zaragoza@lanternwoodremovals.example
+  phone: (555) 226-3719
+  address:
+    line1: 3609 Keelson Lane
+    city: Pueblo
+    state: CO
+    postal_code: '81001'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3290.71'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-25
+  display_name: Amber Glenmoor Orchards
+  company_name: Amber Glenmoor Orchards
+  contact_given_name: Bruno
+  contact_family_name: Nieminen
+  email: bruno.nieminen@amberglenmoororchards.example
+  phone: (555) 585-2067
+  address:
+    line1: 9177 Jointer Road
+    city: Greensboro
+    state: NC
+    postal_code: '27430'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2798.57'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-32
+  display_name: Kingsmere Nursery Group
+  company_name: Kingsmere Nursery Group
+  contact_given_name: Oskar
+  contact_family_name: Lefebvre
+  email: oskar.lefebvre@kingsmerenurserygroup.example
+  phone: (555) 816-5199
+  address:
+    line1: 2799 Reelwright Road
+    city: Hartford
+    state: CT
+    postal_code: '06101'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4257.82'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 308
+  ended_date: '2026-08-10'
+  ended_sim_event_id: event-47639
+  notes: ''
+- id: cust-customer-33
+  display_name: Northstar Oakhurst Textiles
+  company_name: Northstar Oakhurst Textiles
+  contact_given_name: Isolde
+  contact_family_name: Mwangi
+  email: isolde.mwangi@northstaroakhursttextile.example
+  phone: (555) 409-1368
+  address:
+    line1: 2187 Crateman Way
+    city: Davenport
+    state: IA
+    postal_code: '52898'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3025.64'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 140
+  ended_date: '2026-02-23'
+  ended_sim_event_id: event-16873
+  notes: ''
+- id: cust-customer-34
+  display_name: Grimaldi & Daughters Textiles
+  company_name: Grimaldi & Daughters Textiles
+  contact_given_name: Clarisse
+  contact_family_name: Imamura
+  email: clarisse.imamura@grimaldidaughterstextile.example
+  phone: (555) 330-4949
+  address:
+    line1: 2654 Handcart Way
+    city: Fresno
+    state: CA
+    postal_code: '93756'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3747.26'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-35
+  display_name: Kestrel Ridge Hardware LLC
+  company_name: Kestrel Ridge Hardware LLC
+  contact_given_name: Yusuf
+  contact_family_name: Rosenthal
+  email: yusuf.rosenthal@kestrelridgehardwarellc.example
+  phone: (555) 102-3217
+  address:
+    line1: 5052 Quire Street
+    city: Duluth
+    state: MN
+    postal_code: '55816'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3516.01'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-38
+  display_name: Kingsmere Nursery
+  company_name: Kingsmere Nursery
+  contact_given_name: Noor
+  contact_family_name: Villanueva
+  email: noor.villanueva@kingsmerenursery.example
+  phone: (555) 160-6990
+  address:
+    line1: 1279 Ledgeway Drive
+    city: Mobile
+    state: AL
+    postal_code: '36698'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2787.20'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-43
+  display_name: Inlet Cove Lantern Quilting & Co.
+  company_name: Inlet Cove Lantern Quilting & Co.
+  contact_given_name: Eleni
+  contact_family_name: Mwangi
+  email: eleni.mwangi@inletcovelanternquilting.example
+  phone: (555) 883-1308
+  address:
+    line1: 7634 Quire Street
+    city: Fresno
+    state: CA
+    postal_code: '93717'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3852.38'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-45
+  display_name: Westmarch Stationers
+  company_name: Westmarch Stationers
+  contact_given_name: Noor
+  contact_family_name: Goddard
+  email: noor.goddard@westmarchstationers.example
+  phone: (555) 307-2705
+  address:
+    line1: 592 Offcut Avenue
+    city: Eugene
+    state: OR
+    postal_code: '97433'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4045.54'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-46
+  display_name: Amber Works & Co.
+  company_name: Amber Works & Co.
+  contact_given_name: Yara
+  contact_family_name: Lindholm
+  email: yara.lindholm@amberworksco.example
+  phone: (555) 455-7053
+  address:
+    line1: 2599 Kiln Road
+    city: Davenport
+    state: IA
+    postal_code: '52843'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4138.12'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-47
+  display_name: Timberline Bindery Inc.
+  company_name: Timberline Bindery Inc.
+  contact_given_name: Imani
+  contact_family_name: Uddin
+  email: imani.uddin@timberlinebinderyinc.example
+  phone: (555) 214-7215
+  address:
+    line1: 7521 Grommet Lane
+    city: Peoria
+    state: IL
+    postal_code: '61606'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3605.40'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 84
+  ended_date: '2025-12-29'
+  ended_sim_event_id: event-08385
+  notes: ''
+- id: cust-customer-50
+  display_name: Alder Creek Removals
+  company_name: Alder Creek Removals
+  contact_given_name: Katarina
+  contact_family_name: Radulescu
+  email: katarina.radulescu@aldercreekremovals.example
+  phone: (555) 768-1037
+  address:
+    line1: 2516 Edgeboard Street
+    city: Grand Rapids
+    state: MI
+    postal_code: '49531'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3916.54'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-52
+  display_name: Nakamura & Daughters Goods
+  company_name: Nakamura & Daughters Goods
+  contact_given_name: Katarina
+  contact_family_name: Eskildsen
+  email: katarina.eskildsen@nakamuradaughtersgoods.example
+  phone: (555) 471-9292
+  address:
+    line1: 1763 Nailhouse Lane
+    city: Duluth
+    state: MN
+    postal_code: '55884'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3809.13'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-56
+  display_name: Delacroix & Daughters Supply
+  company_name: Delacroix & Daughters Supply
+  contact_given_name: Ulises
+  contact_family_name: Tarkington
+  email: ulises.tarkington@delacroixdaughterssupply.example
+  phone: (555) 375-2087
+  address:
+    line1: 5077 Inkhouse Street
+    city: Manchester
+    state: NH
+    postal_code: '03117'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3309.04'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-57
+  display_name: Redwood Bellrock Florals
+  company_name: Redwood Bellrock Florals
+  contact_given_name: Ximena
+  contact_family_name: Jessup
+  email: ximena.jessup@redwoodbellrockflorals.example
+  phone: (555) 020-5190
+  address:
+    line1: 7552 Strapping Lane
+    city: Davenport
+    state: IA
+    postal_code: '52887'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2896.62'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-58
+  display_name: Stonegate Hardware
+  company_name: Stonegate Hardware
+  contact_given_name: Soren
+  contact_family_name: Xu
+  email: soren.xu@stonegatehardware.example
+  phone: (555) 056-1411
+  address:
+    line1: 7521 Palletier Drive
+    city: Providence
+    state: RI
+    postal_code: 02932
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3366.96'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-59
+  display_name: Keaton & Daughters Goods
+  company_name: Keaton & Daughters Goods
+  contact_given_name: Sigrid
+  contact_family_name: Villanueva
+  email: sigrid.villanueva@keatondaughtersgoods.example
+  phone: (555) 197-9058
+  address:
+    line1: 9767 Drayman Court
+    city: Greensboro
+    state: NC
+    postal_code: '27487'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3998.44'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 336
+  ended_date: '2026-09-07'
+  ended_sim_event_id: event-53268
+  notes: ''
+- id: cust-customer-60
+  display_name: Westmarch Fulfillment
+  company_name: Westmarch Fulfillment
+  contact_given_name: Clarisse
+  contact_family_name: Uddin
+  email: clarisse.uddin@westmarchfulfillment.example
+  phone: (555) 608-5280
+  address:
+    line1: 3731 Edgeboard Street
+    city: Mobile
+    state: AL
+    postal_code: '36606'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3384.95'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-61
+  display_name: Evergreen Bellrock Textiles
+  company_name: Evergreen Bellrock Textiles
+  contact_given_name: Hassan
+  contact_family_name: Yildirim
+  email: hassan.yildirim@evergreenbellrocktextile.example
+  phone: (555) 637-6811
+  address:
+    line1: 3601 Grommet Lane
+    city: Kalamazoo
+    state: MI
+    postal_code: '49084'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3737.98'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-62
+  display_name: Eastgate Toyworks
+  company_name: Eastgate Toyworks
+  contact_given_name: Liesel
+  contact_family_name: Zabala
+  email: liesel.zabala@eastgatetoyworks.example
+  phone: (555) 928-2236
+  address:
+    line1: 3465 Quire Street
+    city: Kalamazoo
+    state: MI
+    postal_code: '49089'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3108.11'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-66
+  display_name: Opal Havenwood Mercantile
+  company_name: Opal Havenwood Mercantile
+  contact_given_name: Nadia
+  contact_family_name: Ferreira
+  email: nadia.ferreira@opalhavenwoodmercantile.example
+  phone: (555) 028-8831
+  address:
+    line1: 1223 Dunnage Way
+    city: Davenport
+    state: IA
+    postal_code: '52834'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2922.68'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-67
+  display_name: Alder Creek Joinery
+  company_name: Alder Creek Joinery
+  contact_given_name: Priya
+  contact_family_name: Rosenthal
+  email: priya.rosenthal@aldercreekjoinery.example
+  phone: (555) 637-4358
+  address:
+    line1: 1752 Ventwell Road
+    city: Fresno
+    state: CA
+    postal_code: '93740'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2967.09'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 252
+  ended_date: '2026-06-15'
+  ended_sim_event_id: event-37041
+  notes: ''
+- id: cust-customer-69
+  display_name: Mbeki & Sons Orchards
+  company_name: Mbeki & Sons Orchards
+  contact_given_name: Camille
+  contact_family_name: Vandenberg
+  email: camille.vandenberg@mbekisonsorchards.example
+  phone: (555) 684-9714
+  address:
+    line1: 6508 Offcut Avenue
+    city: Roanoke
+    state: VA
+    postal_code: '24043'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2871.85'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 56
+  ended_date: '2025-12-01'
+  ended_sim_event_id: event-04970
+  notes: ''
+- id: cust-customer-71
+  display_name: Xiong & Daughters Roasters
+  company_name: Xiong & Daughters Roasters
+  contact_given_name: Priya
+  contact_family_name: Wickramasinghe
+  email: priya.wickramasinghe@xiongdaughtersroasters.example
+  phone: (555) 061-4099
+  address:
+    line1: 1016 Nailhouse Lane
+    city: Davenport
+    state: IA
+    postal_code: '52879'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4016.03'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-73
+  display_name: Sandoval & Daughters Orchards
+  company_name: Sandoval & Daughters Orchards
+  contact_given_name: Jonas
+  contact_family_name: Ostrowski
+  email: jonas.ostrowski@sandovaldaughtersorchard.example
+  phone: (555) 001-6612
+  address:
+    line1: 6611 Jobbing Road
+    city: Peoria
+    state: IL
+    postal_code: '61649'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3070.26'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-75
+  display_name: Stonegate Evergreen Brewing Holdings
+  company_name: Stonegate Evergreen Brewing Holdings
+  contact_given_name: Mateo
+  contact_family_name: Imamura
+  email: mateo.imamura@stonegateevergreenbrewin.example
+  phone: (555) 434-3878
+  address:
+    line1: 759 Grommet Lane
+    city: Lubbock
+    state: TX
+    postal_code: '79483'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2364.96'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-78
+  display_name: Mbeki & Daughters Stationers
+  company_name: Mbeki & Daughters Stationers
+  contact_given_name: Eleni
+  contact_family_name: Kettleborough
+  email: eleni.kettleborough@mbekidaughtersstationers.example
+  phone: (555) 313-6333
+  address:
+    line1: 9166 Yardarm Drive
+    city: Spokane
+    state: WA
+    postal_code: '99239'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4152.58'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-8
+  display_name: Rasmussen & Daughters Textiles
+  company_name: Rasmussen & Daughters Textiles
+  contact_given_name: Bruno
+  contact_family_name: Wexler
+  email: bruno.wexler@rasmussendaughterstextil.example
+  phone: (555) 770-4291
+  address:
+    line1: 3424 Hoist Street
+    city: Kalamazoo
+    state: MI
+    postal_code: '49046'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '2741.02'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-81
+  display_name: Millbrook Brewing Company
+  company_name: Millbrook Brewing Company
+  contact_given_name: Ulises
+  contact_family_name: Fontaine
+  email: ulises.fontaine@millbrookbrewingcompany.example
+  phone: (555) 624-6090
+  address:
+    line1: 5978 Grommet Lane
+    city: Erie
+    state: PA
+    postal_code: '16519'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3023.34'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-84
+  display_name: Evergreen Elmsworth Trading
+  company_name: Evergreen Elmsworth Trading
+  contact_given_name: Esperanza
+  contact_family_name: Kirkland
+  email: esperanza.kirkland@evergreenelmsworthtradin.example
+  phone: (555) 147-2972
+  address:
+    line1: 4081 Millrace Drive
+    city: Albany
+    state: NY
+    postal_code: '12239'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3348.63'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-85
+  display_name: Union Glenmoor Bindery
+  company_name: Union Glenmoor Bindery
+  contact_given_name: Yara
+  contact_family_name: Fairbairn
+  email: yara.fairbairn@unionglenmoorbindery.example
+  phone: (555) 482-9576
+  address:
+    line1: 129 Reelwright Road
+    city: Greensboro
+    state: NC
+    postal_code: '27444'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3210.56'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-87
+  display_name: Whitlock & Sons Fulfillment
+  company_name: Whitlock & Sons Fulfillment
+  contact_given_name: Hassan
+  contact_family_name: Zaragoza
+  email: hassan.zaragoza@whitlocksonsfulfillment.example
+  phone: (555) 219-6586
+  address:
+    line1: 7225 Kiln Road
+    city: Springfield
+    state: MO
+    postal_code: '65851'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3223.35'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-92
+  display_name: Driftwood Textiles Partners
+  company_name: Driftwood Textiles Partners
+  contact_given_name: Imani
+  contact_family_name: Yildirim
+  email: imani.yildirim@driftwoodtextilespartner.example
+  phone: (555) 395-8219
+  address:
+    line1: 1430 Palletier Drive
+    city: Hartford
+    state: CT
+    postal_code: 06158
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4037.70'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 168
+  ended_date: '2026-03-23'
+  ended_sim_event_id: event-21645
+  notes: ''
+- id: cust-customer-93
+  display_name: Gallagher & Sons Apothecary
+  company_name: Gallagher & Sons Apothecary
+  contact_given_name: Halle
+  contact_family_name: Imamura
+  email: halle.imamura@gallaghersonsapothecary.example
+  phone: (555) 431-2390
+  address:
+    line1: 5964 Gantry Lane
+    city: Peoria
+    state: IL
+    postal_code: '61615'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3259.86'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-95
+  display_name: Delacroix Hardware Inc.
+  company_name: Delacroix Hardware Inc.
+  contact_given_name: Tamsin
+  contact_family_name: Wexler
+  email: tamsin.wexler@delacroixhardwareinc.example
+  phone: (555) 478-3265
+  address:
+    line1: 8837 Foundry Lane
+    city: Wichita
+    state: KS
+    postal_code: '67209'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '3486.48'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-customer-96
+  display_name: Bellrock Provisions
+  company_name: Bellrock Provisions
+  contact_given_name: Jonas
+  contact_family_name: Fontaine
+  email: jonas.fontaine@bellrockprovisions.example
+  phone: (555) 697-5681
+  address:
+    line1: 9044 Wharfinger Lane
+    city: Peoria
+    state: IL
+    postal_code: '61617'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4240.48'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: 84
+  ended_date: '2025-12-29'
+  ended_sim_event_id: event-08386
+  notes: ''
+- id: cust-customer-99
+  display_name: Copper Glenmoor Outfitters
+  company_name: Copper Glenmoor Outfitters
+  contact_given_name: Yusuf
+  contact_family_name: Lindholm
+  email: yusuf.lindholm@copperglenmooroutfitters.example
+  phone: (555) 967-4571
+  address:
+    line1: 5328 Palletyard Road
+    city: Wichita
+    state: KS
+    postal_code: '67270'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '4238.01'
+  joined_sim_day: 0
+  joined_date: '2025-10-06'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''

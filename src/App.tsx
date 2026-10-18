@@ -31,7 +31,7 @@ type Workspace = 'explore' | 'dashboard' | 'rules' | 'tasks' | 'messages' | 'eva
 export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
-  const [provider, setProvider] = useState<Provider>(() => param('model') === 'qwen' ? 'qwen' : 'jev');
+  const [provider, setProvider] = useState<Provider>(() => param('model') === 'qwen' && [null, 'explore', 'rules'].includes(param('workspace')) ? 'qwen' : 'jev');
   const changeProvider = (next: Provider) => { setParam('model', next); setProvider(next); };
   const [companyId, setCompanyState] = useState(() => param('company') ?? DEFAULT_COMPANY);
   const setCompanyId = (id: string) => { setParam('company', id); setCompanyState(id); };
@@ -39,7 +39,8 @@ export default function App() {
     const selected = param('workspace');
     return selected === 'dashboard' || selected === 'rules' || selected === 'tasks' || selected === 'messages' || selected === 'evaluation' || selected === 'feedback' ? selected : 'explore';
   });
-  const setWorkspace = (next: Workspace) => { setParam('workspace', next); setWorkspaceState(next); };
+  const setWorkspace = (next: Workspace) => { if (next !== 'explore' && next !== 'rules') changeProvider('jev'); setParam('workspace', next); setWorkspaceState(next); };
+  useEffect(() => { if (workspace !== 'explore' && workspace !== 'rules') setParam('model', 'jev'); }, [workspace]);
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
   const [as, setAsState] = useState(() => { const id = param('as'); return employeeById(id) ? id! : 'emp-ap'; });
   const setAs = (id: string) => { setParam('as', id); setAsState(id); };

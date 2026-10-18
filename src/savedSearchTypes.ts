@@ -16,4 +16,22 @@ export interface SavedSearch {
   revision: number;
   createdAt: string;
   updatedAt: string;
+  enabled: boolean;
+  tracking: SearchTracking;
+}
+
+export interface SearchTracking {
+  status: 'never' | 'checking' | 'ready' | 'error';
+  lastCheckedAt: string | null;
+  changedRecords: number;
+  matches: number;
+  uncertain: number;
+  newMatches: number;
+  error: string | null;
+  retryAt: string | null;
+}
+
+export interface NewSearchMatch {
+  row: import('./types').Row;
+  token: string;
 }

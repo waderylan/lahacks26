@@ -21,6 +21,16 @@ const workspace = new WorkspaceData(database);
 const semantics = new SemanticService(workspace);
 const actions = new ActionEngine(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
 const rules = new RuleService(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
+const savedSearches = new SavedSearchService(database, id => listCompanies().some(company => company.companyId === id), {
+  rows: companyId => {
+    const full = workspace.bills(companyId);
+    if (full.company.scenario) return full.rows;
+    const reserved = new Set(full.rows.slice(-5).map(row => row.id));
+    const arrived = rules.snapshot(companyId).store.arrivals[companyId] ?? [];
+    return full.rows.filter(row => !reserved.has(row.id) || arrived.includes(row.id));
+  },
+  judge: (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows),
+});
 
 app.use('/api', sameOriginApi);
 
@@ -74,12 +84,13 @@ app.post('/api/evaluate', async (req, res) => {
 actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));
-savedSearchRoutes(app, new SavedSearchService(database, id => listCompanies().some(company => company.companyId === id)));
+savedSearchRoutes(app, savedSearches);
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.
 const automationTimer = setInterval(() => {
   void actions.scan().catch(error => console.error('Automation:', (error as Error).message));
   void rules.scan().catch(error => console.error('Rules:', (error as Error).message));
+  void savedSearches.monitor.scan().catch(error => console.error('Saved searches:', (error as Error).message));
 }, 10_000);
 automationTimer.unref();
 const draftTimer = setInterval(() => { void rules.drainDrafts().catch(error => console.error('Draft worker:', (error as Error).message)); }, 1000);

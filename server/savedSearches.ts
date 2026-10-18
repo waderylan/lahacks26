@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { Express, Request, Response } from 'express';
 import type { ActionStore } from './actionStore.ts';
 import type { SavedSearch, SearchDefinition } from '../src/savedSearchTypes.ts';
+import { SearchMonitor, searchCriteria, type SearchSource, type StoredSearch } from './searchMonitor.ts';
 
 const kind = 'saved-search';
 class SearchError extends Error {
@@ -24,15 +25,23 @@ function validate(input: unknown): { name: string; definition: SearchDefinition 
 }
 
 export class SavedSearchService {
-  constructor(readonly db: ActionStore, private companyExists: (id: string) => boolean) {}
+  readonly monitor: SearchMonitor;
+  constructor(readonly db: ActionStore, private companyExists: (id: string) => boolean, source?: SearchSource) { this.monitor = new SearchMonitor(db, source); }
+  private present(search: StoredSearch): SavedSearch { return { ...search, enabled: Boolean(search.enabled), tracking: this.monitor.summary(search.id) }; }
   private company(id: string) { if (!this.companyExists(id)) throw new SearchError('Company not found.', 404); }
   list(company: string) {
     this.company(company);
-    return this.db.list<SavedSearch>(kind, company).sort((a, b) => a.name.localeCompare(b.name));
+    return this.db.list<StoredSearch>(kind, company).map(search => this.present(search)).sort((a, b) => a.name.localeCompare(b.name));
+  }
+  get(company: string, id: string) {
+    this.company(company);
+    const search = this.db.get<StoredSearch>(kind, id);
+    if (!search || search.companyId !== company) throw new SearchError('Saved search not found.', 404);
+    return this.present(search);
   }
   private existing(company: string, id: string, revision: unknown) {
     this.company(company);
-    const search = this.db.get<SavedSearch>(kind, id);
+    const search = this.db.get<StoredSearch>(kind, id);
     if (!search || search.companyId !== company) throw new SearchError('Saved search not found.', 404);
     if (!Number.isSafeInteger(revision) || revision !== search.revision) throw new SearchError('This search changed in another session. Reopen it before saving or deleting.', 409);
     return search;
@@ -45,8 +54,8 @@ export class SavedSearchService {
     return this.db.atomic(() => {
       this.unique(company, value.name);
       const now = new Date().toISOString();
-      const search: SavedSearch = { ...value, id: randomUUID(), companyId: company, revision: 1, createdAt: now, updatedAt: now };
-      this.db.put(kind, search.id, company, search); return search;
+      const search: StoredSearch = { ...value, enabled: false, id: randomUUID(), companyId: company, revision: 1, createdAt: now, updatedAt: now };
+      this.db.put(kind, search.id, company, search); this.monitor.reset(search); return this.present(search);
     });
   }
   update(company: string, id: string, input: unknown) {
@@ -54,14 +63,34 @@ export class SavedSearchService {
     return this.db.atomic(() => {
       const previous = this.existing(company, id, revision); this.unique(company, value.name, id);
       const search = { ...previous, ...value, revision: previous.revision + 1, updatedAt: new Date().toISOString() };
-      this.db.put(kind, id, company, search); return search;
+      this.db.put(kind, id, company, search);
+      if (searchCriteria(previous.definition) !== searchCriteria(search.definition)) this.monitor.reset(search);
+      return this.present(search);
     });
   }
   remove(company: string, id: string, revision: unknown) {
     this.db.atomic(() => {
       this.existing(company, id, revision);
       this.db.db.prepare('DELETE FROM documents WHERE kind=? AND id=? AND company=?').run(kind, id, company);
+      this.db.db.prepare('DELETE FROM documents WHERE kind=? AND id=? AND company=?').run('search-watch', id, company);
     });
+  }
+  toggle(company: string, id: string, revision: unknown, enabled: unknown) {
+    if (typeof enabled !== 'boolean') throw new SearchError('Choose On or Off.');
+    this.db.atomic(() => {
+      const previous = this.existing(company, id, revision);
+      const search = { ...previous, enabled, revision: previous.revision + 1, updatedAt: new Date().toISOString() };
+      this.db.put(kind, id, company, search); this.monitor.invalidate(search);
+    });
+    if (enabled) void this.monitor.check(id);
+    return this.get(company, id);
+  }
+  check(company: string, id: string) { this.get(company, id); void this.monitor.check(id); return this.get(company, id); }
+  newMatches(company: string, id: string) { return this.monitor.newMatches(this.get(company, id)); }
+  seen(company: string, id: string, matches: unknown) {
+    try { this.monitor.seen(this.get(company, id), matches); }
+    catch (error) { if (error instanceof SearchError) throw error; throw new SearchError('Choose the matches you viewed.'); }
+    return this.get(company, id);
   }
 }
 
@@ -78,6 +107,19 @@ export function savedSearchRoutes(app: Express, service: SavedSearchService) {
   }));
   app.patch(`${base}/:searchId`, route((req, res) => {
     const company = String(req.params.companyId), search = service.update(company, String(req.params.searchId), req.body);
+    res.json({ search, searches: service.list(company) });
+  }));
+  app.post(`${base}/:searchId/toggle`, route((req, res) => {
+    const company = String(req.params.companyId), search = service.toggle(company, String(req.params.searchId), req.body?.revision, req.body?.enabled);
+    res.json({ search, searches: service.list(company) });
+  }));
+  app.post(`${base}/:searchId/check`, route((req, res) => {
+    const company = String(req.params.companyId), search = service.check(company, String(req.params.searchId));
+    res.status(202).json({ search, searches: service.list(company) });
+  }));
+  app.get(`${base}/:searchId/new-matches`, route((req, res) => res.json(service.newMatches(String(req.params.companyId), String(req.params.searchId)))));
+  app.post(`${base}/:searchId/seen`, route((req, res) => {
+    const company = String(req.params.companyId), search = service.seen(company, String(req.params.searchId), req.body?.matches);
     res.json({ search, searches: service.list(company) });
   }));
   app.delete(`${base}/:searchId`, route((req, res) => {

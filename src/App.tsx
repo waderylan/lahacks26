@@ -410,7 +410,7 @@ export default function App() {
             )}
           </div>
         </div>
-        <SavedSearches key={companyId} companyId={companyId} companyName={company?.name ?? companyId} definition={{ query: input, type: typeFilter as SearchDefinition['type'], status: statusFilter as SearchDefinition['status'], assignee: assigneeFilter, tab, matchesOnly, sort }} onOpen={openSavedSearch} />
+        <SavedSearches key={companyId} companyId={companyId} companyName={company?.name ?? companyId} definition={{ query: input, type: typeFilter as SearchDefinition['type'], status: statusFilter as SearchDefinition['status'], assignee: assigneeFilter, tab, matchesOnly, sort }} onOpen={openSavedSearch} onInspect={inspect} />
         <div className="chips">
           <label className="chip-set">
             Examples

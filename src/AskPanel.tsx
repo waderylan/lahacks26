@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { pMatchFor } from './jevClient';
 import { EMPLOYEES, employeeById } from './employees';
+import { aggregate, chartForAnswer, GROUP_LABELS, KIND_LABELS, MEASURE_LABELS, type ChartKind, type ChartSpec, type GroupBy, type Measure } from './charts';
+import { ChartView } from './ChartView';
+import { useDashboard } from './dashboardStore';
 import { draftSender, uid, type DraftMessage } from './rules';
 import type { ActionPlan, BillAction, ReviewTask } from './actionTypes';
 import type { Mail } from './mailTypes';
@@ -106,10 +109,12 @@ const isOwner = (owner: string | undefined, as: string) => {
   return !!e && !!o && (o === e.name.toLowerCase() || o === e.name.split(' ')[0].toLowerCase() || o === e.id);
 };
 
-interface ChatProps { companyId: string; as: string; jevReady: boolean; onOpenBill: (row: Row) => void; onChanged?: () => void; /** Sit above a bottom action bar. */ lifted?: boolean }
+interface ChatProps { companyId: string; as: string; jevReady: boolean; onOpenBill: (row: Row) => void; onChanged?: () => void; /** Sit above a bottom action bar. */ lifted?: boolean; /** Switch to the Dashboard tab (after adding a chart). */ onOpenDashboard?: () => void }
+let openDashboard: (() => void) | undefined;
 
 /** Floating "Ask your books" assistant in the bottom-right corner, on every tab. */
 export function ChatWidget(props: ChatProps) {
+  openDashboard = props.onOpenDashboard;
   const [open, setOpen] = useState(false);
   const { data } = useFullBills(props.companyId);
   const key = `${props.companyId}|${props.as}`;
@@ -358,6 +363,7 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
           <div className="sub-h">Largest bills</div>
           <BillList rows={showAll ? sorted : sorted.slice(0, 4)} onOpen={onOpenBill} />
           {sorted.length > 4 && <button className="linkish" onClick={() => setShowAll(s => !s)}>{showAll ? 'Show fewer' : `Show all ${sorted.length}`}</button>}
+          <GraphThis data={data} rows={matches} question={turn.question} model={turn.model} intent={parsed.intent} />
           <ActOnBills companyId={data.company.companyId} as={as} model={turn.model} rows={matches} label={shortTopic || turn.question} onChanged={onChanged} />
         </>
       )}
@@ -414,9 +420,50 @@ function UpcomingAnswer({ data, as, model, question, onOpenBill, onChanged, foot
         <Breakdown items={p.windows.filter(w => w.bills.length).map(w => ({ label: w.label, cents: w.cents, count: w.bills.length }))} />
         <div className="sub-h">Next due</div>
         <BillList rows={p.open.slice(0, 5)} onOpen={onOpenBill} amount={openCents} />
+        <GraphThis data={data} rows={p.open} question={question} model={model} intent="upcoming" />
         <ActOnBills companyId={data.company.companyId} as={as} model={model} rows={p.open} label={question} onChanged={onChanged} />
       </>}
       {footer}
+    </div>
+  );
+}
+
+// ---------- Graph an answer: preview it here, then add it to the Dashboard or replace a chart ----------
+function GraphThis({ data, rows, question, model, intent }: { data: CompanyBills; rows: Row[]; question: string; model: ChatModel; intent: string }) {
+  const dash = useDashboard(data.company.companyId);
+  const [open, setOpen] = useState(false);
+  const [spec, setSpec] = useState(() => chartForAnswer(intent));
+  const [target, setTarget] = useState('new');
+  const [done, setDone] = useState('');
+  const ids = useMemo(() => rows.map(r => r.id), [rows]);
+  const points = useMemo(() => aggregate(data.rows, { ...spec, ids }), [data.rows, spec, ids]);
+  const save = () => {
+    const chart: ChartSpec = { id: uid(), title: question.replace(/[?.!]+$/, '').slice(0, 120), ...spec, ids, source: { question, model, at: new Date().toISOString() } };
+    if (target === 'new') { dash.add(chart); setDone('Added to the Dashboard.'); }
+    else { const old = dash.charts.find(c => c.id === target); dash.replace(target, chart); setDone(`Replaced “${old?.title ?? 'chart'}” on the Dashboard.`); }
+  };
+  if (!rows.length) return null;
+  return (
+    <div className="graph-this">
+      <button className={`chip ${open ? 'on' : ''}`} onClick={() => { setOpen(o => !o); setDone(''); }}>📊 Graph this</button>
+      {open && (
+        <div className="graph-body">
+          <ChartView points={points} kind={spec.kind} measure={spec.measure} height={150} />
+          <div className="act-form">
+            <label>Group by<select value={spec.groupBy} onChange={e => setSpec(s => ({ ...s, groupBy: e.target.value as GroupBy, kind: e.target.value === 'vendor' || e.target.value === 'account' ? 'hbar' : s.kind === 'hbar' ? 'bar' : s.kind }))}>{Object.entries(GROUP_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+            <label>Measure<select value={spec.measure} onChange={e => setSpec(s => ({ ...s, measure: e.target.value as Measure }))}>{Object.entries(MEASURE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+            <label>Chart<select value={spec.kind} onChange={e => setSpec(s => ({ ...s, kind: e.target.value as ChartKind }))}>{Object.entries(KIND_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+          </div>
+          <div className="act-form">
+            <label>On the Dashboard<select value={target} onChange={e => setTarget(e.target.value)}>
+              <option value="new">Add as a new chart</option>
+              {dash.charts.map(c => <option key={c.id} value={c.id}>Replace “{c.title}”</option>)}
+            </select></label>
+            <button className="primary" onClick={save}>{target === 'new' ? 'Add to Dashboard' : 'Replace chart'}</button>
+          </div>
+          {done && <p className="act-done">✓ {done} {openDashboard && <button className="linkish" onClick={openDashboard}>Open Dashboard →</button>}</p>}
+        </div>
+      )}
     </div>
   );
 }

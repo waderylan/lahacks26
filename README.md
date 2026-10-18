@@ -73,3 +73,10 @@ npm run dev        # http://localhost:5173
 - Answers with bills can create tasks, assign, flag, tag or mark reviewed through the existing action engine (preview, then apply), or message a teammate (Jev can pick the recipient; the message links the bills).
 - **Model picker** in the chat header: Jev (default) runs on `AI_GATEWAY_API_KEY`; Gemini 3.5 Flash / Flash-Lite run on `GEMINI_API_KEY` (`server/llm.ts`) for reading the question, judging bills (up to 100 per request, same rules and fields as Jev) and "let AI choose". The gateway key is never used for anything but Jev; `server/keys.test.ts` enforces it. Gemini gives no probabilities and reports tokens instead of dollars.
 - History is saved per company and employee in SQLite (`server/chat.ts`). If Jev calls fail, the chat says so and offers Try again rather than reporting zero matches.
+
+## Dashboard tab
+
+- Starter charts per company (monthly spend, top vendors, spend by account, open payables by due date) drawn as SVG from chart specs in `src/charts.ts`; every number is an integer-cent sum computed in code.
+- Each chart can be regrouped (month, vendor, account, due date), remeasured (spend, count, open balance) and redrawn (bars, line, horizontal bars).
+- From the chat bubble, **📊 Graph this** on an answer previews a chart of the bills the chosen model picked, then adds it to the Dashboard or replaces an existing chart. The model only chooses bills; the chart math is deterministic.
+- Charts are saved per company in SQLite (`GET/PUT /api/companies/:id/dashboard`); **Reset charts** restores the starter set.

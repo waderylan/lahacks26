@@ -15,6 +15,7 @@ import { useWorkspace, type RowPatch } from './useWorkspace';
 import { ActionPanel, TaskBoard } from './ActionPanel';
 import { RuleWizard } from './RuleWizard';
 import { ChatWidget } from './AskPanel';
+import { Dashboard } from './Dashboard';
 
 const DEFAULT_COMPANY = 'company-018';
 
@@ -89,9 +90,9 @@ export default function App() {
     const first = companies.find((c) => c.synthetic);
     if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
   };
-  const [workspace, setWorkspaceState] = useState<'transactions' | 'rules' | 'tasks' | 'messages' | 'risk'>(() => {
+  const [workspace, setWorkspaceState] = useState<'dashboard' | 'transactions' | 'rules' | 'tasks' | 'messages' | 'risk'>(() => {
     const selected = new URLSearchParams(location.search).get('workspace');
-    return selected === 'transactions' || selected === 'tasks' || selected === 'messages' || selected === 'risk' ? selected : 'rules';
+    return selected === 'dashboard' || selected === 'transactions' || selected === 'tasks' || selected === 'messages' || selected === 'risk' ? selected : 'rules';
   });
   const setWorkspace = (next: typeof workspace) => { const url = new URL(location.href); url.searchParams.set('workspace', next); history.replaceState(null, '', url); setWorkspaceState(next); };
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
@@ -367,7 +368,7 @@ export default function App() {
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules</button><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count">{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button><button className={workspace === 'risk' ? 'on' : ''} onClick={() => setWorkspace('risk')}>Payment risk{riskOpen > 0 && <b className="task-nav-count" title="Suspicious and not yet sent to the CFO">{riskOpen}</b>}</button></nav><span className="muted">Saved in SQLite</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'dashboard' ? 'on' : ''} onClick={() => setWorkspace('dashboard')}>Dashboard</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules</button><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count">{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button><button className={workspace === 'risk' ? 'on' : ''} onClick={() => setWorkspace('risk')}>Payment risk{riskOpen > 0 && <b className="task-nav-count" title="Suspicious and not yet sent to the CFO">{riskOpen}</b>}</button></nav><span className="muted">Saved in SQLite</span></div>
       {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
       {prefsError && <div className="rules-notice error" role="alert">{prefsError}</div>}
       {inspectError && <div className="rules-notice error" role="alert">{inspectError}<button onClick={() => setInspectError('')}>Dismiss</button></div>}
@@ -436,7 +437,7 @@ export default function App() {
       {workspace === 'rules' && (rules.storageError || rules.message) && <div className={`rules-notice ${rules.storageError ? 'error' : ''}`} role="status">{rules.storageError || rules.message}</div>}
       {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Jev evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
       {workspace === 'rules' && data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
-      {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
+      {workspace === 'dashboard' ? <div className="insight-body"><Dashboard companyId={companyId} /></div> : workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
       {workspace === 'transactions' && <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} />}
       <div className="ledger-column">
       {workspace !== 'tasks' && workspace !== 'messages' && workspace !== 'risk' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
@@ -530,7 +531,7 @@ export default function App() {
         <button className="ghost" onClick={resetReview} disabled={dashboard.busy || !rows.length} title="Reset review for loaded bills in this company">Reset review state</button>
       </footer>}
 
-      <ChatWidget companyId={companyId} as={as} jevReady={!!jev?.configured} lifted={workspace === 'transactions'} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} />
+      <ChatWidget companyId={companyId} as={as} jevReady={!!jev?.configured} lifted={workspace === 'transactions'} onOpenDashboard={() => setWorkspace('dashboard')} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} />
 
       {drawerRow && (
         <Drawer row={drawerRow} reviewed={drawerRow.dashboard?.reviewed ?? reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />

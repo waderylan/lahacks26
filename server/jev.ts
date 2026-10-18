@@ -1,5 +1,6 @@
 import { experimental_evaluate as evaluate } from 'ai';
 import { getRow, type Row } from './data.ts';
+import { evaluationEvidence } from '../src/jevEvidence.ts';
 
 export type MatchState = 'match' | 'no_match' | 'uncertain';
 export interface RecordResult {
@@ -11,23 +12,7 @@ export interface RecordResult {
 
 export const JEV_MODEL = 'typesafe-ai/jev';
 
-/** Optional deeper context, present only for rows that carry supporting records (the synthetic extensions). */
-export function supportingContext(row: Row) {
-  if (!row.evidence) return {};
-  const vendor = row.vendorRecord ?? {};
-  const project = row.projectRecord ?? {};
-  const payee = vendor.payee_account_ending ? { bank: vendor.payee_bank, account_ending: vendor.payee_account_ending, last_changed: vendor.payee_details_last_changed, verification: vendor.payee_change_verification } : undefined;
-  // JSON round-trip drops undefined fields, which the gateway rejects in `state`.
-  return JSON.parse(JSON.stringify({
-    type: { bill: 'vendor_bill', invoice: 'customer_invoice', bank: 'bank_transaction' }[row.txnType ?? 'bill'],
-    doc_number: row.docNumber,
-    ...(payee && { vendor_payee: payee }),
-    ...(row.details && { details: row.details }),
-    ...(row.project && { project: { name: row.project, status: project.status, started: project.started_date, cancelled: project.cancelled_date, completed: project.completed_date } }),
-    ...(row.evidence.length && { evidence: row.evidence.map(e => ({ kind: e.kind, date: e.date, title: e.title, text: e.text })) }),
-    ...(row.related?.length && { related_bills: row.related.map(r => ({ doc_number: r.docNumber, billed_as: r.vendor, date: r.date, amount: (r.amountCents / 100).toFixed(2), description: r.description, memo: r.memo })) }),
-  }));
-}
+export { supportingContext } from '../src/jevEvidence.ts';
 
 export function jevConfigured() {
   return Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
@@ -70,15 +55,7 @@ export async function evaluateBatch(
     criterion: req.criterion,
     transactions: refs.map(({ key, row }) => ({
       ref: key,
-      date: row.date,
-      vendor: row.vendor,
-      account: row.account,
-      expense_kind: row.expenseKind,
-      amount: (row.amountCents / 100).toFixed(2),
-      item_names: row.itemNames,
-      description: row.description,
-      memo: row.memo,
-      ...supportingContext(row),
+      ...evaluationEvidence(row),
     })),
   };
   const instructions = (key: string) =>

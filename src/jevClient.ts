@@ -1,5 +1,6 @@
 import type { CompanyBills, RecordResult, Row } from './types';
 import type { Outcome } from './rules';
+import { evaluationEvidence } from './jevEvidence';
 
 // Shared by semantic filtering, rule preview, and arrivals: at most three gateway batches.
 let active = 0;
@@ -30,8 +31,8 @@ export async function requestEvaluation(companyId: string, criterion: string, id
     return body as { results: RecordResult[]; costNanoUsd: string };
   });
 }
-export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v1:choice-v1';
-export const judgmentKey = (row: Row, text: string) => JSON.stringify([CACHE_VERSION, row.companyId, row.id, row.date, row.vendor, row.account, row.memo, row.amountCents, row.description, row.itemNames, text]);
+export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v2:choice-v1';
+export const judgmentKey = (row: Row, text: string) => JSON.stringify([CACHE_VERSION, row.companyId, row.id, text, evaluationEvidence(row)]);
 const judgments = new Map<string, Promise<Outcome>>();
 export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void): Promise<void> {
   const missing = data.rows.filter(row => !judgments.has(judgmentKey(row, text)));

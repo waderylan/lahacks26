@@ -9,8 +9,7 @@ interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; repl
 const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
-export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '') {
-  const companyId = data?.company.companyId ?? '';
+export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '') {
   const current = useRef(companyId); current.current = companyId;
   const [store, setStore] = useState<RuleStore>(() => structuredClone(EMPTY_STORE));
   const storeRef = useRef(store); storeRef.current = store;
@@ -75,10 +74,10 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [timing, setTiming] = useState({ start: 0, end: 0 });
   const [now, setNow] = useState(performance.now());
-  const validCompany = Boolean(ready && draft && draft.companyId === companyId && data);
+  const validCompany = Boolean(ready && draft && draft.companyId === companyId && data?.company.companyId === companyId);
   const conditions = validCompany ? leaves(draft!.expression) : [];
   const aiTexts = JSON.stringify([...new Set(conditions.filter(node => node.type === 'ai' && node.text.trim()).map(node => node.type === 'ai' ? node.text : ''))].sort());
-  const dataKey = useMemo(() => data ? JSON.stringify(data.rows.map(row => [row.id, row.account, row.memo, row.description, row.itemNames, row.amountCents])) : '', [data]);
+  const dataKey = useMemo(() => data ? JSON.stringify(data.rows.map(row => judgmentKey(row, ''))) : '', [data]);
   useEffect(() => {
     let live = true;
     const texts: string[] = JSON.parse(aiTexts);

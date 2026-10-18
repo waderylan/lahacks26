@@ -1,14 +1,14 @@
-import { adjustedProbability, readCalibration } from './calibration.ts';
-import fs from 'node:fs';
+import { adjustedProbability, readCalibration, type Calibration } from './calibration.ts';
+import { runtimeModelConfig } from './modelConfig.ts';
 import { randomUUID } from 'node:crypto';
-import path from 'node:path';
 import { withQwenSlot } from './qwenConcurrency.ts';
 import { decisionMessages, LABELS, type Decision, type DecisionInput } from './modelContract.ts';
 export function qwenDeploymentId(): string | undefined {
-  if (process.env.VERI_DEPLOYMENT_ID) return process.env.VERI_DEPLOYMENT_ID;
-  const file = path.resolve('training/semantic-review/qwen-deployment.json');
-  try { const id = JSON.parse(fs.readFileSync(file, 'utf8')).id; return typeof id === 'string' && /^[a-f0-9]+$/.test(id) ? id : undefined; } catch { return undefined; }
+  const id = process.env.VERI_DEPLOYMENT_ID ?? runtimeModelConfig().deploymentId;
+  return typeof id === 'string' && /^[a-zA-Z0-9_-]{1,200}$/.test(id) ? id : undefined;
 }
+export interface QwenRuntime { deploymentId?: string; calibration: Calibration | null }
+export const qwenRuntime = (): QwenRuntime => { const deploymentId = qwenDeploymentId(); return { deploymentId, calibration: process.env.QWEN_RAW_SCORES === '1' ? null : readCalibration(deploymentId) }; };
 export class QwenReadinessError extends Error { constructor() { super('Qwen is starting. Retry after Veri shows serving.'); this.name = 'QwenReadinessError'; } }
 export class QwenRequestError extends Error {
   constructor(readonly kind: string, readonly requestId: string, readonly status = 502) {
@@ -39,16 +39,16 @@ export function parseQwenResponse(body: any): Decision {
   const valid = probs.size === 3 && total > 0;
   return { state: LABELS[content as keyof typeof LABELS], pMatch: valid ? probs.get('A')! / total : null, ...(valid ? { scoreKind: 'candidate_score_uncalibrated' as const } : {}) };
 }
-export async function evaluateQwen(input: DecisionInput, signal?: AbortSignal): Promise<Decision> {
-  return withQwenSlot(() => evaluateQwenRequest(input, signal), signal);
+export async function evaluateQwen(input: DecisionInput, signal?: AbortSignal, runtime = qwenRuntime()): Promise<Decision> {
+  return withQwenSlot(() => evaluateQwenRequest(input, signal, runtime), signal);
 }
-async function evaluateQwenRequest(input: DecisionInput, signal?: AbortSignal): Promise<Decision> {
-  if (!qwenConfigured()) throw new Error('Qwen is not configured');
-  const url = `https://api.veri.studio/v1/deployments/${encodeURIComponent(qwenDeploymentId()!)}/chat/completions`;
+async function evaluateQwenRequest(input: DecisionInput, signal: AbortSignal | undefined, runtime: QwenRuntime): Promise<Decision> {
+  if (!process.env.VERI_API_KEY || !runtime.deploymentId) throw new Error('Qwen is not configured');
+  const url = `https://api.veri.studio/v1/deployments/${encodeURIComponent(runtime.deploymentId)}/chat/completions`;
   const requestId = randomUUID();
   const startedAt = Date.now();
   let httpStatus: number | undefined;
-  console.info(JSON.stringify({ event: 'qwen.start', requestId, deployment: qwenDeploymentId(), at: new Date().toISOString() }));
+  console.info(JSON.stringify({ event: 'qwen.start', requestId, deployment: runtime.deploymentId, at: new Date().toISOString() }));
   try {
   let response: Response;
   try { response = await fetch(url, {
@@ -66,7 +66,7 @@ async function evaluateQwenRequest(input: DecisionInput, signal?: AbortSignal): 
   try { result = parseQwenResponse(await response.json()); }
   catch { throw new QwenRequestError('invalid model response', requestId); }
   console.info(JSON.stringify({ event: 'qwen.success', requestId, httpStatus, elapsedMs: Date.now() - startedAt }));
-  const calibration = process.env.QWEN_RAW_SCORES === '1' ? null : readCalibration(qwenDeploymentId());
+  const calibration = runtime.calibration;
   if (calibration && result.pMatch !== null) return { ...result, rawPMatch: result.pMatch, pMatch: adjustedProbability(result.pMatch, calibration.a, calibration.b), scoreKind: 'validation_calibrated' };
   return result;
   } catch (error) {

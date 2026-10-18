@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import { EMPLOYEES, employeeById } from '../src/employees.ts';
-import { uid, type DraftMessage } from '../src/rules.ts';
+import { draftSender, uid, type DraftMessage } from '../src/rules.ts';
 import type { Mail, MailboxView, MailInput } from '../src/mailTypes.ts';
 import type { ActionStore } from './actionStore.ts';
 import type { WorkspaceData } from './workspaceData.ts';
@@ -27,7 +27,7 @@ export class Mailbox {
     if (!subject || subject.length > 200 || !body || body.length > 8000) throw new Error('Add a subject (up to 200 characters) and a message.');
     const original = replyTo === undefined ? undefined : this.db.get<Mail>('mail', String(replyTo));
     if (replyTo !== undefined && (!original || original.companyId !== companyId || ![original.from, original.to].includes(from))) throw new Error('You can only reply to a message you sent or received.');
-    // New messages may link up to 25 bills from this company (e.g. sent from the chat).
+    // Intentional human Compose/reply can link up to 25 transactions from this company.
     const linked = Array.isArray(input.items) ? input.items.slice(0, 25).map(item => this.data.row(companyId, String(item?.transactionId))).map(row => ({ transactionId: row.id, billId: row.billId })) : [];
     const id = uid();
     const mail: Mail = { id, companyId, threadId: original?.threadId ?? id, ...(original && { replyTo: original.id }), from, to, subject, body,
@@ -45,7 +45,7 @@ export class Mailbox {
 }
 
 /** Starts a new thread from one employee to another. */
-export function postMail(db: ActionStore, fields: Omit<Mail, 'id' | 'threadId' | 'sentAt' | 'readAt'>) {
+function postMail(db: ActionStore, fields: Omit<Mail, 'id' | 'threadId' | 'sentAt' | 'readAt'>) {
   const id = uid();
   const mail: Mail = { ...fields, id, threadId: id, sentAt: new Date().toISOString(), readAt: null };
   db.put('mail', id, fields.companyId, mail);
@@ -54,6 +54,7 @@ export function postMail(db: ActionStore, fields: Omit<Mail, 'id' | 'threadId' |
 
 /** Delivers an approved rule draft from the approving employee to its recipient. Call inside the approval transaction. */
 export function deliverDraft(db: ActionStore, message: DraftMessage, from: string) {
+  if (message.status !== 'approved' || message.generation !== 'ready' || draftSender(message) !== from || !employeeById(from)) throw new Error('Only the sender can deliver an approved, ready draft.');
   if (!message.employeeId) throw new Error('This draft has no recipient yet.');
   return postMail(db, { companyId: message.companyId, from, to: message.employeeId, subject: message.subject, body: message.body,
     source: 'rule', draftId: message.id, ruleName: message.ruleName, items: message.items.map(({ transactionId, billId }) => ({ transactionId, billId })) });

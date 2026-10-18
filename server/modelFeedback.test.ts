@@ -14,7 +14,7 @@ import express from 'express';
 import {createServer} from 'node:http';
 
 function setup(t: {after:(fn:()=>void)=>void}) {
- const db=new ActionStore(':memory:'),original=loadCompanyBills('company-018');const data=new WorkspaceData(db,()=>original,()=>[]),row=data.bills('company-018').rows[0];
+ const db=new ActionStore(':memory:'),original=loadCompanyBills('company-101');const data=new WorkspaceData(db,()=>original,()=>[]),row=data.bills('company-101').rows[0];
  const folder=fs.mkdtempSync(path.join(os.tmpdir(),'model-feedback-'));t.after(()=>{db.db.close();fs.rmSync(folder,{recursive:true,force:true});});
  const old=process.env.VERI_DEPLOYMENT_ID;process.env.VERI_DEPLOYMENT_ID='abc123';t.after(()=>{if(old===undefined)delete process.env.VERI_DEPLOYMENT_ID;else process.env.VERI_DEPLOYMENT_ID=old;});
  const input=visibleInput({name:original.company.name,industry:original.company.industry},'Anything electronic or tech-related',row);
@@ -29,7 +29,7 @@ test('corrections use frozen server observations, deduplicate, export exact A/B 
  const x=setup(t);x.service.correct(x.row.companyId,x.correction);x.service.correct(x.row.companyId,x.correction);
  const s=x.service.state(x.row.companyId);assert.equal(s.entries.length,1);assert.equal(x.calls.length,0);assert.ok(!('observation' in s.entries[0]));
  const pair=JSON.parse(x.service.export(x.row.companyId));assert.deepEqual(pair,{prompt:x.o.messages,chosen:'A',rejected:'B'});assert.equal(fs.readFileSync(path.join(x.folder,x.row.companyId,'preferences.jsonl'),'utf8'),x.service.export(x.row.companyId));
- assert.throws(()=>x.service.correct(x.row.companyId,{...x.correction,observed:'match'}));assert.throws(()=>x.service.record('company-019',{observationId:x.o.id,chosen:'match',observed:'no_match',actor:'emp-ap'}));
+ assert.throws(()=>x.service.correct(x.row.companyId,{...x.correction,observed:'match'}));assert.throws(()=>x.service.record('company-102',{observationId:x.o.id,chosen:'match',observed:'no_match',actor:'emp-ap'}));
  const changed={...x.row,memo:'Edited after evaluation'};x.db.write(changed,x.row.sourceVersion!);assert.throws(()=>x.service.correct(x.row.companyId,x.correction),/transaction changed/);
  x.service.include(x.row.companyId,s.entries[0].id,false);assert.equal(x.service.export(x.row.companyId),'');
 });

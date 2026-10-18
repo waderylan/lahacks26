@@ -1,35 +1,15 @@
-import { useEffect, useState } from 'react';
+import { money, moneyShort, sumCents, monthLabel, openCents, asOfDate, DUE_WINDOWS, dueWindow } from './chartMath';
+export { money, moneyShort, sumCents, monthLabel, openCents, asOfDate, DUE_WINDOWS, dueWindow } from './chartMath';
+export { useFullRecords as useFullBills } from './useFullRecords';
+import type { EvaluationContext } from './modelContext';
 import { evaluateCondition } from './jevClient';
 import type { Outcome } from './rules';
 import type { CompanyBills, Row } from './types';
 
-const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-const usdShort = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 });
-export const money = (cents: number) => usd.format(cents / 100);
-export const moneyShort = (cents: number) => usdShort.format(cents / 100);
 export const spend = (nano: bigint) => {
   const micro = (nano + 500n) / 1000n;
   return `$${micro / 1_000_000n}.${(micro % 1_000_000n).toString().padStart(6, '0')}`;
 };
-export const sumCents = (rows: Row[]) => rows.reduce((s, r) => s + r.amountCents, 0);
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-export const monthLabel = (ym: string) => `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.slice(2, 4)}`;
-
-/** Every original bill for a company (no sample), for whole-year totals. */
-export function useFullBills(companyId: string) {
-  const [state, setState] = useState<{ id: string; data: CompanyBills | null; error: string | null }>({ id: companyId, data: null, error: null });
-  useEffect(() => {
-    let live = true;
-    setState({ id: companyId, data: null, error: null });
-    fetch(`/api/companies/${companyId}/bills`)
-      .then(r => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((data: CompanyBills) => live && setState({ id: companyId, data, error: null }))
-      .catch((e: Error) => live && setState({ id: companyId, data: null, error: e.message }));
-    return () => { live = false; };
-  }, [companyId]);
-  return state.id === companyId ? state : { id: companyId, data: null, error: null };
-}
-
 export interface SemanticRun {
   outcomes: Record<string, Outcome>;
   done: number;
@@ -43,7 +23,7 @@ export interface SemanticRun {
 }
 
 /** Runs one Jev criterion over `rows` with live progress. Judgments are cached in jevClient, so reruns are free. */
-export function runSemantic(company: CompanyBills['company'], rows: Row[], criterion: string, onUpdate: (run: SemanticRun) => void) {
+export function runSemantic(company: CompanyBills['company'], rows: Row[], criterion: string, onUpdate: (run: SemanticRun) => void, context?: EvaluationContext) {
   const run: SemanticRun = { outcomes: {}, done: 0, total: rows.length, costNano: 0n, startedAt: performance.now(), finishedAt: null, error: null };
   const emit = () => onUpdate({ ...run, outcomes: { ...run.outcomes } });
   emit();
@@ -57,7 +37,7 @@ export function runSemantic(company: CompanyBills['company'], rows: Row[], crite
     run.done++;
     if (error) run.error = error;
     emit();
-  }, nano => { run.costNano += nano; emit(); }).then(() => {
+  }, nano => { run.costNano += nano; emit(); }, context).then(() => {
     run.finishedAt = performance.now();
     emit();
   });
@@ -171,6 +151,8 @@ export function parseQuestion(question: string, latestDate: string): ParsedQuest
       : 'total';
   let topic = rest
     .replace(/[?.!]+$/g, '')
+    // "graph/chart/plot … " asks for a picture, it isn't part of the topic
+    .replace(/^\s*((please|can you)\s+)?(graph|chart|plot|visuali[sz]e|draw|show)(\s+me)?(\s+(a|an|the))?(\s+(graph|chart|plot)\s+of)?\b/i, '')
     .replace(/^\s*(how much|how many|what('s| is| was)?( the)?( total)?|which vendors?|who|show( me)?|list|find|give me|total|count|number of|top vendors)\b/i, '')
     .replace(/^\s*(did|do|does|have|has|was|were|is|are)\b/i, '')
     .replace(/^\s*(we|i|the company|our company|us)\b/i, '')
@@ -275,27 +257,9 @@ export function combineUnderstanding(question: string, rules: ParsedQuestion, je
 }
 
 // ---------- Payables: open balances by due date (no AI) ----------
-export const openCents = (r: Row) => Math.max(0, r.amountCents - r.payments.reduce((s, p) => s + p.amountCents, 0));
-export const asOfDate = (rows: Row[]) => rows.flatMap(r => [r.date, ...r.payments.map(p => p.date)]).sort().pop() ?? '';
-const addDays = (date: string, n: number) => new Date(Date.parse(`${date}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
-export const DUE_WINDOWS = [
-  { id: 'overdue', label: 'Overdue' },
-  { id: 'week1', label: 'Next 7 days' },
-  { id: 'week2', label: '8–14 days' },
-  { id: 'month', label: '15–30 days' },
-  { id: 'later', label: 'Later' },
-] as const;
-export type DueWindow = typeof DUE_WINDOWS[number]['id'];
-export function dueWindow(dueDate: string, asOf: string): DueWindow {
-  if (dueDate < asOf) return 'overdue';
-  if (dueDate <= addDays(asOf, 7)) return 'week1';
-  if (dueDate <= addDays(asOf, 14)) return 'week2';
-  if (dueDate <= addDays(asOf, 30)) return 'month';
-  return 'later';
-}
 export function upcomingPayables(rows: Row[]) {
   const asOf = asOfDate(rows);
-  const open = rows.filter(r => openCents(r) > 0).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  const open = rows.filter(r => (r.txnType ?? 'bill') === 'bill' && openCents(r) > 0).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   const windows = DUE_WINDOWS.map(w => {
     const bills = open.filter(r => dueWindow(r.dueDate, asOf) === w.id);
     return { ...w, bills, cents: bills.reduce((s, r) => s + openCents(r), 0) };

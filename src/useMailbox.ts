@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MailboxView, MailInput } from './mailTypes';
+import { usePolling } from './usePolling';
 
 const EMPTY: MailboxView = { inbox: [], sent: [], unread: {} };
 
-/** The signed-in employee's mail for one company. Polls like useRules so other tabs' sends show up. */
-export function useMailbox(companyId: string, as: string) {
+/** The signed-in employee's mail for one company. Polls so other tabs' sends show up; `pollMs` of 0 pauses. */
+export function useMailbox(companyId: string, as: string, pollMs = 2000) {
   const [view, setView] = useState<MailboxView>(EMPTY);
   const [error, setError] = useState('');
   const scope = useRef(''); scope.current = `${companyId}|${as}`;
@@ -24,9 +25,8 @@ export function useMailbox(companyId: string, as: string) {
     setView(EMPTY);
     if (!companyId || !as) return;
     void refresh();
-    const timer = setInterval(() => void refresh(), 2000);
-    return () => clearInterval(timer);
   }, [companyId, as, refresh]);
+  usePolling(() => void refresh(), pollMs);
   const post = (path: string, body: unknown) => call(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   return {
     ...view, error, refresh,

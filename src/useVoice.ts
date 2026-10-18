@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Speech-to-text for the chat, using the browser's built-in recognition (no API key; in Chrome the
+ * Speech-to-text for Explore search, using the browser's built-in recognition (no API key; in Chrome the
  * audio is processed by Google's speech service). Shows words as they are heard and calls onFinal
  * once the speaker pauses. Unsupported browsers get `supported: false` and no mic button.
  */

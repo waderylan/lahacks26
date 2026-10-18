@@ -1,0 +1,142 @@
+{
+  "phase": "test",
+  "runHash": "b1abd1d26980192767334ad65446fe367f8514d94f8560c4295cfc4559cf4243",
+  "rawMatchBrier": null,
+  "perClass": {
+    "match": {
+      "precision": 0.8773584905660378,
+      "recall": 0.9393939393939394,
+      "f1": 0.9073170731707317
+    },
+    "no_match": {
+      "precision": 0.9222222222222223,
+      "recall": 0.8691099476439791,
+      "f1": 0.894878706199461
+    },
+    "uncertain": {
+      "precision": 0.7857142857142857,
+      "recall": 0.825,
+      "f1": 0.8048780487804879
+    }
+  },
+  "macroF1": 0.8690246093835601,
+  "confusion": {
+    "match": {
+      "match": 93,
+      "no_match": 2,
+      "uncertain": 4,
+      "error": 0
+    },
+    "no_match": {
+      "match": 11,
+      "no_match": 166,
+      "uncertain": 14,
+      "error": 0
+    },
+    "uncertain": {
+      "match": 2,
+      "no_match": 12,
+      "uncertain": 66,
+      "error": 0
+    }
+  },
+  "scoreCoverage": 0,
+  "matchBrier": null,
+  "provider": "gemini-lite",
+  "model": "google/gemini-3.5-flash-lite",
+  "geminiTokens": 64322,
+  "n": 370,
+  "accuracy": 0.8783783783783784,
+  "errors": 0,
+  "falseMatches": 13,
+  "uncertainRecall": 0.825,
+  "byFamily": {
+    "effectively_blank": {
+      "n": 30,
+      "accuracy": 0.8
+    },
+    "nonempty_uninformative": {
+      "n": 30,
+      "accuracy": 0.8
+    },
+    "conflict": {
+      "n": 45,
+      "accuracy": 0.9555555555555556
+    },
+    "needs_attention": {
+      "n": 30,
+      "accuracy": 0.9333333333333333
+    },
+    "agreement": {
+      "n": 45,
+      "accuracy": 0.9111111111111111
+    },
+    "overhead": {
+      "n": 14,
+      "accuracy": 1
+    },
+    "financial_shipment": {
+      "n": 14,
+      "accuracy": 1
+    },
+    "vague": {
+      "n": 15,
+      "accuracy": 0.7333333333333333
+    },
+    "attention": {
+      "n": 15,
+      "accuracy": 0.5333333333333333
+    },
+    "goods": {
+      "n": 15,
+      "accuracy": 1
+    },
+    "clothing": {
+      "n": 15,
+      "accuracy": 1
+    },
+    "blank": {
+      "n": 15,
+      "accuracy": 0.8666666666666667
+    },
+    "electronics": {
+      "n": 15,
+      "accuracy": 0.8666666666666667
+    },
+    "delay": {
+      "n": 15,
+      "accuracy": 0.7333333333333333
+    },
+    "utility_backorder": {
+      "n": 14,
+      "accuracy": 0.7142857142857143
+    },
+    "trading_vague": {
+      "n": 14,
+      "accuracy": 0.8571428571428571
+    },
+    "utilities": {
+      "n": 15,
+      "accuracy": 1
+    },
+    "goods_overhead": {
+      "n": 14,
+      "accuracy": 1
+    }
+  },
+  "byOrigin": {
+    "existing_authored_demo_holdout": {
+      "n": 150,
+      "accuracy": 0.9066666666666666
+    },
+    "authored_overlay": {
+      "n": 220,
+      "accuracy": 0.8590909090909091
+    }
+  },
+  "requestCostNanoUsd": null,
+  "costNote": "Billed to GEMINI_API_KEY by tokens; see geminiTokens",
+  "latencyNote": "Batch end-to-end timings; Same cases in batches up to 20. Jev uses native multi-question requests; Qwen uses three concurrent record requests, as in the app adapter. These are product-workload timings, not equal-token engine benchmarks.",
+  "batchP50Ms": 5826.6712919999845,
+  "batchP95Ms": 9333.522708000033
+}

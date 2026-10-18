@@ -18,7 +18,7 @@ test('grouped views reopen across browsers without actions and convert into inde
   await page.getByLabel('View name').fill('Missing evidence');
   await page.getByRole('button', { name: 'Save new view', exact: true }).click();
   await expect(page.getByLabel('Saved views')).toContainText('Missing evidence');
-  const getState = async () => (await (await page.request.get(`${app.url}/api/companies/company-018/rules`)).json()).store;
+  const getState = async () => (await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store;
   expect((await getState()).rules).toEqual([]); expect((await getState()).history).toEqual([]);
   const context = await browser.newContext();
   try {
@@ -54,7 +54,7 @@ test('views can be renamed, copied, deleted, and filtered without modifying tran
   await page.getByRole('button', { name: 'Delete saved view', exact: true }).click();
   await expect(page.getByLabel('Saved views')).not.toContainText('Bank review copy');
   await expect(page.getByRole('button', { name: 'Create rule', exact: true })).toBeDisabled();
-  expect((await (await page.request.get(`${app.url}/api/companies/company-018/rules`)).json()).store.history).toEqual([]);
+  expect((await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store.history).toEqual([]);
 });
 
 test('Jev answers are reused when regrouping, refreshing, and converting to a rule', async ({ page }) => {

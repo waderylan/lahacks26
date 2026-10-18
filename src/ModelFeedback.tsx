@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { selectedProvider } from './jevClient';
 import type { DecisionLabel, FeedbackState, TrainingPlan } from './modelFeedbackTypes';
 import './modelFeedback.css';
 const names={match:'Match',no_match:'No match',uncertain:'Uncertain'};
@@ -12,12 +11,12 @@ export function CorrectionHistory({companyId,children}:{companyId:string;childre
  useEffect(()=>{let live=true;const load=()=>{void call(companyId).then(s=>{if(live)setState(s);}).catch(()=>{if(live)setState(null);});};load();window.addEventListener('model-feedback-changed',load);return()=>{live=false;window.removeEventListener('model-feedback-changed',load);};},[companyId]);
  return <CorrectionContext.Provider value={state}>{children}</CorrectionContext.Provider>;
 }
-export function CorrectEvaluation({companyId,rowId,criterion,version,observed,actor}:{companyId:string;rowId:string;criterion:string;version:string;observed:string;actor:string}) {
+export function CorrectEvaluation({provider,companyId,rowId,criterion,version,observed,actor}:{provider:'jev'|'qwen';companyId:string;rowId:string;criterion:string;version:string;observed:string;actor:string}) {
   const history=useContext(CorrectionContext);
   const saved=history?.entries.find(e=>e.companyId===companyId&&e.rowId===rowId&&e.criterion===criterion&&e.current);
   const [message,setMessage]=useState(''),[busy,setBusy]=useState(false);
   useEffect(()=>{setMessage('');},[companyId,rowId,criterion,version,observed]);
-  if(selectedProvider()!=='qwen'||!['true','false','uncertain'].includes(observed))return null;
+  if(provider!=='qwen'||!['true','false','uncertain'].includes(observed))return null;
   const rejected=({true:'match',false:'no_match',uncertain:'uncertain'} as Record<string,DecisionLabel>)[observed];
   const save=async(chosen:DecisionLabel)=>{setBusy(true);setMessage('');try{
     if(chosen===rejected){if(saved?.included)await call(companyId,'/'+saved.id,{included:false},'PATCH');}

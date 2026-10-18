@@ -1,14 +1,17 @@
 import fs from 'node:fs';
 const dir='training/semantic-review';
 const read=(f:string)=>fs.existsSync(`${dir}/${f}`)?JSON.parse(fs.readFileSync(`${dir}/${f}`,'utf8')):null;
-const models=['heuristic','jev','base','qwen','base17','qwen17'].map(name=>({name,quality:read(`${name}-benchmark.json`),workload:read(`${name}-workload.json`)}));
+const models=['heuristic','jev','gemini-lite','base','qwen','base17','qwen17'].map(name=>({name,quality:read(`${name}-benchmark.json`),workload:read(`${name}-workload.json`)}));
 const dollars=(nano:string)=>{const n=BigInt(nano);return `${n/1_000_000_000n}.${(n%1_000_000_000n).toString().padStart(9,'0')}`;};
 const f=(n:number|undefined|null)=>n==null?'Pending':`${(n*100).toFixed(1)}%`;
-let text='# Qwen semantic review vs Jev\n\n';
+let text='# Semantic review: Jev vs Gemini Flash-Lite vs Qwen vs keyword rules\n\n';
 text+='Same 370 authored-reference cases: 150 existing demo cases and all 220 held-out synthetic overlays. Original records are not modified. Teacher labels are training-only imitation targets. This is a limited hackathon evaluation, not production accounting validation.\n\n';
 text+='| Model | Exact state accuracy | Errors | False matches | Uncertain recall | 50-row app workload |\n|---|---:|---:|---:|---:|---:|\n';
-const names:Record<string,string>={heuristic:'Keyword rules',jev:'Jev',base:'Qwen3-0.6B original',qwen:'Qwen3-0.6B SFT',base17:'Qwen3-1.7B original',qwen17:'Qwen3-1.7B SFT'};
+const names:Record<string,string>={heuristic:'Keyword rules',jev:'Jev',gemini:'Gemini 3.5 Flash (Gemini key)','gemini-lite':'Gemini 3.5 Flash-Lite (Gemini key)',base:'Qwen3-0.6B original',qwen:'Qwen3-0.6B SFT',base17:'Qwen3-1.7B original',qwen17:'Qwen3-1.7B SFT'};
 for(const m of models)text+=`| ${names[m.name]} | ${f(m.quality?.accuracy)} | ${m.quality?.errors??'Pending'} | ${m.quality?.falseMatches??'Pending'} | ${f(m.quality?.uncertainRecall)} | ${m.workload?`${(m.workload.totalMs/1000).toFixed(2)} s`:'Not measured'} |\n`;
+text+='\nGemini baselines get the same visible fields, Jev\'s judging instructions and answer options in one batch prompt per group of up to 20 cases, on GEMINI_API_KEY (the AI Gateway key is Jev-only). Gemini returns labels without probabilities; its batch times are model response times, excluding free-tier rate-limit waits.\n';
+for(const name of ['gemini-lite']){const q=read(`${name}-benchmark.json`);if(q?.geminiTokens!=null)text+=`\n${names[name]}: ${q.geminiTokens.toLocaleString('en-US')} tokens for ${q.n} cases.\n`;}
+text+='\nGemini 3.5 Flash is not included: the free-tier Gemini key allows 20 Flash requests per day and this benchmark needs about 70 (one per company and criterion group). Flash-Lite is the Gemini comparison.\n';
 text+='\nJev uses native multi-question requests. Qwen is a generative single-record classifier with bounded concurrency. The 50-row test is one warm-server run with the app concurrency settings; do not generalize it as a statistical speed benchmark. Missing or invalid answers count as errors. Per-request Jev billing and GPU-hour Veri billing are different cost models. Raw Qwen scores are uncalibrated. Optional monotonic calibration uses only held-out synthetic validation cases; real-world calibration is not established. Absent logprobs do not become invented probabilities.\n';
 for(const name of ['jev','qwen','qwen17']){const w=read(`${name}-workload.json`);if(w)text+=`\n${name} 50-row reported request cost: ${w.requestCostNanoUsd==null?'unavailable (GPU time for Qwen)':`$${dollars(w.requestCostNanoUsd)}`}.\n`;}
 for(const suffix of ['', '-all']){

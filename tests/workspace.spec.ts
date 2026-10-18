@@ -5,9 +5,13 @@ import type { Rule } from '../src/rules';
 test('tasks, owners, status, and review filters remain shared between browsers', async ({ page, browser }) => {
   const app = await startRuleApp();
   try {
-    const base = `${app.url}/api/companies/company-018`;
-    const plan = await (await page.request.post(`${base}/actions/preview`, { data: { selection: { ids: ['company-018:bill-1'], scope: 'selected' }, action: { type: 'task', owner: 'Bookkeeper', title: 'Check receipt', dueDate: '2026-11-01' } } })).json();
+    const base = `${app.url}/api/companies/company-101`;
+    const plan = await (await page.request.post(`${base}/actions/preview`, { data: { selection: { ids: ['company-101:bill-1'], scope: 'selected' }, action: { type: 'task', owner: 'Bookkeeper', title: 'Check receipt', dueDate: '2026-11-01' } } })).json();
     expect((await page.request.post(`${base}/actions/${plan.id}/apply`)).ok()).toBe(true);
+    const state = await (await page.request.get(`${base}/workspace`)).json();
+    expect(state.rows.find((row: any) => row.id === 'company-101:bill-1').dashboard.owner).toBe('');
+    const assignment = await (await page.request.post(`${base}/actions/preview`, { data: { selection: { ids: ['company-101:bill-1'], scope: 'selected' }, action: { type: 'assign', owner: 'Bookkeeper' } } })).json();
+    expect((await page.request.post(`${base}/actions/${assignment.id}/apply`)).ok()).toBe(true);
     await page.goto(app.url);
     await page.getByLabel('Explore assignee').selectOption('Bookkeeper');
     await expect(page.getByRole('table', { name: 'Explore results' }).locator('tbody tr')).toHaveCount(1);
@@ -27,10 +31,10 @@ test('tasks, owners, status, and review filters remain shared between browsers',
 
 test('stale rule edits cannot overwrite a newer saved revision', async ({ page, browser }) => {
   const app = await startRuleApp();
-  const rule: Rule = { id: 'shared', companyId: 'company-018', name: 'Shared rule', revision: 1, enabled: false, expression: { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '500' }, actions: [{ id: 'flag', type: 'flag', value: 'Check receipt' }] };
+  const rule: Rule = { id: 'shared', companyId: 'company-101', name: 'Shared rule', revision: 1, enabled: false, expression: { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '500' }, actions: [{ id: 'flag', type: 'flag', value: 'Check receipt' }] };
   const context = await browser.newContext();
   try {
-    const base = `${app.url}/api/companies/company-018`;
+    const base = `${app.url}/api/companies/company-101`;
     await page.request.post(`${base}/rules/commands`, { data: { type: 'save', rule, expectedRevision: null } });
     const other = await context.newPage();
     for (const target of [page, other]) {

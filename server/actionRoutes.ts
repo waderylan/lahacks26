@@ -15,7 +15,6 @@ export function actionRoutes(app: Express, engine: ActionEngine) {
   const route = (fn: (req: Request, res: Response) => unknown) => async (req: Request, res: Response, next: NextFunction) => {
     try { await fn(req, res); } catch (error) { next(error); }
   };
-  app.use('/api', sameOriginApi);
   app.get('/api/companies/:id/workspace', route((req, res) => {
     const data = engine.data.bills(company(req));
     const rows = data.rows.map(({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges, evidence }) => ({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges, evidence }));
@@ -27,14 +26,16 @@ export function actionRoutes(app: Express, engine: ActionEngine) {
   app.post('/api/companies/:id/actions/preview', route(async (req, res) => res.json(await engine.preview(company(req), req.body.selection, req.body.action))));
   app.post('/api/companies/:id/actions/review', route(async (req, res) => {
     if (typeof req.body.reviewed !== 'boolean') throw new Error('Choose a valid review status.');
+    if (req.body.expectedVersions !== undefined) {
+      if (!req.body.expectedVersions || typeof req.body.expectedVersions !== 'object' || !Array.isArray(req.body.ids)) throw new Error('Invalid review versions.');
+      for (const id of req.body.ids) if (engine.data.row(company(req), id).sourceVersion !== req.body.expectedVersions[id]) throw new Error('Transaction changed. Refresh before reviewing.');
+    }
     const plan = await engine.preview(company(req), { ids: req.body.ids, scope: 'selected' }, { type: 'review', reviewed: req.body.reviewed });
     res.json(reply(req, engine.apply(company(req), plan.id)));
   }));
   app.post('/api/companies/:id/actions/:planId/apply', route((req, res) => res.json(reply(req, engine.apply(company(req), String(req.params.planId))))));
   app.post('/api/companies/:id/actions/:planId/undo', route((req, res) => res.json(reply(req, engine.undo(company(req), String(req.params.planId), req.body.billId)))));
   app.patch('/api/companies/:id/tasks/:taskId', route((req, res) => res.json(engine.updateTask(company(req), String(req.params.taskId), req.body.status, req.body.updatedAt))));
-  app.post('/api/companies/:id/automations', route(async (req, res) => res.json(await engine.automate(company(req), req.body.selection, req.body.action))));
-  app.post('/api/companies/:id/automations/:automationId/pause', route((req, res) => { engine.pauseAutomation(company(req), String(req.params.automationId)); res.json({ ok: true }); }));
   app.use('/api', (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error('Workspace request:', error instanceof Error ? error.message : 'Unknown error');
     res.status(400).json({ error: error instanceof Error ? error.message : 'The workspace action failed. Try again.' });

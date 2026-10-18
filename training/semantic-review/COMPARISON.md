@@ -1,4 +1,4 @@
-# Qwen semantic review vs Jev
+# Semantic review: Jev vs Gemini Flash-Lite vs Qwen vs keyword rules
 
 Same 370 authored-reference cases: 150 existing demo cases and all 220 held-out synthetic overlays. Original records are not modified. Teacher labels are training-only imitation targets. This is a limited hackathon evaluation, not production accounting validation.
 
@@ -6,10 +6,17 @@ Same 370 authored-reference cases: 150 existing demo cases and all 220 held-out 
 |---|---:|---:|---:|---:|---:|
 | Keyword rules | 76.2% | 0 | 1 | 65.0% | Not measured |
 | Jev | 90.5% | 0 | 13 | 86.3% | 3.97 s |
+| Gemini 3.5 Flash-Lite (Gemini key) | 87.8% | 0 | 13 | 82.5% | Not measured |
 | Qwen3-0.6B original | 50.3% | 3 | 1 | 33.8% | Not measured |
 | Qwen3-0.6B SFT | 66.2% | 3 | 8 | 71.3% | 2.24 s |
 | Qwen3-1.7B original | 21.4% | 89 | 156 | 0.0% | Not measured |
 | Qwen3-1.7B SFT | 67.6% | 0 | 79 | 63.7% | 4.33 s |
+
+Gemini baselines get the same visible fields, Jev's judging instructions and answer options in one batch prompt per group of up to 20 cases, on GEMINI_API_KEY (the AI Gateway key is Jev-only). Gemini returns labels without probabilities; its batch times are model response times, excluding free-tier rate-limit waits.
+
+Gemini 3.5 Flash-Lite (Gemini key): 64,322 tokens for 370 cases.
+
+Gemini 3.5 Flash is not included: the free-tier Gemini key allows 20 Flash requests per day and this benchmark needs about 70 (one per company and criterion group). Flash-Lite is the Gemini comparison.
 
 Jev uses native multi-question requests. Qwen is a generative single-record classifier with bounded concurrency. The 50-row test is one warm-server run with the app concurrency settings; do not generalize it as a statistical speed benchmark. Missing or invalid answers count as errors. Per-request Jev billing and GPU-hour Veri billing are different cost models. Raw Qwen scores are uncalibrated. Optional monotonic calibration uses only held-out synthetic validation cases; real-world calibration is not established. Absent logprobs do not become invented probabilities.
 

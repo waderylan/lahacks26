@@ -1,18 +1,36 @@
-import { useState } from 'react';
 import './tasks.css';
-import { billActionLabel } from './actionTypes';
+import { useState } from 'react';
+import type { ReviewTask } from './actionTypes';
+import { ActivityList } from './ActivityList';
+import type { ActivityEvent } from './activity';
+import { ownerKey, ownerLabel, ownerOptions, sameOwner } from './employees';
 import type { WorkspaceController } from './useWorkspace';
 
-export function TaskBoard({ c, onInspect }: { c: WorkspaceController; onInspect: (id: string) => void }) {
+/** Tasks and the single activity feed for the company. `as` is the signed-in employee, used by the My tasks shortcut. */
+export function TaskBoard({ c, as, activity, transactionOwner, onInspect, onUndo, busy }: {
+  c: WorkspaceController; as: string; activity: ActivityEvent[]; transactionOwner: (transactionId: string) => string | undefined;
+  onInspect: (id: string) => void; onUndo: (event: ActivityEvent) => void; busy: boolean;
+}) {
   const [status, setStatus] = useState('open');
   const [owner, setOwner] = useState('all');
-  const tasks = c.tasks.filter(task => (status === 'all' || task.status === status) && (owner === 'all' || task.owner === owner));
-  return <section className="dashboard-board tasks-board" aria-label="Tasks and action history">
-    <div className="dashboard-board-heading"><div><h2>Tasks & activity</h2><p className="tasks-intro">Review assignments, update their status, and track recent changes.</p></div><span className="small muted">Saved in SQLite</span></div>
-    <div className="dashboard-filters"><label>Status<select aria-label="Task status filter" value={status} onChange={event => setStatus(event.target.value)}><option value="open">Open</option><option value="done">Done</option><option value="cancelled">Cancelled</option><option value="all">Any status</option></select></label><label>Assigned to<select aria-label="Task assignee filter" value={owner} onChange={event => setOwner(event.target.value)}><option value="all">Anyone</option>{c.owners.map(name => <option key={name} value={name}>{name}</option>)}</select></label></div>
-    <p className="tasks-count" role="status">{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'} shown · {c.tasks.length} total</p>
-    <div className="task-list">{tasks.length ? tasks.map(task => <article className="dashboard-task" key={task.id}><div><button className="bill-inspect" onClick={() => onInspect(task.billId)}>{task.title}</button><p>{task.vendor}</p><span>{task.owner} · Due {task.dueDate}</span></div><label className="task-status-label">Status<select aria-label={`Status for ${task.title}, ${task.vendor}`} value={task.status} disabled={c.busy} onChange={event => { void c.updateTask(task, event.target.value as typeof task.status).catch(() => {}); }}><option value="open">Open</option><option value="done">Done</option><option value="cancelled">Cancelled</option></select></label></article>) : <p className="dashboard-empty">No tasks in this view. Add a review task action to a rule, then run it.</p>}</div>
-    <h3>Action history</h3><div className="dashboard-history">{c.runs.length ? c.runs.map(run => <details key={run.id}><summary>{billActionLabel(run.action)} <span>{run.items.filter(item => item.status === 'succeeded').length} saved · {new Date(run.createdAt).toLocaleString()}</span></summary>{run.items.map(item => <article key={item.billId}><div><button className="bill-inspect" onClick={() => onInspect(item.billId)}>{item.vendor}</button><p>{item.before || '(blank)'} → {item.after}</p><span className={`action-item-status status-${item.status}`}>{item.status}</span>{item.message && <p className="small muted">{item.message}</p>}</div>{item.status === 'succeeded' && <button disabled={c.busy} onClick={() => { void c.undo(run.id, item.billId).catch(() => {}); }}>Undo</button>}</article>)}</details>) : <p className="dashboard-empty">Changes and their before/after values will appear here.</p>}</div>
-    {c.automations.length > 0 && <><h3>Automatic actions</h3>{c.automations.map(rule => <article className="dashboard-task" key={rule.id}><div><b>{billActionLabel(rule.action)}</b><p>{rule.criterion}</p><span>{rule.error || (rule.enabled ? 'Running on this server' : 'Paused')}</span></div>{rule.enabled && <button disabled={c.busy} onClick={() => { void c.pause(rule.id).catch(() => {}); }}>Pause</button>}</article>)}</>}
+  const tasks = c.tasks.filter((task: ReviewTask) => (status === 'all' || task.status === status) && (owner === 'all' || sameOwner(task.owner, owner)));
+  const mine = owner !== 'all' && ownerKey(owner) === ownerKey(as);
+  const owners = ownerOptions(c.owners);
+  return <section className="dashboard-board tasks-board" aria-label="Tasks and activity">
+    <div className="dashboard-board-heading"><div><h2>Tasks & activity</h2><p className="tasks-intro">Review assignments, update their status, and track recent changes.</p></div><span className="small muted">Everything that happened in this company</span></div>
+    <div className="dashboard-filters"><label>Status<select aria-label="Task status filter" value={status} onChange={event => setStatus(event.target.value)}><option value="open">Open</option><option value="done">Done</option><option value="cancelled">Cancelled</option><option value="all">Any status</option></select></label>
+      <label>Task owner<select aria-label="Task assignee filter" value={owner} onChange={event => setOwner(event.target.value)}><option value="all">Anyone</option>{owners.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+      <button className={mine ? 'on' : ''} aria-pressed={mine} onClick={() => setOwner(mine ? 'all' : as)}>My tasks</button></div>
+    <p className="small muted">The task owner does the work. The transaction owner is set separately. Marking a task Done does not mark the transaction reviewed or resolve its rule issue.</p>
+    <p className="tasks-count" role="status">{tasks.length} shown · {c.tasks.length} total</p>
+    <div className="task-list">{tasks.length ? tasks.map(task => {
+      const holder = transactionOwner(task.billId);
+      return <article className="dashboard-task" key={task.id}><div><button className="bill-inspect" onClick={() => onInspect(task.billId)}>{task.title}</button><p>{task.vendor}</p>
+        <span>Task owner: {ownerLabel(task.owner)} · Due {task.dueDate}</span>
+        {holder !== undefined && <span> · Transaction owner: {ownerLabel(holder)}</span>}</div>
+        <label className="task-status-label">Status<select aria-label={`Status for ${task.title}, ${task.vendor}`} value={task.status} disabled={c.busy} onChange={event => { void c.updateTask(task, event.target.value as typeof task.status).catch(() => {}); }}><option value="open">Open</option><option value="done">Done</option><option value="cancelled">Cancelled</option></select></label></article>;
+    }) : <p className="dashboard-empty">No tasks in this view. {mine ? 'Choose Anyone to see everyone’s tasks. ' : ''}Add a task action to a rule, then run it.</p>}</div>
+    <h3>Activity</h3>
+    <ActivityList events={activity} onInspect={onInspect} onUndo={onUndo} busy={busy} empty="Rule actions, assignments, tasks, messages and reviews will appear here." />
   </section>;
 }

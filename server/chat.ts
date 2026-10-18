@@ -24,6 +24,15 @@ export class ChatStore {
     if (existing && (existing.companyId !== companyId || existing.as !== turn.as)) throw new Error('Invalid chat turn.');
     this.db.put('chat-turn', turn.id, companyId, { ...turn, companyId, createdAt: turn.createdAt ?? new Date().toISOString() });
   }
+  /** Dashboard charts are shared by everyone in the company; null until someone changes the starter set. */
+  charts(companyId: string) { return this.db.get<{ charts: unknown[] }>('dashboard-charts', companyId)?.charts ?? null; }
+  saveCharts(companyId: string, charts: unknown) {
+    const ok = (c: any) => c && typeof c.id === 'string' && typeof c.title === 'string' && c.title.length <= 200
+      && ['month', 'vendor', 'account', 'due'].includes(c.groupBy) && ['spend', 'count', 'open'].includes(c.measure) && ['bar', 'line', 'hbar'].includes(c.kind)
+      && (c.ids === undefined || (Array.isArray(c.ids) && c.ids.length <= 5000 && c.ids.every((id: unknown) => typeof id === 'string' && id.startsWith(`${companyId}:`))));
+    if (!Array.isArray(charts) || charts.length > 24 || !charts.every(ok)) throw new Error('Invalid dashboard charts.');
+    this.db.put('dashboard-charts', companyId, companyId, { charts });
+  }
   clear(companyId: string, as: string) {
     // Every turn, not just the 50 that history() returns.
     for (const turn of this.db.list<{ id: string; as: string }>('chat-turn', companyId).filter(t => t.as === as)) this.db.db.prepare('DELETE FROM documents WHERE kind=? AND id=?').run('chat-turn', turn.id);
@@ -66,6 +75,8 @@ export function chatRoutes(app: Express, chat: ChatStore) {
     const { company: c } = chat.data.bills(id);
     res.json(await judgeWithGemini({ name: c.name, industry: c.industry }, criterion.slice(0, 500), ids.map((b: unknown) => chat.data.row(id, String(b))), model));
   }));
+  app.get('/api/companies/:id/dashboard', route((req, res) => res.json({ charts: chat.charts(company(req)) })));
+  app.put('/api/companies/:id/dashboard', route((req, res) => { chat.saveCharts(company(req), req.body?.charts); res.json({ ok: true }); }));
   app.get('/api/companies/:id/chat', route((req, res) => res.json(chat.history(company(req), String(req.query.as ?? '')))));
   app.post('/api/companies/:id/chat', route((req, res) => { chat.save(company(req), req.body); res.json({ ok: true }); }));
   app.delete('/api/companies/:id/chat', route((req, res) => { chat.clear(company(req), String(req.query.as ?? '')); res.json({ ok: true }); }));

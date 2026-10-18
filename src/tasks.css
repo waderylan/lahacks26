@@ -1,0 +1,24 @@
+.tasks-workspace { width:100%; min-width:0; }
+.tasks-workspace .tasks-board { width:100%; min-width:0; box-sizing:border-box; padding:28px 32px; background:var(--bg); }
+.tasks-workspace .tasks-board .dashboard-board-heading { align-items:flex-start; margin-bottom:24px; }
+.tasks-workspace .tasks-board .tasks-intro { margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.5; }
+.tasks-workspace .tasks-board .dashboard-filters { border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:var(--panel); }
+.tasks-count { margin:18px 0 12px; font-size:12px; color:var(--muted); }
+.tasks-workspace .tasks-board .task-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:16px; align-items:stretch; }
+.tasks-workspace .tasks-board .dashboard-task { min-width:0; flex-direction:column; gap:20px; padding:20px; border:1px solid var(--line); border-radius:10px; background:var(--panel); }
+.tasks-workspace .tasks-board .dashboard-task > div { width:100%; min-width:0; overflow-wrap:anywhere; }
+.tasks-workspace .tasks-board .dashboard-task .bill-inspect { font-size:14px; line-height:1.45; }
+.tasks-workspace .tasks-board .dashboard-task p { font-size:13px; line-height:1.5; margin:8px 0; }
+.tasks-workspace .tasks-board .dashboard-task span { line-height:1.5; }
+.tasks-workspace .tasks-board .task-status-label { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.tasks-workspace .tasks-board .task-status-label select { min-width:120px; }
+.tasks-workspace .tasks-board .dashboard-history { border:1px solid var(--line); border-radius:10px; padding:4px 20px; background:var(--panel); }
+.tasks-workspace .tasks-board .dashboard-history details:last-child { border-bottom:0; }
+.tasks-workspace .tasks-board .dashboard-empty { grid-column:1/-1; padding:28px; margin:0; line-height:1.6; }
+@media(max-width:600px) {
+  .tasks-workspace .tasks-board { padding:20px 16px; }
+  .tasks-workspace .tasks-board .dashboard-filters { align-items:stretch; flex-direction:column; gap:12px; }
+  .tasks-workspace .tasks-board .dashboard-filters label { justify-content:space-between; }
+  .tasks-workspace .tasks-board .dashboard-board-heading { gap:12px; }
+  .tasks-workspace .tasks-board .dashboard-history { padding:4px 12px; }
+}

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { pMatchFor } from './jevClient';
 import { EMPLOYEES, employeeById } from './employees';
+import { chartTitle, graphRequest, type ChartSpec } from './charts';
+import { showOnDashboard } from './dashboardStore';
+import { useVoice } from './useVoice';
 import { draftSender, uid, type DraftMessage } from './rules';
 import type { ActionPlan, BillAction, ReviewTask } from './actionTypes';
 import type { Mail } from './mailTypes';
@@ -11,7 +14,7 @@ import type { CompanyBills, Row } from './types';
 interface Plate { tasks: ReviewTask[]; assignedIds: string[]; unread: Pick<Mail, 'id' | 'from' | 'subject' | 'sentAt'>[]; approvals: number }
 
 /** reading: the model's understanding of the question; 'choose' while waiting for the user to pick a model, 'pending' while it reads, 'rules' when the text-rule fallback was used. */
-interface Turn { id: string; model: ChatModel; createdAt: string; question: string; parsed: ParsedQuestion; scope: Row[]; run: SemanticRun | null; reading: Understanding | 'choose' | 'pending' | 'rules'; plate?: Plate | 'loading' | { error: string } }
+interface Turn { id: string; model: ChatModel; createdAt: string; question: string; parsed: ParsedQuestion; scope: Row[]; run: SemanticRun | null; reading: Understanding | 'choose' | 'pending' | 'rules'; plate?: Plate | 'loading' | { error: string }; /** The answer's chart was shown on the Dashboard. */ graphed?: boolean }
 
 /** Compact form saved in SQLite; rebuilt into a Turn against the company's current bills. */
 interface StoredTurn {
@@ -19,7 +22,7 @@ interface StoredTurn {
   intent: Intent; topic: string; criterion: string | null; periodLabel: string | null;
   scopeIds: string[]; outcomes: Record<string, 'true' | 'uncertain'>; costNano: string; ms: number;
   reading: Understanding | 'rules'; plate?: Plate;
-  model?: ChatModel; tokens?: number;
+  model?: ChatModel; tokens?: number; graphed?: boolean;
 }
 
 async function api<T>(path: string, init?: RequestInit & { json?: unknown }): Promise<T> {
@@ -68,7 +71,7 @@ function toStored(turn: Turn, as: string): StoredTurn {
     id: turn.id, as, createdAt: turn.createdAt, question: turn.question, intent: turn.parsed.intent, topic: turn.parsed.topic,
     criterion: turn.parsed.criterion, periodLabel: turn.parsed.period?.label ?? null, scopeIds: turn.scope.map(r => r.id), outcomes,
     costNano: String(turn.run?.costNano ?? 0n), ms: turn.run && turn.run.finishedAt !== null ? Math.round(turn.run.finishedAt - turn.run.startedAt) : 0,
-    model: turn.model, tokens: turn.run?.tokens,
+    model: turn.model, tokens: turn.run?.tokens, graphed: turn.graphed,
     reading: turn.reading === 'pending' || turn.reading === 'choose' ? 'rules' : turn.reading, ...(turn.plate && typeof turn.plate === 'object' && 'tasks' in turn.plate && { plate: turn.plate }),
   };
 }
@@ -76,7 +79,7 @@ function fromStored(s: StoredTurn, rows: Row[]): Turn {
   const byId = new Map(rows.map(r => [r.id, r]));
   const scope = s.scopeIds.map(id => byId.get(id)).filter((r): r is Row => !!r);
   return {
-    id: s.id, model: s.model ?? 'jev', createdAt: s.createdAt, question: s.question, reading: s.reading, plate: s.plate,
+    id: s.id, model: s.model ?? 'jev', graphed: s.graphed, createdAt: s.createdAt, question: s.question, reading: s.reading, plate: s.plate,
     parsed: { intent: s.intent, topic: s.topic, criterion: s.criterion, period: s.periodLabel ? { label: s.periodLabel, test: () => true } : null },
     scope,
     run: s.criterion ? { outcomes: s.outcomes, done: scope.length, total: scope.length, costNano: BigInt(s.costNano), startedAt: 0, finishedAt: s.ms, error: null, tokens: s.tokens } : null,
@@ -106,10 +109,12 @@ const isOwner = (owner: string | undefined, as: string) => {
   return !!e && !!o && (o === e.name.toLowerCase() || o === e.name.split(' ')[0].toLowerCase() || o === e.id);
 };
 
-interface ChatProps { companyId: string; as: string; jevReady: boolean; onOpenBill: (row: Row) => void; onChanged?: () => void; /** Sit above a bottom action bar. */ lifted?: boolean }
+interface ChatProps { companyId: string; as: string; jevReady: boolean; onOpenBill: (row: Row) => void; onChanged?: () => void; /** Sit above a bottom action bar. */ lifted?: boolean; /** Switch to the Dashboard tab (after adding a chart). */ onOpenDashboard?: () => void }
+let openDashboard: (() => void) | undefined;
 
 /** Floating "Ask your books" assistant in the bottom-right corner, on every tab. */
 export function ChatWidget(props: ChatProps) {
+  openDashboard = props.onOpenDashboard;
   const [open, setOpen] = useState(false);
   const { data } = useFullBills(props.companyId);
   const key = `${props.companyId}|${props.as}`;
@@ -149,6 +154,24 @@ async function loadPlate(companyId: string, as: string): Promise<Plate> {
     unread: mail.inbox.filter(m => !m.readAt).map(({ id, from, subject, sentAt }) => ({ id, from, subject, sentAt })),
     approvals: (rules.store?.messages ?? []).filter(m => draftSender(m) === as && m.status === 'pending').length,
   };
+}
+
+/** Bills an answer is about: matches for a topic question, open bills for "what's due", or every bill in the period. */
+function answerRows(turn: Turn, data: CompanyBills): Row[] {
+  if (turn.parsed.intent === 'upcoming') return upcomingPayables(data.rows).open;
+  if (turn.parsed.criterion) return turn.scope.filter(r => turn.run?.outcomes[r.id] === 'true');
+  return turn.scope;
+}
+/** Shows the answer's chart on its own on the Dashboard (until Refresh) and switches to that tab. */
+function graphOnDashboard(turn: Turn, data: CompanyBills) {
+  const rows = answerRows(turn, data);
+  const all = rows.length === data.rows.length;
+  const chart: ChartSpec = {
+    id: `focus-${turn.id}`, title: chartTitle(turn.question), ...graphRequest(turn.question, turn.parsed.intent).spec,
+    ...(all ? {} : { ids: rows.map(r => r.id) }), source: { question: turn.question, model: turn.model, at: new Date().toISOString() },
+  };
+  showOnDashboard(data.company.companyId, chart);
+  openDashboard?.();
 }
 
 /** When a model is remembered, the header shows it and lets the user change it or go back to being asked. */
@@ -214,6 +237,11 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
     let turn: Turn = { ...base, model: m, parsed: rules, reading: ready ? 'pending' : 'rules' };
     const inScope = (p: ParsedQuestion) => (p.intent === 'my_work' || p.intent === 'upcoming' ? [] : p.period ? data.rows.filter(r => p.period!.test(r.date)) : data.rows);
     const patch = (fields: Partial<Turn>) => { turn = { ...turn, ...fields }; setTurns(key, ts => ts.map(t => (t.id === id ? turn : t))); };
+    // Graph questions ("graph utilities by month") put their chart on the Dashboard instead of in the chat.
+    const done = () => {
+      if (turn.parsed.intent !== 'my_work' && graphRequest(q, turn.parsed.intent).wanted && answerRows(turn, data).length) { patch({ graphed: true }); graphOnDashboard(turn, data); }
+      save(companyId, as, turn);
+    };
     const start = (parsed: ParsedQuestion, reading: Turn['reading']) => {
       const scope = inScope(parsed);
       patch({ parsed, scope, reading });
@@ -221,15 +249,17 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
         patch({ plate: 'loading' });
         loadPlate(companyId, as).then(plate => { patch({ plate }); save(companyId, as, turn); }, e => patch({ plate: { error: (e as Error).message } }));
       } else if (parsed.criterion && ready) {
-        const onRun = (run: SemanticRun) => { patch({ run }); if (run.finishedAt !== null && !run.error) save(companyId, as, turn); };
+        const onRun = (run: SemanticRun) => { patch({ run }); if (run.finishedAt !== null && !run.error) done(); };
         void (m === 'jev' ? runSemantic(data.company, scope, parsed.criterion, onRun) : runSemanticGemini(data.company, scope, parsed.criterion, m, onRun));
-      } else save(companyId, as, turn);
+      } else done();
     };
     setTurns(key, ts => ts.map(t => (t.id === id ? turn : t)));
     if (!ready) return start(rules, 'rules');
     // The chosen model reads the whole question first; if that call fails, the text rules answer instead.
     understand(q, m).then(u => start(combineUnderstanding(q, rules, u, latest), u), () => start(rules, 'rules'));
   };
+  // Voice: words appear in the box as they are heard; the question sends when the speaker pauses.
+  const voice = useVoice(setInput, text => ask(text));
   const busy = turns.some(t => (t.run && t.run.finishedAt === null) || t.reading === 'pending');
 
   return (
@@ -253,8 +283,10 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
         ))}
         <div ref={endRef} />
       </div>
-      <form className="chat-input" onSubmit={e => { e.preventDefault(); ask(input); }}>
-        <input value={input} onChange={e => setInput(e.target.value)} placeholder={busy ? 'Working…' : `Ask about ${data.company.name}'s spending…`} maxLength={300} autoFocus />
+      {voice.error && <p className="voice-error" role="alert">{voice.error} <button className="linkish" onClick={voice.clearError}>Dismiss</button></p>}
+      <form className="chat-input" onSubmit={e => { e.preventDefault(); voice.stop(); ask(input); }}>
+        <input value={input} onChange={e => setInput(e.target.value)} placeholder={voice.listening ? 'Listening… speak your question' : busy ? 'Working…' : `Ask about ${data.company.name}'s spending…`} maxLength={300} autoFocus />
+        {voice.supported && <button type="button" className={`mic ${voice.listening ? 'on' : ''}`} onClick={voice.listening ? voice.stop : voice.start} aria-pressed={voice.listening} aria-label={voice.listening ? 'Stop listening' : 'Ask by voice'} title={voice.listening ? 'Stop listening' : 'Ask by voice (sends when you pause)'}>🎤</button>}
         <button className="send" disabled={!input.trim()} aria-label="Send">↑</button>
       </form>
     </div>
@@ -277,7 +309,7 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
   if (reading === 'choose') return <ModelChoice turn={turn} availability={availability} onChoose={onChoose} />;
   if (reading === 'pending') return <div className="msg bot scanning"><div className="scan-line"><span className="dots"><i /><i /><i /></span> {modelLabel(turn.model)} is reading your question…</div></div>;
   if (parsed.intent === 'my_work') return <PlateAnswer turn={turn} data={data} as={as} onOpenBill={onOpenBill} footer={footer} />;
-  if (parsed.intent === 'upcoming') return <UpcomingAnswer data={data} as={as} model={turn.model} question={turn.question} onOpenBill={onOpenBill} onChanged={onChanged} footer={footer} />;
+  if (parsed.intent === 'upcoming') return <UpcomingAnswer turn={turn} data={data} as={as} model={turn.model} question={turn.question} onOpenBill={onOpenBill} onChanged={onChanged} footer={footer} />;
 
   const periodText = parsed.period ? ` in ${parsed.period.label}` : ' this year';
   if (parsed.criterion && !jevReady) return <div className="msg bot"><span className="err">{turn.model === 'jev' ? 'Jev is not configured (AI_GATEWAY_API_KEY missing)' : `${modelLabel(turn.model)} needs GEMINI_API_KEY in .env`}, so I can't judge bills by meaning.</span></div>;
@@ -351,13 +383,14 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
   return (
     <div className="msg bot">
       <p className="lead">{headline}</p>
-      {detail}
+      {turn.graphed ? <GraphedNote turn={turn} data={data} /> : detail}
       {unsure.length > 0 && <p className="muted small">◐ {plural(unsure.length, 'more bill')} ({money(sumCents(unsure))}) {unsure.length === 1 ? 'was' : 'were'} too vague to decide and {unsure.length === 1 ? 'is' : 'are'} not counted.</p>}
       {matches.length > 0 && (
         <>
           <div className="sub-h">Largest bills</div>
           <BillList rows={showAll ? sorted : sorted.slice(0, 4)} onOpen={onOpenBill} />
           {sorted.length > 4 && <button className="linkish" onClick={() => setShowAll(s => !s)}>{showAll ? 'Show fewer' : `Show all ${sorted.length}`}</button>}
+          {!turn.graphed && <button className="chip graph-btn" onClick={() => graphOnDashboard(turn, data)}>📊 Show as a graph on the Dashboard</button>}
           <ActOnBills companyId={data.company.companyId} as={as} model={turn.model} rows={matches} label={shortTopic || turn.question} onChanged={onChanged} />
         </>
       )}
@@ -404,21 +437,27 @@ function PlateAnswer({ turn, data, as, onOpenBill, footer }: { turn: Turn; data:
   );
 }
 
-function UpcomingAnswer({ data, as, model, question, onOpenBill, onChanged, footer }: { data: CompanyBills; as: string; model: ChatModel; question: string; onOpenBill: (row: Row) => void; onChanged?: () => void; footer: React.ReactNode }) {
+function UpcomingAnswer({ turn, data, as, model, question, onOpenBill, onChanged, footer }: { turn: Turn; data: CompanyBills; as: string; model: ChatModel; question: string; onOpenBill: (row: Row) => void; onChanged?: () => void; footer: React.ReactNode }) {
   const p = useMemo(() => upcomingPayables(data.rows), [data.rows]);
   const overdue = p.windows.find(w => w.id === 'overdue')!;
   return (
     <div className="msg bot">
       <p className="lead">{p.open.length ? <><span className="big">{money(p.total)}</span> is still open across {plural(p.open.length, 'bill')} as of {p.asOf}{overdue.bills.length ? <>, and <b>{money(overdue.cents)}</b> of it is overdue</> : ''}.</> : <>Every bill is paid as of {p.asOf}. 🎉</>}</p>
       {p.open.length > 0 && <>
-        <Breakdown items={p.windows.filter(w => w.bills.length).map(w => ({ label: w.label, cents: w.cents, count: w.bills.length }))} />
+        {turn.graphed ? <GraphedNote turn={turn} data={data} /> : <Breakdown items={p.windows.filter(w => w.bills.length).map(w => ({ label: w.label, cents: w.cents, count: w.bills.length }))} />}
         <div className="sub-h">Next due</div>
         <BillList rows={p.open.slice(0, 5)} onOpen={onOpenBill} amount={openCents} />
+        {!turn.graphed && <button className="chip graph-btn" onClick={() => graphOnDashboard(turn, data)}>📊 Show as a graph on the Dashboard</button>}
         <ActOnBills companyId={data.company.companyId} as={as} model={model} rows={p.open} label={question} onChanged={onChanged} />
       </>}
       {footer}
     </div>
   );
+}
+
+/** In place of an in-chat chart: the chart is on the Dashboard; this brings it back after a Refresh. */
+function GraphedNote({ turn, data }: { turn: Turn; data: CompanyBills }) {
+  return <p className="graphed-note">📊 Shown as a graph on the Dashboard. <button className="linkish" onClick={() => graphOnDashboard(turn, data)}>Show it again</button></p>;
 }
 
 // ---------- #1 Take action on an answer's bills (team's action engine; previews before applying) ----------

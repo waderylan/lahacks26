@@ -17,8 +17,8 @@ Keep the floating **Ask your books** assistant (`src/AskPanel.tsx`). It supports
 ## Hosted demo
 
 - Frontend: https://waderylan.github.io/lahacks26/app/ (built by `.github/workflows/pages.yml` on push to `main`; slideshow stays under `docs/`).
-- API: https://lahacks26-api.vercel.app (Vercel Hobby project `lahacks26-api`, built by `scripts/build_vercel.mjs`, starts from `server/seed/actions.sqlite`). `AI_GATEWAY_API_KEY`, `ALLOWED_ORIGINS`, and `GEMINI_KEY_PRIVATE` live only in Vercel env.
-- Gemini key: never commit it in plaintext. Run `node --env-file=.env scripts/encrypt_gemini_key.mjs`, commit only `config/gemini-key.enc`, push to `main`; the API picks it up within a minute without a redeploy.
+- API: https://lahacks26-api.vercel.app (Vercel Hobby project `lahacks26-api`, built by `scripts/build_vercel.mjs`, starts from `server/seed/actions.sqlite`). `AI_GATEWAY_API_KEY`, `GEMINI_API_KEY`, `ALLOWED_ORIGINS`, and `GEMINI_KEY_PRIVATE` live only in Vercel env; env changes need `npx vercel deploy --prod`.
+- Gemini key fallback for teammates without Vercel access (unused while `GEMINI_API_KEY` is set): never commit it in plaintext. Run `node --env-file=.env scripts/encrypt_gemini_key.mjs`, commit only `config/gemini-key.enc`, push to `main`; the API picks it up within a minute without a redeploy.
 
 ## Rules
 

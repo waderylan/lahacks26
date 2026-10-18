@@ -1,19 +1,21 @@
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { ActionEngine } from './actionEngine.ts';
 
+export function sameOriginApi(req: Request, res: Response, next: NextFunction) {
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.get('origin')) {
+    try { if (new URL(req.get('origin')!).host !== req.get('host')) { res.status(403).json({ error: 'Cross-origin changes are not allowed.' }); return; } }
+    catch { res.status(403).json({ error: 'Invalid request origin.' }); return; }
+  }
+  next();
+}
+
 export function actionRoutes(app: Express, engine: ActionEngine) {
   const company = (req: Request) => String(req.params.id);
   const reply = (req: Request, plan: ReturnType<ActionEngine['apply']>) => ({ plan, state: engine.store.state(company(req)), rows: plan.items.map(item => engine.store.row(company(req), item.billId)).filter(Boolean) });
   const route = (fn: (req: Request, res: Response) => unknown) => async (req: Request, res: Response, next: NextFunction) => {
     try { await fn(req, res); } catch (error) { next(error); }
   };
-  app.use('/api', (req, res, next) => {
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.get('origin')) {
-      try { if (new URL(req.get('origin')!).host !== req.get('host')) { res.status(403).json({ error: 'Cross-origin changes are not allowed.' }); return; } }
-      catch { res.status(403).json({ error: 'Invalid request origin.' }); return; }
-    }
-    next();
-  });
+  app.use('/api', sameOriginApi);
   app.get('/api/companies/:id/workspace', route((req, res) => {
     const data = engine.data.bills(company(req));
     const rows = data.rows.map(({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges }) => ({ id, companyId, account, memo, dashboard, sourceVersion, workspaceChanges }));

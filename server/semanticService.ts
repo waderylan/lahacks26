@@ -14,11 +14,18 @@ export class SemanticService {
     // another model call, while edits to category or memo invalidate the result.
     return crypto.createHash('sha256').update(JSON.stringify([companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
   }
-  private async bounded<T>(work: () => Promise<T>): Promise<T> {
-    if (this.active >= 3) await new Promise<void>(resolve => this.waiting.push(resolve));
-    else this.active++;
-    try { return await work(); }
-    finally { const next = this.waiting.shift(); if (next) next(); else this.active--; }
+  private pump() {
+    while (this.active < 3 && this.waiting.length) {
+      const next = this.waiting.shift()!;
+      this.active++;
+      next();
+    }
+  }
+  private bounded<T>(work: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      this.waiting.push(() => { void work().then(resolve, reject).finally(() => { this.active--; this.pump(); }); });
+      this.pump();
+    });
   }
   async evaluateRows(companyId: string, criterion: string, rows: Row[], signal?: AbortSignal): Promise<{ results: RecordResult[]; costNanoUsd: string }> {
     const company = this.data.bills(companyId).company;

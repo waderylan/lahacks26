@@ -3,7 +3,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { EMPLOYEES, employeeById, type Employee } from '../src/employees.ts';
 import type { MessageContext } from '../src/rules.ts';
 import { JEV_MODEL } from './jev.ts';
-import type { Row } from './data.ts';
+import { formatCents, type Row } from './data.ts';
 
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
 const geminiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -22,7 +22,7 @@ export interface DraftRequest {
 const billFields = (row: Row, context: MessageContext[]) => ({ ...visibleFields(row), rule_results: context });
 const visibleFields = (row: Row) => ({
   bill: row.docNumber || row.billId, date: row.date, vendor: row.vendor, account: row.account, expense_kind: row.expenseKind,
-  amount: (row.amountCents / 100).toFixed(2), item_names: row.itemNames, description: row.description, memo: row.memo, project: row.project,
+  amount: formatCents(row.amountCents), item_names: row.itemNames, description: row.description, memo: row.memo, project: row.project,
 });
 
 async function chooseEmployee(req: DraftRequest, signal?: AbortSignal): Promise<{ employee: Employee; probability: number }> {

@@ -102,6 +102,8 @@ export default function App() {
   const [drawerExtra, setDrawerExtra] = useState<Row | null>(null);
   const [data, setData] = useState<CompanyBills | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [prefsError, setPrefsError] = useState<string | null>(null);
+  const [inspectError, setInspectError] = useState('');
 
   const [input, setInput] = useState('');
   const [query, setQuery] = useState('');
@@ -141,13 +143,13 @@ export default function App() {
   }, [customOnly, companies, companyId]);
   const updatePrefs = (p: Partial<typeof prefs>) => {
     void fetch('/api/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
-      .then(async response => { const body = await response.json(); if (!response.ok) throw new Error(body.error); setPrefs(body); })
-      .catch(error => setLoadError(error.message));
+      .then(async response => { const body = await response.json(); if (!response.ok) throw new Error(body.error); setPrefs(body); setPrefsError(null); })
+      .catch(error => setPrefsError(error.message));
   };
 
   useEffect(() => {
     fetch('/api/settings').then(async response => { if (!response.ok) throw new Error('Could not load display preferences.'); return response.json(); })
-      .then(value => { setPrefs(value); setPrefsReady(true); }).catch(error => setLoadError(error.message));
+      .then(value => { setPrefs(value); setPrefsReady(true); setPrefsError(null); }).catch(error => { setPrefsError(error.message); setPrefsReady(true); });
     fetch('/api/companies').then((r) => r.json()).then(setCompanies).catch(() => {});
     fetch('/api/status').then((r) => r.json()).then((s) => setJev(s.jev)).catch(() => {});
   }, []);
@@ -186,7 +188,7 @@ export default function App() {
     if (!data) return;
     setReviewed(current => new Set([...current].filter(id => !id.startsWith(`${data.company.companyId}:`)).concat(data.rows.filter(row => row.dashboard?.reviewed).map(row => row.id))));
   }, [data]);
-  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as, companyId);
+  const rules = useRules(data?.company.companyId === companyId ? data : null, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as, companyId);
   // Drafts are only actionable by their sender, so each employee sees just their own.
   const myDrafts = rules.store.messages.filter(message => draftSender(message) === as);
   const pendingApprovals = myDrafts.filter(message => message.status === 'pending').length;
@@ -311,11 +313,12 @@ export default function App() {
   const company = data?.company ?? companies.find((c) => c.companyId === companyId);
   const drawerRow = rows.find((r) => r.id === drawerId) ?? (drawerExtra?.id === drawerId ? drawerExtra : null);
   const inspect = (id: string) => {
+    setInspectError('');
     if (rows.some(row => row.id === id)) { setDrawerId(id); return; }
     void fetch(`/api/companies/${companyId}/bills/${encodeURIComponent(id)}`).then(async response => {
       const row = await response.json(); if (!response.ok) throw new Error(row.error ?? 'Could not load bill.');
       if (row.companyId === companyId) { setDrawerExtra(row); setDrawerId(id); }
-    }).catch(() => {});
+    }).catch((error: Error) => setInspectError(error.message));
   };
   const actionMatches = { ids: visibleRows.filter(row => isMatch(row.id)).map(row => row.id), criterion: query, scope: 'matches' as const };
   const actionReady = complete && !awaitingDebounce;
@@ -362,6 +365,8 @@ export default function App() {
 
       <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules</button><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count">{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button></nav><span className="muted">Saved in SQLite</span></div>
       {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
+      {prefsError && <div className="rules-notice error" role="alert">{prefsError}</div>}
+      {inspectError && <div className="rules-notice error" role="alert">{inspectError}<button onClick={() => setInspectError('')}>Dismiss</button></div>}
 
       {workspace === 'transactions' && <section className="semantic">
         <label htmlFor="criterion">Select transactions by meaning</label>
@@ -489,7 +494,9 @@ export default function App() {
                     ? 'No reviewed transactions yet.'
                     : tab === 'needs'
                       ? 'Everything here has been reviewed.'
-                      : 'This company has no vendor bills.'}
+                      : statusFilter !== 'all' || typeFilter !== 'all' || assigneeFilter !== 'all'
+                        ? 'No rows match the current filters.'
+                        : `This company has no ${isSynthetic ? 'transactions' : 'vendor bills'}.`}
               </div>
             )}
           </div>

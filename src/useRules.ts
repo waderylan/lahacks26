@@ -9,7 +9,7 @@ interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; repl
 const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
-export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '') {
+export function useRules(data: CompanyBills | null, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '', companyId = data?.company.companyId ?? '') {
   const current = useRef(companyId); current.current = companyId;
   const [store, setStore] = useState<RuleStore>(() => structuredClone(EMPTY_STORE));
   const storeRef = useRef(store); storeRef.current = store;
@@ -102,7 +102,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
   if (validCompany) for (const row of data!.rows) {
     const results: Record<string, Outcome> = {};
     for (const condition of conditions) {
-      results[condition.id] = condition.type === 'standard' ? standardResult(condition, row, reviewed.has(row.id)) : judgments[judgmentKey(row, condition.text)] ?? 'pending';
+      results[condition.id] = condition.type === 'standard' ? standardResult(condition, row, Boolean(row.dashboard?.reviewed)) : judgments[judgmentKey(row, condition.text)] ?? 'pending';
       counts[condition.id][results[condition.id]]++;
       if (condition.type === 'ai' && results[condition.id] === 'error') previewErrors.add(errors[judgmentKey(row, condition.text)] ?? 'Jev request failed');
     }

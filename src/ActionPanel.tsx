@@ -16,15 +16,17 @@ export function ActionPanel({ controller: c, matches, selectedIds, ready, onInsp
   const [scope, setScope] = useState<'matches' | 'selected'>(selectedIds.length ? 'selected' : 'matches');
   const [plan, setPlan] = useState<ActionPlan | null>(null);
   const [message, setMessage] = useState('');
+  const [ok, setOk] = useState(true);
   const selection: ActionSelection = scope === 'selected' ? { ids: selectedIds, scope: 'selected' } : matches;
   const signature = JSON.stringify([type, owner, title, dueDate, accountId, text, scope, matches.criterion, matches.expression]);
-  useEffect(() => { setPlan(null); setMessage(''); }, [signature]);
+  useEffect(() => { setPlan(null); setMessage(''); setOk(true); }, [signature]);
   useEffect(() => { setPlan(current => current?.status === 'preview' ? null : current); }, [selection.ids.join('|')]);
   useEffect(() => { setScope(selectedIds.length ? 'selected' : 'matches'); }, [selectedIds.join('|')]);
   const action = (): BillAction => type === 'task' ? { type, owner, title, dueDate } : type === 'category' ? { type, accountId } : type === 'memo' ? { type, text } : type === 'assign' ? { type, owner } : type === 'review' ? { type, reviewed: true } : { type, label: text };
   const eligible = selection.ids.length > 0 && (scope === 'selected' || ready);
-  const preview = async () => { try { setPlan(await c.preview(selection, action())); setMessage(''); } catch {} };
-  const apply = async () => { if (!plan) return; try { const receipt = await c.apply(plan.id); setPlan(receipt); setMessage(`${receipt.items.filter(item => item.status === 'succeeded').length} bills updated. Changes are saved in SQLite.`); } catch {} };
+  const fail = (error: unknown) => { setOk(false); setMessage((error as Error).message || 'The action failed. Try again.'); };
+  const preview = async () => { try { setPlan(await c.preview(selection, action())); setMessage(''); setOk(true); } catch (error) { fail(error); } };
+  const apply = async () => { if (!plan) return; try { const receipt = await c.apply(plan.id); setPlan(receipt); setOk(true); setMessage(`${receipt.items.filter(item => item.status === 'succeeded').length} bills updated. Changes are saved in SQLite.`); } catch (error) { fail(error); } };
   const count = plan?.items.filter(item => item.status === 'ready').length ?? 0;
   return <aside className="rule-panel dashboard-action-panel" aria-label="Take action">
     <div className="builder-header"><h2>Take action</h2><p className="small muted">Change bills or create assigned review tasks.</p></div>
@@ -44,8 +46,8 @@ export function ActionPanel({ controller: c, matches, selectedIds, ready, onInsp
         <div className="action-preview-items">{plan.items.map(item => <article key={item.billId}><button className="bill-inspect" onClick={() => onInspect(item.billId)}>{item.vendor}</button><span className={`action-item-status status-${item.status}`}>{({ ready: 'Ready', skipped: 'Skipped', succeeded: 'Saved', failed: 'Failed', undone: 'Undone' })[item.status]}</span><div className="before-value">{item.before || '(blank)'}</div><div className="after-value">{item.after}</div>{item.message && <p>{item.message}</p>}</article>)}</div>
         {plan.status === 'preview' && <button className="primary dashboard-apply-button" disabled={!count || c.busy} onClick={() => void apply()}>{type === 'task' ? `Create ${count} tasks` : `Apply ${count} changes`}</button>}
       </section>}
-      {message && <p className="action-confirmation" role="status">{message}</p>}
-      {plan?.status === 'finished' && scope === 'matches' && ready && <details className="repeat-action"><summary>Repeat this action automatically</summary><p>Apply to new or changed matching bills while the server is running. Existing bills are not backfilled.</p><button disabled={c.busy} onClick={() => { void c.automate(matches, action()).then(() => setMessage('Automation enabled. It continues when this browser closes, while the server runs.')).catch(() => {}); }}>Enable automation</button></details>}
+      {message && <p className={`action-confirmation${ok ? '' : ' error'}`} role={ok ? 'status' : 'alert'}>{message}</p>}
+      {plan?.status === 'finished' && scope === 'matches' && ready && <details className="repeat-action"><summary>Repeat this action automatically</summary><p>Apply to new or changed matching bills while the server is running. Existing bills are not backfilled.</p><button disabled={c.busy} onClick={() => { void c.automate(matches, action()).then(() => { setOk(true); setMessage('Automation enabled. It continues when this browser closes, while the server runs.'); }).catch(fail); }}>Enable automation</button></details>}
     </div>
     <div className="builder-save"><span className="small muted">Saved on this server in SQLite.</span></div>
   </aside>;

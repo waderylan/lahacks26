@@ -1,5 +1,12 @@
 import type { Row } from './types.ts';
 
+/** Integer cents -> "12.34", using only integer arithmetic. */
+export function formatCents(cents: number): string {
+  const sign = cents < 0 ? '-' : '';
+  const abs = Math.abs(Math.trunc(cents));
+  return `${sign}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, '0')}`;
+}
+
 /** Only business records visible in the UI reach Jev; no provenance or evaluation labels. */
 export function supportingContext(row: Row) {
   if (!row.evidence) return {};
@@ -13,7 +20,7 @@ export function supportingContext(row: Row) {
     ...(row.details && { details: row.details }),
     ...(row.project && { project: { name: row.project, status: project.status, started: project.started_date, cancelled: project.cancelled_date, completed: project.completed_date } }),
     ...(row.evidence.length && { evidence: row.evidence.map(e => ({ kind: e.kind, date: e.date, title: e.title, text: e.text })) }),
-    ...(row.related?.length && { related_bills: row.related.map(r => ({ doc_number: r.docNumber, billed_as: r.vendor, date: r.date, amount: (r.amountCents / 100).toFixed(2), description: r.description, memo: r.memo })) }),
+    ...(row.related?.length && { related_bills: row.related.map(r => ({ doc_number: r.docNumber, billed_as: r.vendor, date: r.date, amount: formatCents(r.amountCents), description: r.description, memo: r.memo })) }),
   }));
 }
 
@@ -23,7 +30,7 @@ export const evaluationEvidence = (row: Row) => ({
   vendor: row.vendor,
   account: row.account,
   expense_kind: row.expenseKind,
-  amount: (row.amountCents / 100).toFixed(2),
+  amount: formatCents(row.amountCents),
   item_names: row.itemNames,
   description: row.description,
   memo: row.memo,

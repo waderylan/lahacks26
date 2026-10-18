@@ -33,7 +33,12 @@ export async function requestEvaluation(companyId: string, criterion: string, id
 }
 export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v2:choice-v1';
 export const judgmentKey = (row: Row, text: string) => JSON.stringify([CACHE_VERSION, row.companyId, row.id, text, evaluationEvidence(row)]);
+const MAX_JUDGMENTS = 10_000;
 const judgments = new Map<string, Promise<Outcome>>();
+function remember(key: string, promise: Promise<Outcome>) {
+  judgments.set(key, promise);
+  while (judgments.size > MAX_JUDGMENTS) judgments.delete(judgments.keys().next().value!);
+}
 export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void): Promise<void> {
   const missing = data.rows.filter(row => !judgments.has(judgmentKey(row, text)));
   for (let i = 0; i < missing.length; i += 20) {
@@ -45,7 +50,7 @@ export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, 
         const result = results.find(r => r.id === row.id)!;
         return ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[result.state];
       }).catch((error: Error) => { judgments.delete(key); throw error; });
-      judgments.set(key, promise);
+      remember(key, promise);
     }
   }
   return Promise.all(data.rows.map(async row => {

@@ -528,3 +528,6 @@ table.score tr.muted td { color:var(--muted); }
 
 .explore-search-bar .mic { flex-shrink:0; padding:8px 12px; }
 .explore-search-bar .mic.listening { color:#a42d2d; border-color:currentColor; background:#fff0f0; }
+.dash-actions { display:flex; gap:6px; flex-wrap:wrap; }
+.chart-field { display:flex; flex-direction:column; gap:3px; font-size:11px; font-weight:600; color:var(--muted); margin:2px 0 4px; }
+.chart-field input { font:inherit; font-size:13px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; color:var(--text); min-width:280px; }

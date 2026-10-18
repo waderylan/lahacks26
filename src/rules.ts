@@ -8,8 +8,13 @@ export type AICondition = { id: string; type: 'ai'; text: string; label: string 
 export type StandardCondition = { id: string; type: 'standard'; field: 'amountCents' | 'review' | 'vendor' | 'account'; operator: 'gt' | 'lt' | 'eq'; value: string };
 export type RuleNode = Group | AICondition | StandardCondition;
 export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message';
-/** For `message`, `value` is the reviewer's short request and `recipient` is an employee ID or 'jev' (Jev picks per bill). */
-export type Action = { id: string; type: ActionType; value: string; recipient?: string };
+/**
+ * For `message`, `value` is the reviewer's short request, `recipient` is an employee ID or 'jev' (Jev picks),
+ * and `sender` is the employee who approves the drafts and sends them.
+ */
+export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string };
+/** Drafts and rules saved before senders existed are sent from AP, the default reviewer. */
+export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
   expression: RuleNode; actions: Action[];
@@ -24,7 +29,7 @@ export interface DraftMessage {
   to: string; subject: string; body: string; reason: string;
   status: MessageStatus; edited: boolean; createdAt: string; decidedAt?: string;
   /** Absent on drafts saved before generated messages; those are ready. */
-  request?: string; routing?: 'jev' | 'manual'; employeeId?: string | null; routingProbability?: number;
+  request?: string; routing?: 'jev' | 'manual'; senderId?: string; employeeId?: string | null; routingProbability?: number;
   generation?: 'pending' | 'ready' | 'error'; generationError?: string;
 }
 export interface MessageItem { transactionId: string; billId: string; context: MessageContext[] }
@@ -139,12 +144,13 @@ export function validateRule(input: unknown): string[] {
     if (!['flag', 'assign', 'tag', 'pass', 'message'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
     else if (a.type === 'message' && a.value.length > 500) errors.push('Message requests must be 500 characters or fewer.');
     else if (a.type === 'message' && a.recipient !== 'jev' && !employeeById(a.recipient)) errors.push('Choose a message recipient or let Jev choose.');
+    else if (a.type === 'message' && !employeeById(a.sender)) errors.push('Choose who the message is sent from.');
   });
   return [...new Set(errors)];
 }
 
-/** Message actions saved before recipients existed default to letting Jev choose. */
-export const migrateRule = (rule: Rule): Rule => ({ ...rule, actions: rule.actions.map(a => a.type === 'message' && !a.recipient ? { ...a, recipient: 'jev' } : a) });
+/** Message actions saved before recipients or senders existed default to letting Jev choose, sent from AP. */
+export const migrateRule = (rule: Rule): Rule => ({ ...rule, actions: rule.actions.map(a => a.type === 'message' ? { ...a, recipient: a.recipient || 'jev', sender: a.sender || DEFAULT_SENDER } : a) });
 
 // Content version includes all loaded evidence. Review status adds a local update version for execution.
 export function transactionVersion(row: Row, reviewed?: boolean): string {
@@ -154,13 +160,15 @@ export function transactionVersion(row: Row, reviewed?: boolean): string {
 }
 export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
 export const recipientLabel = (recipient?: string) => recipient === 'jev' ? 'Jev chooses recipient' : employeeById(recipient)?.name ?? 'No recipient';
-export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${recipientLabel(a.recipient)}): ${a.value}` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
+export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
 
 export const describeCondition = (n: AICondition | StandardCondition) => n.type === 'ai' ? n.label ? `${n.label}: ${n.text}` : n.text
   : `${{ amountCents: 'Amount', review: 'Review status', vendor: 'Vendor', account: 'Account' }[n.field]} ${{ gt: 'greater than', lt: 'less than', eq: 'equals' }[n.operator]} ${n.field === 'amountCents' ? `$${n.value}` : n.value}`;
 
 const messageItem = (row: Row, rule: Rule, snapshot: Snapshot): MessageItem => ({ transactionId: row.id, billId: row.billId,
   context: leaves(rule.expression).map(n => ({ condition: describeCondition(n), kind: n.type, result: snapshot.conditions[n.id] as Truth })) });
+/** The employee who approves and sends this draft; only they see it in Approvals. */
+export const draftSender = (m: DraftMessage) => m.senderId ?? DEFAULT_SENDER;
 export const messageBills = (m: DraftMessage) => m.items.length === 1 ? m.items[0].billId : `${m.items.length} bills`;
 /** Back to un-generated: the recipient (if Jev routes) and text are produced again for the current items. */
 const resetGeneration = (m: DraftMessage): DraftMessage => ({ ...m, subject: '', body: '', generation: 'pending', generationError: undefined,
@@ -182,7 +190,7 @@ export function createDraft(row: Row, rule: Rule, action: Action, snapshot: Snap
     to: employee?.name ?? 'Choosing recipient…', subject: '', body: '',
     reason: `Drafted by rule “${rule.name}” r${rule.revision}. Nothing has been sent.`,
     status: 'pending', edited: false, createdAt: new Date().toISOString(),
-    request: action.value.trim() || DEFAULT_MESSAGE_ASK, routing, employeeId: employee?.id ?? null,
+    request: action.value.trim() || DEFAULT_MESSAGE_ASK, routing, employeeId: employee?.id ?? null, senderId: action.sender ?? DEFAULT_SENDER,
     generation: 'pending',
   };
 }
@@ -217,8 +225,8 @@ export function decideMessage(store: RuleStore, id: string, status: Exclude<Mess
   const nextBody = body ?? current.body;
   const edited = current.edited || nextBody !== current.body;
   const messages = (store.messages ?? []).map(message => message.id === id ? { ...message, status, body: nextBody, edited, decidedAt: new Date().toISOString() } : message);
-  const title = status === 'approved' ? `Approved message to ${current.to}` : `Rejected draft to ${current.to}`;
-  const noticeBody = status === 'approved' ? `${messageBills(current)} · approval saved — no email was delivered.` : `${messageBills(current)} · this draft will not be sent.`;
+  const title = status === 'approved' ? `Sent to ${current.to}` : `Rejected draft to ${current.to}`;
+  const noticeBody = status === 'approved' ? `${messageBills(current)} · delivered to their inbox here — no email was delivered.` : `${messageBills(current)} · this draft will not be sent.`;
   return { store: { ...store, messages, notices: [notice(current.companyId, title, noticeBody, status === 'approved' ? 'good' : 'warn', current.items[0]?.transactionId), ...(store.notices ?? [])] } };
 }
 

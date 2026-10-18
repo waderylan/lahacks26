@@ -30,7 +30,7 @@ export function ruleRoutes(app: Express, service: RuleService) {
       case 'replay': replayed = await service.replay(id); break;
       case 'undo': service.undo(id, command.id); break;
       case 'metadata': service.updateMetadata(id, command.id, command.value, command.expectedVersion); break;
-      case 'decide': service.decide(id, command.id, command.status, command.body, command.expectedBody); break;
+      case 'decide': service.decide(id, command.id, command.status, command.body, command.expectedBody, command.actor); break;
       case 'retry-draft': service.retry(id, command.id); break;
       case 'read-notices': service.notices(id); break;
       case 'dismiss-notice': service.notices(id, command.id); break;

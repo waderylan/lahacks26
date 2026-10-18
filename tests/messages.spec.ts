@@ -42,11 +42,32 @@ test('message actions: one synthesized draft per run, routed by Jev or to a chos
   expect(messages.every((m: any) => m.subject && m.body && m.items.every((i: any) => i.context.length === 2))).toBe(true);
   expect(messages.every((message: any) => message.items.every((item: any) => item.context.every((condition: any) => ['true', 'false', 'uncertain'].includes(condition.result))))).toBe(true);
 
-  await page.getByRole('button', { name: /Messages/ }).last().click();
+  await page.getByRole('navigation', { name: 'Workspace' }).getByRole('button', { name: /^Messages/ }).click();
+  await page.getByRole('navigation', { name: 'Message folders' }).getByRole('button', { name: /^Approvals/ }).click();
   const card = page.locator('.message-card').filter({ hasText: 'Recipient chosen by Jev' }).first();
   await expect(card).toContainText('Request: Ask whether this was a one-off purchase');
   await card.getByRole('button', { name: 'Approve' }).click();
-  await expect(card).toContainText('Approved · not emailed');
+  await expect(card).toContainText('Sent to inbox · not emailed');
+
+  // Signed in as Priya (default), the approval is in her Sent folder and the recipient's inbox.
+  const recipient = jev[0].to as string, first = recipient.split(' ')[0];
+  const folders = page.getByRole('navigation', { name: 'Message folders' });
+  await folders.getByRole('button', { name: /^Sent/ }).click();
+  await expect(page.getByLabel('Sent messages')).toContainText(`To ${recipient}`);
+  const tabs = page.getByRole('tablist', { name: 'Signed in as' });
+  await expect(tabs.getByRole('tab', { name: new RegExp(first) })).toContainText('1');
+  await tabs.getByRole('tab', { name: new RegExp(first) }).click();
+  await expect(page).toHaveURL(new RegExp(`as=${jev[0].employeeId}`));
+  await folders.getByRole('button', { name: /^Inbox/ }).click();
+  await page.getByLabel('Received messages').getByRole('button', { name: /Priya Natarajan/ }).first().click();
+  await expect(page.getByLabel('Conversation')).toContainText(jev[0].subject);
+  await expect(tabs.getByRole('tab', { name: new RegExp(first) })).not.toContainText('1');
+  await page.getByRole('button', { name: 'Reply', exact: true }).click();
+  await page.getByLabel('Message body').fill('Checked these. Recoding two of them today.');
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
+  await tabs.getByRole('tab', { name: /Priya/ }).click();
+  await folders.getByRole('button', { name: /^Inbox/ }).click();
+  await expect(page.getByLabel('Received messages')).toContainText('Recoding two of them today');
   console.log(`Jev recipient for ${count} bills: ${jev[0].to} (${Math.round(jev[0].routingProbability * 100)}%)`);
   console.log('Sample draft:\n' + jev[0].subject + '\n' + jev[0].body);
   expect(errors).toEqual([]);

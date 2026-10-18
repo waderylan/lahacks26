@@ -47,6 +47,9 @@ export class ActionStore {
   put(kind: string, id: string, company: string, value: unknown) {
     this.db.prepare('INSERT INTO documents VALUES(?,?,?,?) ON CONFLICT(kind,id) DO UPDATE SET body=excluded.body,company=excluded.company').run(kind, id, company, JSON.stringify(value));
   }
+  removeAll(kind: string, company: string) {
+    this.db.prepare('DELETE FROM documents WHERE kind=? AND company=?').run(kind, company);
+  }
   list<T>(kind: string, company?: string): T[] {
     const rows = (company ? this.db.prepare('SELECT body FROM documents WHERE kind=? AND company=?').all(kind, company) : this.db.prepare('SELECT body FROM documents WHERE kind=?').all(kind)) as { body: string }[];
     return rows.map(row => JSON.parse(row.body));

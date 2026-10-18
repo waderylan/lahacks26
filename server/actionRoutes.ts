@@ -1,9 +1,12 @@
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { ActionEngine } from './actionEngine.ts';
 
+/** Extra origins (the GitHub Pages frontend) allowed to make changes, from comma-separated ALLOWED_ORIGINS. */
+export const allowedOrigins = () => (process.env.ALLOWED_ORIGINS ?? '').split(',').map(origin => origin.trim()).filter(Boolean);
+
 export function sameOriginApi(req: Request, res: Response, next: NextFunction) {
   if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.get('origin')) {
-    try { if (new URL(req.get('origin')!).host !== req.get('host')) { res.status(403).json({ error: 'Cross-origin changes are not allowed.' }); return; } }
+    try { if (new URL(req.get('origin')!).host !== req.get('host') && !allowedOrigins().includes(req.get('origin')!)) { res.status(403).json({ error: 'Cross-origin changes are not allowed.' }); return; } }
     catch { res.status(403).json({ error: 'Invalid request origin.' }); return; }
   }
   next();

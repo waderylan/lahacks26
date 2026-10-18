@@ -24,3 +24,6 @@ artifacts/
 
 # Local agent notes, not shared
 /agent-notes/
+
+# Vercel CLI link and local build output
+.vercel/

@@ -13,7 +13,7 @@ import type { ActionStore } from './actionStore.ts';
 import { emptyDashboard } from './actionStore.ts';
 import type { WorkspaceData } from './workspaceData.ts';
 import type { Judge } from './actionEngine.ts';
-import { draftMessage, type DraftRequest } from './messages.ts';
+import { draftMessage, geminiConfigured, type DraftRequest } from './messages.ts';
 import { deliverDraft } from './mailbox.ts';
 import { normalizeOwner, normalizeRuleOwners } from './owners.ts';
 import { employeeById } from '../src/employees.ts';
@@ -36,7 +36,9 @@ const itemKey = (message: DraftMessage) => JSON.stringify(message.items);
 export class RuleService {
   private drafting = new Set<string>();
   private scanning = false;
-  constructor(readonly db: ActionStore, readonly data: WorkspaceData, private judge: Judge, private writer: Writer = draftMessage, private companyExists: (id: string) => boolean = () => true) {}
+  constructor(readonly db: ActionStore, readonly data: WorkspaceData, private judge: Judge, private writer: Writer = draftMessage, private companyExists: (id: string) => boolean = () => true,
+    /** Drafts stay pending (not failed) until the writer's key is configured. */
+    private draftReady: () => boolean = () => writer !== draftMessage || geminiConfigured()) {}
 
   private read(companyId: string): SavedState {
     const full = this.data.bills(companyId);
@@ -332,6 +334,7 @@ export class RuleService {
     } finally { this.scanning = false; }
   }
   async drainDrafts() {
+    if (!this.draftReady()) return;
     const work: Promise<void>[] = [];
     for (const saved of this.db.list<SavedState>('rule-state').filter(saved => this.companyExists(saved.companyId))) for (const message of saved.store.messages) {
       if (this.drafting.size >= 3 || this.drafting.has(message.id) || message.status !== 'pending' || message.generation !== 'pending') continue;

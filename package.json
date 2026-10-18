@@ -4,7 +4,7 @@
   "description": "Setup for the [QuickBooks-Hackathon-2026](https://huggingface.co/datasets/CL251215/QuickBooks-Hackathon-2026) `hackathon-100-participant` dataset: 100 synthetic companies, one year of books each.",
   "main": "index.js",
   "scripts": {
-    "test": "tsx --test src/arrange.test.ts src/rules.test.ts src/billStatus.test.ts server/actionEngine.test.ts server/synthetic.test.ts server/semanticService.test.ts server/messages.test.ts server/ruleService.test.ts src/insights.test.ts server/chat.test.ts server/keys.test.ts",
+    "test": "tsx --test src/arrange.test.ts src/rules.test.ts src/billStatus.test.ts server/actionEngine.test.ts server/synthetic.test.ts server/semanticService.test.ts server/messages.test.ts server/paymentRisk.test.ts server/ruleService.test.ts src/insights.test.ts server/chat.test.ts server/keys.test.ts",
     "build": "vite build",
     "test:browser": "playwright test",
     "start": "tsx --env-file=.env server/index.ts",

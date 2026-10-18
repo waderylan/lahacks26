@@ -12,6 +12,7 @@ import { geminiConfigured, GEMINI_MODEL } from './messages.ts';
 import { RuleService } from './ruleService.ts';
 import { ruleRoutes } from './ruleRoutes.ts';
 import { Mailbox, mailRoutes } from './mailbox.ts';
+import { PaymentRisk, paymentRiskRoutes } from './paymentRisk.ts';
 import { ChatStore, chatRoutes } from './chat.ts';
 
 const app = express();
@@ -74,6 +75,7 @@ app.post('/api/evaluate', async (req, res) => {
 actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));
+paymentRiskRoutes(app, new PaymentRisk(database, workspace));
 chatRoutes(app, new ChatStore(database, workspace));
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.

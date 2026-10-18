@@ -511,3 +511,15 @@ table.sheet { border-collapse: separate; border-spacing: 0; table-layout: fixed;
 .model-choice button small { font-size:11px; color:var(--muted); font-weight:400; }
 .model-choice button.primary small { color:rgba(255,255,255,.85); }
 .model-keep { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); cursor:pointer; }
+.risk-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:8px; }
+.risk-list { list-style:none; margin:0 0 12px; padding:0; border:1px solid var(--line); border-radius:8px; }
+.risk-list li + li { border-top:1px solid var(--line); }
+.risk-item { display:flex; flex-direction:column; gap:6px; width:100%; text-align:left; border:0; border-radius:0; background:none; padding:10px 12px; }
+.risk-item:hover { background:#f7f8f6; }
+.risk-item-top { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:13px; }
+.risk-item-why { display:flex; flex-wrap:wrap; gap:6px; }
+.risk-signal { font-size:11px; padding:1px 8px; border-radius:999px; background:#fff4e0; color:#8a5a12; border:1px solid #efd3a0; }
+.risk-badge-suspicious { color:var(--red); background:var(--red-bg); font-weight:600; }
+.risk-escalate { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:4px 0 16px; }
+.risk-quiet summary { cursor:pointer; font-size:12px; color:var(--muted); margin:12px 0 8px; }
+.payment-risk .dashboard-board-heading p { max-width:720px; margin:4px 0 0; }

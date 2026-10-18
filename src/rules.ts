@@ -102,6 +102,38 @@ export function syntheticExampleRules(companyId: string): Rule[] {
       [['flag', 'Suspicious record text']]),
   ];
 }
+/**
+ * Possible payment fraud: money sent, or asked to be sent, somewhere the business hasn't verified.
+ * Mirrors the Payment risk check's criteria as editable conditions, and routes matches to the CFO.
+ */
+export function paymentFraudRule(companyId: string, sender: string = DEFAULT_SENDER): Rule {
+  const ai = (label: string, text: string): AICondition => ({ id: uid(), type: 'ai', label, text });
+  return { id: uid(), companyId, name: 'Possible payment fraud', revision: 1, enabled: false,
+    expression: { id: uid(), type: 'all', children: [
+      { id: uid(), type: 'any', children: [
+        ai('Paid to an account not on file', 'Payment is sent, or asked to be sent, to a bank account that differs from the account on file (the vendor\'s payee details, or the company\'s remit-to account for a customer invoice).'),
+        ai('Asks to change payment details', 'The text or supporting records ask to change where payment goes, such as new bank details or a new remittance account. Urgency alone, without a change to payment details, does not count.'),
+      ] },
+      { id: uid(), type: 'not', children: [
+        ai('Change documented and verified', 'Supporting records show the change to payment details was documented and verified, such as a signed bank change form and a call-back to a known contact, with the vendor master updated.'),
+      ] },
+    ] },
+    actions: [
+      { id: uid(), type: 'flag', value: 'Possible payment diversion' },
+      { id: uid(), type: 'message', value: 'Ask them to hold payment on these and confirm the bank details with each vendor through a known contact before anything is released.', recipient: 'emp-cfo', sender },
+    ] };
+}
+
+export interface RulePreset { id: string; name: string; description: string; build: (companyId: string, sender: string) => Rule }
+/** Starting points for the rule builder. Choosing one fills in its conditions and actions for editing. */
+export function rulePresets(synthetic: boolean): RulePreset[] {
+  const presets: RulePreset[] = [
+    { id: 'payment-fraud', name: 'Possible payment fraud', description: 'Payment to a bank account not on file, or a request to change payment details, without a verified change. Flags it and drafts a message to the CFO. Works best on companies with bank records (the synthetic ones).', build: paymentFraudRule },
+    { id: 'memo-clarification', name: 'Memo needs clarification', description: 'Memo says standing overhead, but the items are physical goods.', build: companyId => exampleRule(companyId) },
+  ];
+  if (synthetic) syntheticExampleRules('').forEach((rule, index) => presets.push({ id: `synthetic-${index}`, name: rule.name, description: leaves(rule.expression).map(n => n.type === 'ai' ? n.label : '').filter(Boolean).join(' · '), build: companyId => syntheticExampleRules(companyId)[index] }));
+  return presets;
+}
 export const leaves = (node: RuleNode): (AICondition | StandardCondition)[] => 'children' in node ? node.children.flatMap(leaves) : [node];
 
 // Semantic uncertainty is preserved under negation. Execution states never become booleans.

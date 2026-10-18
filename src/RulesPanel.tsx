@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { actionLabel, draftSender, messageBills, emptyTransaction, evaluateTree, RESULT_LABELS, type DraftMessage, type LocalTransaction, type Outcome, type RuleNode, type Snapshot, type RuleIssue } from './rules';
-import type { RulesController } from './useRules';
+import { draftSender, messageBills, emptyTransaction, evaluateTree, RESULT_LABELS, type DraftMessage, type LocalTransaction, type Outcome, type RuleNode, type Snapshot, type RuleIssue } from './rules';
 import { employeeById } from './employees';
+import { EmployeeSelect } from './EmployeeSelect';
 const labels = { all: 'AND', any: 'OR', not: 'NOT', ai: 'English condition', standard: 'Filter' };
 
 export function ResultBadge({ value }: { value: Outcome }) { return <span className={`result result-${value}`}>{value === 'true' ? 'Match' : value === 'false' ? 'No match' : value === 'error' ? 'Failed' : value === 'pending' ? 'Checking' : 'Uncertain'}</span>; }
 
-export function RuleIssueList({ issues, onInspect, conditionKey }: { issues: RuleIssue[]; onInspect?: (id: string) => void; conditionKey?: string }) {
+/** `links` adds jumps from an issue to the tasks and approvals it created. */
+export function RuleIssueList({ issues, onInspect, conditionKey, links }: { issues: RuleIssue[]; onInspect?: (id: string) => void; conditionKey?: string; links?: { approvals: (issue: RuleIssue) => number; onTasks: () => void; onApprovals: () => void } }) {
   if (!issues.length) return null;
   const sorted = [...issues].sort((a, b) => (b.resolvedAt ?? b.openedAt).localeCompare(a.resolvedAt ?? a.openedAt));
   return <section className="rule-follow-up" aria-label="Rule follow-up"><h3>Rule follow-up</h3>
@@ -14,26 +15,10 @@ export function RuleIssueList({ issues, onInspect, conditionKey }: { issues: Rul
     <ul>{sorted.slice(0, 20).map(issue => <li key={issue.id} data-issue-id={issue.id}><div>
       {onInspect ? <button className="ghost" onClick={() => onInspect(issue.transactionId)}>{issue.transactionId.split(':').pop()}</button> : <b>{issue.ruleName}</b>}
       <span className={`tag ${issue.status === 'resolved' ? 'ok' : 'warn'}`}>{issue.status === 'resolved' ? 'Resolved' : 'Open'}</span>
-    </div><p>{issue.status === 'resolved' ? 'The rule no longer matches. Cleanup is recorded in action history.' : `Last result: ${RESULT_LABELS[issue.lastResult]}.`}</p>
+    </div><p>{issue.status === 'resolved' ? 'The rule no longer matches. Cleanup is recorded in Tasks & activity.' : `Last result: ${RESULT_LABELS[issue.lastResult]}.`}</p>
       {conditionKey && issue.conditionKey !== conditionKey && issue.status === 'open' && <p>Created with earlier conditions. Kept open for review.</p>}
+      {links && (issue.taskIds.length > 0 || links.approvals(issue) > 0) && <p className="issue-links">{issue.taskIds.length > 0 && <button className="ghost" onClick={links.onTasks}>{issue.taskIds.length} {issue.taskIds.length === 1 ? 'task' : 'tasks'}</button>}{links.approvals(issue) > 0 && <button className="ghost" onClick={links.onApprovals}>{links.approvals(issue)} {links.approvals(issue) === 1 ? 'approval' : 'approvals'}</button>}</p>}
     </li>)}</ul>{issues.length > 20 && <p className="wizard-help">Showing the 20 latest issues.</p>}
-  </section>;
-}
-
-export function RuleHistory({ c, companyId, onOpen }: { c: RulesController; companyId: string; onOpen?: (transactionId: string) => void }) {
-  const [tab, setTab] = useState<'history' | 'replay' | 'messages'>('history');
-  const [open, setOpen] = useState(false);
-  const history = c.store.history.filter(h => h.companyId === companyId);
-  const messages = (c.store.messages ?? []).filter(m => m.companyId === companyId);
-  const pending = messages.filter(m => m.status === 'pending').length;
-  return <section className={`rule-history ${open ? 'expanded' : ''}`} aria-label="Action history"><div className="history-toolbar"><button aria-expanded={open} onClick={() => setOpen(!open)}>{open ? '▾' : '▸'} Activity <b>{history.length}</b></button><button className={tab === 'history' ? 'active' : 'ghost'} onClick={() => { setTab('history'); setOpen(true); }}>Action history</button><button className={tab === 'messages' ? 'active' : 'ghost'} onClick={() => { setTab('messages'); setOpen(true); }}>Messages{pending ? ` · ${pending}` : ''}</button><button className={tab === 'replay' ? 'active' : 'ghost'} onClick={() => { setTab('replay'); setOpen(true); }}>Replay log</button><span className="spacer" /><button disabled={c.busy || !c.remaining || Boolean(c.storageError)} onClick={() => { setTab('replay'); setOpen(true); void c.replay(); }}>{c.busy ? 'Evaluating replay…' : 'Replay next original bill'} <b>({c.remaining})</b></button><button className="ghost" disabled={c.busy || Boolean(c.storageError)} onClick={c.reset}>Reset demo action state</button></div>
-    {open && <div className="history-body">{tab === 'messages' ? messages.length ? messages.map(m => <MessageCard key={m.id} message={m} actor={c.actor} onDecide={c.decideMessage} onRetry={c.retryDraft} onOpen={onOpen} />) : <p className="muted">No drafts yet. Add a Draft internal message action, save, and run the rule.</p> : tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
-      <div><b>{h.transactionId.split(':').pop()}</b> · {h.resolution ? 'Issue resolved' : h.action ? actionLabel(h.action) : 'Rule evaluated'} <ResultBadge value={h.snapshot.result} /><span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
-        {h.resolution && <p className="small">Cleared {h.resolution.flags.length} {h.resolution.flags.length === 1 ? 'flag' : 'flags'} and completed {h.resolution.taskIds.length} {h.resolution.taskIds.length === 1 ? 'task' : 'tasks'}.{h.resolution.kept.length > 0 && ` ${h.resolution.kept.join('. ')}.`}</p>}
-        <div className="small muted">{h.action && `${JSON.stringify(h.previous)} → ${JSON.stringify(h.resulting)} · `}Version {h.transactionVersion} · Rule result: {h.snapshot.result}</div>
-        <small>Evaluator: {h.snapshot.evaluation ? h.snapshot.evaluation.provider + ' · ' + h.snapshot.evaluation.model + ' · policy ' + h.snapshot.evaluation.policyVersion : 'Unknown (legacy history)'}</small>{h.snapshot.expression && <details className="history-evidence"><summary>View condition results</summary><RuleEvidence node={h.snapshot.expression} snapshot={h.snapshot} /></details>}
-      </div>{h.action && <button disabled={Boolean(h.undoneAt) || c.busy} onClick={() => c.undo(h.id)}>{h.undoneAt ? 'Undone' : 'Undo'}</button>}
-    </div>) : <p className="muted">No actions yet. Save a rule and run it on the current preview.</p> : <><p className="small muted">Replay of reserved, unmodified original bills. No live QuickBooks connection.</p>{c.automation.length ? c.automation.map((line, i) => <p key={i}>{line}</p>) : <p className="muted">Enable a saved rule, then replay an original bill.</p>}<button disabled={c.busy} onClick={c.retryAutomation}>Retry failed automation</button></>}</div>}
   </section>;
 }
 
@@ -45,16 +30,16 @@ export function LocalStateEditor({ value, update }: { value?: LocalTransaction; 
   const tx = value ?? emptyTransaction();
   const list = (value: string) => [...new Set(value.split(',').map(s => s.trim()).filter(Boolean))];
   const same = (a: string[], b: string[]) => JSON.stringify(a) === JSON.stringify(b);
-  return <div className="local-editor"><label>Assigned to<input key={`owner-${tx.owner}`} aria-label="Bill assignment" defaultValue={tx.owner} onBlur={event => { if (event.target.value !== tx.owner) update({ ...tx, owner: event.target.value }); }} /></label><label>Flags (comma separated)<input key={`flags-${JSON.stringify(tx.flags)}`} aria-label="Bill flags" defaultValue={tx.flags.join(', ')} onBlur={e => { const flags = list(e.target.value); if (!same(flags, tx.flags)) update({ ...tx, flags }); }} /></label><label>Tags (comma separated)<input key={`tags-${JSON.stringify(tx.tags)}`} aria-label="Bill tags" defaultValue={tx.tags.join(', ')} onBlur={e => { const tags = list(e.target.value); if (!same(tags, tx.tags)) update({ ...tx, tags }); }} /></label><label className="check"><input type="checkbox" checked={tx.automatedCheck} onChange={e => update({ ...tx, automatedCheck: e.target.checked })} /> Passed automated check</label><p className="small muted">Saved in SQLite. Automated check does not mark a bill human reviewed.</p></div>;
+  return <div className="local-editor"><label>Transaction owner<EmployeeSelect label="Bill assignment" value={tx.owner} emptyLabel="Unassigned" onChange={owner => { if (owner !== tx.owner) update({ ...tx, owner }); }} /></label><label>Flags (comma separated)<input key={`flags-${JSON.stringify(tx.flags)}`} aria-label="Bill flags" defaultValue={tx.flags.join(', ')} onBlur={e => { const flags = list(e.target.value); if (!same(flags, tx.flags)) update({ ...tx, flags }); }} /></label><label>Tags (comma separated)<input key={`tags-${JSON.stringify(tx.tags)}`} aria-label="Bill tags" defaultValue={tx.tags.join(', ')} onBlur={e => { const tags = list(e.target.value); if (!same(tags, tx.tags)) update({ ...tx, tags }); }} /></label><label className="check"><input type="checkbox" checked={tx.automatedCheck} onChange={e => update({ ...tx, automatedCheck: e.target.checked })} /> Passed automated check</label><p className="small muted">An automated check is not a human review. Mark the transaction reviewed from its Human review section.</p></div>;
 }
 
 const MESSAGE_STATUS = { pending: 'Pending approval', approved: 'Sent to inbox · not emailed', rejected: 'Rejected · not sent' };
 
 /** `actor` is the signed-in employee; only the draft's sender can approve, edit or reject it. */
-export function MessageCard({ message, actor, onDecide, onRetry, onOpen }: { message: DraftMessage; actor?: string; onDecide: (id: string, status: 'approved' | 'rejected', body?: string) => void; onRetry?: (id: string) => void; onOpen?: (transactionId: string) => void }) {
+export function MessageCard({ message, actor, onDecide, onRetry, onOpen, onSwitch }: { message: DraftMessage; actor?: string; onDecide: (id: string, status: 'approved' | 'rejected', body?: string) => void; onRetry?: (id: string) => void; onOpen?: (transactionId: string) => void; onSwitch?: (employeeId: string) => void }) {
   const sender = draftSender(message), senderName = employeeById(sender)?.name ?? 'the sender';
   const canDecide = !actor || actor === sender;
-  const waiting = <p className="muted">Awaiting {senderName}'s approval</p>;
+  const waiting = <p className="muted">Only {senderName} can approve this draft.{onSwitch && sender && <> <button className="ghost" onClick={() => onSwitch(sender)}>View as {senderName}</button></>}</p>;
   const [editing, setEditing] = useState(false);
   const [open, setOpen] = useState(message.status === 'pending');
   const [draft, setDraft] = useState(message.body);

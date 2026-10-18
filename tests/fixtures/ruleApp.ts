@@ -44,7 +44,7 @@ export async function startRuleApp(options: RuleAppOptions = {}) {
     timers: { scanMs: 100, draftMs: 100 },
   });
   const server = createServer(runtime.app);
-  const vite = await createVite({ server: { middlewareMode: true, hmr: { port: 0 }, ws: false }, appType: 'spa', logLevel: 'error' });
+  const vite = await createVite({ server: { middlewareMode: true, ws: { server } }, appType: 'spa', logLevel: 'error' });
   runtime.app.use(vite.middlewares);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
@@ -52,9 +52,9 @@ export async function startRuleApp(options: RuleAppOptions = {}) {
   return {
     url: `http://127.0.0.1:${address.port}`,
     close: async () => {
-      await runtime.stop();
+      await runtime.stop(); await vite.close();
       const closing = new Promise<void>(resolve => server.close(() => resolve()));
-      server.closeAllConnections(); await closing; await vite.close(); db.db.close();
+      server.closeAllConnections(); await closing; db.db.close();
     },
   };
 }

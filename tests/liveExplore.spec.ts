@@ -8,7 +8,7 @@ test('typing must stop for a full second before checks start, including cached s
     await page.clock.install({ time: new Date('2026-10-17T12:00:00Z') });
     await page.route('**/api/evaluate', route => {
       const { criterion, ids } = route.request().postDataJSON(); queries.push(criterion);
-      return route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: 'match', pMatch: .95 })), costNanoUsd: '0' } });
+      return route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: 'match', scoreKind: 'jev_probability', pMatch: .95 })), costNanoUsd: '0' } });
     });
     await page.goto(app.url);
     await expect(page.getByRole('table', { name: 'Explore results' }).locator('tbody tr')).toHaveCount(8);
@@ -47,20 +47,20 @@ test('the simple bar streams highlighted matches, shows scores, sorts by confide
     await page.route('**/api/evaluate', async route => {
       const { ids } = route.request().postDataJSON();
       if (ids.length === 20) await slowBatch;
-      await route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: scores[id] ? 'match' : 'no_match', pMatch: scores[id] ?? .1 })), costNanoUsd: '0' } });
+      await route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: scores[id] ? 'match' : 'no_match', scoreKind: 'jev_probability', pMatch: scores[id] ?? .1 })), costNanoUsd: '0' } });
     });
     await expect(page.getByLabel('Group logic')).toHaveCount(0);
     await page.getByLabel('Search transactions', { exact: true }).fill('Purchases for tools');
     await expect(page.getByLabel('Explore check progress')).toContainText('4/24 checked');
     await expect(table.locator('tbody tr').first()).toHaveAttribute('data-id', original[20]);
-    await expect(table.locator('tr.m-match .explore-confidence')).toHaveText('90%');
+    await expect(table.locator('tr.m-match .explore-confidence')).toHaveText('90% Jev match probability');
     release();
     await expect(page.getByLabel('Explore check progress')).toContainText('24/24 checked · Complete');
     const matches = table.locator('tbody tr.m-match');
     expect(await matches.evaluateAll(rows => rows.map(row => row.getAttribute('data-id')))).toEqual([original[1], original[20], original[0]]);
-    expect(await matches.locator('.explore-confidence').allTextContents()).toEqual(['95%', '90%', '80%']);
+    expect(await matches.locator('.explore-confidence').allTextContents()).toEqual(['95% Jev match probability', '90% Jev match probability', '80% Jev match probability']);
     await page.getByLabel('Reverse sort', { exact: true }).click();
-    expect(await matches.locator('.explore-confidence').allTextContents()).toEqual(['80%', '90%', '95%']);
+    expect(await matches.locator('.explore-confidence').allTextContents()).toEqual(['80% Jev match probability', '90% Jev match probability', '95% Jev match probability']);
     await page.getByRole('button', { name: 'Clear search', exact: true }).click();
     await expect(matches).toHaveCount(0);
     expect(await table.locator('tbody tr').evaluateAll(rows => rows.map(row => row.getAttribute('data-id')))).toEqual(original);
@@ -80,7 +80,7 @@ test('older search responses cannot highlight or score a newer search', async ({
     await page.route('**/api/evaluate', async route => {
       const { criterion, ids } = route.request().postDataJSON();
       if (criterion === 'Slow search') await oldSearch;
-      await route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: criterion === 'Slow search' ? 'match' : 'no_match', pMatch: criterion === 'Slow search' ? .99 : .05 })), costNanoUsd: '0' } });
+      await route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: criterion === 'Slow search' ? 'match' : 'no_match', scoreKind: 'jev_probability', pMatch: criterion === 'Slow search' ? .99 : .05 })), costNanoUsd: '0' } });
     });
     await page.goto(app.url);
     const oldRequest = page.waitForRequest(request => request.url().endsWith('/api/evaluate') && request.postDataJSON().criterion === 'Slow search');
@@ -91,7 +91,7 @@ test('older search responses cannot highlight or score a newer search', async ({
     const oldReply = page.waitForResponse(response => response.url().endsWith('/api/evaluate') && response.request().postDataJSON().criterion === 'Slow search');
     release(); await oldReply;
     await expect(page.locator('.explore-table .m-match')).toHaveCount(0);
-    await expect(page.locator('.explore-confidence').first()).toHaveText('5%');
+    await expect(page.locator('.explore-confidence').first()).toHaveText('5% Jev match probability');
   } finally { release(); await app.close(); }
 });
 
@@ -119,7 +119,7 @@ test('saved simple searches reopen with their parameters and confidence scores v
     await expect(parameters).toContainText('Matches');
     await expect(parameters).toContainText('Highest confidence first');
     await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked · Complete');
-    await expect(page.locator('.explore-confidence').first()).toHaveText('50%');
+    await expect(page.locator('.explore-confidence').first()).toHaveText('50% Jev match probability');
     await page.getByLabel('Search transactions', { exact: true }).fill('Updated search');
     await expect(parameters).toContainText('Updated search');
     await expect(page.locator('.view-title')).toContainText('Unsaved changes');
@@ -139,7 +139,7 @@ test('combining keeps the simple search and labels each condition confidence wit
     await page.route('**/api/evaluate', route => {
       checks++;
       const { criterion, ids } = route.request().postDataJSON();
-      return route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: 'match', pMatch: criterion === 'Equipment' ? .9 : .7 })), costNanoUsd: '0' } });
+      return route.fulfill({ json: { results: ids.map((id: string) => ({ id, state: 'match', scoreKind: 'jev_probability', pMatch: criterion === 'Equipment' ? .9 : .7 })), costNanoUsd: '0' } });
     });
     await page.goto(app.url);
     await page.getByLabel('Search transactions', { exact: true }).fill('Equipment');
@@ -154,10 +154,10 @@ test('combining keeps the simple search and labels each condition confidence wit
     await page.getByLabel('Condition 2', { exact: true }).fill('Receipt');
     await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked · Complete');
     await expect(page.getByRole('button', { name: 'Use simple search', exact: true })).toBeDisabled();
-    await expect(page.locator('.explore-confidence').first()).toHaveText('90%');
+    await expect(page.locator('.explore-confidence').first()).toHaveText('90% Jev match probability');
     const options = page.getByLabel('Confidence condition').locator('option');
     await page.getByLabel('Confidence condition').selectOption((await options.nth(1).getAttribute('value'))!);
-    await expect(page.locator('.explore-confidence').first()).toHaveText('70%');
+    await expect(page.locator('.explore-confidence').first()).toHaveText('70% Jev match probability');
     await expect(page.locator('.explore-table tbody tr.m-match')).toHaveCount(8);
     expect(checks).toBe(2);
     await expect(page.locator('.explore-confidence-choice')).toContainText('before AND, OR, and NOT');

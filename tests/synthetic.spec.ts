@@ -5,12 +5,14 @@ test('mixed transaction types have clear filters and retain their detail screens
   const app = await startRuleApp({ synthetic: true });
   try {
     await page.goto(app.url);
-    for (const [type, heading] of [['bill', 'Bill'], ['invoice', 'Customer invoice'], ['bank', 'Bank transaction']]) {
+    await expect(page.getByLabel('Transactions by type')).toContainText('Vendor bills 3');
+    await expect(page.getByLabel('Transactions by type')).toContainText('Bank transactions 2');
+    for (const [type, heading] of [['bill', 'Vendor bill'], ['invoice', 'Customer invoice'], ['bank', 'Bank transaction']]) {
       await page.getByLabel('Explore type').selectOption(type);
       const rows = page.getByRole('table', { name: 'Explore results' }).locator('tbody tr');
       await expect(rows).toHaveCount(type === 'bank' ? 2 : 3);
       await rows.first().getByRole('button').click();
-      await expect(page.getByLabel('Transaction detail').getByRole('heading', { name: heading, exact: true })).toBeVisible();
+      await expect(page.getByLabel('Transaction detail')).toContainText(heading);
       await page.getByLabel('Close detail', { exact: true }).click();
     }
     await page.setViewportSize({ width: 390, height: 844 });

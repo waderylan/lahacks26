@@ -4,15 +4,16 @@ import { actionLabel, leaves, savedPreset } from './rules';
 import { STARTER_DEMOS } from './ruleStarterDemos';
 import './ruleStarters.css';
 
+/** The four starter packs are the visible review entry points. Each can be edited before it is saved or run. */
 export function RuleStarters({ c, data, onInspect, onDemoSample }: {
   c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onDemoSample: () => void;
 }) {
-  const presets = c.presets.filter(preset => preset.starter);
+  const presets = c.presets;
   const companyId = data.company.companyId;
-  const example = data.company.synthetic ? STARTER_DEMOS[companyId] : undefined;
-  return <details className="rule-starters">
-    <summary><h2>Rule starter packs</h2><span>Editable examples</span><span className="starter-chevron" aria-hidden="true">›</span></summary>
-    <div className="starter-intro"><p>Save an example as a rule for {data.company.name}, edit it, then review its results and run it.</p>
+  const example = STARTER_DEMOS[companyId];
+  return <section className="rule-starters" aria-label="Rule starter packs">
+    <header><h2>Rule starter packs</h2><span>Editable examples</span></header>
+    <div className="starter-intro"><p>Save an example as a rule for {data.company.name}, edit it, then preview and run it.</p>
       {example && !data.curatedSample && <button onClick={onDemoSample}>Use demo sample</button>}
       {data.curatedSample && <span>Demo sample loaded</span>}
     </div>
@@ -44,11 +45,6 @@ export function RuleStarters({ c, data, onInspect, onDemoSample }: {
         </article>;
       })}
     </div>
-    <details className="starter-more"><summary>More examples</summary><div>
-      {c.presets.filter(preset => !preset.starter).map(preset => <button key={preset.id} aria-label={preset.name} onClick={() => c.loadPreset(preset.id)}>
-        <b>{preset.name}</b><span>{preset.description}</span>
-      </button>)}
-    </div></details>
-    <p className="starter-footnote">Adding a starter saves it with Keep checking off. Review the live results before Run now. Message drafts require approval.</p>
-  </details>;
+    <p className="starter-footnote">Adding a starter saves it with Keep checking off. Review the preview results before running it. Message drafts require the sender’s approval.</p>
+  </section>;
 }

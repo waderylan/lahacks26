@@ -11,6 +11,7 @@ import { ActionEngine } from './actionEngine.ts';
 import { actionRoutes } from './actionRoutes.ts';
 import { RuleService } from './ruleService.ts';
 import { ruleRoutes } from './ruleRoutes.ts';
+import { Mailbox } from './mailbox.ts';
 import { EMPTY_STORE, exampleRule, type Rule, type DraftResult } from '../src/rules.ts';
 import type { CompanyBills, Row } from '../src/types.ts';
 import type { DraftRequest } from './messages.ts';
@@ -22,7 +23,7 @@ const draft: DraftResult = { employeeId: 'emp-controller', subject: 'Check codin
 const judge = async (_company: string, _text: string, rows: Row[]) => Object.fromEntries(rows.map(row => [row.id, 'match' as const]));
 const makeRule = (company = companyId): Rule => ({ ...exampleRule(company), expression: { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '50' }, actions: [
   { id: 'assign', type: 'assign', value: 'Bookkeeper' }, { id: 'flag', type: 'flag', value: 'Needs review' },
-  { id: 'message', type: 'message', value: 'Ask whether these should be recoded.', recipient: 'jev' },
+  { id: 'message', type: 'message', value: 'Ask whether these should be recoded.', recipient: 'jev', sender: 'emp-ap' },
 ] });
 function setup(filename = ':memory:', writer = async (_request: DraftRequest): Promise<DraftResult> => draft) {
   const db = new ActionStore(filename);
@@ -44,7 +45,7 @@ test('rules, messages, approvals, notification flags, bill metadata and arrivals
     await first.service.run(companyId, rule.id, 1, ids);
     await eventually(() => first.service.snapshot(companyId).store.messages[0]?.generation === 'ready');
     const message = first.service.snapshot(companyId).store.messages[0];
-    first.service.decide(companyId, message.id, 'approved', 'Edited approved text', message.body);
+    first.service.decide(companyId, message.id, 'approved', 'Edited approved text', message.body, 'emp-ap');
     first.service.notices(companyId); first.service.notices(companyId, first.service.snapshot(companyId).store.notices[0].id);
     await first.service.replay(companyId);
     first.db.db.close();
@@ -83,8 +84,8 @@ test('stale rule saves, metadata and duplicate message decisions cannot overwrit
   await service.run(companyId, rule.id, 2, ids);
   await eventually(() => service.snapshot(companyId).store.messages[0]?.generation === 'ready');
   const message = service.snapshot(companyId).store.messages[0];
-  service.decide(companyId, message.id, 'approved', 'New text', message.body);
-  assert.throws(() => service.decide(companyId, message.id, 'rejected'), /no longer pending/);
+  service.decide(companyId, message.id, 'approved', 'New text', message.body, 'emp-ap');
+  assert.throws(() => service.decide(companyId, message.id, 'rejected', undefined, undefined, 'emp-ap'), /no longer pending/);
   assert.throws(() => service.updateMetadata(companyId, ids[0], { owner: 'stale', flags: [], tags: [], automatedCheck: false }, '0'), /another session/);
   assert.equal(data.row(companyId, ids[0]).dashboard?.owner, 'Bookkeeper');
 });
@@ -163,4 +164,38 @@ test('HTTP commands share state across clients, isolate companies, persist prefe
   assert.equal(settings.status, 200); assert.equal((await (await fetch(`${base}/api/settings`)).json()).limit, 100);
   assert.equal((await command(companyId, { type: 'run', id: rule.id, revision: 1, ids: ['company-005:bill-1'] })).status, 400);
   const other = service.snapshot('company-005'); assert.equal(other.store.messages.length, 0);
+});
+
+test('mail: X sends Y, Y sees it in their inbox; replies thread; only the recipient marks read; approvals deliver from the approver', async t => {
+  const { db, data, service } = setup(); t.after(() => db.db.close());
+  const mailbox = new Mailbox(db, data);
+  mailbox.send(companyId, { from: 'emp-ap', to: 'emp-controller', subject: 'Coding question', body: 'Is this COGS?' });
+  let marcus = mailbox.view(companyId, 'emp-controller');
+  assert.equal(marcus.inbox.length, 1); assert.equal(marcus.inbox[0].from, 'emp-ap'); assert.equal(marcus.unread['emp-controller'], 1);
+  assert.equal(mailbox.view(companyId, 'emp-ap').sent.length, 1); assert.equal(mailbox.view(companyId, 'emp-ap').inbox.length, 0);
+  assert.equal(mailbox.view(companyId, 'emp-it').inbox.length, 0);
+  const first = marcus.inbox[0];
+  assert.throws(() => mailbox.markRead(companyId, first.id, 'emp-ap'), /recipient/);
+  mailbox.markRead(companyId, first.id, 'emp-controller');
+  assert.equal(mailbox.view(companyId, 'emp-controller').unread['emp-controller'], 0);
+  const reply = mailbox.send(companyId, { from: 'emp-controller', to: 'emp-ap', subject: 'Re: Coding question', body: 'Yes.', replyTo: first.id });
+  assert.equal(reply.threadId, first.threadId); assert.equal(mailbox.view(companyId, 'emp-ap').inbox[0].id, reply.id);
+  assert.throws(() => mailbox.send(companyId, { from: 'emp-it', to: 'emp-ap', subject: 'Re', body: 'x', replyTo: first.id }), /reply/);
+  assert.throws(() => mailbox.send(companyId, { from: 'emp-ap', to: 'emp-nobody', subject: 's', body: 'b' }), /recipient/);
+  assert.throws(() => mailbox.send(companyId, { from: 'emp-ap', to: 'emp-it', subject: ' ', body: 'b' }), /subject/);
+  assert.equal(mailbox.view('company-005', 'emp-controller').inbox.length, 0);
+
+  const rule = makeRule(); service.save(companyId, rule, null); await service.run(companyId, rule.id, 1, ids);
+  await eventually(() => service.snapshot(companyId).store.messages[0]?.generation === 'ready');
+  const draftMessage = service.snapshot(companyId).store.messages[0];
+  assert.throws(() => service.decide(companyId, draftMessage.id, 'approved', undefined, draftMessage.body), /which employee/);
+  assert.throws(() => service.decide(companyId, draftMessage.id, 'approved', undefined, draftMessage.body, 'emp-procurement'), /Only Priya Natarajan/);
+  assert.throws(() => service.decide(companyId, draftMessage.id, 'rejected', undefined, undefined, 'emp-controller'), /Only Priya Natarajan/);
+  service.decide(companyId, draftMessage.id, 'approved', undefined, draftMessage.body, 'emp-ap');
+  const delivered = mailbox.view(companyId, 'emp-controller').inbox.find(mail => mail.source === 'rule')!;
+  assert.equal(delivered.from, 'emp-ap'); assert.equal(delivered.subject, draft.subject); assert.equal(delivered.draftId, draftMessage.id);
+  assert.deepEqual(delivered.items.map(item => item.transactionId), ids);
+  assert.equal(mailbox.view(companyId, 'emp-ap').sent.find(mail => mail.source === 'rule')!.id, delivered.id);
+  service.reset(companyId);
+  assert.equal(mailbox.view(companyId, 'emp-controller').inbox.length, 0);
 });

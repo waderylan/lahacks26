@@ -8,7 +8,8 @@ import { importBrowserWorkspace } from './workspaceMigration';
 interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row }
 const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions]);
 
-export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void) {
+/** `actor` is the signed-in employee; approved drafts are sent from them. */
+export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArrival: (row: Row) => void, previewEnabled = true, onRows?: (rows: RowPatch[]) => void, onChange?: () => void, actor = '') {
   const companyId = data?.company.companyId ?? '';
   const current = useRef(companyId); current.current = companyId;
   const [store, setStore] = useState<RuleStore>(() => structuredClone(EMPTY_STORE));
@@ -126,7 +127,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     toggleEnabled: () => saved && command({ type: 'toggle', id: saved.id, revision: saved.revision, enabled: !saved.enabled }, saved.enabled ? 'Rule disabled.' : 'Enabled on the server for subsequent arrivals and updates.'),
     runOnce: () => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids: data!.rows.map(row => row.id) }, 'Run once completed. Actions and messages are saved in SQLite.'),
     replay: () => command({ type: 'replay' }, 'Original bill replayed. Actions are saved in SQLite.'),
-    busy, automation, message, storageError,
+    busy, automation, message, storageError, actor,
     undo: (id: string) => command({ type: 'undo', id }, 'Action undone. Its execution key is retained.'),
     reset: () => command({ type: 'reset' }, 'Actions, messages, and notifications reset. Saved rules, arrivals, tasks, and review status were preserved.'),
     updateLocal: (id: string, value: import('./rules').LocalTransaction, expectedVersion?: string) => command({ type: 'metadata', id, value, expectedVersion: expectedVersion ?? data?.rows.find(row => row.id === id)?.sourceVersion }),
@@ -136,7 +137,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(rule => rule.id === id); if (rule) { setDraft(structuredClone(rule)); setMessage(''); } },
     loadExample: () => { setDraft(exampleRule(companyId)); setMessage('Editable suggested review policy. A match is not proof of an accounting error.'); },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [] }, actions: [] }); setMessage('Add conditions under IF, then actions under THEN.'); },
-    decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Approval saved. No email was delivered.' : 'Draft rejected.'),
+    decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),
     retryDraft: (id: string) => command({ type: 'retry-draft', id }),
     markNoticesRead: () => command({ type: 'read-notices' }),
     markNoticeToasted: (id: string) => command({ type: 'dismiss-notice', id }),

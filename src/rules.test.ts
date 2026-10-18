@@ -124,12 +124,12 @@ test('clean demo reset clears only the selected company and preserves disabled r
 
 test('message actions create pending drafts that Jev/Gemini complete, stay idempotent, and require approval', () => {
   const rule = exampleRule(row.companyId);
-  rule.actions.push({ id: 'message', type: 'message', value: DEFAULT_MESSAGE_ASK, recipient: 'jev' });
+  rule.actions.push({ id: 'message', type: 'message', value: DEFAULT_MESSAGE_ASK, recipient: 'jev', sender: 'emp-ap' });
   assert.deepEqual(validateRule(rule), []);
-  assert.ok(validateRule({ ...rule, actions: [{ id: 'blank', type: 'message', value: '   ', recipient: 'jev' }] }).length);
-  assert.ok(validateRule({ ...rule, actions: [{ id: 'nobody', type: 'message', value: 'Ask', recipient: 'emp-unknown' }] }).length);
-  assert.deepEqual(validateRule({ ...rule, actions: [{ id: 'manual', type: 'message', value: 'Ask', recipient: 'emp-ap' }] }), []);
-  assert.equal(migrateRule({ ...rule, actions: [{ id: 'old', type: 'message', value: 'Ask' }] }).actions[0].recipient, 'jev');
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'blank', type: 'message', value: '   ', recipient: 'jev', sender: 'emp-ap' }] }).length);
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'nobody', type: 'message', value: 'Ask', recipient: 'emp-unknown', sender: 'emp-ap' }] }).length);
+  assert.deepEqual(validateRule({ ...rule, actions: [{ id: 'manual', type: 'message', value: 'Ask', recipient: 'emp-ap', sender: 'emp-ap' }] }), []);
+  assert.equal(migrateRule({ ...rule, actions: [{ id: 'old', type: 'message', value: 'Ask', sender: 'emp-ap' }] }).actions[0].recipient, 'jev');
   const snapshot = snapshotFor(rule);
   const first = executeRule(structuredClone(EMPTY_STORE), rule, row, 'v1', snapshot, 'run');
   assert.equal(first.messages.length, 1);
@@ -149,7 +149,7 @@ test('message actions create pending drafts that Jev/Gemini complete, stay idemp
   const failed = completeDraft(first, pending.id, { error: 'Gemini down' });
   assert.equal(failed.messages[0].generation, 'error');
   assert.equal(retryDraft(failed, pending.id).messages[0].generation, 'pending');
-  const manualRule = { ...rule, actions: [{ id: 'message', type: 'message' as const, value: 'Ask', recipient: 'emp-ap' }] };
+  const manualRule = { ...rule, actions: [{ id: 'message', type: 'message' as const, value: 'Ask', recipient: 'emp-ap', sender: 'emp-ap' }] };
   const manual = executeRule(structuredClone(EMPTY_STORE), manualRule, row, 'v1', snapshot, 'run');
   assert.equal(manual.messages[0].to, 'Priya Natarajan');
   assert.equal(completeDraft(manual, manual.messages[0].id, { employeeId: 'emp-cfo', subject: 's', body: 'b' }).messages[0].generation, 'error');
@@ -164,7 +164,7 @@ test('message actions create pending drafts that Jev/Gemini complete, stay idemp
   assert.match(decided.store.notices[0].body!, /no email/);
   assert.match(undoEntry(decided.store, entry.id).error!, /conflict/);
   const otherRow = { ...row, id: 'company-005:bill-original', companyId: 'company-005' };
-  const otherRule = { ...exampleRule(otherRow.companyId), actions: [{ id: 'message', type: 'message' as const, value: DEFAULT_MESSAGE_ASK, recipient: 'jev' }] };
+  const otherRule = { ...exampleRule(otherRow.companyId), actions: [{ id: 'message', type: 'message' as const, value: DEFAULT_MESSAGE_ASK, recipient: 'jev', sender: 'emp-ap' }] };
   const mixed = executeRule({ ...structuredClone(ready), rules: [rule, otherRule] }, otherRule, otherRow, 'v1', { result: 'true', conditions: { [leaves(otherRule.expression)[0].id]: 'true', [leaves(otherRule.expression)[1].id]: 'false' } }, 'run');
   const reset = resetCompanyDemo(mixed, row.companyId);
   assert.equal(reset.messages.every(m => m.companyId === otherRow.companyId), true);
@@ -173,7 +173,7 @@ test('message actions create pending drafts that Jev/Gemini complete, stay idemp
 
 
 test('one run synthesizes its matches into one message per action; undo and stale results are handled', () => {
-  const rule = { ...exampleRule(row.companyId), actions: [{ id: 'message', type: 'message' as const, value: 'Ask', recipient: 'jev' }] };
+  const rule = { ...exampleRule(row.companyId), actions: [{ id: 'message', type: 'message' as const, value: 'Ask', recipient: 'jev', sender: 'emp-ap' }] };
   const snapshot = snapshotFor(rule);
   const rows = Array.from({ length: MAX_MESSAGE_ITEMS + 2 }, (_, i) => ({ ...row, id: `${row.companyId}:bill-${i}`, billId: `bill-${i}` }));
   const run = rows.reduce((next, r) => executeRule(next, rule, r, 'v1', snapshot, 'run', 'batch-1'), structuredClone(EMPTY_STORE));

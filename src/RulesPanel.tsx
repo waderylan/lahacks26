@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CompanyBills } from './types';
-import { actionLabel, DEFAULT_MESSAGE_ASK, messageBills, emptyTransaction, evaluateTree, uid, type Action, type DraftMessage, type Group, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
+import { actionLabel, DEFAULT_MESSAGE_ASK, draftSender, messageBills, emptyTransaction, evaluateTree, uid, type Action, type DraftMessage, type Group, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
 import type { RulesController } from './useRules';
 import { EMPLOYEES, employeeById } from './employees';
 
@@ -98,7 +98,7 @@ export function RulesPanel({ controller: c, data }: { controller: RulesControlle
       {render(draft.expression, 1)}
       <div className="section-label then-label">2. THEN <span>What should happen?</span></div>
       <datalist id="flag-labels"><option value="Needs clarification" /><option value="Possible mismatch" /></datalist>
-      {draft.actions.map(a => <article className="action-block" key={a.id}><div className="node-heading"><b>Action</b><span className="spacer" /><button className="ghost" aria-label="Remove action" onClick={() => c.setDraft({ ...draft, actions: draft.actions.filter(x => x.id !== a.id) })}>×</button></div><select aria-label="Action type" value={a.type} onChange={e => updateAction(a.id, { type: e.target.value as Action['type'], value: e.target.value === 'message' ? DEFAULT_MESSAGE_ASK : '', recipient: e.target.value === 'message' ? 'jev' : undefined })}><option value="flag">Add flag</option><option value="assign">Assign to</option><option value="tag">Add tag</option><option value="pass">Mark passed automated check</option><option value="message">Draft internal message</option></select>{a.type === 'message' ? <MessageActionEditor action={a} update={change => updateAction(a.id, change)} /> : a.type !== 'pass' ? <input aria-label="Action value" list={a.type === 'flag' ? 'flag-labels' : undefined} placeholder={a.type === 'flag' ? 'Choose or type a custom flag' : a.type === 'assign' ? 'Person or team' : 'Tag name'} value={a.value} onChange={e => updateAction(a.id, { value: e.target.value })} /> : <p className="small muted">Human review status stays separate.</p>}</article>)}
+      {draft.actions.map(a => <article className="action-block" key={a.id}><div className="node-heading"><b>Action</b><span className="spacer" /><button className="ghost" aria-label="Remove action" onClick={() => c.setDraft({ ...draft, actions: draft.actions.filter(x => x.id !== a.id) })}>×</button></div><select aria-label="Action type" value={a.type} onChange={e => updateAction(a.id, { type: e.target.value as Action['type'], value: e.target.value === 'message' ? DEFAULT_MESSAGE_ASK : '', recipient: e.target.value === 'message' ? 'jev' : undefined, sender: e.target.value === 'message' ? c.actor || undefined : undefined })}><option value="flag">Add flag</option><option value="assign">Assign to</option><option value="tag">Add tag</option><option value="pass">Mark passed automated check</option><option value="message">Draft internal message</option></select>{a.type === 'message' ? <MessageActionEditor action={a} update={change => updateAction(a.id, change)} /> : a.type !== 'pass' ? <input aria-label="Action value" list={a.type === 'flag' ? 'flag-labels' : undefined} placeholder={a.type === 'flag' ? 'Choose or type a custom flag' : a.type === 'assign' ? 'Person or team' : 'Tag name'} value={a.value} onChange={e => updateAction(a.id, { value: e.target.value })} /> : <p className="small muted">Human review status stays separate.</p>}</article>)}
       <button className="add-action" onClick={() => c.setDraft({ ...draft, actions: [...draft.actions, { id: uid(), type: 'tag', value: '' }] })}>+ Add action</button>
       {(treeError || c.validation.length > 0) && <div className="builder-validation" role="status">{treeError || c.validation.join(' ')}</div>}
       <p className="policy-note">Suggested review policy. A match is not proof of an accounting error.</p>
@@ -123,7 +123,7 @@ export function RuleHistory({ c, companyId, onOpen }: { c: RulesController; comp
   const messages = (c.store.messages ?? []).filter(m => m.companyId === companyId);
   const pending = messages.filter(m => m.status === 'pending').length;
   return <section className={`rule-history ${open ? 'expanded' : ''}`} aria-label="Action history"><div className="history-toolbar"><button aria-expanded={open} onClick={() => setOpen(!open)}>{open ? '▾' : '▸'} Activity <b>{history.length}</b></button><button className={tab === 'history' ? 'active' : 'ghost'} onClick={() => { setTab('history'); setOpen(true); }}>Action history</button><button className={tab === 'messages' ? 'active' : 'ghost'} onClick={() => { setTab('messages'); setOpen(true); }}>Messages{pending ? ` · ${pending}` : ''}</button><button className={tab === 'replay' ? 'active' : 'ghost'} onClick={() => { setTab('replay'); setOpen(true); }}>Replay log</button><span className="spacer" /><button disabled={c.busy || !c.remaining || Boolean(c.storageError)} onClick={() => { setTab('replay'); setOpen(true); void c.replay(); }}>{c.busy ? 'Evaluating replay…' : 'Replay next original bill'} <b>({c.remaining})</b></button><button className="ghost" disabled={c.busy || Boolean(c.storageError)} onClick={c.reset}>Reset demo action state</button></div>
-    {open && <div className="history-body">{tab === 'messages' ? messages.length ? messages.map(m => <MessageCard key={m.id} message={m} onDecide={c.decideMessage} onRetry={c.retryDraft} onOpen={onOpen} />) : <p className="muted">No drafts yet. Add a Draft internal message action, save, and run the rule.</p> : tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
+    {open && <div className="history-body">{tab === 'messages' ? messages.length ? messages.map(m => <MessageCard key={m.id} message={m} actor={c.actor} onDecide={c.decideMessage} onRetry={c.retryDraft} onOpen={onOpen} />) : <p className="muted">No drafts yet. Add a Draft internal message action, save, and run the rule.</p> : tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
       <div><b>{h.transactionId.split(':').pop()}</b> · {h.action ? actionLabel(h.action) : `Rule result: ${h.snapshot.result}`}<span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
         <div className="small muted">{h.action && `${JSON.stringify(h.previous)} → ${JSON.stringify(h.resulting)} · `}Version {h.transactionVersion} · Rule result: {h.snapshot.result}</div>
         {h.snapshot.expression && <details className="history-evidence"><summary>View condition results</summary><RuleEvidence node={h.snapshot.expression} snapshot={h.snapshot} /></details>}
@@ -145,6 +145,11 @@ function MessageActionEditor({ action: a, update }: { action: Action; update: (c
   const employee = employeeById(a.recipient);
   return <div className="message-action">
     <label className="field-label">What kind of message?<textarea aria-label="Message request" maxLength={500} placeholder="e.g. Ask whether this was a one-off purchase or part of the monthly service, and if it should be recoded." value={a.value} onChange={e => update({ value: e.target.value })} /></label>
+    <label className="field-label">Send from<select aria-label="Message sender" value={a.sender ?? ''} onChange={e => update({ sender: e.target.value })}>
+      {!a.sender && <option value="">Choose who sends it…</option>}
+      {EMPLOYEES.map(e => <option key={e.id} value={e.id}>{e.name} — {e.title}</option>)}
+    </select></label>
+    {a.sender && <p className="small muted">Drafts wait in {employeeById(a.sender)?.name}'s Approvals and are sent from them.</p>}
     <label className="field-label">Send to<select aria-label="Message recipient" value={a.recipient ?? ''} onChange={e => update({ recipient: e.target.value })}>
       <option value="jev">Let Jev choose the most relevant employee</option>
       <optgroup label="Choose an employee">{EMPLOYEES.map(e => <option key={e.id} value={e.id}>{e.name} — {e.title}</option>)}</optgroup>
@@ -155,9 +160,13 @@ function MessageActionEditor({ action: a, update }: { action: Action; update: (c
   </div>;
 }
 
-const MESSAGE_STATUS = { pending: 'Pending approval', approved: 'Approved · not emailed', rejected: 'Rejected · not sent' };
+const MESSAGE_STATUS = { pending: 'Pending approval', approved: 'Sent to inbox · not emailed', rejected: 'Rejected · not sent' };
 
-export function MessageCard({ message, onDecide, onRetry, onOpen }: { message: DraftMessage; onDecide: (id: string, status: 'approved' | 'rejected', body?: string) => void; onRetry?: (id: string) => void; onOpen?: (transactionId: string) => void }) {
+/** `actor` is the signed-in employee; only the draft's sender can approve, edit or reject it. */
+export function MessageCard({ message, actor, onDecide, onRetry, onOpen }: { message: DraftMessage; actor?: string; onDecide: (id: string, status: 'approved' | 'rejected', body?: string) => void; onRetry?: (id: string) => void; onOpen?: (transactionId: string) => void }) {
+  const sender = draftSender(message), senderName = employeeById(sender)?.name ?? 'the sender';
+  const canDecide = !actor || actor === sender;
+  const waiting = <p className="muted">Awaiting {senderName}'s approval</p>;
   const [editing, setEditing] = useState(false);
   const [open, setOpen] = useState(message.status === 'pending');
   const [draft, setDraft] = useState(message.body);
@@ -177,7 +186,7 @@ export function MessageCard({ message, onDecide, onRetry, onOpen }: { message: D
     </div>
     <div className="message-actions">
       {generation === 'error' && onRetry && <button className="primary" onClick={() => onRetry(message.id)}>Retry</button>}
-      <button className="ghost" onClick={() => onDecide(message.id, 'rejected')}>Discard</button>
+      {canDecide && <button className="ghost" onClick={() => onDecide(message.id, 'rejected')}>Discard</button>}
     </div>
   </article>;
   return <article className={`message-card status-${message.status}`} aria-label={`Draft message to ${message.to}`}>
@@ -186,7 +195,7 @@ export function MessageCard({ message, onDecide, onRetry, onOpen }: { message: D
       <div>
         <div className="message-meta"><span>Message</span><span className={`message-status status-${message.status}`}>{MESSAGE_STATUS[message.status]}</span>{message.edited && <span className="muted">· edited</span>}</div>
         <h3>{message.subject}</h3>
-        <p className="muted">To {message.to}{employee && ` · ${employee.title}`} · {messageBills(message)} · {message.ruleName} r{message.revision}</p>
+        <p className="muted">From {senderName} · To {message.to}{employee && ` · ${employee.title}`} · {messageBills(message)} · {message.ruleName} r{message.revision}</p>
         {message.routing === 'jev' && employee && <p className="muted" title={employee.description}>Recipient chosen by Jev{Number.isFinite(message.routingProbability) && ` · ${Math.round(message.routingProbability! * 100)}% confidence`}</p>}
         {message.request && <p className="muted">Request: {message.request}</p>}
         <MessageEvidence message={message} onOpen={onOpen} />
@@ -195,7 +204,7 @@ export function MessageCard({ message, onDecide, onRetry, onOpen }: { message: D
     </div>
     {!editing && <button className="ghost" onClick={() => setOpen(o => !o)}>{open ? 'Hide draft' : 'View draft'}</button>}
     {editing ? <textarea aria-label="Edit draft message" value={draft} onChange={e => setDraft(e.target.value)} rows={Math.min(12, draft.split('\n').length + 2)} /> : open && <pre className="message-body">{message.body}</pre>}
-    {done ? <p className={`message-result status-${message.status}`}>{MESSAGE_STATUS[message.status]}</p> : <div className="message-actions">
+    {done ? <p className={`message-result status-${message.status}`}>{MESSAGE_STATUS[message.status]}</p> : !canDecide ? waiting : <div className="message-actions">
       <button className="primary" onClick={() => { onDecide(message.id, 'approved', editing ? draft : undefined); setEditing(false); }}>Approve</button>
       <button onClick={() => { setEditing(e => !e); setOpen(true); }}>{editing ? 'Cancel edit' : 'Edit'}</button>
       <button className="ghost" onClick={() => onDecide(message.id, 'rejected')}>Reject</button>

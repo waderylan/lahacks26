@@ -55,6 +55,7 @@ export function useDashboard(companyId: string) {
   const state = useSyncExternalStore(client.subscribe, () => client.get(companyId));
   return { ...state, refresh: () => client.refresh(companyId), retry: () => client.retry(companyId),
     setFocus: (chart: ChartSpec) => client.focus(companyId, chart), clearFocus: () => client.focus(companyId, null),
+    clearSavedFocus: (chartId: string) => { if (client.get(companyId).focus?.id === chartId) client.focus(companyId, null); },
     add: (chart: ChartSpec) => client.mutate(companyId, current => [...current, chart]),
     replace: (id: string, chart: ChartSpec) => client.mutate(companyId, current => current.map(c => c.id === id ? { ...chart, id, starter: false } : c)),
     update: (id: string, update: Partial<ChartSpec>) => client.mutate(companyId, current => current.map(c => c.id === id ? { ...c, ...update, id } : c)),

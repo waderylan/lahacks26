@@ -18,13 +18,25 @@ export function Dashboard({ companyId }: { companyId: string }) {
 
 function DashboardBody({ data, reload, reloading }: { data: CompanyBills; reload: () => void; reloading: boolean }) {
   const dash = useDashboard(data.company.companyId);
+  const [savingFocus, setSavingFocus] = useState<string | null>(null);
   const rows = data.rows;
   const kpi = useMemo(() => dashboardTotals(rows), [rows]);
   const dates = useMemo(() => rows.map(r => r.date).sort(), [rows]);
   const keep = async (target: string) => {
     if (!dash.focus) return;
+    const focusId = dash.focus.id;
+    setSavingFocus(focusId);
     const chart = { ...dash.focus, id: crypto.randomUUID() };
-    if (await (target === 'new' ? dash.add(chart) : dash.replace(target, chart))) dash.clearFocus();
+    if (await (target === 'new' ? dash.add(chart) : dash.replace(target, chart))) {
+      dash.clearSavedFocus(focusId);
+      setSavingFocus(current => current === focusId ? null : current);
+    }
+  };
+  const retry = async () => {
+    if (await dash.retry() && savingFocus) {
+      dash.clearSavedFocus(savingFocus);
+      setSavingFocus(current => current === savingFocus ? null : current);
+    }
   };
   return (
     <div className="dash" role="main" aria-label="Dashboard">
@@ -45,7 +57,7 @@ function DashboardBody({ data, reload, reloading }: { data: CompanyBills; reload
         <div><span>Unpaid vendor bills</span><b>{money(kpi.payables)}</b></div>
         <div><span>Overdue vendor bills</span><b className={kpi.overdue ? 'warn' : ''}>{money(kpi.overdue)}</b></div>
       </div>
-      {dash.error && <p className="err small" role="alert">{dash.error} <button className="linkish" disabled={dash.busy} onClick={() => { void dash.retry(); }}>Retry</button></p>}
+      {dash.error && <p className="err small" role="alert">{dash.error} <button className="linkish" disabled={dash.busy} onClick={() => { void retry(); }}>Retry</button></p>}
       {dash.focus ? <FocusChart chart={dash.focus} data={data} charts={dash.charts} busy={dash.busy} onChange={patch => dash.setFocus({ ...dash.focus!, ...patch })} onRefresh={dash.clearFocus} onKeep={target => { void keep(target); }} /> : <>
       <p className="dash-tip">Ask <b>Ask your books</b> to “graph utilities by month”. <b>Back to charts</b> returns to saved charts.</p>
       {!dash.ready ? <div className="state">Loading charts…</div> : (

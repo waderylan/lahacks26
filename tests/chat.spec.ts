@@ -47,19 +47,22 @@ test('Ask your books restores semantic answers, previewed tasks and durable conv
   } finally { await app.close(); }
 });
 
-test('chat graphs use the current Dashboard save flow and survive reload', async ({ page }) => {
+for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) test(`chat graphs expose Save chart and survive reload at ${viewport.width}px`, async ({ page }) => {
   const app = await startRuleApp();
   try {
+    await page.setViewportSize(viewport);
     await page.goto(app.url); await openChat(page);
     const chat = await ask(page, 'Graph all spending by month');
     await expect(page.getByRole('main', { name: 'Dashboard', exact: true })).toBeVisible();
-    await chat.getByRole('button', { name: 'Close chat', exact: true }).click();
+    await expect(chat).toHaveCount(0);
     await page.getByRole('button', { name: 'Save chart', exact: true }).click();
     await expect(page.locator('.chart-card')).toHaveCount(5);
     const data = await (await page.request.get(app.url + '/api/companies/company-101/dashboard')).json();
     expect(data.revision).toBe(1);
     expect(data.charts.at(-1).source.question).toBe('Graph all spending by month');
     await page.reload(); await expect(page.locator('.chart-card')).toHaveCount(5);
+    await openChat(page);
+    await expect(chat.locator('.msg.user')).toHaveText('Graph all spending by month');
   } finally { await app.close(); }
 });
 

@@ -122,8 +122,8 @@ let openDashboard: (() => void) | undefined;
 
 /** Floating "Ask your books" assistant in the bottom-right corner, on every tab. */
 export function ChatWidget(props: ChatProps) {
-  openDashboard = props.onOpenDashboard;
   const [open, setOpen] = useState(false);
+  openDashboard = () => { setOpen(false); props.onOpenDashboard?.(); };
   const [clearError, setClearError] = useState('');
   const { data, error: loadError } = useFullBills(props.companyId);
   const key = `${props.companyId}|${props.as}`;
@@ -449,7 +449,7 @@ function UpcomingAnswer({ turn, data, as, model, question, onOpenBill, onChanged
 
 /** In place of an in-chat chart: the chart is on the Dashboard; this brings it back after a Refresh. */
 function GraphedNote({ turn, data }: { turn: Turn; data: CompanyBills }) {
-  return <p className="graphed-note">Chart added to Dashboard. <button className="linkish" onClick={() => graphOnDashboard(turn, data)}>Open chart</button></p>;
+  return <p className="graphed-note">Chart preview on Dashboard. <button className="linkish" onClick={() => graphOnDashboard(turn, data)}>Open preview</button></p>;
 }
 
 // ---------- #1 Take action on an answer's bills (team's action engine; previews before applying) ----------

@@ -20,6 +20,31 @@ test('failed chart deletion stays visible, reports the failure, and persists onl
   } finally { await app.close(); }
 });
 
+test('retrying a failed graph save closes the saved preview and persists one chart', async ({ page }) => {
+  const app = await startRuleApp();
+  try {
+    await page.goto(app.url + '/?workspace=dashboard');
+    await expect(page.locator('.chart-card')).toHaveCount(4);
+    await page.getByRole('button', { name: 'Add chart', exact: true }).click();
+    await page.getByLabel('Chart title', { exact: true }).fill('Retry graph');
+    await page.route('**/api/companies/company-101/dashboard', route => route.request().method() === 'PUT'
+      ? route.fulfill({ status: 500, json: { error: 'Controlled save failure' } }) : route.continue());
+    await page.getByRole('button', { name: 'Save chart', exact: true }).click();
+    await expect(page.getByRole('alert')).toContainText('Controlled save failure');
+    const state = async () => (await (await page.request.get(app.url + '/api/companies/company-101/dashboard')).json());
+    expect((await state()).charts).toHaveLength(4);
+    await page.unroute('**/api/companies/company-101/dashboard');
+    await page.getByRole('button', { name: 'Retry', exact: true }).click();
+    await expect(page.locator('.focus-chart')).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Retry graph', exact: true })).toBeVisible();
+    const saved = await state();
+    expect(saved.revision).toBe(1);
+    expect(saved.charts.filter((chart: any) => chart.title === 'Retry graph')).toHaveLength(1);
+    await page.reload();
+    await expect(page.getByRole('region', { name: 'Retry graph', exact: true })).toBeVisible();
+  } finally { await app.close(); }
+});
+
 test('stale dashboard edits receive a conflict and revisit reloads shared charts', async ({ page, context }) => {
   const app = await startRuleApp(); const other = await context.newPage();
   try {

@@ -14,7 +14,8 @@ import { loadSharedGeminiKey } from './sharedGeminiKey.ts';
 process.env.WORKSPACE_DB ||= '/tmp/actions.sqlite';
 const seed = path.resolve('seed/actions.sqlite');
 if (!fs.existsSync(process.env.WORKSPACE_DB) && fs.existsSync(seed)) fs.copyFileSync(seed, process.env.WORKSPACE_DB);
-const runtime = createReviewApp({ database: actionStore() });
+// The function bundle is read-only; /tmp is the only writable directory.
+const runtime = createReviewApp({ database: actionStore(), feedbackDirectory: '/tmp/model-feedback' });
 const app = express();
 app.set('trust proxy', true);
 

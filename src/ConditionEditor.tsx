@@ -6,6 +6,13 @@ const changeNode = (node: RuleNode, id: string, update: (node: RuleNode) => Rule
 const removeNode = (node: RuleNode, id: string): RuleNode => 'children' in node ? { ...node, children: node.children.filter(child => child.id !== id).map(child => removeNode(child, id)) } : node;
 const newCondition = (): RuleNode => ({ id: uid(), type: 'ai', text: '', label: '' });
 export const conditionText = (node: RuleNode): string => node.type === 'ai' ? node.text : node.type === 'standard' ? `${node.field === 'amountCents' ? 'Amount' : node.field === 'review' ? 'Review status' : node.field} ${node.operator === 'gt' ? '>' : node.operator === 'lt' ? '<' : '='} ${node.field === 'amountCents' ? '$' : ''}${node.value}` : node.type === 'not' ? `NOT (${node.children.map(conditionText).join(' ')})` : `(${node.children.map(conditionText).join(` ${groupLabel[node.type]} `)})`;
+export function conditionEquation(expression: RuleNode): string {
+  const conditions = leaves(expression);
+  const equation = (node: RuleNode): string => !('children' in node) ? `Condition ${conditions.findIndex(condition => condition.id === node.id) + 1}`
+    : node.type === 'not' ? `NOT (${node.children.map(equation).join(' ')})`
+      : node.children.length === 1 ? equation(node.children[0]) : `(${node.children.map(equation).join(` ${groupLabel[node.type]} `)})`;
+  return equation(expression);
+}
 
 export function ConditionEditor({ expression, onChange, data }: { expression: RuleNode; onChange: (node: RuleNode) => void; data: CompanyBills }) {
   const instance = useId();
@@ -35,7 +42,7 @@ export function ConditionEditor({ expression, onChange, data }: { expression: Ru
     const options = data.referenceOptions ?? { vendors: [...new Set(data.rows.map(row => row.vendor))].sort(), accounts: [...new Set(data.rows.map(row => row.account))].sort() };
     return <section className="wizard-condition" key={node.id} data-testid={`node-${node.type}`}>
       <div className="wizard-condition-heading"><label htmlFor={`condition-${instance}-${node.id}`}>Condition {number}{parent?.type === 'not' && <span className="wizard-negation">NOT</span>}</label>{parent && <button className="ghost" aria-label={`Remove condition ${number}`} onClick={() => updateTree(removeNode(expression, node.id))}>Remove</button>}</div>
-      {node.type === 'ai' ? <textarea id={`condition-${instance}-${node.id}`} aria-label={`Condition ${number}`} rows={3} maxLength={500} placeholder="Describe what should be true about this transaction…" value={node.text} onChange={event => update(node.id, current => ({ ...current, text: event.target.value } as RuleNode))} /> : <div className="wizard-standard-condition">
+      {node.type === 'ai' ? <textarea id={`condition-${instance}-${node.id}`} aria-label={`Condition ${number}`} rows={3} maxLength={500} placeholder="Example: Purchases for tools or equipment" value={node.text} onChange={event => update(node.id, current => ({ ...current, text: event.target.value } as RuleNode))} /> : <div className="wizard-standard-condition">
         <select id={`condition-${instance}-${node.id}`} aria-label="Condition field" value={node.field} onChange={event => { const field = event.target.value as StandardCondition['field']; update(node.id, current => ({ ...current, field, operator: field === 'amountCents' ? 'gt' : 'eq', value: field === 'amountCents' ? '500' : field === 'review' ? 'needs_review' : '' } as StandardCondition)); }}>
           <option value="amountCents">Amount</option><option value="review">Review status</option><option value="vendor">{data.company.synthetic ? 'Counterparty' : 'Vendor'}</option><option value="account">Category</option>
         </select><select aria-label="Comparison" value={node.operator} onChange={event => update(node.id, current => ({ ...current, operator: event.target.value } as StandardCondition))}>
@@ -48,5 +55,5 @@ export function ConditionEditor({ expression, onChange, data }: { expression: Ru
     </section>;
   };
 
-  return <>{renderNode(expression, 1)}</>;
+  return <><details className="condition-help copy-details"><summary aria-label="Condition logic help">ⓘ AND / OR / NOT</summary><p>AND: every condition. OR: at least one. NOT: reverse the result. Missing information stays uncertain.</p></details>{renderNode(expression, 1)}</>;
 }

@@ -12,7 +12,7 @@ export function ActivityList({ events, onInspect, onUndo, busy, limit = 50, empt
       <span className="activity-dot" aria-hidden="true" />
       <div>
         <b>{event.label}</b>
-        {event.detail && <p className="small muted">{event.detail}</p>}
+        {event.detail && <details className="copy-details"><summary>Details</summary><p>{event.detail}</p></details>}
         <span className="small muted">{when(event.at)}{onInspect && event.transactionIds.length > 0 && <> · {event.transactionIds.slice(0, 3).map(id => <button key={id} className="bill-inspect" onClick={() => onInspect(id)}>{id.split(':').pop()}</button>)}{event.transactionIds.length > 3 && ` +${event.transactionIds.length - 3} more`}</>}</span>
       </div>
       {event.undo && <button disabled={busy} onClick={() => onUndo(event)}>Undo</button>}

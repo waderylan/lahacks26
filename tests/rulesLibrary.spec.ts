@@ -19,7 +19,7 @@ test('all saved rules have recurring toggles and Preview opens a preview without
   const state = async () => (await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store;
   expect((await state()).history).toEqual([]);
   await card.getByRole('button', { name: 'Preview', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Review the results and actions' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Preview', exact: true })).toBeVisible();
   await expect(page.getByRole('table', { name: 'Rule results and planned actions' }).locator('tbody tr')).toHaveCount(8);
   expect((await state()).history).toEqual([]);
   await page.getByRole('button', { name: /^Run/ }).click();
@@ -36,13 +36,13 @@ test('all saved rules have recurring toggles and Preview opens a preview without
 test('trying a saved rule in Explore needs an explicit return and save before changing it', async ({ page }) => {
   await page.request.post(`${app.url}/api/companies/company-101/rules/commands`, { data: { type: 'save', rule: rule('large'), expectedRevision: null } });
   await page.goto(`${app.url}/?workspace=rules`);
-  await page.getByRole('button', { name: 'View in Explore', exact: true }).click();
+  await page.getByRole('table', { name: 'Company rules', exact: true }).getByRole('button', { name: 'Explore', exact: true }).click();
   await page.getByLabel('Amount in dollars').fill('2500');
   const state = async () => (await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store;
   expect((await state()).rules[0].expression.value).toBe('500');
-  await page.getByRole('button', { name: 'Use these conditions in rule', exact: true }).click();
+  await page.getByRole('button', { name: 'Update rule conditions', exact: true }).click();
   await expect(page.getByLabel('Amount in dollars')).toHaveValue('2500');
-  await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Review results', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Preview', exact: true }).click();
   expect((await state()).rules[0].expression.value).toBe('500');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
   await expect.poll(async () => (await state()).rules[0].expression.value).toBe('2500');

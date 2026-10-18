@@ -164,7 +164,10 @@ test('combining keeps the simple search and labels each condition confidence wit
     await expect(firstRow.getByRole('group', { name: 'Condition 2 score', exact: true })).toContainText('70% Jev match probability');
     await expect(page.locator('.explore-table tbody tr.m-match')).toHaveCount(8);
     expect(checks).toBe(2);
-    await expect(page.locator('.explore-confidence-choice')).toContainText('before AND, OR, and NOT');
+    const scoreDetails = page.locator('.explore-confidence-choice details');
+    await expect(scoreDetails).not.toHaveAttribute('open');
+    await scoreDetails.locator('summary').click();
+    await expect(scoreDetails).toContainText('individual conditions before grouping');
   } finally { await app.close(); }
 });
 

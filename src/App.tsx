@@ -1,5 +1,5 @@
 import { ChatWidget } from './AskPanel';
-import { providerLabel, type Provider } from './modelContext';
+import type { Provider } from './modelContext';
 import { Dashboard } from './Dashboard';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
@@ -178,14 +178,14 @@ export default function App() {
         </div>
         <div className="spacer" />
         <label className="rows-pick" title="Which records Explore and the rule preview load. Running a rule on all records ignores this.">
-          Preview records
+          Records
           <select value={rowLimit} onChange={(e) => updatePrefs({ limit: Number(e.target.value) })} aria-label="Rows to load">
-            {ROW_LIMITS.map((n) => <option key={n} value={n}>{n === 0 ? 'All records' : n === -1 ? 'Curated demo sample' : n}</option>)}
+            {ROW_LIMITS.map((n) => <option key={n} value={n}>{n === 0 ? 'All records' : n === -1 ? 'Demo sample' : n}</option>)}
           </select>
         </label>
         {data && (data.sampled || data.disclosure) && <div className="data-summary">
           {data.sampled && <span className="pill sample" title={data.curatedSample ? 'A hand-picked set of records that shows each starter rule' : 'Records are sampled evenly across the year'}>
-            Sample: {data.rows.length} of {data.totalBills} transactions
+            {data.rows.length} of {data.totalBills}
           </span>}
           {data.disclosure && <>
             <button type="button" className="data-info" aria-label="About this data" aria-haspopup="dialog" popoverTarget="data-disclosure">i</button>
@@ -196,25 +196,24 @@ export default function App() {
             </div>
           </>}
         </div>}
-        {(workspace === 'explore' || workspace === 'rules') && <label className="rows-pick">Explore / new rule model <select aria-label="Evaluation model" title="Saved rules use their recorded provider. Switching preserves the current search and unsaved rule." value={provider} onChange={event => changeProvider(event.target.value as Provider)}><option value="jev">Jev</option><option value="qwen">Qwen</option></select></label>}
-        <JevBadge jev={jev} provider={provider} />
+        {workspace === 'explore' && !exploreRule && <label className="rows-pick">Model <select aria-label="Evaluation model" title="Saved rules use their recorded provider. Switching preserves the current search and unsaved rule." value={provider} onChange={event => changeProvider(event.target.value as Provider)}><option value="jev">Jev</option><option value="qwen">Qwen</option></select></label>}
         <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
         <NotificationBell notices={notices} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'rules', 'dashboard', 'tasks', 'messages'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages' }[value]}{value === 'tasks' && openTasks > 0 && <b className="task-nav-count">{openTasks}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav><span className="muted">{{ explore: 'Find and inspect transactions', dashboard: 'Saved charts and company totals', rules: 'Preview, run and keep checking', tasks: 'Tasks and everything that happened', messages: 'Approvals and internal messages' }[workspace]}</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'rules', 'dashboard', 'tasks', 'messages'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages' }[value]}{value === 'tasks' && openTasks > 0 && <b className="task-nav-count">{openTasks}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav></div>
       {error && <div className="rules-notice error" role="alert">{error}</div>}
       {workspace === 'rules' && rules.message && <div className="rules-notice" role="status">{rules.message}</div>}
-      {workspace === 'rules' && editor !== null && rules.previewErrors.length > 0 && <div className="rules-notice error" role="alert">Some records could not be checked. <button onClick={rules.retry}>Retry failed checks</button></div>}
+      {workspace === 'rules' && editor !== null && rules.previewErrors.length > 0 && <div className="rules-notice error" role="alert">Some checks failed. <button onClick={rules.retry}>Retry failed checks</button></div>}
       {!data ? <main className="wizard-loading" role="status">{loadError || 'Loading transactions…'}</main> : <>
-        <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} provider={exploreRule?.provider ?? provider} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} onOpenRules={() => setWorkspace('rules')} /></div>
+        <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} provider={exploreRule?.provider ?? provider} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} /></div>
         {workspace === 'dashboard' && <div className="insight-body"><Dashboard companyId={companyId} /></div>}
         {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => goTo('messages')} onActivity={() => setWorkspace('tasks')} onExplore={openRuleInExplore} onDemoSample={() => updatePrefs({ limit: -1 })} onRestore={restoreCompany} restoring={restoring} />}
         {workspace === 'tasks' && <div className="workspace-body tasks-workspace"><TaskBoard c={dashboard} as={as} activity={activity} transactionOwner={id => rows.find(row => row.id === id)?.dashboard?.owner} onInspect={inspect} onUndo={undoEvent} busy={dashboard.busy || rules.busy} /></div>}
         {workspace === 'messages' && <div className="workspace-body"><div className="workspace-center"><Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} folder={folder} onFolder={setFolder} onInspect={inspect} approvals={companyDrafts.length ? <>
-          {myDrafts.length > 0 && <section aria-label="Waiting on you"><h3>Sent from {employeeById(as)?.name ?? 'you'}</h3>{myDrafts.map(approvalCard)}</section>}
-          {otherDrafts.length > 0 && <section aria-label="Waiting on others"><h3>Sent from other employees</h3><p className="small muted">You cannot approve these as {employeeById(as)?.name ?? 'this employee'}. Switch to the sender to approve.</p>{otherDrafts.map(approvalCard)}</section>}
-        </> : <p className="dashboard-empty">No drafts yet. Add a Draft internal message action to a rule and run it.</p>} /></div></div>}
+          {myDrafts.length > 0 && <section aria-label="Waiting on you"><h3>Your approvals</h3>{myDrafts.map(approvalCard)}</section>}
+          {otherDrafts.length > 0 && <section aria-label="Waiting on others"><h3>Awaiting other senders</h3>{otherDrafts.map(approvalCard)}</section>}
+        </> : <p className="dashboard-empty">No message drafts.</p>} /></div></div>}
       </>}
       <ChatWidget companyId={companyId} as={as} jevReady={provider === 'jev' && Boolean(jev?.configured)} onOpenDashboard={() => setWorkspace('dashboard')} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={refreshAll} />
       {drawerRow && <Drawer row={drawerRow} rules={rules} readOnly={workspace === 'explore'} tasks={dashboard.tasks.filter(task => task.billId === drawerRow.id)} timeline={transactionTimeline(activity, drawerRow.id)} actor={as} busy={dashboard.busy || rules.busy}
@@ -222,14 +221,6 @@ export default function App() {
       <Toasts notices={notices} onDismiss={rules.markNoticeToasted} />
     </div>
   );
-}
-
-/** Shows "configured" rather than "connected": a credential is present, but no request has proven the connection. */
-function JevBadge({ jev, provider }: { jev: JevStatus | null; provider: Provider }) {
-  const name = providerLabel(provider);
-  if (!jev) return <span className="pill">{name}: checking…</span>;
-  if (!jev.configured) return <span className="pill bad">{name}: not configured</span>;
-  return <span className="pill ok" title={`${jev.model} via ${jev.via}. A key is configured; the first successful check confirms the connection.`}>{name}: configured · {jev.via}</span>;
 }
 
 function CompanyPicker({ companies, value, onChange }: { companies: CompanySummary[]; value: string; onChange: (id: string) => void }) {

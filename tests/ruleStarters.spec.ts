@@ -19,10 +19,10 @@ test('starters add once, stay editable, retain saved status after reload, and ru
     await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
     await expect(page.getByLabel('Condition 1', { exact: true })).toContainText('unitemized receipt');
     await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
-    await step('Choose actions');
+    await step('Actions');
     await expect(page.getByLabel('Clear resolved issues')).toBeChecked();
-    await expect(page.getByRole('group', { name: 'When there is not enough information', exact: true }).getByLabel('Task owner')).toHaveValue('emp-ap');
-    await step('Review results');
+    await expect(page.getByRole('group', { name: 'Uncertain', exact: true }).getByLabel('Task owner')).toHaveValue('emp-ap');
+    await step('Preview');
     await page.getByLabel('Rule name', { exact: true }).fill('Receipt review for this company');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click();
     await page.getByRole('button', { name: /Run/ }).click();
@@ -62,9 +62,9 @@ test('all four custom companies show a useful starter, public example, and indep
     for (const [company, preset, clue] of cases) {
       await chooseCompany(page, company);
       const starter = page.getByRole('article', { name: `${preset} starter`, exact: true });
-      await expect(starter).toContainText('Try first for this company');
+      await expect(starter).toContainText('Suggested');
       await expect(starter).toContainText(clue);
-      await expect(page.locator('.rule-starters > header')).toContainText('Editable examples');
+      await expect(page.locator('.rule-starters > header')).toContainText('Rule starters');
       await starter.getByRole('button', { name: 'Inspect example', exact: true }).click();
       await expect(page.getByLabel('Transaction detail')).toBeVisible();
       await page.getByLabel('Close detail', { exact: true }).click();
@@ -76,7 +76,7 @@ test('all four custom companies show a useful starter, public example, and indep
       await expect(page.locator('.starter-intro')).toContainText('Demo sample loaded');
       if (preset === 'Possible payment fraud') {
         await starter.getByRole('button', { name: 'Open rule', exact: true }).click();
-        await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Choose actions', exact: true }).click();
+        await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Actions', exact: true }).click();
         await expect(page.getByLabel('Message recipient')).toHaveValue('emp-cfo');
         await page.setViewportSize({ width: 1600, height: 1000 });
         await page.screenshot({ path: 'artifacts/rule-starters-desktop.png', fullPage: true });

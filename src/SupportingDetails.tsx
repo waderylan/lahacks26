@@ -18,21 +18,19 @@ export function SupportingDetails({ row, save, busy, issues = [], rules = [], on
   const [rechecked, setRechecked] = useState<string[]>([]);
   const owners = [...new Map(issues.filter(issue => issue.status === 'open').map(issue => [issue.ruleId, rules.find(rule => rule.id === issue.ruleId)])).values()].filter((rule): rule is Rule => Boolean(rule));
   return <section className="supporting-details" aria-label="Add supporting details"><h3>Add supporting details</h3>
-    <p className="small muted">Add the receipt details, approval, or explanation needed to review this transaction.</p>
-    {owners.length > 0 && <ol className="resolution-route small">
-      <li><b>Add details.</b> Save what supports or explains the transaction.</li>
-      <li><b>Recheck.</b> {owners.map(rule => rule.enabled ? `${rule.name} has Keep checking on and rechecks changed records automatically.` : `${rule.name} has Keep checking off. Recheck it yourself after saving.`).join(' ')}</li>
-      <li><b>Resolved.</b> The issue closes when the recheck finds No match and the rule is set to clear resolved issues. Completing a task does not resolve it.</li>
-    </ol>}
+    {owners.length > 0 && <div className="resolution-route small">
+      {owners.map(rule => <p key={rule.id}>{rule.name} · Keep checking {rule.enabled ? 'on' : 'off'}</p>)}
+      <details className="copy-details"><summary>Recheck details</summary><p>Save details, then recheck. Keep checking rechecks changed records automatically. A No match resolves the issue if the rule has Clear resolved issues enabled.</p></details>
+    </div>}
     <form onSubmit={async event => {
       event.preventDefault(); setSaved(false); setError(''); setRechecked([]);
       try { if (await save(row, title, text)) { setTitle(''); setText(''); setSaved(true); } }
       catch (error) { setError((error as Error).message); }
     }}>
-      <label className="wizard-field">Title<input aria-label="Supporting details title" value={title} onChange={event => { setSaved(false); setTitle(event.target.value); }} maxLength={160} required placeholder="For example: Receipt from October 1" /></label>
-      <label className="wizard-field">Details<textarea aria-label="Supporting details text" value={text} onChange={event => { setSaved(false); setText(event.target.value); }} maxLength={8000} rows={4} required placeholder="Describe what was purchased and the records that support it." /></label>
+      <label className="wizard-field">Title<input aria-label="Supporting details title" value={title} onChange={event => { setSaved(false); setTitle(event.target.value); }} maxLength={160} required placeholder="Receipt from October 1" /></label>
+      <label className="wizard-field">Details<textarea aria-label="Supporting details text" value={text} onChange={event => { setSaved(false); setText(event.target.value); }} maxLength={8000} rows={4} required placeholder="Items purchased, approval or receipt details" /></label>
       <button type="submit" disabled={busy || !title.trim() || !text.trim()}>{busy ? 'Saving...' : 'Save supporting details'}</button>
-      {saved && <p className="small" role="status">Details saved. {owners.some(rule => rule.enabled) ? 'Rules with Keep checking on will recheck this transaction.' : 'Recheck the rule to see whether the issue is resolved.'}</p>}
+      {saved && <p className="small" role="status">Details saved. {owners.some(rule => rule.enabled) ? 'Recheck scheduled.' : 'Run the rule again to recheck.'}</p>}
       {error && <p className="wizard-validation" role="alert">{error}</p>}
     </form>
     {saved && onRecheck && owners.length > 0 && <div className="recheck-actions">{owners.map(rule => <button key={rule.id} disabled={busy || rechecked.includes(rule.id)} onClick={async () => { await onRecheck(rule); setRechecked(done => [...done, rule.id]); }}>{rechecked.includes(rule.id) ? `Rechecked: ${rule.name}` : `Recheck now: ${rule.name}`}</button>)}</div>}

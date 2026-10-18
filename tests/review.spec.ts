@@ -60,7 +60,7 @@ test('approvals name their sender and say which employee can approve them', asyn
     await page.getByRole('navigation', { name: 'Message folders' }).getByRole('button', { name: /^Approvals/ }).click();
     const waiting = page.getByLabel('Waiting on others');
     await expect(waiting).toContainText('From Priya Natarajan');
-    await expect(waiting).toContainText('Only Priya Natarajan can approve this draft.');
+    await expect(waiting).toContainText('Awaiting Priya Natarajan');
     await expect(waiting.getByRole('button', { name: 'Approve' })).toHaveCount(0);
     await waiting.getByRole('button', { name: 'View as Priya Natarajan' }).click();
     await expect(page.getByLabel('Waiting on you').getByRole('button', { name: 'Approve', exact: true })).toBeVisible();

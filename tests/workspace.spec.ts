@@ -39,8 +39,8 @@ test('stale rule edits cannot overwrite a newer saved revision', async ({ page, 
     const other = await context.newPage();
     for (const target of [page, other]) {
       await target.goto(`${app.url}/?workspace=rules`);
-      await target.getByRole('button', { name: 'Edit rule', exact: true }).click();
-      await target.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Review results', exact: true }).click();
+      await target.getByRole('button', { name: 'Edit', exact: true }).click();
+      await target.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Preview', exact: true }).click();
     }
     await page.getByLabel('Rule name').fill('Saved revision');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click();

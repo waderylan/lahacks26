@@ -47,26 +47,25 @@ export function Drawer({ row: r, rules, readOnly, tasks, timeline, actor, busy, 
           <dt>Open tasks</dt><dd>{openTasks.length}{tasks.length > 0 && <> <button className="ghost" onClick={() => onGoTo('tasks')}>View in Tasks & activity</button></>}</dd>
         </dl>
         {readOnly
-          ? <section className="review-handoff" aria-label="Review this transaction"><p className="small muted">Explore only inspects. To review it, add supporting details, or work its tasks, continue in Tasks & activity.</p><button className="primary" onClick={() => onGoTo('tasks')}>Continue in Tasks & activity</button></section>
+          ? <section className="review-handoff" aria-label="Review this transaction"><button className="primary" onClick={() => onGoTo('tasks')}>Review in Tasks & activity</button></section>
           : <section className="human-review" aria-label="Human review"><h3>Human review</h3>
-            <p className="small muted">Your sign-off that a person looked at this transaction. It is separate from task status, automated checks and rule results.</p>
             <button disabled={busy} onClick={() => onReview(!reviewed)}>{reviewed ? 'Mark needs review' : 'Mark reviewed'}</button></section>}
-        {!readOnly && rules.draft && snapshot && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={snapshot} /><h3>Actions for this result</h3>{actionsForOutcome(rules.draft, snapshot.result).map(a => <p key={a.id}>{actionLabel(a)}</p>)}{!actionsForOutcome(rules.draft, snapshot.result).length && <p className="muted">No actions configured for this result.</p>}</>}
+        {!readOnly && rules.draft && snapshot && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={snapshot} /><h3>Actions for this result</h3>{actionsForOutcome(rules.draft, snapshot.result).map(a => <p key={a.id}>{actionLabel(a)}</p>)}{!actionsForOutcome(rules.draft, snapshot.result).length && <p className="muted">No action</p>}</>}
         <RuleIssueList issues={issues} links={{ approvals: issue => drafts.filter(message => message.ruleId === issue.ruleId).length, onTasks: () => onGoTo('tasks'), onApprovals: () => onGoTo('messages') }} />
         {!readOnly && <SupportingDetails key={r.id} row={r} save={rules.addEvidence} busy={rules.busy} issues={issues} rules={rules.store.rules} onRecheck={rule => rules.recheck(rule, [r.id])} />}
         {tasks.length > 0 && <section aria-label="Tasks for this transaction"><h3>Tasks</h3>{tasks.map(task => <dl key={task.id} className="line"><dt>{task.status}</dt><dd><b>{task.title}</b><br />Task owner: {ownerLabel(task.owner)} · Due {task.dueDate}</dd></dl>)}</section>}
         {drafts.length > 0 && <section aria-label="Approvals for this transaction"><h3>Message approvals</h3>{drafts.map(message => <MessageCard key={message.id} message={message} actor={actor} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onSwitch={onSwitch} />)}<button className="ghost" onClick={() => onGoTo('messages')}>Open Messages</button></section>}
-        <h3>What happened</h3>
-        <ActivityList events={timeline} onUndo={onUndo} busy={busy} limit={20} empty="Nothing has been done to this transaction yet." />
+        <h3>Activity</h3>
+        <ActivityList events={timeline} onUndo={onUndo} busy={busy} limit={20} empty="No activity yet." />
         {!readOnly && <details className="legacy-metadata"><summary>Edit owner, flags & tags</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => { void rules.updateLocal(r.id, value, r.sourceVersion); }} /></details>}
-        {r.evidence && (<><h3>Supporting records</h3>{r.evidence.length === 0 ? <p className="muted">No supporting records on file for this transaction.</p> : r.evidence.map((e) => (
+        {r.evidence && (<><h3>Supporting records</h3>{r.evidence.length === 0 ? <p className="muted">No supporting records.</p> : r.evidence.map((e) => (
           <dl key={e.id} className="line"><dt>{e.kind.replace(/_/g, ' ')}</dt><dd><b>{e.title}</b> · {e.date}<br />{e.text}</dd></dl>
         ))}</>)}
-        {r.related && r.related.length > 0 && (<><h3>Nearby transactions from this counterparty</h3>{r.related.map((x) => (
-          <dl key={x.id} className="line"><dt>{x.docNumber}</dt><dd>{x.date} · {money(x.amountCents)} · billed as {x.vendor}<br />{x.description || '(blank)'}{x.memo ? ` — ${x.memo}` : ''}</dd></dl>
+        {r.related && r.related.length > 0 && (<><h3>Related transactions</h3>{r.related.map((x) => (
+          <dl key={x.id} className="line"><dt>{x.docNumber}</dt><dd>{x.date} · {money(x.amountCents)} · billed as {x.vendor}<br />{x.description || '(blank)'}{x.memo ? ` · ${x.memo}` : ''}</dd></dl>
         ))}</>)}
         {r.workspaceChanges && Object.keys(r.workspaceChanges).length > 0 && <><h3>Original source values</h3><dl>{r.workspaceChanges.account !== undefined && <><dt>Category</dt><dd>{r.workspaceChanges.account}</dd></>}{r.workspaceChanges.memo !== undefined && <><dt>Memo</dt><dd>{r.workspaceChanges.memo || '(blank)'}</dd></>}</dl></>}
-        <details className="record-details"><summary>Record details</summary>
+        <details className="record-details"><summary>Details</summary>
           <dl>
             <dt>Date</dt><dd>{r.date}</dd>
             <dt>Due</dt><dd>{r.dueDate}</dd>
@@ -92,7 +91,7 @@ export function Drawer({ row: r, rules, readOnly, tasks, timeline, actor, busy, 
           <h3>{r.txnType === 'invoice' ? 'Customer' : r.txnType === 'bank' ? 'Counterparty' : 'Vendor'}</h3>
           <dl>{kv(r.vendorRecord).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}</dl>
           {r.projectRecord && (<><h3>Project</h3><dl>{kv(r.projectRecord).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}</dl></>)}
-          <p className="muted small">Payments are shown as context only and are not counted as separate spend.</p>
+          <p className="muted small">Payments excluded from spend totals.</p>
         </details>
       </div>
     </aside>

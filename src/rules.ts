@@ -16,7 +16,7 @@ export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message' | 'task'
  * and `sender` is the employee who approves the drafts and sends them.
  */
 export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string; when?: Truth; owner?: string; dueDays?: number };
-export const RESULT_LABELS: Record<Truth, string> = { true: 'Match', uncertain: 'Not enough information', false: 'No match' };
+export const RESULT_LABELS: Record<Truth, string> = { true: 'Match', uncertain: 'Uncertain', false: 'No match' };
 /** Actions saved before outcome branches were added still run only on matches. */
 export const actionOutcome = (action: Action): Truth => action.when ?? 'true';
 export const actionsForOutcome = (rule: Rule, outcome: Outcome): Action[] =>
@@ -191,10 +191,10 @@ export interface RulePreset { id: string; name: string; description: string; sta
 /** Starting points for the rule builder. Choosing one fills in its conditions and actions for editing. */
 export function rulePresets(synthetic: boolean): RulePreset[] {
   const presets: RulePreset[] = [
-    { id: 'duplicate-charges', name: 'Possible duplicate charges', starter: true, description: 'Compare repeated bills and payments while allowing separate deliveries, installments and service periods.', build: duplicateChargesRule },
-    { id: 'missing-documentation', name: 'Missing documentation', starter: true, description: 'Find vague purchase details and unitemized receipts; use supporting records before requesting more detail.', build: missingDocumentationRule },
-    { id: 'payment-fraud', name: 'Possible payment fraud', starter: true, description: 'Find unverified payment changes and account mismatches. Flag possible diversion and draft a message to the CFO.', build: paymentFraudRule },
-    { id: 'unsupported-expenses', name: 'Unsupported expenses', starter: true, description: 'Compare billed work, delivered quantities and business purpose with approvals, project records and receipts.', build: unsupportedExpensesRule },
+    { id: 'duplicate-charges', name: 'Possible duplicate charges', starter: true, description: 'Repeated bills or payments for the same purchase.', build: duplicateChargesRule },
+    { id: 'missing-documentation', name: 'Missing documentation', starter: true, description: 'Vague purchase details or unitemized receipts.', build: missingDocumentationRule },
+    { id: 'payment-fraud', name: 'Possible payment fraud', starter: true, description: 'Unverified payment changes or account mismatches.', build: paymentFraudRule },
+    { id: 'unsupported-expenses', name: 'Unsupported expenses', starter: true, description: 'Purchases or billed work that conflict with supporting records.', build: unsupportedExpensesRule },
     { id: 'memo-clarification', name: 'Memo needs clarification', description: 'Memo says standing overhead, but the items are physical goods.', build: companyId => exampleRule(companyId) },
   ];
   if (synthetic) syntheticExampleRules('').forEach((rule, index) => presets.push({ id: `synthetic-${index}`, name: rule.name, description: leaves(rule.expression).map(n => n.type === 'ai' ? n.label : '').filter(Boolean).join(' · '), build: companyId => syntheticExampleRules(companyId)[index] }));
@@ -245,7 +245,7 @@ export function standardResult(node: StandardCondition, row: Row, reviewed: bool
 export function validateRule(input: unknown): string[] {
   const errors: string[] = []; const ids = new Set<string>(); const r = input as Rule;
   if (!r || typeof r !== 'object') return ['Invalid rule'];
-  if (r.provider !== undefined && !['jev', 'qwen'].includes(r.provider)) errors.push('Choose a valid evaluation provider.');
+  if (r.provider !== undefined && !['jev', 'qwen'].includes(r.provider)) errors.push('Choose a model.');
   if (typeof r.id !== 'string' || !r.id || typeof r.companyId !== 'string' || !r.companyId) errors.push('Rule and company IDs are required.');
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
@@ -260,13 +260,13 @@ export function validateRule(input: unknown): string[] {
       const g = n as Group;
       if (depth > 3) { errors.push('Use at most three group levels.'); return; }
       if (!Array.isArray(g.children) || !g.children.length) { errors.push('Groups cannot be empty.'); return; }
-      if (g.type === 'not' && g.children.length !== 1) errors.push('NOT requires exactly one child.');
+      if (g.type === 'not' && g.children.length !== 1) errors.push('NOT needs one condition or group.');
       g.children.forEach(c => visit(c, depth + 1));
     } else if (n.type === 'ai') {
-      if (typeof n.text !== 'string' || !n.text.trim()) errors.push('AI conditions need criterion text.');
-      else if (n.text.length > 500) errors.push('AI conditions must be 500 characters or fewer.');
+      if (typeof n.text !== 'string' || !n.text.trim()) errors.push('Write each condition.');
+      else if (n.text.length > 500) errors.push('Conditions must be 500 characters or fewer.');
     } else if (n.type === 'standard') {
-      if (!['amountCents', 'review', 'vendor', 'account'].includes(n.field) || !['gt', 'lt', 'eq'].includes(n.operator) || typeof n.value !== 'string' || !n.value.trim()) errors.push('Complete each standard condition.');
+      if (!['amountCents', 'review', 'vendor', 'account'].includes(n.field) || !['gt', 'lt', 'eq'].includes(n.operator) || typeof n.value !== 'string' || !n.value.trim()) errors.push('Complete each filter.');
       else if (n.field === 'amountCents' && parseCents(n.value) === null) errors.push('Enter an amount with at most two decimal places.');
       else if (n.field !== 'amountCents' && n.operator !== 'eq') errors.push('Only amounts support greater than or less than.');
       else if (n.field === 'review' && !['reviewed', 'needs_review'].includes(n.value)) errors.push('Choose a valid review status.');
@@ -283,7 +283,7 @@ export function validateRule(input: unknown): string[] {
     else if (a.type === 'task' && (typeof a.owner !== 'string' || !a.owner.trim() || a.owner.length > 100 || !Number.isSafeInteger(a.dueDays) || a.dueDays! < 0 || a.dueDays! > 365)) errors.push('Give each task an owner and a due date from 0 to 365 days.');
     else if (a.type === 'message' && a.value.length > 500) errors.push('Message requests must be 500 characters or fewer.');
     else if (a.type === 'message' && a.recipient !== 'jev' && !employeeById(a.recipient)) errors.push('Choose a message recipient or let Jev choose.');
-    else if (a.type === 'message' && !employeeById(a.sender)) errors.push('Choose who the message is sent from.');
+    else if (a.type === 'message' && !employeeById(a.sender)) errors.push('Choose a message sender.');
   });
   return [...new Set(errors)];
 }
@@ -299,7 +299,7 @@ export function transactionVersion(row: Row, reviewed?: boolean): string {
 }
 export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' || a.type === 'task' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
 export const recipientLabel = (recipient?: string) => recipient === 'jev' ? 'Jev chooses recipient' : employeeById(recipient)?.name ?? 'No recipient';
-export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : a.type === 'task' ? `Task for ${ownerLabel(a.owner)}: ${a.value} (due in ${a.dueDays} ${a.dueDays === 1 ? 'day' : 'days'})` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.type === 'assign' ? ownerLabel(a.value) : a.value}`;
+export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark automated check passed' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : a.type === 'task' ? `Task for ${ownerLabel(a.owner)}: ${a.value} (due in ${a.dueDays} ${a.dueDays === 1 ? 'day' : 'days'})` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.type === 'assign' ? ownerLabel(a.value) : a.value}`;
 
 export const describeCondition = (n: AICondition | StandardCondition) => n.type === 'ai' ? n.label ? `${n.label}: ${n.text}` : n.text
   : `${{ amountCents: 'Amount', review: 'Review status', vendor: 'Vendor', account: 'Account' }[n.field]} ${{ gt: 'greater than', lt: 'less than', eq: 'equals' }[n.operator]} ${n.field === 'amountCents' ? `$${n.value}` : n.value}`;

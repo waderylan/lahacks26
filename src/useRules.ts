@@ -100,7 +100,7 @@ export function useRules(data: CompanyBills | null, { previewEnabled = true, onR
   return {
     store, issues, runs, ready, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
     elapsed, previewErrors: [...previewErrors, ...(evaluation.error ? [evaluation.error] : [])], retry: () => { evaluation.retry(); retry(); }, save,
-    toggleEnabled: (rule = saved) => rule && command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled: !rule.enabled }, rule.enabled ? 'Keep checking is off.' : 'Keep checking is on. Current records are the baseline; only new or changed records trigger actions.'),
+    toggleEnabled: (rule = saved) => rule && command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled: !rule.enabled }, rule.enabled ? 'Keep checking is off.' : 'Keep checking is on for new or changed records.'),
     toggleRule: (rule: Rule, enabled: boolean) => command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled }, `${rule.name}: Keep checking is ${enabled ? 'on' : 'off'}.`),
     /** Full-company run: every company record inside the saved rule's record filters, not just the loaded preview. */
     runRule: (rule: Rule) => command({ type: 'run-all', id: rule.id, revision: rule.revision }, `${rule.name}: run complete. See Tasks & activity for what changed.`),
@@ -110,7 +110,7 @@ export function useRules(data: CompanyBills | null, { previewEnabled = true, onR
       return Boolean(reply);
     },
     /** Runs the saved rule on exactly these records. The wizard passes every evaluated preview record that has a configured action. */
-    runOnce: (ids: string[]) => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids }, 'Run complete. See Tasks & activity for what changed.'),
+    runOnce: (ids: string[]) => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids }, 'Run complete.'),
     /** Re-evaluates one record against a saved rule, for example after supporting details were added. */
     recheck: (rule: Rule, ids: string[]) => command({ type: 'run', id: rule.id, revision: rule.revision, ids }, `${rule.name}: rechecked.`),
     busy, message, storageError, actor,
@@ -126,13 +126,13 @@ export function useRules(data: CompanyBills | null, { previewEnabled = true, onR
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(rule => rule.id === id); if (rule) { setDraft(structuredClone(rule)); setMessage(''); } },
     presets: STARTERS,
     addPreset: async (presetId: string) => {
-      const reply = await command({ type: 'add-preset', presetId, model: pageProvider, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
+      const reply = await command({ type: 'add-preset', presetId, model: pageProvider, sender: actor || 'emp-ap' }, 'Starter saved.');
       const rule = reply?.store.rules.find(rule => rule.id === reply.selectedRuleId);
       if (rule) setDraft(structuredClone(rule));
       return Boolean(rule);
     },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, provider: pageProvider, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
-    decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),
+    decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to internal inbox.' : 'Draft rejected.'),
     retryDraft: (id: string) => command({ type: 'retry-draft', id }),
     markNoticesRead: () => command({ type: 'read-notices' }),
     markNoticeToasted: (id: string) => command({ type: 'dismiss-notice', id }),

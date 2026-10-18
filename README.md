@@ -104,7 +104,7 @@ Routing is the same kind of decision. Picking the right reviewer from a list of 
 
 ## Developer setup
 
-Rule-based review of synthetic company transactions (companies 101–104), with Jev as the judge and fictional employees as reviewers. See [DEMO.md](DEMO.md) for setup, the walkthrough and verification.
+Rule-based review of synthetic company transactions (companies 101–104), with Jev as the judge and fictional employees as reviewers. See [docs/DEMO.md](docs/DEMO.md) for setup, the walkthrough and verification.
 
 ```sh
 npm install
@@ -167,10 +167,10 @@ Regenerate the synthetic companies with `uv run scripts/generate_synthetic.py` a
 
 Dashboard charts and company totals remain available in the Dashboard tab. Use Add chart to configure a chart and Keep on dashboard to save it. Refresh dashboard reloads records and saved chart definitions.
 
-Explore and new rules can use Jev or Qwen. Saved rules retain their own evaluation provider; changing it requires a saved revision before running actions. See [MODEL_RUNTIME.md](MODEL_RUNTIME.md) for server configuration. Browser voice input is available in the Explore search bar on supported browsers.
+Explore and new rules can use Jev or Qwen. Saved rules retain their own evaluation provider; changing it requires a saved revision before running actions. See [docs/MODEL_RUNTIME.md](docs/MODEL_RUNTIME.md) for server configuration. Browser voice input is available in the Explore search bar on supported browsers.
 
 ### Human model feedback
 
-Rules provides one-click Match / No match corrections for Qwen judgments. The separate Model feedback tab reviews local proposals, exports preference JSONL, and requires independent confirmations for Veri upload and optional paid replay-SFT training. Discard removes a proposal from the list and future exports. Existing deployments are unchanged. See [MODEL_FEEDBACK.md](MODEL_FEEDBACK.md).
+Rules provides one-click Match / No match corrections for Qwen judgments. The separate Model feedback tab reviews local proposals, exports preference JSONL, and requires independent confirmations for Veri upload and optional paid replay-SFT training. Discard removes a proposal from the list and future exports. Existing deployments are unchanged. See [docs/MODEL_FEEDBACK.md](docs/MODEL_FEEDBACK.md).
 
 Training and benchmark commands remain available in package.json; see [training/semantic-review/README.md](training/semantic-review/README.md).

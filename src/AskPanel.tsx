@@ -3,6 +3,7 @@ import { pMatchFor } from './jevClient';
 import { EMPLOYEES, employeeById } from './employees';
 import { chartTitle, graphRequest, type ChartSpec } from './charts';
 import { showOnDashboard } from './dashboardStore';
+import { useVoice } from './useVoice';
 import { draftSender, uid, type DraftMessage } from './rules';
 import type { ActionPlan, BillAction, ReviewTask } from './actionTypes';
 import type { Mail } from './mailTypes';
@@ -257,6 +258,8 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
     // The chosen model reads the whole question first; if that call fails, the text rules answer instead.
     understand(q, m).then(u => start(combineUnderstanding(q, rules, u, latest), u), () => start(rules, 'rules'));
   };
+  // Voice: words appear in the box as they are heard; the question sends when the speaker pauses.
+  const voice = useVoice(setInput, text => ask(text));
   const busy = turns.some(t => (t.run && t.run.finishedAt === null) || t.reading === 'pending');
 
   return (
@@ -280,8 +283,10 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
         ))}
         <div ref={endRef} />
       </div>
-      <form className="chat-input" onSubmit={e => { e.preventDefault(); ask(input); }}>
-        <input value={input} onChange={e => setInput(e.target.value)} placeholder={busy ? 'Working…' : `Ask about ${data.company.name}'s spending…`} maxLength={300} autoFocus />
+      {voice.error && <p className="voice-error" role="alert">{voice.error} <button className="linkish" onClick={voice.clearError}>Dismiss</button></p>}
+      <form className="chat-input" onSubmit={e => { e.preventDefault(); voice.stop(); ask(input); }}>
+        <input value={input} onChange={e => setInput(e.target.value)} placeholder={voice.listening ? 'Listening… speak your question' : busy ? 'Working…' : `Ask about ${data.company.name}'s spending…`} maxLength={300} autoFocus />
+        {voice.supported && <button type="button" className={`mic ${voice.listening ? 'on' : ''}`} onClick={voice.listening ? voice.stop : voice.start} aria-pressed={voice.listening} aria-label={voice.listening ? 'Stop listening' : 'Ask by voice'} title={voice.listening ? 'Stop listening' : 'Ask by voice (sends when you pause)'}>🎤</button>}
         <button className="send" disabled={!input.trim()} aria-label="Send">↑</button>
       </form>
     </div>

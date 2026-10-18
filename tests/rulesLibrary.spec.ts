@@ -12,8 +12,8 @@ const rule = (id: string): Rule => ({ id, companyId: 'company-018', name: `Revie
 test('all saved rules have recurring toggles and Run now opens a preview without applying actions', async ({ page }) => {
   for (const id of ['receipts', 'charges']) expect((await page.request.post(`${app.url}/api/companies/company-018/rules/commands`, { data: { type: 'save', rule: rule(id), expectedRevision: null } })).ok()).toBe(true);
   await page.goto(`${app.url}/?workspace=rules`);
-  await expect(page.getByRole('article')).toHaveCount(2);
-  const card = page.getByRole('article', { name: 'Review receipts', exact: true });
+  await expect(page.getByRole('table', { name: 'Company rules', exact: true }).locator('tbody tr')).toHaveCount(2);
+  const card = page.getByRole('table', { name: 'Company rules', exact: true }).locator('tr[data-rule-id=receipts]');
   await card.getByLabel('Keep checking: Review receipts').click();
   await expect(card.getByLabel('Keep checking: Review receipts')).toBeChecked();
   const state = async () => (await (await page.request.get(`${app.url}/api/companies/company-018/rules`)).json()).store;

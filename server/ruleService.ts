@@ -2,8 +2,8 @@ import { inScope } from '../src/ruleScope.ts';
 import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
   markNoticesRead, markNoticeToasted, migrateMessage, migrateRule, resetCompanyDemo, retryDraft,
-  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome, ruleConditionKey,
-  type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue, type HistoryEntry,
+  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome, ruleConditionKey, rulePresets, savedPreset,
+  type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue, type HistoryEntry, type RuleRunSummary,
 } from '../src/rules.ts';
 import { standardResult } from '../src/rules.ts';
 import type { Row } from '../src/types.ts';
@@ -73,7 +73,7 @@ export class RuleService {
   snapshot(companyId: string) {
     const saved = this.read(companyId);
     const rows = this.data.bills(companyId).rows.map(({ id, companyId, dashboard, sourceVersion, account, memo, workspaceChanges, evidence }) => ({ id, companyId, dashboard, sourceVersion, account, memo, workspaceChanges, evidence }));
-    return { store: saved.store, automation: saved.log, rows, issues: this.db.list<RuleIssue>('rule-issue', companyId) };
+    return { store: saved.store, automation: saved.log, rows, issues: this.db.list<RuleIssue>('rule-issue', companyId), runs: this.db.list<RuleRunSummary>('rule-run', companyId).filter(run => saved.store.rules.some(rule => rule.id === run.ruleId)) };
   }
 
   private trackIssue(saved: SavedState, rule: Rule, row: Row, snapshot: Snapshot, before: RuleStore, cycle: string) {
@@ -132,11 +132,28 @@ export class RuleService {
       this.db.put('rule-issue', issue.id, saved.companyId, issue);
     }
   }
+  /** Adding a starter never runs actions; repeated/concurrent clicks reopen the existing rule. */
+  addPreset(companyId: string, presetId: string, sender: string): string {
+    const company = this.data.bills(companyId).company;
+    const preset = rulePresets(Boolean(company.synthetic)).find(preset => preset.id === presetId);
+    if (!preset || !employeeById(sender)) throw new Error('Choose a valid rule starter and sender.');
+    return this.change(companyId, saved => {
+      const existing = savedPreset(saved.store.rules, preset, companyId);
+      if (existing) return existing.id;
+      const rule = preset.build(companyId, sender);
+      const errors = validateRule(rule);
+      if (errors.length) throw new Error(errors[0]);
+      saved.store.rules.push(rule);
+      return rule.id;
+    });
+  }
+
   save(companyId: string, input: Rule, expectedRevision: number | null, activate = false) {
     const errors = validateRule(input);
     if (errors.length || input.companyId !== companyId || typeof input.name !== 'string' || !input.name.trim() || input.name.length > 200 || typeof activate !== 'boolean' ||
       input.actions.some(action => action.type !== 'message' && typeof action.value === 'string' && action.value.length > 100)) throw new Error(errors[0] ?? 'Invalid rule for this company.');
     this.change(companyId, saved => {
+      if (this.db.get('deleted-rule', `${companyId}:${input.id}`)) throw new Error('This rule was deleted. Return to All rules and create a new rule.');
       const old = saved.store.rules.find(rule => rule.id === input.id);
       if ((old?.revision ?? null) !== expectedRevision) throw new Error('Rule changed in another session. Reload the saved rule before saving.');
       const enabled = activate || Boolean(old?.enabled);
@@ -154,6 +171,23 @@ export class RuleService {
       if (enabled) saved.watches[id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row, rule)]));
     });
   }
+  delete(companyId: string, id: string, revision: number) {
+    this.change(companyId, saved => {
+      const rule = saved.store.rules.find(rule => rule.id === id);
+      if (!rule || rule.revision !== revision) throw new Error('Saved rule changed. Refresh before deleting it.');
+      saved.store.rules = saved.store.rules.filter(rule => rule.id !== id);
+      delete saved.watches[id];
+      this.db.put('deleted-rule', `${companyId}:${id}`, companyId, { rule, deletedAt: new Date().toISOString() });
+    });
+  }
+  async runAll(companyId: string, id: string, revision: number) {
+    const full = this.data.bills(companyId), state = this.read(companyId);
+    const reserved = new Set(full.company.scenario ? [] : full.rows.slice(-5).map(row => row.id));
+    const arrived = new Set(state.store.arrivals[companyId] ?? []);
+    const ids = full.rows.filter(row => !reserved.has(row.id) || arrived.has(row.id)).map(row => row.id);
+    if (!ids.length) throw new Error('No transactions are available for this company.');
+    await this.run(companyId, id, revision, ids, 'run', true);
+  }
   private async evaluate(companyId: string, rule: Rule, rows: Row[]): Promise<Record<string, Snapshot>> {
     if (!rows.length) return {};
     const results: Record<string, Record<string, Outcome>> = Object.fromEntries(rows.map(row => [row.id, {}]));
@@ -167,8 +201,8 @@ export class RuleService {
     }));
     return Object.fromEntries(rows.map(row => [row.id, { conditions: results[row.id], result: evaluateTree(rule.expression, results[row.id]) }]));
   }
-  async run(companyId: string, id: string, revision: number, ids: string[], source: 'run' | 'arrival' | 'update' = 'run') {
-    if (!Array.isArray(ids) || !ids.length || ids.length > 1000) throw new Error('Choose 1-1000 bills for this run.');
+  async run(companyId: string, id: string, revision: number, ids: string[], source: 'run' | 'arrival' | 'update' = 'run', wholeCompany = false) {
+    if (!Array.isArray(ids) || !ids.length || (!wholeCompany && ids.length > 1000)) throw new Error('Choose 1-1000 bills for this run.');
     const rule = this.read(companyId).store.rules.find(rule => rule.id === id);
     if (!rule || rule.revision !== revision || (source !== 'run' && !rule.enabled)) throw new Error('Saved rule changed. Refresh before running.');
     const requested = [...new Set(ids)].map(id => this.data.row(companyId, id));
@@ -194,6 +228,10 @@ export class RuleService {
       }
       const counts = ['true', 'uncertain', 'false'].map(result => rows.filter(row => snapshots[row.id].result === result).length);
       const actedOn = rows.filter(row => actionsForOutcome(rule, snapshots[row.id].result).length).length;
+      this.db.put('rule-run', `${companyId}:${rule.id}`, companyId, {
+        ruleId: rule.id, revision: rule.revision, checkedAt: new Date().toISOString(), transactionCount: rows.length,
+        matches: counts[0], uncertain: counts[1], nonmatches: counts[2], source,
+      } satisfies RuleRunSummary);
       saved.log = [`${source === 'run' ? 'Run now' : source === 'arrival' ? 'Replay' : 'Updated transactions'}: ${counts[0]} match, ${counts[1]} not enough information, ${counts[2]} no match. Actions configured for ${actedOn} transactions.`, ...saved.log].slice(0, 20);
     });
     void this.drainDrafts();

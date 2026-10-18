@@ -8,7 +8,7 @@ const step = (page: Page, name: string) => page.getByRole('navigation', { name: 
 
 test('outcome actions are explained, previewed, saved, and executed in their own branches', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
-  await page.goto(`${app.url}/?workspace=rules`);
+  await page.goto(`${app.url}/?workspace=rules&editRule=1`);
   await page.getByRole('button', { name: 'New rule', exact: true }).click();
   await page.getByLabel('Condition 1', { exact: true }).fill('This charge is a duplicate without supporting documentation.');
   await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 evaluated · Complete');
@@ -59,7 +59,7 @@ test('outcome actions are explained, previewed, saved, and executed in their own
 
 test('supporting details clear a tracked flag and complete its task after an automatic recheck', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
-  await page.goto(`${app.url}/?workspace=rules`);
+  await page.goto(`${app.url}/?workspace=rules&editRule=1`);
   await page.getByRole('button', { name: 'New rule', exact: true }).click();
   await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
   await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 evaluated · Complete');
@@ -117,7 +117,7 @@ test('supporting details clear a tracked flag and complete its task after an aut
 });
 
 test('manual rechecks preview cleanup even when the No match action section is empty', async ({ page }) => {
-  await page.goto(`${app.url}/?workspace=rules`);
+  await page.goto(`${app.url}/?workspace=rules&editRule=1`);
   await page.getByRole('button', { name: 'New rule', exact: true }).click();
   await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
   await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 evaluated · Complete');

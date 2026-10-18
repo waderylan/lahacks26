@@ -54,8 +54,8 @@ monitor worker.
    limit a manual run. Display sorting, result filters, and text searches do not
    become recurring rule conditions. The server rechecks both record scope and
    conditions before applying any action.
-5. Open **All rules** to see every saved rule, its conditions and actions, open
-   issues, last recorded action, and **Keep checking** toggle. **Run now** from
+5. Open **All rules** to see every saved rule in the company table, its conditions
+   and actions, open issues, last-check counts and time, and **Keep checking** toggle. **Run now** from
    this list opens the result preview before anything runs.
 6. **Keep checking** checks new or changed available company records every ten
    seconds while the server runs, including records outside the preview sample.
@@ -65,6 +65,24 @@ monitor worker.
    experimentation. **Use these conditions in rule** returns the changes to its
    draft. The saved rule changes only after **Save rule**. **Create rule** instead
    creates a separate rule with no inherited actions.
+
+The company table also supports **Run all records**. Confirm to apply the saved
+rule across all available records within its record filters, including those
+outside the preview sample. The table records the number checked, each outcome
+count, and the rule revision. **Delete** removes a rule and stops its future
+checks, preserving existing flags, tasks, messages, and history.
+
+Expand **Rule starter packs** below the table for editable examples: possible
+duplicate charges, missing documentation, possible payment fraud, and unsupported
+expenses. **Add rule** saves it with Keep checking off and opens the editor; no
+actions run. Repeated adds reopen the existing company rule after edits or renames.
+Synthetic companies include a suggested starter, an inspectable example, and a
+curated demo sample.
+
+The merged branch also includes **Payment risk check** under Rules and the
+**Ask your books** chat. Payment-risk escalation is a separate explicit action;
+it adds flags and sends an internal summary to the CFO. Chat retains the branch's
+model choices and company/employee-specific SQLite history.
 
 ## Try assignments and resolution
 

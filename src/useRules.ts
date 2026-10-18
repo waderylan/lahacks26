@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { useConditionPreview } from './useConditionPreview';
 import { inScope } from './ruleScope';
-import { EMPTY_STORE, exampleRule, syntheticExampleRules, uid, validateRule, type Rule, type RuleStore, type RuleIssue } from './rules';
+import { EMPTY_STORE, exampleRule, syntheticExampleRules, rulePresets, savedPreset, uid, validateRule, type Rule, type RuleStore, type RuleIssue, type RuleRunSummary } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
-interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[] }
+interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[]; runs?: RuleRunSummary[]; selectedRuleId?: string }
 const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve), rule.scope]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
@@ -20,6 +20,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const [message, setMessage] = useState('');
   const [automation, setAutomation] = useState<string[]>([]);
   const [issues, setIssues] = useState<RuleIssue[]>([]);
+  const [runs, setRuns] = useState<RuleRunSummary[]>([]);
   const [busy, setBusy] = useState(false);
   const pending = useRef(0);
   const commandError = useRef('');
@@ -30,13 +31,13 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     setStore(old => JSON.stringify(old) === JSON.stringify(reply.store) ? old : reply.store);
     storeRef.current = reply.store;
     setAutomation(reply.automation); callbacks.current.onRows?.(reply.rows);
-    setIssues(reply.issues ?? []);
+    setIssues(reply.issues ?? []); setRuns(reply.runs ?? []);
     if (reply.replayed) callbacks.current.onArrival(reply.replayed);
     setStorageError('');
   }, []);
   useEffect(() => {
     const scope = companyId;
-    setReady(false); setStore(structuredClone(EMPTY_STORE)); setDraft(null); setIssues([]); setStorageError(''); setMessage(''); setBusy(false);
+    setReady(false); setStore(structuredClone(EMPTY_STORE)); setDraft(null); setIssues([]); setRuns([]); setStorageError(''); setMessage(''); setBusy(false);
     if (!scope) return;
     let disposed = false;
     const refresh = async (initial = false) => {
@@ -88,9 +89,16 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     const next = reply?.store.rules.find(rule => rule.id === draft.id); if (next) setDraft(next);
   };
   return {
-    store, issues, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
+    store, issues, runs, ready, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
     elapsed, previewErrors, retry, save,
     toggleEnabled: (rule = saved) => rule && command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled: !rule.enabled }, rule.enabled ? 'Recurring checks off.' : 'Recurring checks on. Current records form the baseline; only new or changed records trigger actions.'),
+    toggleRule: (rule: Rule, enabled: boolean) => command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled }, `${rule.name}: automatic runs ${enabled ? 'on' : 'off'}.`),
+    runRule: (rule: Rule) => command({ type: 'run-all', id: rule.id, revision: rule.revision }, `${rule.name}: run complete. Results are shown in the table.`),
+    deleteRule: async (rule: Rule) => {
+      const reply = await command({ type: 'delete', id: rule.id, revision: rule.revision }, `${rule.name} deleted. Existing tasks, flags, messages and history were kept.`);
+      if (reply && draft?.id === rule.id) setDraft(reply.store.rules[0] ?? exampleRule(companyId));
+      return Boolean(reply);
+    },
     runOnce: (ids?: string[]) => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids: ids ?? data!.rows.map(row => row.id) }, 'Run complete. View action history for details.'),
     replay: () => command({ type: 'replay' }, 'Original bill replayed. Actions are saved in SQLite.'),
     busy, automation, message, storageError, actor,
@@ -111,6 +119,21 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
       const examples = data?.company.synthetic ? syntheticExampleRules(companyId) : [exampleRule(companyId)];
       const next = examples[exampleIndex.current++ % examples.length];
       setDraft(next); setMessage('');
+    },
+    presets: rulePresets(Boolean(data?.company.synthetic)),
+    addPreset: async (presetId: string) => {
+      const reply = await command({ type: 'add-preset', presetId, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
+      const rule = reply?.store.rules.find(rule => rule.id === reply.selectedRuleId);
+      if (rule) setDraft(structuredClone(rule));
+      return Boolean(rule);
+    },
+    /** Reopen a saved starter, or begin a fresh unsaved draft for editing. */
+    loadPreset: (id: string) => {
+      const preset = rulePresets(Boolean(data?.company.synthetic)).find(preset => preset.id === id);
+      if (!preset) return;
+      const existing = savedPreset(storeRef.current.rules, preset, companyId);
+      const rule = existing ?? preset.build(companyId, actor || 'emp-ap');
+      setDraft(structuredClone(rule)); setMessage('');
     },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
     decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),

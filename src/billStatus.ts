@@ -1,6 +1,7 @@
 import type { ActionPlan } from './actionTypes';
 import { employeeById } from './employees';
 import { draftSender, type DraftMessage, type HistoryEntry } from './rules';
+import type { RiskState } from './paymentRisk';
 
 export type StatusTone = 'need' | 'rev' | 'ok' | 'info' | 'warn' | 'muted';
 export interface BillEvent { label: string; tone: StatusTone; at: string }
@@ -9,7 +10,7 @@ export interface BillStatus { label: string; tone: StatusTone; events: BillEvent
 const firstName = (id?: string | null) => employeeById(id)?.name.split(' ')[0] ?? 'someone';
 
 /** Every action taken on each bill, from rule history, rule messages and dashboard actions, newest first. */
-export function billEvents(history: HistoryEntry[], messages: DraftMessage[], runs: ActionPlan[]): Map<string, BillEvent[]> {
+export function billEvents(history: HistoryEntry[], messages: DraftMessage[], runs: ActionPlan[], risk?: RiskState): Map<string, BillEvent[]> {
   const events = new Map<string, BillEvent[]>();
   const add = (id: string, event: BillEvent) => { const list = events.get(id) ?? []; list.push(event); events.set(id, list); };
   for (const entry of history) {
@@ -35,6 +36,11 @@ export function billEvents(history: HistoryEntry[], messages: DraftMessage[], ru
       : a.type === 'review' ? { label: a.reviewed ? 'Marked reviewed' : 'Marked needs review', tone: a.reviewed ? 'rev' : 'need' }
       : { label: `${a.type === 'flag' ? 'Flagged' : 'Tagged'}: ${a.label}`, tone: a.type === 'flag' ? 'warn' : 'info' }) });
   }
+  for (const r of Object.values(risk?.results ?? {})) {
+    if (r.verdict === 'suspicious') add(r.id, { label: `Payment risk: suspicious (${Math.round(r.pSuspicious * 100)}%)`, tone: 'warn', at: r.checkedAt });
+    else if (r.verdict === 'cannot_tell' && r.signals.length) add(r.id, { label: "Payment risk: can't tell", tone: 'info', at: r.checkedAt });
+  }
+  for (const [id, sent] of Object.entries(risk?.escalated ?? {})) add(id, { label: 'Payment risk sent to Robert', tone: 'warn', at: sent.at });
   for (const list of events.values()) list.sort((a, b) => b.at.localeCompare(a.at));
   return events;
 }

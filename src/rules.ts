@@ -24,6 +24,8 @@ export const actionsForOutcome = (rule: Rule, outcome: Outcome): Action[] =>
 export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
+  /** Retained after editing or renaming a starter so the library can reopen it. */
+  presetId?: string;
   expression: RuleNode; actions: Action[];
   autoResolve?: boolean;
   scope?: RuleScope;
@@ -36,6 +38,10 @@ export interface RuleIssue {
   conditionKey: string; cycle: string; openedAt: string; resolvedAt?: string;
   status: 'open' | 'resolved'; lastResult: Truth;
   flags: { label: string; removable: boolean }[]; taskIds: string[];
+}
+export interface RuleRunSummary {
+  ruleId: string; revision: number; checkedAt: string; transactionCount: number;
+  matches: number; uncertain: number; nonmatches: number; source: 'run' | 'arrival' | 'update';
 }
 export interface LocalTransaction { flags: string[]; tags: string[]; owner: string; automatedCheck: boolean }
 export type MessageStatus = 'pending' | 'approved' | 'rejected';
@@ -122,6 +128,83 @@ export function syntheticExampleRules(companyId: string): Rule[] {
       [['flag', 'Suspicious record text']]),
   ];
 }
+/**
+ * Possible payment fraud: money sent, or asked to be sent, somewhere the business hasn't verified.
+ * Mirrors the Payment risk check's criteria as editable conditions, and routes matches to the CFO.
+ */
+export function paymentFraudRule(companyId: string, sender: string = DEFAULT_SENDER): Rule {
+  const ai = (label: string, text: string): AICondition => ({ id: uid(), type: 'ai', label, text });
+  return { id: uid(), companyId, name: 'Possible payment fraud', revision: 1, enabled: false,
+    expression: { id: uid(), type: 'all', children: [
+      { id: uid(), type: 'any', children: [
+        ai('Paid to an account not on file', 'Payment is sent, or asked to be sent, to a bank account that differs from the account on file (the vendor\'s payee details, or the company\'s remit-to account for a customer invoice).'),
+        ai('Asks to change payment details', 'The text or supporting records ask to change where payment goes, such as new bank details or a new remittance account. Urgency alone, without a change to payment details, does not count.'),
+      ] },
+      { id: uid(), type: 'not', children: [
+        ai('Change documented and verified', 'Supporting records show the change to payment details was documented and verified, such as a signed bank change form and a call-back to a known contact, with the vendor master updated.'),
+      ] },
+    ] },
+    actions: [
+      { id: uid(), type: 'flag', value: 'Possible payment diversion' },
+      { id: uid(), type: 'message', value: 'Ask them to hold payment on these and confirm the bank details with each vendor through a known contact before anything is released.', recipient: 'emp-cfo', sender },
+    ] };
+}
+
+/** The same editable condition/action blocks as the payment-fraud preset. */
+function accountingStarter(companyId: string, sender: string, name: string, label: string, text: string, flag: string, task: string, owner: string, request: string): Rule {
+  return { id: uid(), companyId, name, revision: 1, enabled: false, autoResolve: true,
+    expression: { id: uid(), type: 'all', children: [{ id: uid(), type: 'ai', label, text }] },
+    actions: [
+      { id: uid(), type: 'flag', value: flag },
+      { id: uid(), type: 'task', value: task, owner, dueDays: 2 },
+      { id: uid(), type: 'message', value: request, recipient: 'jev', sender },
+      { id: uid(), type: 'task', value: `Clarify: ${task}`, owner, dueDays: 2, when: 'uncertain' },
+    ] };
+}
+
+export function duplicateChargesRule(companyId: string, sender = DEFAULT_SENDER): Rule {
+  return accountingStarter(companyId, sender, 'Possible duplicate charges', 'Same charge more than once',
+    'This transaction appears to charge or pay again for the same underlying goods, work, invoice or one-time fee as a nearby transaction. Compare the related records, amounts, dates and references. Exclude separate deliveries, documented installments, distinct service periods and payments applied to different invoices. If similar charges cannot be distinguished with the available records, return uncertain.',
+    'Possible duplicate', 'Verify whether this charge was already billed or paid', 'Priya Natarajan',
+    'Ask whether these charges cover the same work, goods or invoice. Request the original invoice and delivery, service-period or payment records that distinguish them. Describe them as possible duplicates pending review.');
+}
+
+export function missingDocumentationRule(companyId: string, sender = DEFAULT_SENDER): Rule {
+  return accountingStarter(companyId, sender, 'Missing documentation', 'Insufficient purchase detail',
+    'The available description, memo and supporting records together do not identify what was bought or paid for, its business purpose, or its applicable service period, job or event. An unitemized receipt or generic placeholder without supporting detail counts. A blank memo or description alone does not count when the other records explain the transaction. Do not require a job or event for ordinary overhead.',
+    'Needs documentation', 'Request itemized documentation and business purpose', 'Priya Natarajan',
+    'Ask for itemized purchase details, business purpose and any applicable service period, job or event reference for these transactions. Explain what is missing without calling the charge fraudulent.');
+}
+
+export function unsupportedExpensesRule(companyId: string, sender = DEFAULT_SENDER): Rule {
+  return accountingStarter(companyId, sender, 'Unsupported expenses', 'Expense conflicts with supporting records',
+    'The transaction claims goods, work or a business expense that the receiving, completion, project, order or receipt records contradict: undelivered quantities, work after cancellation, unauthorized scope, or personal purchases inconsistent with the stated purpose. Exclude approved change orders, documented business purchases and late invoices for work completed before cancellation. If authorization or receipt evidence is missing rather than contradictory, return uncertain.',
+    'Unsupported expense', 'Verify delivery, authorization or business purpose', 'Grace Adeyemi',
+    'Ask for the delivery, completion, approval or receipt records supporting these expenses. Identify any conflict with the billed quantity, project timeline or stated business purpose. Request review before payment; do not present a screening result as proven fraud.');
+}
+
+export interface RulePreset { id: string; name: string; description: string; starter?: boolean; build: (companyId: string, sender: string) => Rule }
+/** Starting points for the rule builder. Choosing one fills in its conditions and actions for editing. */
+export function rulePresets(synthetic: boolean): RulePreset[] {
+  const presets: RulePreset[] = [
+    { id: 'duplicate-charges', name: 'Possible duplicate charges', starter: true, description: 'Compare repeated bills and payments while allowing separate deliveries, installments and service periods.', build: duplicateChargesRule },
+    { id: 'missing-documentation', name: 'Missing documentation', starter: true, description: 'Find vague purchase details and unitemized receipts; use supporting records before requesting more detail.', build: missingDocumentationRule },
+    { id: 'payment-fraud', name: 'Possible payment fraud', starter: true, description: 'Find unverified payment changes and account mismatches. Flag possible diversion and draft a message to the CFO.', build: paymentFraudRule },
+    { id: 'unsupported-expenses', name: 'Unsupported expenses', starter: true, description: 'Compare billed work, delivered quantities and business purpose with approvals, project records and receipts.', build: unsupportedExpensesRule },
+    { id: 'memo-clarification', name: 'Memo needs clarification', description: 'Memo says standing overhead, but the items are physical goods.', build: companyId => exampleRule(companyId) },
+  ];
+  if (synthetic) syntheticExampleRules('').forEach((rule, index) => presets.push({ id: `synthetic-${index}`, name: rule.name, description: leaves(rule.expression).map(n => n.type === 'ai' ? n.label : '').filter(Boolean).join(' · '), build: companyId => syntheticExampleRules(companyId)[index] }));
+  return presets.map(preset => ({ ...preset, build: (companyId, sender) => ({ ...preset.build(companyId, sender), presetId: preset.id }) }));
+}
+
+/** Older presets have no marker. Recognize their exact conditions without relying on the editable name. */
+export function savedPreset(rules: Rule[], preset: RulePreset, companyId: string): Rule | undefined {
+  const expression = (node: RuleNode): unknown => 'children' in node ? [node.type, node.children.map(expression)]
+    : node.type === 'ai' ? [node.type, node.text] : [node.type, node.field, node.operator, node.value];
+  const original = JSON.stringify(expression(preset.build(companyId, DEFAULT_SENDER).expression));
+  return rules.find(rule => rule.companyId === companyId && rule.presetId === preset.id)
+    ?? rules.find(rule => rule.companyId === companyId && !rule.presetId && JSON.stringify(expression(rule.expression)) === original);
+}
 export const leaves = (node: RuleNode): (AICondition | StandardCondition)[] => 'children' in node ? node.children.flatMap(leaves) : [node];
 
 // Semantic uncertainty is preserved under negation. Execution states never become booleans.
@@ -161,6 +244,7 @@ export function validateRule(input: unknown): string[] {
   if (typeof r.id !== 'string' || !r.id || typeof r.companyId !== 'string' || !r.companyId) errors.push('Rule and company IDs are required.');
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
+  if (r.presetId !== undefined && (typeof r.presetId !== 'string' || !/^[a-z0-9-]{1,64}$/.test(r.presetId))) errors.push('Invalid rule preset.');
   if (r.autoResolve !== undefined && typeof r.autoResolve !== 'boolean') errors.push('Choose whether this rule clears resolved issues.');
   if (r.scope !== undefined && (!r.scope || typeof r.scope !== 'object' || !['all', 'bill', 'invoice', 'bank'].includes(r.scope.type) || !['all', 'needs_review', 'reviewed', 'flagged'].includes(r.scope.status) || typeof r.scope.assignee !== 'string' || !r.scope.assignee || r.scope.assignee.length > 100)) errors.push('Choose valid record filters.');
   const checkId = (id: unknown) => { if (typeof id !== 'string' || !id || ids.has(id)) errors.push('Every block needs a unique ID.'); else ids.add(id); };

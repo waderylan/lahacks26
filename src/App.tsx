@@ -1,3 +1,5 @@
+import { PaymentRiskPanel, usePaymentRisk } from './PaymentRiskPanel';
+import { ChatWidget } from './AskPanel';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useRules } from './useRules';
@@ -43,6 +45,7 @@ export default function App() {
   const [as, setAsState] = useState(() => { const id = new URLSearchParams(location.search).get('as'); return employeeById(id) ? id! : 'emp-ap'; });
   const setAs = (id: string) => { const url = new URL(location.href); url.searchParams.set('as', id); history.replaceState(null, '', url); setAsState(id); };
   const mailbox = useMailbox(companyId, as);
+  const paymentRisk = usePaymentRisk(companyId);
   const [definition, setDefinition] = useState<SearchDefinition>(emptyExplore);
   const [editor, setEditor] = useState<number | null>(null);
   const [exploreRule, setExploreRule] = useState<Rule | null>(null);
@@ -180,10 +183,11 @@ export default function App() {
       {data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
       {!data ? <main className="wizard-loading" role="status">{loadError || 'Loading transactions?'}</main> : <>
         <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} /></div>
-        {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => setWorkspace('messages')} onExplore={openRuleInExplore} />}
+        {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => setWorkspace('messages')} onExplore={openRuleInExplore} onDemoSample={() => updatePrefs({ limit: -1 })} paymentRisk={<details className="rules-payment-risk"><summary>Payment risk check</summary><PaymentRiskPanel c={paymentRisk} loadedIds={data.rows.map(row => row.id)} totalCount={data.totalBills} as={as} onInspect={inspect} onEscalated={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} /></details>} />}
         {workspace === 'tasks' && <div className="workspace-body"><div className="workspace-center"><TaskBoard c={dashboard} onInspect={inspect} /></div></div>}
         {workspace === 'messages' && <div className="workspace-body"><div className="workspace-center"><Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /></div></div>}
       </>}
+      <ChatWidget companyId={companyId} as={as} jevReady={Boolean(jev?.configured)} lifted={false} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} />
       {drawerRow && <Drawer row={drawerRow} reviewed={Boolean(drawerRow.dashboard?.reviewed)} onClose={() => setDrawerId(null)} rules={rules} readOnly={workspace === 'explore'} />}
       <Toasts notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onDismiss={rules.markNoticeToasted} />
     </div>

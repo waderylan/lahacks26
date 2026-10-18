@@ -1,3 +1,6 @@
+import { loadCompanyBills, listCompanies, demoSample } from '../../server/data';
+import { ChatStore, chatRoutes } from '../../server/chat';
+import { PaymentRisk, paymentRiskRoutes } from '../../server/paymentRisk';
 import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
@@ -24,19 +27,28 @@ export async function startRuleApp(options: { synthetic?: boolean } = {}) {
     expenseKind: 'operating', costCategory: 'service', memo: index === 0 ? 'Needs receipt' : index === 1 ? 'Duplicate charge' : 'Receipt checked',
     project: null, supplyRole: null, lines: [], payments: [], vendorRecord: null, projectRecord: null,
   }));
-  const data = new WorkspaceData(db, () => ({ company, rows, totalBills: rows.length, sampled: false }), () => []);
+  const companies = [company, ...(options.synthetic ? listCompanies().filter(company => company.synthetic) : [])];
+  const data = new WorkspaceData(db, id => id === companyId ? { company, rows, totalBills: rows.length, sampled: false } : loadCompanyBills(id), () => []);
   const outcome = (row: Row) => row.evidence?.length || row.memo === 'Receipt checked' ? 'no_match' as const : row.memo === 'Needs receipt' ? 'uncertain' as const : 'match' as const;
   const judge = async (_company: string, _criterion: string, rows: Row[]) => Object.fromEntries(rows.map(row => [row.id, outcome(row)]));
   const rules = new RuleService(db, data, judge, async request => ({ employeeId: request.recipient === 'jev' ? 'emp-controller' : request.recipient, subject: 'Please provide the receipt', body: 'Please attach the missing receipt so Accounting can finish reviewing this charge.' }));
-  const searches = new SavedSearchService(db, id => id === companyId, { rows: id => data.bills(id).rows, judge });
+  const searches = new SavedSearchService(db, id => companies.some(company => company.companyId === id), { rows: id => data.bills(id).rows, judge });
   const app = express(); app.use(express.json());
   app.get('/api/status', (_req, res) => res.json({ jev: { configured: true, model: 'test-double', via: 'Workflow test' }, gemini: { configured: true } }));
-  app.get('/api/companies', (_req, res) => res.json([company]));
-  app.get('/api/companies/:id/bills', (_req, res) => res.json(data.bills(companyId)));
-  app.post('/api/evaluate', (req, res) => res.json({ results: req.body.ids.map((id: string) => ({ id, state: outcome(data.row(companyId, id)), pMatch: 0.5 })), costNanoUsd: '0' }));
+  app.get('/api/companies', (_req, res) => res.json(companies));
+  app.get('/api/companies/:id/bills', (req, res) => {
+    const full = data.bills(String(req.params.id));
+    const curated = Number(req.query.limit) === -1 ? demoSample(full.company.companyId) : null;
+    const limit = Number(req.query.limit);
+    const visible = curated ? full.rows.filter(row => curated.ids.has(row.billId)) : limit > 0 ? full.rows.slice(0, limit) : full.rows;
+    res.json({ ...full, rows: visible, sampled: visible.length < full.rows.length, curatedSample: Boolean(curated) });
+  });
+  app.post('/api/evaluate', (req, res) => res.json({ results: req.body.ids.map((id: string) => ({ id, state: outcome(data.row(req.body.companyId, id)), pMatch: 0.5 })), costNanoUsd: '0' }));
   actionRoutes(app, new ActionEngine(db, data, judge));
   ruleRoutes(app, rules); mailRoutes(app, new Mailbox(db, data));
   savedSearchRoutes(app, searches);
+  chatRoutes(app, new ChatStore(db, data));
+  paymentRiskRoutes(app, new PaymentRisk(db, data));
   const server = createServer(app);
   const vite = await createVite({ server: { middlewareMode: true, hmr: false }, appType: 'spa', logLevel: 'error' });
   app.use(vite.middlewares);

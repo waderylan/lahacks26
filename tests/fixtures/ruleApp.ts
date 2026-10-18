@@ -8,6 +8,7 @@ export interface RuleAppOptions {
   /** controlled: eight rows in company-101; real-four-company: all unmodified authored examples. */
   mode?: 'controlled' | 'real-four-company';
   rowCount?: number;
+  scores?: 'missing' | 'raw' | 'calibrated';
   /** Compatibility option: mixed transaction types in the controlled fixture. */
   synthetic?: boolean;
 }
@@ -33,14 +34,17 @@ export async function startRuleApp(options: RuleAppOptions = {}) {
       accounts: () => [], sample: () => null,
     }),
     evaluate: async (_request, _signal, batch = []) => ({ costNanoUsd: '0', results: batch.map(row => ({
-      id: row.id, state: row.evidence?.length || row.memo === 'Receipt checked' ? 'no_match' as const : row.memo === 'Needs receipt' ? 'uncertain' as const : 'match' as const, pMatch: 0.5,
+      id: row.id, state: row.evidence?.length || row.memo === 'Receipt checked' ? 'no_match' as const : row.memo === 'Needs receipt' ? 'uncertain' as const : 'match' as const, pMatch: options.scores === 'missing' ? null : 0.5, ...(options.scores && options.scores !== 'missing' && { scoreKind: options.scores === 'calibrated' ? 'validation_calibrated' as const : 'candidate_score_uncalibrated' as const }),
+    })) }),
+    evaluateProvider: async (_provider, _request, _signal, batch = []) => ({ costKind: 'gpu_time_unavailable' as const, costNanoUsd: '0', results: batch.map(row => ({
+      id: row.id, state: row.evidence?.length || row.memo === 'Receipt checked' ? 'no_match' as const : row.memo === 'Needs receipt' ? 'uncertain' as const : 'match' as const, pMatch: options.scores === 'missing' ? null : 0.5, ...(options.scores && options.scores !== 'missing' && { scoreKind: options.scores === 'calibrated' ? 'validation_calibrated' as const : 'candidate_score_uncalibrated' as const }),
     })) }),
     writer: async request => ({ employeeId: request.recipient === 'jev' ? 'emp-controller' : request.recipient,
       subject: 'Please provide the receipt', body: 'Please attach the missing receipt so Accounting can finish reviewing this charge.' }),
     timers: { scanMs: 100, draftMs: 100 },
   });
   const server = createServer(runtime.app);
-  const vite = await createVite({ server: { middlewareMode: true, hmr: false }, appType: 'spa', logLevel: 'error' });
+  const vite = await createVite({ server: { middlewareMode: true, hmr: { port: 0 }, ws: false }, appType: 'spa', logLevel: 'error' });
   runtime.app.use(vite.middlewares);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();

@@ -255,3 +255,19 @@ test('mail: X sends Y, Y sees it in their inbox; replies thread; only the recipi
   service.reset(companyId);
   assert.equal(mailbox.view(companyId, 'emp-controller').inbox.length, 0);
 });
+
+test('rule runs use the selected provider and retain it for background runs', async () => {
+  const { db, data } = setup();
+  const providers: (string | undefined)[] = [];
+  const service = new RuleService(db, data, async (company, text, rows, provider) => {
+    providers.push(provider); return judge(company, text, rows);
+  });
+  try {
+    const rule: Rule = { ...makeRule(), provider: 'qwen', expression: { id: 'ai', type: 'ai', text: 'Equipment purchase', label: '' }, actions: [{ id: 'flag', type: 'flag', value: 'Needs review' }] };
+    service.save(companyId, rule, null);
+    await service.run(companyId, rule.id, 1, ids);
+    await assert.rejects(service.run(companyId, rule.id, 1, ids, 'run', false, 'jev'), /Save a new rule revision/);
+    assert.deepEqual(providers, ['qwen']);
+    assert.equal(service.snapshot(companyId).store.rules[0].provider, 'qwen');
+  } finally { db.db.close(); }
+});

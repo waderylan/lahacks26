@@ -227,7 +227,7 @@ test('restore during evaluation rejects the late run and discards late generated
   const { db, data } = setup(); t.after(() => db.db.close());
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const rules = new RuleService(db, data, async (...args) => { await gate; return judge(...args); }, async () => { await gate; return draft; });
+  const rules = new RuleService(db, data, async (...args) => { await gate; return judge(args[0], args[1], args[2]); }, async () => { await gate; return draft; });
   const rule = { ...makeRule(), expression: { id: 'ai', type: 'ai' as const, label: '', text: 'Needs review' } };
   rules.save(a, rule, null);
   const run = rules.runAll(a, rule.id, 1); rules.reset(a, true); release();
@@ -261,7 +261,7 @@ test('restore during a recurring scan suppresses its late writes and error log',
   const { db, data } = setup(); t.after(() => db.db.close());
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const rules = new RuleService(db, data, async (...args) => { await gate; return judge(...args); });
+  const rules = new RuleService(db, data, async (...args) => { await gate; return judge(args[0], args[1], args[2]); });
   const rule = { ...makeRule(), expression: { id: 'ai', type: 'ai' as const, label: '', text: 'Needs review' } };
   rules.save(a, rule, null, true);
   const row = data.row(a, `${a}:bill-8`); db.write({ ...row, memo: 'Changed evidence' }, row.sourceVersion!);

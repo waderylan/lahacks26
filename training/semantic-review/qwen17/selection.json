@@ -1,0 +1,17 @@
+{
+  "reason": "0.6B validation accuracy 0.7091 insufficient; select larger model based on validation only",
+  "dataset": "5a33a7d072c2",
+  "dataChanges": false,
+  "hyperparameters": {
+    "learning_rate": 0.00003,
+    "num_epochs": 1,
+    "max_steps": 125,
+    "max_seq_length": 1024,
+    "micro_batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "gradient_checkpointing": true
+  },
+  "selectedAt": "2026-10-17T23:42:46.027818Z",
+  "validationRunHash": "8266bf09c0861acad861d5cd549b9a93e311ceb2fb9ea38633ddbf67c3d0e51c",
+  "note": "No test labels were changed. All model variants keep their own reports; the 1.7B trial follows the preplanned validation-based fallback."
+}

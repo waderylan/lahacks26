@@ -1,0 +1,33 @@
+{
+  "model": "Qwen/Qwen3-0.6B",
+  "fineTune": "full SFT",
+  "veriJob": "482c2048c6c4",
+  "checkpointStatus": "completed",
+  "steps": 125,
+  "trainingCostUsd": 0.4595982342131555,
+  "functions": [
+    "semantic criterion matching",
+    "explicit non-matches",
+    "uncertain when purchase text is insufficient"
+  ],
+  "outputs": {
+    "A": "match",
+    "B": "no_match",
+    "C": "uncertain"
+  },
+  "notProvided": [
+    "Jev architecture",
+    "calibrated Jev probabilities",
+    "unrestricted accounting reasoning",
+    "automatic changes to original books"
+  ],
+  "trainingData": {
+    "authoredOverlays": 800,
+    "jevTeacherPredictions": 200
+  },
+  "evaluation": {
+    "reservedDemoCases": 150,
+    "reservedOverlayCases": 220
+  },
+  "deploymentId": "5f5f551e6e83"
+}

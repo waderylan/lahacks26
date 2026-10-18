@@ -1,3 +1,4 @@
+import type { EvaluationContext } from './modelContext';
 import type { RuleScope } from './ruleScope';
 import type { Row } from './types';
 import { employeeById } from './employees';
@@ -23,6 +24,8 @@ export const actionsForOutcome = (rule: Rule, outcome: Outcome): Action[] =>
 /** Drafts and rules saved before senders existed are sent from AP, the default reviewer. */
 export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
+  provider?: 'jev' | 'qwen';
+  evaluation?: EvaluationContext;
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
   /** Retained after editing or renaming a starter so the library can reopen it. */
   presetId?: string;
@@ -40,6 +43,7 @@ export interface RuleIssue {
   flags: { label: string; removable: boolean }[]; taskIds: string[];
 }
 export interface RuleRunSummary {
+  evaluation?: EvaluationContext;
   ruleId: string; revision: number; checkedAt: string; transactionCount: number;
   matches: number; uncertain: number; nonmatches: number; source: 'run' | 'arrival' | 'update';
 }
@@ -67,7 +71,7 @@ export interface Notice {
   id: string; companyId: string; title: string; body?: string; tone: NoticeTone;
   time: string; read: boolean; toasted: boolean; transactionId?: string;
 }
-export interface Snapshot { result: Outcome; conditions: Record<string, Outcome>; expression?: RuleNode }
+export interface Snapshot { evaluation?: EvaluationContext; result: Outcome; conditions: Record<string, Outcome>; expression?: RuleNode }
 export interface HistoryEntry {
   id: string; key: string; ruleId: string; ruleName: string; revision: number;
   companyId: string; transactionId: string; transactionVersion: string; action: Action | null;
@@ -241,6 +245,7 @@ export function standardResult(node: StandardCondition, row: Row, reviewed: bool
 export function validateRule(input: unknown): string[] {
   const errors: string[] = []; const ids = new Set<string>(); const r = input as Rule;
   if (!r || typeof r !== 'object') return ['Invalid rule'];
+  if (r.provider !== undefined && !['jev', 'qwen'].includes(r.provider)) errors.push('Choose a valid evaluation provider.');
   if (typeof r.id !== 'string' || !r.id || typeof r.companyId !== 'string' || !r.companyId) errors.push('Rule and company IDs are required.');
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
@@ -376,7 +381,7 @@ export function markNoticeToasted(store: RuleStore, id: string): RuleStore {
 export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid(), tasks: ReviewTask[] = []): RuleStore {
   if (validateRule(rule).length || row.companyId !== rule.companyId) return store;
   if (leaves(rule.expression).some(n => !['true', 'false', 'uncertain'].includes(snapshot.conditions[n.id])) || evaluateTree(rule.expression, snapshot.conditions) !== snapshot.result) return store;
-  const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}`;
+  const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}:${snapshot.evaluation?.identity ?? rule.provider ?? 'jev'}`;
   const executionKey = `${prefix}:evaluation:${source}`;
   if (store.executions.includes(executionKey)) return store;
   if (snapshot.result === 'pending' || snapshot.result === 'error' || Object.values(snapshot.conditions).some(v => v === 'pending' || v === 'error')) return store;

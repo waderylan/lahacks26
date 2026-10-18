@@ -1,6 +1,4 @@
-import { ReviewCheckPanel, useReviewCheck } from './ReviewCheckPanel';
-import { CHECKS, type CheckKind } from './reviewChecks';
-import { ChatWidget } from './AskPanel';
+import { providerLabel, type Provider } from './modelContext';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useRules } from './useRules';
@@ -15,11 +13,12 @@ import { useWorkspace, type RowPatch } from './useWorkspace';
 import { TaskBoard } from './TaskBoard';
 import { Explore, emptyExplore } from './Explore';
 import { RulesWorkspace } from './RulesWorkspace';
+import { Dashboard } from './Dashboard';
 import { ALL_RECORDS, type RuleScope } from './ruleScope';
 import { uid, type Rule, type RuleNode } from './rules';
 import type { SearchDefinition } from './savedSearchTypes';
 
-const DEFAULT_COMPANY = 'company-018';
+const DEFAULT_COMPANY = 'company-101';
 
 const ROW_LIMITS = [50, 100, 0, -1]; // 0 = all bills, -1 = curated demo sample (synthetic extensions only)
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -28,7 +27,10 @@ const pct = (p: number) => `${Math.round(p * 100)}%`;
 export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
-  const [companyId, setCompanyId] = useState(DEFAULT_COMPANY);
+  const [provider, setProvider] = useState<Provider>(() => new URLSearchParams(location.search).get('model') === 'qwen' ? 'qwen' : 'jev');
+  const [companyId, setCompanyState] = useState(() => { const id = new URLSearchParams(location.search).get('company'); return /^company-10[1-4]$/.test(id ?? '') ? id! : DEFAULT_COMPANY; });
+  const setCompanyId = (id: string) => { const url = new URL(location.href); url.searchParams.set('company',id); history.replaceState(null,'',url); setCompanyState(id); };
+  const changeProvider = (next: Provider) => { const url = new URL(location.href); url.searchParams.set('model', next); url.searchParams.set('company',companyId); history.replaceState(null,'',url); setProvider(next); };
   const [customOnly, setCustomOnly] = useState(() => { try { return localStorage.getItem('tr.customOnly') === '1'; } catch { return false; } });
   const toggleCustom = (on: boolean) => {
     setCustomOnly(on);
@@ -37,19 +39,15 @@ export default function App() {
     const first = companies.find((c) => c.synthetic);
     if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
   };
-  const [workspace, setWorkspaceState] = useState<'explore' | 'rules' | 'tasks' | 'messages'>(() => {
+  const [workspace, setWorkspaceState] = useState<'explore' | 'dashboard' | 'rules' | 'tasks' | 'messages'>(() => {
     const selected = new URLSearchParams(location.search).get('workspace');
-    return selected === 'rules' || selected === 'tasks' || selected === 'messages' ? selected : 'explore';
+    return selected === 'dashboard' || selected === 'rules' || selected === 'tasks' || selected === 'messages' ? selected : 'explore';
   });
   const setWorkspace = (next: typeof workspace) => { const url = new URL(location.href); url.searchParams.set('workspace', next); history.replaceState(null, '', url); setWorkspaceState(next); };
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
   const [as, setAsState] = useState(() => { const id = new URLSearchParams(location.search).get('as'); return employeeById(id) ? id! : 'emp-ap'; });
   const setAs = (id: string) => { const url = new URL(location.href); url.searchParams.set('as', id); history.replaceState(null, '', url); setAsState(id); };
   const mailbox = useMailbox(companyId, as);
-  const paymentRisk = useReviewCheck(companyId, 'payment-risk');
-  const duplicates = useReviewCheck(companyId, 'duplicates');
-  const checks = { 'payment-risk': paymentRisk, duplicates };
-  const [checkKind, setCheckKind] = useState<CheckKind>('payment-risk');
   const [definition, setDefinition] = useState<SearchDefinition>(emptyExplore);
   const [editor, setEditor] = useState<number | null>(null);
   const [exploreRule, setExploreRule] = useState<Rule | null>(null);
@@ -61,7 +59,7 @@ export default function App() {
   const [inspectError, setInspectError] = useState('');
 
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  const [prefs, setPrefs] = useState({ set: 'plain', limit: 50 });
+  const [prefs, setPrefs] = useState({ limit: -1 });
   const [prefsReady, setPrefsReady] = useState(false);
   const updateRows = useCallback((patches: RowPatch[]) => {
     setData(current => {
@@ -97,8 +95,10 @@ export default function App() {
     fetch('/api/settings').then(async response => { if (!response.ok) throw new Error('Could not load display preferences.'); return response.json(); })
       .then(value => { setPrefs(value); setPrefsReady(true); setPrefsError(null); }).catch(error => { setPrefsError(error.message); setPrefsReady(true); });
     fetch('/api/companies').then((r) => r.json()).then(setCompanies).catch(() => {});
-    fetch('/api/status').then((r) => r.json()).then((s) => setJev(s.jev)).catch(() => {});
+
   }, []);
+
+  useEffect(() => { let live = true; setJev(null); fetch('/api/status?model=' + provider).then(r => r.json()).then(body => { if (live) setJev(body.jev); }); return () => { live = false; }; }, [provider]);
 
   // Load a company's records; never show another company's rows while loading.
   const loadSeq = useRef(0);
@@ -119,7 +119,7 @@ export default function App() {
   }, [companyId, rowLimit, prefsReady]);
 
   const rows = data?.rows ?? [];
-  const rules = useRules(data?.company.companyId === companyId ? data : null, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules' && editor !== null, updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as, companyId);
+  const rules = useRules(data?.company.companyId === companyId ? data : null, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules' && editor !== null, updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as, companyId, provider);
   // Drafts are only actionable by their sender, so each employee sees just their own.
   const myDrafts = rules.store.messages.filter(message => draftSender(message) === as);
   const pendingApprovals = myDrafts.filter(message => message.status === 'pending').length;
@@ -140,7 +140,7 @@ export default function App() {
     if (seq === loadSeq.current) setData(body);
   };
   const createRule = (expression: RuleNode, scope: RuleScope) => {
-    rules.setDraft({ id: uid(), companyId, name: 'Untitled rule', revision: 1, enabled: false, expression: structuredClone(expression), scope: { ...scope }, actions: [] });
+    rules.setDraft({ id: uid(), companyId, name: 'Untitled rule', provider, revision: 1, enabled: false, expression: structuredClone(expression), scope: { ...scope }, actions: [] });
     setEditor(1); setDrawerId(null); setWorkspace('rules');
   };
   const openRuleInExplore = (rule: Rule) => {
@@ -175,23 +175,26 @@ export default function App() {
             Sample: {data.rows.length} of {data.totalBills} {isSynthetic ? 'transactions' : 'bills'}
           </span>
         )}
-        <JevBadge jev={jev} failed={false} />
+        {(workspace === 'explore' || workspace === 'rules') && <>
+          <label className="rows-pick">Explore / new rule model <select aria-label="Evaluation model" title="Saved rules use their recorded provider. Switching preserves the current search and unsaved rule." value={provider} onChange={event => changeProvider(event.target.value as Provider)}><option value="jev">Jev</option><option value="qwen">Qwen ? Veri</option></select></label>
+          <JevBadge jev={jev} failed={false} provider={provider} />
+        </>}
         <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'rules', 'tasks', 'messages'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages' }[value]}{value === 'tasks' && dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav><span className="muted">{workspace === 'explore' ? 'View transactions' : workspace === 'rules' ? 'Run actions and recurring checks' : 'Saved in your workspace'}</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'dashboard', 'rules', 'tasks', 'messages'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages' }[value]}{value === 'tasks' && dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav><span className="muted">{workspace === 'explore' ? 'View transactions' : workspace === 'rules' ? 'Run actions and recurring checks' : 'Saved in your workspace'}</span></div>
       {(dashboard.error || prefsError || inspectError || loadError || rules.storageError) && <div className="rules-notice error" role="alert">{dashboard.error || prefsError || inspectError || loadError || rules.storageError}</div>}
       {workspace === 'rules' && rules.message && <div className="rules-notice" role="status">{rules.message}</div>}
       {workspace === 'rules' && editor !== null && rules.previewErrors.length > 0 && <div className="rules-notice error" role="alert">Some records could not be checked. <button onClick={rules.retry}>Retry failed checks</button></div>}
       {data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
       {!data ? <main className="wizard-loading" role="status">{loadError || 'Loading transactions?'}</main> : <>
-        <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} /></div>
-        {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => setWorkspace('messages')} onExplore={openRuleInExplore} onDemoSample={() => updatePrefs({ limit: -1 })} paymentRisk={<details className="rules-payment-risk"><summary>Fraud checks: payment risk and duplicates</summary><nav className="check-switch" aria-label="Fraud checks">{(Object.keys(CHECKS) as CheckKind[]).map(kind => <button key={kind} className={checkKind === kind ? 'on' : ''} aria-pressed={checkKind === kind} onClick={() => setCheckKind(kind)}>{CHECKS[kind].title}</button>)}</nav><ReviewCheckPanel key={checkKind} c={checks[checkKind]} loadedIds={data.rows.map(row => row.id)} totalCount={data.totalBills} as={as} onInspect={inspect} onEscalated={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} /></details>} />}
+        <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} definition={definition} onChange={setDefinition} provider={exploreRule?.provider ?? provider} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} /></div>
+        {workspace === 'dashboard' && <div className="insight-body"><Dashboard companyId={companyId} /></div>}
+        {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => setWorkspace('messages')} onExplore={openRuleInExplore} onDemoSample={() => updatePrefs({ limit: -1 })} paymentRisk={null} />}
         {workspace === 'tasks' && <div className="workspace-body"><div className="workspace-center"><TaskBoard c={dashboard} onInspect={inspect} /></div></div>}
         {workspace === 'messages' && <div className="workspace-body"><div className="workspace-center"><Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /></div></div>}
       </>}
-      <ChatWidget companyId={companyId} as={as} jevReady={Boolean(jev?.configured)} lifted={false} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} />
       {drawerRow && <Drawer row={drawerRow} reviewed={Boolean(drawerRow.dashboard?.reviewed)} onClose={() => setDrawerId(null)} rules={rules} readOnly={workspace === 'explore'} />}
       <Toasts notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onDismiss={rules.markNoticeToasted} />
     </div>
@@ -267,12 +270,13 @@ function Drawer({ row: r, reviewed, match, onClose, rules, readOnly }: { row: Ro
   );
 }
 
-function JevBadge({ jev, failed }: { jev: JevStatus | null; failed: boolean }) {
-  if (!jev) return <span className="pill">Jev: checking…</span>;
-  if (!jev.configured) return <span className="pill bad">Jev: not configured</span>;
+function JevBadge({ jev, failed, provider }: { jev: JevStatus | null; failed: boolean; provider: Provider }) {
+  const name = providerLabel(provider);
+  if (!jev) return <span className="pill">{name}: checking…</span>;
+  if (!jev.configured) return <span className="pill bad">{name}: not configured</span>;
   return (
     <span className={'pill ' + (failed ? 'bad' : 'ok')} title={`${jev.model} via ${jev.via}`}>
-      Jev: {failed ? 'errors' : 'connected'} · {jev.via}
+      {name}: {failed ? 'errors' : 'configured'} · {jev.via}
     </span>
   );
 }

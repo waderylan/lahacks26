@@ -1,3 +1,5 @@
+import { evaluationContext, type Provider } from './evaluator.ts';
+import type { EvaluationContext } from '../src/modelContext.ts';
 import { inScope } from '../src/ruleScope.ts';
 import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
@@ -135,14 +137,14 @@ export class RuleService {
     }
   }
   /** Adding a starter never runs actions; repeated/concurrent clicks reopen the existing rule. */
-  addPreset(companyId: string, presetId: string, sender: string): string {
+  addPreset(companyId: string, presetId: string, sender: string, provider: Provider = 'jev'): string {
     const company = this.data.bills(companyId).company;
     const preset = rulePresets(Boolean(company.synthetic)).find(preset => preset.id === presetId);
     if (!preset || !employeeById(sender)) throw new Error('Choose a valid rule starter and sender.');
     return this.change(companyId, saved => {
       const existing = savedPreset(saved.store.rules, preset, companyId);
       if (existing) return existing.id;
-      const rule = normalizeRuleOwners(preset.build(companyId, sender));
+      const rule = normalizeRuleOwners({ ...preset.build(companyId, sender), provider, evaluation: evaluationContext(provider) });
       const errors = validateRule(rule);
       if (errors.length) throw new Error(errors[0]);
       saved.store.rules.push(rule);
@@ -152,6 +154,7 @@ export class RuleService {
 
   save(companyId: string, input: Rule, expectedRevision: number | null, activate = false) {
     input = normalizeRuleOwners(input);
+    if (input?.provider !== undefined && !['jev', 'qwen'].includes(input.provider)) throw new Error('Invalid evaluation provider.');
     const errors = validateRule(input);
     if (errors.length || input.companyId !== companyId || typeof input.name !== 'string' || !input.name.trim() || input.name.length > 200 || typeof activate !== 'boolean' ||
       input.actions.some(action => action.type !== 'message' && typeof action.value === 'string' && action.value.length > 100)) throw new Error(errors[0] ?? 'Invalid rule for this company.');
@@ -160,7 +163,8 @@ export class RuleService {
       const old = saved.store.rules.find(rule => rule.id === input.id);
       if ((old?.revision ?? null) !== expectedRevision) throw new Error('Rule changed in another session. Reload the saved rule before saving.');
       const enabled = activate || Boolean(old?.enabled);
-      const next = { ...structuredClone(input), enabled, revision: old ? old.revision + 1 : 1 };
+      const provider = input.provider ?? old?.provider ?? 'jev';
+      const next = { ...structuredClone(input), provider, evaluation: evaluationContext(provider), enabled, revision: old ? old.revision + 1 : 1 };
       saved.store.rules = [...saved.store.rules.filter(rule => rule.id !== next.id), next];
       if (enabled) saved.watches[next.id] = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, version(row, next)]));
     });
@@ -183,34 +187,38 @@ export class RuleService {
       this.db.put('deleted-rule', `${companyId}:${id}`, companyId, { rule, deletedAt: new Date().toISOString() });
     });
   }
-  async runAll(companyId: string, id: string, revision: number) {
+  async runAll(companyId: string, id: string, revision: number, providerOverride?: Provider) {
     const ids = this.data.availableRows(companyId).map(row => row.id);
     if (!ids.length) throw new Error('No transactions are available for this company.');
-    await this.run(companyId, id, revision, ids, 'run', true);
+    await this.run(companyId, id, revision, ids, 'run', true, providerOverride);
   }
-  private async evaluate(companyId: string, rule: Rule, rows: Row[]): Promise<Record<string, Snapshot>> {
+  private async evaluate(companyId: string, rule: Rule, rows: Row[], context: EvaluationContext): Promise<Record<string, Snapshot>> {
     if (!rows.length) return {};
     const results: Record<string, Record<string, Outcome>> = Object.fromEntries(rows.map(row => [row.id, {}]));
     await Promise.all(leaves(rule.expression).map(async node => {
       if (node.type === 'standard') rows.forEach(row => { results[row.id][node.id] = standardResult(node, row, Boolean(row.dashboard?.reviewed)); });
-      else { const judgments = await this.judge(companyId, node.text, rows); rows.forEach(row => {
+      else { const judgments = await this.judge(companyId, node.text, rows, context.provider, context); rows.forEach(row => {
         const result = judgments[row.id];
         if (!['match', 'no_match', 'uncertain'].includes(result)) throw new Error('Incomplete condition results. Retry the rule.');
         results[row.id][node.id] = ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[result];
       }); }
     }));
-    return Object.fromEntries(rows.map(row => [row.id, { conditions: results[row.id], result: evaluateTree(rule.expression, results[row.id]) }]));
+    return Object.fromEntries(rows.map(row => [row.id, { conditions: results[row.id], result: evaluateTree(rule.expression, results[row.id]), evaluation: context }]));
   }
-  async run(companyId: string, id: string, revision: number, ids: string[], source: 'run' | 'arrival' | 'update' = 'run', wholeCompany = false) {
+  async run(companyId: string, id: string, revision: number, ids: string[], source: 'run' | 'arrival' | 'update' = 'run', wholeCompany = false, providerOverride?: Provider) {
     if (!Array.isArray(ids) || !ids.length || (!wholeCompany && ids.length > 1000)) throw new Error('Choose 1-1000 bills for this run.');
     const rule = this.read(companyId).store.rules.find(rule => rule.id === id);
     if (!rule || rule.revision !== revision || (source !== 'run' && !rule.enabled)) throw new Error('Saved rule changed. Refresh before running.');
+    if (providerOverride && providerOverride !== (rule.provider ?? 'jev')) throw new Error('Save a new rule revision to change its provider.');
+    const context = rule.evaluation ?? evaluationContext(rule.provider ?? 'jev');
+    if (context.identity !== evaluationContext(rule.provider ?? 'jev').identity) throw new Error('Model configuration changed. Save the rule again before running.');
     const requested = [...new Set(ids)].map(id => this.data.row(companyId, id));
     const rows = requested.filter(row => inScope(row, rule.scope));
-    const snapshots = await this.evaluate(companyId, rule, rows);
+    const snapshots = await this.evaluate(companyId, rule, rows, context);
     this.change(companyId, saved => {
       const current = saved.store.rules.find(item => item.id === id);
       if (!current || !same(current, rule) || (source !== 'run' && !current.enabled)) throw new Error('Rule changed during evaluation. No actions applied.');
+      if (context.identity !== evaluationContext(context.provider).identity) throw new Error('Model configuration changed during evaluation. No actions applied.');
       if (rows.some(row => this.data.row(companyId, row.id).sourceVersion !== row.sourceVersion)) throw new Error('Bills changed during evaluation. Retry against the latest values.');
       if (source !== 'run') for (const row of requested) (saved.watches[id] ??= {})[row.id] = version(row, rule);
       const batchId = uid();
@@ -229,7 +237,7 @@ export class RuleService {
       const counts = ['true', 'uncertain', 'false'].map(result => rows.filter(row => snapshots[row.id].result === result).length);
       const actedOn = rows.filter(row => actionsForOutcome(rule, snapshots[row.id].result).length).length;
       this.db.put('rule-run', `${companyId}:${rule.id}`, companyId, {
-        ruleId: rule.id, revision: rule.revision, checkedAt: new Date().toISOString(), transactionCount: rows.length,
+        evaluation: context, ruleId: rule.id, revision: rule.revision, checkedAt: new Date().toISOString(), transactionCount: rows.length,
         matches: counts[0], uncertain: counts[1], nonmatches: counts[2], source,
       } satisfies RuleRunSummary);
       saved.log = [`${source === 'run' ? 'Run now' : source === 'arrival' ? 'Replay' : 'Updated transactions'}: ${counts[0]} match, ${counts[1]} not enough information, ${counts[2]} no match. Actions configured for ${actedOn} transactions.`, ...saved.log].slice(0, 20);

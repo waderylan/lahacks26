@@ -1,0 +1,363 @@
+{
+  "provider": "qwen",
+  "companyId": "company-018",
+  "criterion": "Anything electronic or tech-related",
+  "n": 50,
+  "totalMs": 2240.585875,
+  "concurrency": "3 batches of up to 20; Qwen uses 3 concurrent record calls per batch",
+  "requestCostNanoUsd": null,
+  "costNote": "GPU-hour billing, not a free request",
+  "results": [
+    {
+      "id": "company-018:bill-operating-05267",
+      "state": "no_match",
+      "pMatch": 0.3105650059640363,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3941544746019874
+    },
+    {
+      "id": "company-018:bill-05502",
+      "state": "no_match",
+      "pMatch": 0.30925866504057864,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3924638344424277
+    },
+    {
+      "id": "company-018:bill-05593",
+      "state": "no_match",
+      "pMatch": 0.2706473825272657,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.34191996385308343
+    },
+    {
+      "id": "company-018:bill-05713",
+      "state": "no_match",
+      "pMatch": 0.2504656691625526,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.31511791036580844
+    },
+    {
+      "id": "company-018:bill-05848",
+      "state": "no_match",
+      "pMatch": 0.269984989909447,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.34104401228850784
+    },
+    {
+      "id": "company-018:bill-utilities-05870",
+      "state": "no_match",
+      "pMatch": 0.287974209146277,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36473247381926366
+    },
+    {
+      "id": "company-018:bill-utilities-06022",
+      "state": "no_match",
+      "pMatch": 0.3043135723226485,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3860517064516242
+    },
+    {
+      "id": "company-018:bill-utilities-06169",
+      "state": "no_match",
+      "pMatch": 0.26839859272991085,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3389450626204787
+    },
+    {
+      "id": "company-018:bill-operating-06325",
+      "state": "no_match",
+      "pMatch": 0.28908823273040307,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36619223450720767
+    },
+    {
+      "id": "company-018:bill-06477",
+      "state": "no_match",
+      "pMatch": 0.2699849933657243,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.34104401685981
+    },
+    {
+      "id": "company-018:bill-variable-services-02177",
+      "state": "no_match",
+      "pMatch": 0.28799852165712003,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3647643410751666
+    },
+    {
+      "id": "company-018:bill-02792",
+      "state": "no_match",
+      "pMatch": 0.3105650729595401,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3941545612710497
+    },
+    {
+      "id": "company-018:bill-interest-02610",
+      "state": "no_match",
+      "pMatch": 0.3092586256496806,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3924637834428865
+    },
+    {
+      "id": "company-018:bill-03076",
+      "state": "no_match",
+      "pMatch": 0.309258696158433,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.39246387473082783
+    },
+    {
+      "id": "company-018:bill-03215",
+      "state": "no_match",
+      "pMatch": 0.2312510026210775,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.289411275888874
+    },
+    {
+      "id": "company-018:bill-03376",
+      "state": "no_match",
+      "pMatch": 0.30779310349732864,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3905655094536885
+    },
+    {
+      "id": "company-018:bill-utilities-03220",
+      "state": "no_match",
+      "pMatch": 0.28797421985338373,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36473248785353346
+    },
+    {
+      "id": "company-018:bill-variable-services-03382",
+      "state": "no_match",
+      "pMatch": 0.30925864911688494,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3924638138259628
+    },
+    {
+      "id": "company-018:bill-utilities-03525",
+      "state": "no_match",
+      "pMatch": 0.28797421406428686,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36473248026551275
+    },
+    {
+      "id": "company-018:bill-variable-services-03660",
+      "state": "no_match",
+      "pMatch": 0.3061509038623841,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3884363617759904
+    },
+    {
+      "id": "company-018:bill-variable-services-03793",
+      "state": "no_match",
+      "pMatch": 0.26745366170547863,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.33769410829182417
+    },
+    {
+      "id": "company-018:bill-variable-services-03938",
+      "state": "no_match",
+      "pMatch": 0.3105903898990843,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3941873123953151
+    },
+    {
+      "id": "company-018:bill-variable-services-04083",
+      "state": "no_match",
+      "pMatch": 0.2837490868098625,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3591881929379756
+    },
+    {
+      "id": "company-018:bill-04392",
+      "state": "no_match",
+      "pMatch": 0.23125100319290906,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.2894112766561819
+    },
+    {
+      "id": "company-018:bill-variable-services-04363",
+      "state": "no_match",
+      "pMatch": 0.28908824453610665,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36619224997215233
+    },
+    {
+      "id": "company-018:bill-utilities-04512",
+      "state": "no_match",
+      "pMatch": 0.28908823696655983,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36619224005638396
+    },
+    {
+      "id": "company-018:bill-product-development-04644",
+      "state": "no_match",
+      "pMatch": 0.30431356720552794,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.38605169980648635
+    },
+    {
+      "id": "company-018:bill-utilities-04790",
+      "state": "no_match",
+      "pMatch": 0.3022610752103904,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.38338468059747816
+    },
+    {
+      "id": "company-018:bill-utilities-04946",
+      "state": "no_match",
+      "pMatch": 0.28908823254385024,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3661922342628318
+    },
+    {
+      "id": "company-018:bill-utilities-05106",
+      "state": "no_match",
+      "pMatch": 0.2900793567697828,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36749021320411335
+    },
+    {
+      "id": "company-018:bill-00016",
+      "state": "no_match",
+      "pMatch": 0.23125098140483438,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.28941124742002017
+    },
+    {
+      "id": "company-018:bill-00295",
+      "state": "no_match",
+      "pMatch": 0.23125099386444523,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.2894112641388539
+    },
+    {
+      "id": "company-018:bill-utilities-00138",
+      "state": "no_match",
+      "pMatch": 0.2683985934835411,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.33894506361796356
+    },
+    {
+      "id": "company-018:bill-operating-00218",
+      "state": "no_match",
+      "pMatch": 0.2900793488810172,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36749020287575324
+    },
+    {
+      "id": "company-018:bill-utilities-00280",
+      "state": "no_match",
+      "pMatch": 0.29007935280796776,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3674902080171101
+    },
+    {
+      "id": "company-018:bill-operating-00356",
+      "state": "no_match",
+      "pMatch": 0.28908822221073566,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3661922207269131
+    },
+    {
+      "id": "company-018:bill-00936",
+      "state": "no_match",
+      "pMatch": 0.2699850063109356,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3410440339812581
+    },
+    {
+      "id": "company-018:bill-01039",
+      "state": "no_match",
+      "pMatch": 0.23125098830540286,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.2894112566794953
+    },
+    {
+      "id": "company-018:bill-01124",
+      "state": "no_match",
+      "pMatch": 0.2316656676368875,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.2899676591181351
+    },
+    {
+      "id": "company-018:bill-01241",
+      "state": "no_match",
+      "pMatch": 0.2909603852561215,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36864342109990456
+    },
+    {
+      "id": "company-018:bill-01365",
+      "state": "no_match",
+      "pMatch": 0.2712349160332809,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.34269669515681095
+    },
+    {
+      "id": "company-018:bill-01435",
+      "state": "no_match",
+      "pMatch": 0.27123490744536016,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.34269668380496376
+    },
+    {
+      "id": "company-018:bill-utilities-00902",
+      "state": "no_match",
+      "pMatch": 0.3022610818028476,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3833846891689842
+    },
+    {
+      "id": "company-018:bill-utilities-01035",
+      "state": "no_match",
+      "pMatch": 0.30226107443959865,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.38338467959529554
+    },
+    {
+      "id": "company-018:bill-variable-services-01156",
+      "state": "no_match",
+      "pMatch": 0.28797423017187135,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3647325013784234
+    },
+    {
+      "id": "company-018:bill-01987",
+      "state": "no_match",
+      "pMatch": 0.290079473043957,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.36749036543598057
+    },
+    {
+      "id": "company-018:bill-utilities-01503",
+      "state": "no_match",
+      "pMatch": 0.29096032249050646,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3686433389637141
+    },
+    {
+      "id": "company-018:bill-02240",
+      "state": "no_match",
+      "pMatch": 0.25046571114180005,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3151179663441119
+    },
+    {
+      "id": "company-018:bill-02467",
+      "state": "no_match",
+      "pMatch": 0.230783151041555,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.28878345250093385
+    },
+    {
+      "id": "company-018:bill-utilities-02028",
+      "state": "no_match",
+      "pMatch": 0.28908821790642236,
+      "scoreKind": "validation_calibrated",
+      "rawPMatch": 0.3661922150884546
+    }
+  ],
+  "note": "Original records. Jev/Qwen agreement is not independent accounting accuracy. One warm-server run; not a statistical latency benchmark."
+}

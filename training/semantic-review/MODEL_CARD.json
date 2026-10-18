@@ -1,0 +1,48 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "fineTune": "full SFT",
+  "veriJob": "29c3e7c4c2cf",
+  "checkpointStatus": "completed",
+  "steps": 125,
+  "trainingCostUsd": 0.6048718661012444,
+  "functions": [
+    "semantic criterion matching",
+    "explicit non-matches",
+    "uncertain when purchase text is insufficient"
+  ],
+  "outputs": {
+    "A": "match",
+    "B": "no_match",
+    "C": "uncertain"
+  },
+  "notProvided": [
+    "Jev architecture",
+    "calibrated Jev probabilities",
+    "unrestricted accounting reasoning",
+    "automatic changes to original books"
+  ],
+  "trainingData": {
+    "authoredOverlays": 800,
+    "jevTeacherPredictions": 200
+  },
+  "evaluation": {
+    "reservedDemoCases": 150,
+    "reservedOverlayCases": 220,
+    "testAccuracy": 0.6756756756756757,
+    "testErrors": 0,
+    "falseMatches": 79,
+    "uncertainRecall": 0.6375,
+    "jevAccuracy": 0.9054054054054054
+  },
+  "deploymentId": "bf4ed18a3da9",
+  "selection": "Same frozen 1,000 examples. Size increased after 0.6B validation accuracy of 70.9%. No test labels used to fit weights or calibration.",
+  "validationAccuracy": 0.85,
+  "previousTrial": "MODEL_CARD_06.json",
+  "limitations": [
+    "Authored synthetic references, not accountant-certified accounting correctness",
+    "Interface compatibility does not establish equivalent accuracy to Jev",
+    "Generative three-state classifier, not Jev architecture",
+    "Calibrated only on synthetic validation data; real-world calibration is unproven"
+  ],
+  "recommendation": "Experimental alternative only. Retain Jev as default: Qwen 1.7B is substantially less accurate on the held-out test, despite 85% validation accuracy."
+}

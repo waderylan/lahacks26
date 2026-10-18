@@ -81,3 +81,34 @@ test('new reviewer details replace a cached uncertain judgment and reach the mod
   assert.notEqual(judgmentKey(row, 'criterion'), judgmentKey(updated, 'criterion'));
   assert.deepEqual(evaluationEvidence(updated).evidence, [{ kind: 'reviewer_note', title: 'Receipt verified', date: '2026-10-17', text: 'The receipt supports the charge.' }]);
 });
+
+test('persistent judgments isolate Jev, Qwen, and changed Veri deployments', async t => {
+  const db = new ActionStore(':memory:');
+  const original = loadCompanyBills('company-101');
+  const data = new WorkspaceData(db, () => original, () => []);
+  const row = data.bills('company-101').rows[0];
+  const fetchBefore = globalThis.fetch;
+  const envBefore = { key: process.env.VERI_API_KEY, deployment: process.env.VERI_DEPLOYMENT_ID };
+  t.after(() => {
+    globalThis.fetch = fetchBefore;
+    if (envBefore.key === undefined) delete process.env.VERI_API_KEY; else process.env.VERI_API_KEY = envBefore.key;
+    if (envBefore.deployment === undefined) delete process.env.VERI_DEPLOYMENT_ID; else process.env.VERI_DEPLOYMENT_ID = envBefore.deployment;
+    db.db.close();
+  });
+  process.env.VERI_API_KEY = 'test-only-placeholder';
+  process.env.VERI_DEPLOYMENT_ID = 'abc123';
+  let qwenCalls = 0, jevCalls = 0;
+  globalThis.fetch = async () => { qwenCalls++; return new Response(JSON.stringify({ choices: [{ message: { content: 'A' } }] }), { status: 200 }); };
+  const service = new SemanticService(data, async (_req, _signal, rows = []) => {
+    jevCalls++;
+    return { results: rows.map(row => ({ id: row.id, state: 'no_match' as const, pMatch: 0.1 })), costNanoUsd: '0' };
+  });
+  assert.equal((await service.judge(row.companyId, 'Electronic purchase', [row], 'jev'))[row.id], 'no_match');
+  assert.equal((await service.judge(row.companyId, 'Electronic purchase', [row], 'qwen'))[row.id], 'match');
+  await service.judge(row.companyId, 'Electronic purchase', [row], 'qwen');
+  assert.equal(qwenCalls, 1);
+  process.env.VERI_DEPLOYMENT_ID = 'def456';
+  await service.judge(row.companyId, 'Electronic purchase', [row], 'qwen');
+  assert.equal(qwenCalls, 2, 'a new deployment must not reuse the previous model answer');
+  assert.equal(jevCalls, 1);
+});

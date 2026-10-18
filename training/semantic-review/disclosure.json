@@ -1,0 +1,9 @@
+{
+  "seed": 2601017,
+  "train": 800,
+  "validation": 220,
+  "test": 220,
+  "demo": 150,
+  "modifications": "Authored description, memo, and item-name overlays over unchanged real bill contexts; not defects found in source books. Synthetic order identifiers are included as purchase text variation. Jev teacher labels, if added, must be disclosed separately.",
+  "limitations": "Template-generated labels, not accountant-reviewed. Entire families and realistic accounting ambiguity are not proven. Evaluate on independent demo and original held-out records. No hidden simulation files used."
+}

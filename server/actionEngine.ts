@@ -6,7 +6,7 @@ import type { ActionStore } from './actionStore.ts';
 import { emptyDashboard } from './actionStore.ts';
 import type { WorkspaceData } from './workspaceData.ts';
 
-export type Judge = (companyId: string, criterion: string, rows: Row[]) => Promise<Record<string, 'match' | 'no_match' | 'uncertain'>>;
+export type Judge = (companyId: string, criterion: string, rows: Row[], provider?: 'jev' | 'qwen', context?: import('../src/modelContext.ts').EvaluationContext) => Promise<Record<string, 'match' | 'no_match' | 'uncertain'>>;
 const now = () => new Date().toISOString();
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 export function validateAction(input: unknown): BillAction {

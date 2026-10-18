@@ -1,0 +1,12 @@
+{
+  "deploymentId": "bf4ed18a3da9",
+  "a": 0.7467143964669186,
+  "b": -0.3742120943223668,
+  "n": 220,
+  "validationHash": "de6a643ac610362ab6e4c82ca7220d898197eb2e97d0073120206db8af8fde7b",
+  "source": "authored_validation_only",
+  "method": "Monotonic Platt scaling; no test labels used",
+  "validationBrierBefore": 0.10223448057006788,
+  "validationBrierAfter": 0.10030409801760226,
+  "note": "Fit on held-out authored synthetic cases. This is not evidence of calibration on real accounting data."
+}

@@ -38,13 +38,20 @@ export class ActionStore {
         if (row.companyId !== company || !row.id.startsWith(`${company}:`)) throw new Error('Cross-company import refused.');
         insert.run(company, row.id, JSON.stringify(row), JSON.stringify({ ...row, dashboard: emptyDashboard() }), revision);
       }
+      if (version && dataset?.version !== version) {
+        const dashboard = this.get<{ charts: { ids?: string[] }[]; revision?: number }>('dashboard-charts', company);
+        if (dashboard) {
+          const ids = new Set(rows.map(row => row.id));
+          this.put('dashboard-charts', company, company, { charts: dashboard.charts.map(chart => chart.ids ? { ...chart, ids: chart.ids.filter(id => ids.has(id)) } : chart), revision: (dashboard.revision ?? 0) + 1 });
+        }
+      }
     });
   }
   /** Called inside the same transaction as row restore/replacement. Definitions and semantic caches survive. */
   private clearCompanyReview(company: string) {
     const saved = this.get<{ companyId: string; store: RuleStore }>('rule-state', company);
     // A whitelist prevents newly added activity documents from surviving a restore by accident.
-    this.db.prepare("DELETE FROM documents WHERE company=? AND kind NOT IN ('dataset','semantic-judgment','saved-search','rule-state','deleted-rule')").run(company);
+    this.db.prepare("DELETE FROM documents WHERE company=? AND kind NOT IN ('dataset','semantic-judgment','saved-search','dashboard-charts','rule-state','deleted-rule')").run(company);
     if (saved) this.put('rule-state', company, company, {
       companyId: company,
       store: { ...structuredClone(EMPTY_STORE), rules: saved.store.rules.map(rule => ({ ...rule, enabled: false, revision: rule.revision + 1 })) },

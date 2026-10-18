@@ -172,10 +172,10 @@ export default function App() {
       .catch((e: Error) => seq === loadSeq.current && setLoadError(e.message));
   }, [companyId, rowLimit, prefsReady]);
 
-  // Debounce the criterion (~300 ms); empty input clears immediately.
+  // Wait for typing to settle: Qwen 1 s, Jev 300 ms; empty input clears immediately.
   useEffect(() => {
     if (!input.trim()) return setQuery('');
-    const t = setTimeout(() => setQuery(input), 300);
+    const t = setTimeout(() => setQuery(input), selectedProvider() === 'qwen' ? 1000 : 300);
     return () => clearTimeout(t);
   }, [input]);
 
@@ -356,8 +356,10 @@ export default function App() {
             Sample: {data.rows.length} of {data.totalBills} {isSynthetic ? 'transactions' : 'bills'}
           </span>
         )}
+        {(workspace === 'transactions' || workspace === 'rules') && <>
         <label className="rows-pick">Model <select aria-label="Evaluation model" title="Switches provider and reloads the view. Save rule drafts before switching." value={selectedProvider()} onChange={e => { try { sessionStorage.setItem(SWITCH_CONTEXT_KEY, JSON.stringify({companyId, workspace, input})); } catch {} const url = new URL(window.location.href); url.searchParams.set('model', e.target.value); window.location.assign(url.toString()); }}><option value="jev">Jev</option><option value="qwen">Qwen · Veri</option></select></label>
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
+        </>}
         <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>

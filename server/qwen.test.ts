@@ -27,3 +27,40 @@ test('validation score calibration is bounded, monotonic, and rejects invalid pa
  assert.ok(Math.abs(adjustedProbability(.25,1,0)-.25)<1e-10);
  assert.throws(()=>adjustedProbability(.5,-1,0));assert.throws(()=>adjustedProbability(NaN,1,0));
 });
+
+import { qwenFailureKind, QwenRequestError } from './qwen.ts';
+test('connection diagnostics expose safe codes without leaking upstream details', () => {
+  assert.equal(qwenFailureKind({ cause: { code: 'ENOTFOUND', message: 'secret request' } }), 'connection failed (ENOTFOUND)');
+  assert.equal(qwenFailureKind({ name: 'TimeoutError' }), 'request timed out');
+  assert.equal(qwenFailureKind({ name: 'AbortError' }), 'request cancelled');
+  assert.equal(qwenFailureKind({ cause: { code: 'Bearer secret' } }), 'connection failed');
+  const error = new QwenRequestError('rate limited (HTTP 429)', 'test-reference');
+  assert.equal(error.message, 'Qwen: rate limited (HTTP 429). Reference: test-reference');
+});
+
+import { withQwenSlot } from './qwenConcurrency.ts';
+test('Qwen shares three slots and removes cancelled queued requests', async () => {
+  const releases: (() => void)[] = [];
+  let active = 0, peak = 0, cancelledStarted = false;
+  const work = () => withQwenSlot(async () => {
+    active++; peak = Math.max(peak, active);
+    await new Promise<void>(resolve => releases.push(resolve));
+    active--;
+  });
+  const running = Array.from({ length: 3 }, work);
+  const controller = new AbortController();
+  const cancelled = withQwenSlot(async () => { cancelledStarted = true; }, controller.signal);
+  const rejected = assert.rejects(cancelled, { name: 'AbortError' });
+  controller.abort();
+  const queued = Array.from({ length: 7 }, work);
+  assert.equal(releases.length, 3);
+  while (releases.length) {
+    releases.shift()!();
+    await new Promise(resolve => setImmediate(resolve));
+  }
+  await Promise.all([...running, ...queued, rejected]);
+  assert.equal(peak, 3);
+  assert.equal(cancelledStarted, false);
+  await assert.rejects(withQwenSlot(async () => { throw new Error('test failure'); }), /test failure/);
+  assert.equal(await withQwenSlot(async () => 'released'), 'released');
+});

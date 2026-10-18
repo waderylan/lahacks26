@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
 import { demoSample, listCompanies } from './data.ts';
-import { QwenReadinessError } from './qwen.ts';
+import { QwenReadinessError, QwenRequestError } from './qwen.ts';
 import { providerStatus, type Provider } from './evaluator.ts';
 import { actionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
@@ -67,6 +67,7 @@ app.post('/api/evaluate', async (req, res) => {
     res.json({ results, costNanoUsd, model: providerStatus(provider).model, costKind: provider === 'qwen' ? 'gpu_time_unavailable' : 'request' });
   } catch (e) {
     if (ac.signal.aborted) return;
+    if (e instanceof QwenRequestError) return res.status(e.status).json({ error: e.message, requestId: e.requestId });
     if (e instanceof QwenReadinessError) return res.status(503).json({ error: e.message + ' No actions were applied.' });
     console.error('evaluate failed:', (e as Error).message);
     res.status(502).json({ error: 'Model request failed; no failed record is treated as false' });

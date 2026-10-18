@@ -8,8 +8,16 @@ export function importBrowserWorkspace(companyId: string): Promise<void> {
     try { raw = localStorage.getItem('tr.rules.v1'); reviewed = localStorage.getItem('tr.reviewed.v1'); }
     catch { return; } // Browser storage can be disabled entirely.
     if (!raw && !reviewed) return;
+    let store: unknown = { rules: [] };
+    let reviewedIds: unknown = [];
+    try {
+      if (raw) store = JSON.parse(raw);
+      if (reviewed) reviewedIds = JSON.parse(reviewed);
+    } catch {
+      return; // Corrupt legacy keys are skipped so they cannot block the SQLite workspace.
+    }
     const response = await fetch(`/api/companies/${companyId}/rules/import`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ store: raw ? JSON.parse(raw) : { rules: [] }, reviewed: reviewed ? JSON.parse(reviewed) : [] }) });
+      body: JSON.stringify({ store, reviewed: reviewedIds }) });
     if (!response.ok) { const body = await response.json(); throw new Error(body.error ?? 'Could not migrate the old browser workspace.'); }
   })();
   imports.set(companyId, work);

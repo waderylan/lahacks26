@@ -1,6 +1,7 @@
 import { evaluateBatch, supportingContext, jevConfigured, JEV_MODEL, type EvalRequest } from './jev.ts';
 import { evaluateQwen, qwenConfigured, qwenDeploymentId } from './qwen.ts';
 import type { Row } from '../src/types.ts';
+import { evaluationEvidence } from '../src/jevEvidence.ts';
 import { getRow } from './data.ts';
 import { centsText, type DecisionInput } from './modelContract.ts';
 export type Provider = 'jev' | 'qwen';
@@ -10,7 +11,7 @@ export function providerStatus(provider: Provider) {
     : { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway', provider, scores: 'Jev probabilities', billing: 'Gateway request cost' };
 }
 export function visibleInput(company: DecisionInput['company'], criterion: string, row: NonNullable<ReturnType<typeof getRow>>): DecisionInput {
-  return { company, criterion, transaction: { date: row.date, vendor: row.vendor, account: row.account, expense_kind: row.expenseKind, amount: centsText(row.amountCents), item_names: row.itemNames, description: row.description, memo: row.memo, ...supportingContext(row) } };
+  return { company, criterion, transaction: evaluationEvidence(row) };
 }
 export async function evaluateSelected(provider: Provider, req: EvalRequest, signal?: AbortSignal, visibleRows?: Row[]) {
   if (provider === 'jev') return { ...await evaluateBatch(req, signal, visibleRows), costKind: 'request' as const };

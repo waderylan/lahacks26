@@ -9,7 +9,13 @@ export class WorkspaceData {
   constructor(readonly store: ActionStore, private loadOriginal = loadCompanyBills, private loadAccounts = companyAccounts) {}
   bills(companyId: string): CompanyBills {
     const original = this.loadOriginal(companyId);
-    if (!this.imported.has(companyId)) { this.store.seed(companyId, original.rows, original.datasetVersion); this.imported.add(companyId); }
+    const stored = original.datasetVersion ? this.store.get<{ version: string }>('dataset', companyId)?.version : undefined;
+    // Seed on first open, and again when a generated dataset's version hash changes.
+    if (!this.imported.has(companyId) || (original.datasetVersion && stored !== original.datasetVersion)) {
+      this.store.seed(companyId, original.rows, original.datasetVersion);
+      this.imported.add(companyId);
+      this.accountCache.delete(companyId);
+    }
     return { ...original, company: { ...original.company, source: 'workspace' }, rows: this.store.rows(companyId) };
   }
   row(companyId: string, id: string): Row {

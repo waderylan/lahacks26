@@ -1,9 +1,10 @@
 import type { CompanyBills, RecordResult, Row } from './types';
 import type { Outcome } from './rules';
+import { evaluationEvidence } from './jevEvidence';
 
 let modelRevision = 'pending-status';
-export function setModelRevision(version: string) { if (version !== modelRevision) { modelRevision = version; judgments.clear(); } }
-export const selectedProvider = () => new URLSearchParams(window.location.search).get('model') === 'qwen' ? 'qwen' : 'jev';
+export function setModelRevision(version: string) { if (version !== modelRevision) { modelRevision = version; judgments.clear(); probabilities.clear(); } }
+export const selectedProvider = () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('model') === 'qwen' ? 'qwen' : 'jev';
 
 // Shared by semantic filtering, rule preview, and arrivals: at most three gateway batches.
 let active = 0;
@@ -35,21 +36,31 @@ export async function requestEvaluation(companyId: string, criterion: string, id
   });
 }
 export const evaluationIdentity = () => `${selectedProvider()}:${modelRevision}`;
-export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v1:choice-v1';
-export const judgmentKey = (row: Row, text: string) => JSON.stringify([selectedProvider(), modelRevision, CACHE_VERSION, row.companyId, row.id, row.date, row.vendor, row.account, row.memo, row.amountCents, row.description, row.itemNames, text]);
+export const CACHE_VERSION = 'visible-context-v2:choice-v1';
+export const judgmentKey = (row: Row, text: string) => JSON.stringify([evaluationIdentity(), CACHE_VERSION, row.companyId, row.id, text, evaluationEvidence(row)]);
+const MAX_JUDGMENTS = 10_000;
 const judgments = new Map<string, Promise<Outcome>>();
-export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void): Promise<void> {
+const probabilities = new Map<string, number>();
+/** Jev's P(match) for a finished judgment; the chat uses it to show near misses when nothing matches. */
+export const pMatchFor = (row: Row, text: string) => probabilities.get(judgmentKey(row, text));
+function remember(key: string, promise: Promise<Outcome>) {
+  judgments.set(key, promise);
+  while (judgments.size > MAX_JUDGMENTS) { const oldest = judgments.keys().next().value!; judgments.delete(oldest); probabilities.delete(oldest); }
+}
+export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void, onCost?: (nanoUsd: bigint) => void): Promise<void> {
   const missing = data.rows.filter(row => !judgments.has(judgmentKey(row, text)));
   for (let i = 0; i < missing.length; i += 20) {
     const batch = missing.slice(i, i + 20);
     const request = requestEvaluation(data.company.companyId, text, batch.map(r => r.id));
+    if (onCost) request.then(r => onCost(BigInt(r.costNanoUsd)), () => {});
     for (const row of batch) {
       const key = judgmentKey(row, text);
       const promise = request.then(({ results }) => {
         const result = results.find(r => r.id === row.id)!;
+        if (result.pMatch !== null) probabilities.set(key, result.pMatch);
         return ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[result.state];
       }).catch((error: Error) => { judgments.delete(key); throw error; });
-      judgments.set(key, promise);
+      remember(key, promise);
     }
   }
   return Promise.all(data.rows.map(async row => {

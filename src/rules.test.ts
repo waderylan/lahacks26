@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { completeDraft, compose, MAX_MESSAGE_ITEMS, migrateMessage, decideMessage, DEFAULT_MESSAGE_ASK, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, migrateRule, parseCents, resetCompanyDemo, retryDraft, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
+import { paymentFraudRule, rulePresets, completeDraft, compose, MAX_MESSAGE_ITEMS, migrateMessage, decideMessage, DEFAULT_MESSAGE_ASK, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, migrateRule, parseCents, resetCompanyDemo, retryDraft, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
 import type { Row } from './types';
 
 const row = { id: 'company-018:bill-original', companyId: 'company-018', billId: 'bill-original', docNumber: 'BILL-1', date: '2026-01-15', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo', description: 'Original description', itemNames: ['Widget'] } as Row;
@@ -192,4 +192,61 @@ test('one run synthesizes its matches into one message per action; undo and stal
   assert.equal(undone.employeeId, null);
   const legacy = migrateMessage({ ...small, items: undefined, transactionId: 'c:t', billId: 't', context: [] } as never);
   assert.deepEqual(legacy.items, [{ transactionId: 'c:t', billId: 't', context: [] }]);
+});
+
+test('each outcome runs only its own actions and old actions remain match-only', () => {
+  const rule: Rule = { ...exampleRule(row.companyId), expression: { id: 'condition', type: 'ai', text: 'Needs review', label: '' }, actions: [
+    { id: 'match', type: 'flag', value: 'Check charge' },
+    { id: 'uncertain', type: 'assign', value: 'Request receipt', when: 'uncertain' },
+    { id: 'nonmatch', type: 'tag', value: 'Policy cleared', when: 'false' },
+  ] };
+  for (const result of ['true', 'uncertain', 'false'] as const) {
+    const snapshot = { result, conditions: { condition: result } };
+    const saved = executeRule(structuredClone(EMPTY_STORE), rule, row, 'v1', snapshot, 'run');
+    assert.equal(saved.history.length, 1);
+    assert.equal(saved.history[0].action?.id, { true: 'match', uncertain: 'uncertain', false: 'nonmatch' }[result]);
+    assert.equal(saved.history[0].snapshot.result, result);
+    assert.equal(executeRule(JSON.parse(JSON.stringify(saved)), rule, row, 'v1', snapshot, 'arrival').history.length, 1);
+  }
+  for (const result of ['pending', 'error'] as const) {
+    assert.equal(executeRule(EMPTY_STORE, rule, row, 'v1', { result, conditions: { condition: result } }, 'run'), EMPTY_STORE);
+  }
+});
+
+test('uncertain-only rules are valid, preserve uncertainty in drafts, and cannot mark checked', () => {
+  const rule: Rule = { ...exampleRule(row.companyId), expression: { id: 'condition', type: 'ai', text: 'Needs review', label: '' }, actions: [
+    { id: 'message', type: 'message', value: 'Ask for the missing receipt.', recipient: 'jev', sender: 'emp-ap', when: 'uncertain' },
+  ] };
+  assert.deepEqual(validateRule(rule), []);
+  const saved = executeRule(structuredClone(EMPTY_STORE), rule, row, 'v1', { result: 'uncertain', conditions: { condition: 'uncertain' } }, 'run');
+  assert.equal(saved.messages[0].outcome, 'uncertain');
+  assert.equal(saved.messages[0].items[0].context[0].result, 'uncertain');
+  assert.equal(saved.messages[0].status, 'pending');
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'pass', type: 'pass', value: '', when: 'uncertain' }] }).length);
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'bad', type: 'tag', value: 'Test', when: 'error' }] }).length);
+});
+
+test('task actions require an owner and whole-day deadline; cleanup must be an explicit boolean', () => {
+  const rule = { ...exampleRule(row.companyId), actions: [{ id: 'task', type: 'task' as const, value: 'Check receipt', owner: 'Accountant', dueDays: 2 }] };
+  assert.deepEqual(validateRule(rule), []);
+  for (const dueDays of [-1, 1.5, 366, undefined]) assert.ok(validateRule({ ...rule, actions: [{ ...rule.actions[0], dueDays }] }).length);
+  assert.ok(validateRule({ ...rule, actions: [{ ...rule.actions[0], owner: '' }] }).length);
+  assert.ok(validateRule({ ...rule, autoResolve: 'yes' }).length);
+});
+
+test('every rule preset builds a valid, editable rule; payment fraud routes matches to the CFO from the signed-in employee', () => {
+  for (const synthetic of [false, true]) for (const preset of rulePresets(synthetic)) {
+    const rule = preset.build('company-101', 'emp-controller');
+    assert.deepEqual(validateRule(rule), [], preset.name);
+    assert.equal(rule.companyId, 'company-101'); assert.equal(rule.enabled, false);
+  }
+  assert.equal(rulePresets(false).length, 5); assert.equal(rulePresets(true).length, 9);
+  assert.equal(rulePresets(true).filter(preset => preset.starter).length, 4);
+  const fraud = rulePresets(false).find(p => p.id === 'payment-fraud')!.build('company-101', 'emp-controller');
+  assert.equal(leaves(fraud.expression).length, 3);
+  const message = fraud.actions.find(a => a.type === 'message')!;
+  assert.equal(message.recipient, 'emp-cfo'); assert.equal(message.sender, 'emp-controller');
+  assert.deepEqual(fraud.actions.find(a => a.type === 'flag')?.value, 'Possible payment diversion');
+  // Each build is a fresh copy, so editing one never changes the next.
+  assert.notEqual(fraud.id, paymentFraudRule('company-101').id);
 });

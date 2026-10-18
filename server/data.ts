@@ -69,7 +69,24 @@ export interface CompanyBills {
 
 let index: Record<string, any>[] | null = null;
 let synIndex: Record<string, any>[] | null = null;
+let synMtime = -1;
+const cache = new Map<string, CompanyBills>();
+const rowById = new Map<string, Row>();
+function refreshSynthetic() {
+  const file = path.join(SYN_ROOT, 'index.json');
+  const mtime = fs.existsSync(file) ? fs.statSync(file).mtimeMs : 0;
+  if (mtime === synMtime) return;
+  synMtime = mtime;
+  synIndex = null;
+  for (const [id, value] of [...cache]) {
+    if (value.datasetVersion) {
+      cache.delete(id);
+      for (const row of value.rows) rowById.delete(row.id);
+    }
+  }
+}
 function readSynthetic() {
+  refreshSynthetic();
   const file = path.join(SYN_ROOT, 'index.json');
   synIndex ??= fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : [];
   return synIndex!;
@@ -167,6 +184,8 @@ export function toCents(amount: string | null | undefined): number {
   return m[1] ? -cents : cents;
 }
 
+export { formatCents } from '../src/jevEvidence.ts';
+
 // Drop simulation-only metadata (sim_*, provenance_note) from anything shown or sent to Jev.
 function strip<T>(obj: T): T {
   if (Array.isArray(obj)) return obj.map(strip) as T;
@@ -180,9 +199,6 @@ function strip<T>(obj: T): T {
   }
   return obj;
 }
-
-const cache = new Map<string, CompanyBills>();
-const rowById = new Map<string, Row>();
 
 export function getRow(id: string): Row | undefined {
   return rowById.get(id);
@@ -247,6 +263,7 @@ export function loadCompanyBillsLimited(companyId: string, limit?: number): Comp
 }
 
 export function loadCompanyBills(companyId: string): CompanyBills {
+  refreshSynthetic();
   const hit = cache.get(companyId);
   if (hit) return hit;
   if (companyId === SCENARIO_ID && SCENARIO_ENABLED) return loadScenario();

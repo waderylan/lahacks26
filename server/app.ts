@@ -1,4 +1,5 @@
 import { ChatStore, chatRoutes } from './chat.ts';
+import { evaluationRoutes } from './evaluation.ts';
 import { DashboardStore, dashboardRoutes } from './dashboard.ts';
 import { providerStatus, type Provider } from './evaluator.ts';
 import express from 'express';
@@ -97,6 +98,7 @@ export function createReviewApp(options: AppOptions) {
   savedSearchRoutes(app, searches);
   dashboardRoutes(app, new DashboardStore(database, workspace));
   chatRoutes(app, new ChatStore(database, workspace, options.chat));
+  evaluationRoutes(app);
   app.use('/api', (_req, res) => res.status(404).json({ error: 'API endpoint not found.' }));
 
   const pending = new Set<Promise<unknown>>();

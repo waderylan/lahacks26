@@ -151,6 +151,8 @@ export function parseQuestion(question: string, latestDate: string): ParsedQuest
       : 'total';
   let topic = rest
     .replace(/[?.!]+$/g, '')
+    // "graph/chart/plot … " asks for a picture, it isn't part of the topic
+    .replace(/^\s*((please|can you)\s+)?(graph|chart|plot|visuali[sz]e|draw|show)(\s+me)?(\s+(a|an|the))?(\s+(graph|chart|plot)\s+of)?\b/i, '')
     .replace(/^\s*(how much|how many|what('s| is| was)?( the)?( total)?|which vendors?|who|show( me)?|list|find|give me|total|count|number of|top vendors)\b/i, '')
     .replace(/^\s*(did|do|does|have|has|was|were|is|are)\b/i, '')
     .replace(/^\s*(we|i|the company|our company|us)\b/i, '')

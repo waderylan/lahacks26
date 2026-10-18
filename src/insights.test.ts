@@ -88,3 +88,9 @@ test('"may" the verb is not read as the month May', () => {
   assert.equal(parseQuestion('Show bills from May 2026', LATEST).period?.label, 'May 2026');
   assert.equal(parseQuestion('How much did we spend in March?', LATEST).period?.label, 'March');
 });
+
+test('graph words are not part of the topic', () => {
+  assert.equal(parseQuestion('graph utilities by month', LATEST).topic, 'utilities');
+  assert.equal(parseQuestion('chart electronics spend by vendor', LATEST).topic, 'electronics spend');
+  assert.equal(parseQuestion('show me a graph of rent', LATEST).topic, 'rent');
+});

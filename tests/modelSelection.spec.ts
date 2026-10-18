@@ -12,10 +12,10 @@ test('Qwen selection is scoped to Explore and Rules, not Tasks or Messages', asy
       await expect(page.getByLabel('Evaluation model')).toHaveCount(0);
     }
     await nav.getByRole('button', { name: 'Rules', exact: true }).click();
-    await expect(page.getByLabel('Evaluation model')).toHaveCount(0);
+    await expect(page.getByLabel('Evaluation model')).toHaveValue('qwen');
     await page.getByRole('button', { name: 'New rule', exact: true }).click();
     await expect(page.getByLabel('Rule evaluation provider')).toHaveValue('qwen');
-    await expect(page.locator('.toolbar select[aria-label="Evaluation model"]')).toHaveCount(0);
+    await expect(page.locator('.toolbar select[aria-label="Evaluation model"]')).toHaveValue('qwen');
     await nav.getByRole('button', { name: 'Explore', exact: true }).click();
     await page.getByLabel('Evaluation model').selectOption('jev');
     await expect(page.getByLabel('Evaluation model')).toHaveValue('jev');

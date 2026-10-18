@@ -44,7 +44,7 @@ test('Dashboard supports focused chart creation and visibly enforces the shared 
     await page.getByRole('button', { name: 'Add chart', exact: true }).click();
     await page.getByLabel('Chart title', { exact: true }).fill('Selected purchase');
     await page.getByLabel('Chart record IDs').fill('company-101:bill-2');
-    await page.getByLabel('Measure', { exact: true }).selectOption('count');
+    await page.getByLabel('Measure').selectOption('count');
     await page.getByRole('button', { name: 'Save chart', exact: true }).click();
     await expect(page.getByRole('region', { name: 'Selected purchase', exact: true })).toContainText('1 transaction');
     await page.reload(); await expect(page.getByRole('region', { name: 'Selected purchase', exact: true })).toBeVisible();
@@ -54,7 +54,7 @@ test('Dashboard supports focused chart creation and visibly enforces the shared 
     await page.getByRole('button', { name: 'Refresh', exact: true }).click(); await expect(page.locator('.chart-card')).toHaveCount(24);
     await page.getByRole('button', { name: 'Add chart', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Save chart', exact: true })).toBeDisabled();
-    await expect(page.getByRole('status')).toContainText('24 charts');
+    await expect(page.locator('.focus-chart')).toContainText('24 charts maximum');
   } finally { await app.close(); }
 });
 
@@ -84,7 +84,7 @@ test('provider switching keeps company 104, search conditions and the unsaved ru
     await page.getByRole('navigation', { name: 'Workspace', exact: true }).getByRole('button', { name: 'Rules', exact: true }).click();
     await page.getByRole('button', { name: 'New rule', exact: true }).click();
     await page.getByLabel('Condition 1', { exact: true }).fill('Keep this unsaved condition');
-    await expect(page.getByLabel('Evaluation model')).toHaveCount(0);
+    await expect(page.getByLabel('Evaluation model')).toHaveValue('jev');
     await page.getByLabel('Rule evaluation provider').selectOption('qwen');
     await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('Keep this unsaved condition');
     await expect(page.getByLabel('Rule evaluation provider')).toHaveValue('qwen');

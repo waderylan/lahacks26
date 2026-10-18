@@ -1,6 +1,7 @@
 import { ChatWidget } from './AskPanel';
-import type { Provider } from './modelContext';
+import { providerLabel, type Provider } from './modelContext';
 import { Dashboard } from './Dashboard';
+import { Evaluation } from './Evaluation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useRules } from './useRules';
@@ -24,7 +25,7 @@ const DEFAULT_COMPANY = 'company-101';
 const ROW_LIMITS = [-1, 0, 50, 100];
 const param = (name: string) => new URLSearchParams(location.search).get(name);
 const setParam = (name: string, value: string) => { const url = new URL(location.href); url.searchParams.set(name, value); history.replaceState(null, '', url); };
-type Workspace = 'explore' | 'dashboard' | 'rules' | 'tasks' | 'messages';
+type Workspace = 'explore' | 'dashboard' | 'rules' | 'tasks' | 'messages' | 'evaluation';
 
 export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
@@ -35,7 +36,7 @@ export default function App() {
   const setCompanyId = (id: string) => { setParam('company', id); setCompanyState(id); };
   const [workspace, setWorkspaceState] = useState<Workspace>(() => {
     const selected = param('workspace');
-    return selected === 'dashboard' || selected === 'rules' || selected === 'tasks' || selected === 'messages' ? selected : 'explore';
+    return selected === 'dashboard' || selected === 'rules' || selected === 'tasks' || selected === 'messages' || selected === 'evaluation' ? selected : 'explore';
   });
   const setWorkspace = (next: Workspace) => { setParam('workspace', next); setWorkspaceState(next); };
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
@@ -196,23 +197,25 @@ export default function App() {
             </div>
           </>}
         </div>}
-        {workspace === 'explore' && !exploreRule && <label className="rows-pick">Model <select aria-label="Evaluation model" title="Saved rules use their recorded provider. Switching preserves the current search and unsaved rule." value={provider} onChange={event => changeProvider(event.target.value as Provider)}><option value="jev">Jev</option><option value="qwen">Qwen</option></select></label>}
+        {(workspace === 'explore' || workspace === 'rules') && <label className="rows-pick">Model <select aria-label="Evaluation model" title="Saved rules use their recorded provider. Switching preserves the current search and unsaved rule." value={provider} onChange={event => changeProvider(event.target.value as Provider)}><option value="jev">Jev</option><option value="qwen">Qwen</option></select></label>}
+        <JevBadge jev={jev} provider={provider} />
         <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
         <NotificationBell notices={notices} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'rules', 'dashboard', 'tasks', 'messages'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages' }[value]}{value === 'tasks' && openTasks > 0 && <b className="task-nav-count">{openTasks}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav></div>
+      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'rules', 'dashboard', 'tasks', 'messages', 'evaluation'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages', evaluation: 'Evaluation' }[value]}{value === 'tasks' && openTasks > 0 && <b className="task-nav-count">{openTasks}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav><span className="muted">{{ explore: 'Transactions', dashboard: 'Charts and totals', rules: 'Preview and run rules', tasks: 'Tasks and activity', messages: 'Internal inbox', evaluation: 'Model results' }[workspace]}</span></div>
       {error && <div className="rules-notice error" role="alert">{error}</div>}
       {workspace === 'rules' && rules.message && <div className="rules-notice" role="status">{rules.message}</div>}
       {workspace === 'rules' && editor !== null && rules.previewErrors.length > 0 && <div className="rules-notice error" role="alert">Some checks failed. <button onClick={rules.retry}>Retry failed checks</button></div>}
       {!data ? <main className="wizard-loading" role="status">{loadError || 'Loading transactions…'}</main> : <>
         <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} provider={exploreRule?.provider ?? provider} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} /></div>
         {workspace === 'dashboard' && <div className="insight-body"><Dashboard companyId={companyId} /></div>}
+        {workspace === 'evaluation' && <div className="insight-body"><Evaluation /></div>}
         {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => goTo('messages')} onActivity={() => setWorkspace('tasks')} onExplore={openRuleInExplore} onDemoSample={() => updatePrefs({ limit: -1 })} onRestore={restoreCompany} restoring={restoring} />}
         {workspace === 'tasks' && <div className="workspace-body tasks-workspace"><TaskBoard c={dashboard} as={as} activity={activity} transactionOwner={id => rows.find(row => row.id === id)?.dashboard?.owner} onInspect={inspect} onUndo={undoEvent} busy={dashboard.busy || rules.busy} /></div>}
         {workspace === 'messages' && <div className="workspace-body"><div className="workspace-center"><Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} folder={folder} onFolder={setFolder} onInspect={inspect} approvals={companyDrafts.length ? <>
           {myDrafts.length > 0 && <section aria-label="Waiting on you"><h3>Your approvals</h3>{myDrafts.map(approvalCard)}</section>}
-          {otherDrafts.length > 0 && <section aria-label="Waiting on others"><h3>Awaiting other senders</h3>{otherDrafts.map(approvalCard)}</section>}
+          {otherDrafts.length > 0 && <section aria-label="Waiting on others"><h3>Awaiting other senders</h3><p className="small muted">Switch to the sender to approve.</p>{otherDrafts.map(approvalCard)}</section>}
         </> : <p className="dashboard-empty">No message drafts.</p>} /></div></div>}
       </>}
       <ChatWidget companyId={companyId} as={as} jevReady={provider === 'jev' && Boolean(jev?.configured)} onOpenDashboard={() => setWorkspace('dashboard')} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={refreshAll} />
@@ -221,6 +224,14 @@ export default function App() {
       <Toasts notices={notices} onDismiss={rules.markNoticeToasted} />
     </div>
   );
+}
+
+/** Shows "configured" rather than "connected": a credential is present, but no request has proven the connection. */
+function JevBadge({ jev, provider }: { jev: JevStatus | null; provider: Provider }) {
+  const name = providerLabel(provider);
+  if (!jev) return <span className="pill">{name}: checking…</span>;
+  if (!jev.configured) return <span className="pill bad">{name}: not configured</span>;
+  return <span className="pill ok" title={`${jev.model} via ${jev.via}. A key is configured; the first successful check confirms the connection.`}>{name}: configured</span>;
 }
 
 function CompanyPicker({ companies, value, onChange }: { companies: CompanySummary[]; value: string; onChange: (id: string) => void }) {

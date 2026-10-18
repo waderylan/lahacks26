@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { completeDraft, compose, MAX_MESSAGE_ITEMS, migrateMessage, decideMessage, DEFAULT_MESSAGE_ASK, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, migrateRule, parseCents, resetCompanyDemo, retryDraft, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
+import { paymentFraudRule, rulePresets, completeDraft, compose, MAX_MESSAGE_ITEMS, migrateMessage, decideMessage, DEFAULT_MESSAGE_ASK, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, migrateRule, parseCents, resetCompanyDemo, retryDraft, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
 import type { Row } from './types';
 
 const row = { id: 'company-018:bill-original', companyId: 'company-018', billId: 'bill-original', docNumber: 'BILL-1', date: '2026-01-15', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo', description: 'Original description', itemNames: ['Widget'] } as Row;
@@ -192,4 +192,20 @@ test('one run synthesizes its matches into one message per action; undo and stal
   assert.equal(undone.employeeId, null);
   const legacy = migrateMessage({ ...small, items: undefined, transactionId: 'c:t', billId: 't', context: [] } as never);
   assert.deepEqual(legacy.items, [{ transactionId: 'c:t', billId: 't', context: [] }]);
+});
+
+test('every rule preset builds a valid, editable rule; payment fraud routes matches to the CFO from the signed-in employee', () => {
+  for (const synthetic of [false, true]) for (const preset of rulePresets(synthetic)) {
+    const rule = preset.build('company-101', 'emp-controller');
+    assert.deepEqual(validateRule(rule), [], preset.name);
+    assert.equal(rule.companyId, 'company-101'); assert.equal(rule.enabled, false);
+  }
+  assert.equal(rulePresets(false).length, 2); assert.equal(rulePresets(true).length, 6);
+  const fraud = rulePresets(false).find(p => p.id === 'payment-fraud')!.build('company-101', 'emp-controller');
+  assert.equal(leaves(fraud.expression).length, 3);
+  const message = fraud.actions.find(a => a.type === 'message')!;
+  assert.equal(message.recipient, 'emp-cfo'); assert.equal(message.sender, 'emp-controller');
+  assert.deepEqual(fraud.actions.find(a => a.type === 'flag')?.value, 'Possible payment diversion');
+  // Each build is a fresh copy, so editing one never changes the next.
+  assert.notEqual(fraud.id, paymentFraudRule('company-101').id);
 });

@@ -8,6 +8,7 @@ import { useMailbox } from './useMailbox';
 import { employeeById } from './employees';
 import { draftSender } from './rules';
 import { billEvents, billStatus, type BillStatus } from './billStatus';
+import { PaymentRiskPanel, usePaymentRisk } from './PaymentRiskPanel';
 import { LocalStateEditor, MessageCard, NotificationBell, RuleEvidence, Toasts } from './RulesPanel';
 import { actionLabel, type LocalTransaction } from './rules';
 import { useWorkspace, type RowPatch } from './useWorkspace';
@@ -88,15 +89,16 @@ export default function App() {
     const first = companies.find((c) => c.synthetic);
     if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
   };
-  const [workspace, setWorkspaceState] = useState<'transactions' | 'rules' | 'tasks' | 'messages'>(() => {
+  const [workspace, setWorkspaceState] = useState<'transactions' | 'rules' | 'tasks' | 'messages' | 'risk'>(() => {
     const selected = new URLSearchParams(location.search).get('workspace');
-    return selected === 'transactions' || selected === 'tasks' || selected === 'messages' ? selected : 'rules';
+    return selected === 'transactions' || selected === 'tasks' || selected === 'messages' || selected === 'risk' ? selected : 'rules';
   });
   const setWorkspace = (next: typeof workspace) => { const url = new URL(location.href); url.searchParams.set('workspace', next); history.replaceState(null, '', url); setWorkspaceState(next); };
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
   const [as, setAsState] = useState(() => { const id = new URLSearchParams(location.search).get('as'); return employeeById(id) ? id! : 'emp-ap'; });
   const setAs = (id: string) => { const url = new URL(location.href); url.searchParams.set('as', id); history.replaceState(null, '', url); setAsState(id); };
   const mailbox = useMailbox(companyId, as);
+  const risk = usePaymentRisk(companyId);
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
@@ -193,7 +195,8 @@ export default function App() {
   // Drafts are only actionable by their sender, so each employee sees just their own.
   const myDrafts = rules.store.messages.filter(message => draftSender(message) === as);
   const pendingApprovals = myDrafts.filter(message => message.status === 'pending').length;
-  const events = useMemo(() => billEvents(rules.store.history, rules.store.messages, dashboard.runs), [rules.store.history, rules.store.messages, dashboard.runs]);
+  const riskOpen = Object.values(risk.results).filter(result => result.verdict === 'suspicious' && !risk.escalated[result.id]).length;
+  const events = useMemo(() => billEvents(rules.store.history, rules.store.messages, dashboard.runs, risk), [rules.store.history, rules.store.messages, dashboard.runs, risk]);
   const counts = useMemo(() => {
     const rev = rows.filter((r) => reviewed.has(r.id)).length;
     return { all: rows.length, needs: rows.length - rev, reviewed: rev };
@@ -364,7 +367,7 @@ export default function App() {
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules</button><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count">{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button></nav><span className="muted">Saved in SQLite</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules</button><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count">{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button><button className={workspace === 'risk' ? 'on' : ''} onClick={() => setWorkspace('risk')}>Payment risk{riskOpen > 0 && <b className="task-nav-count" title="Suspicious and not yet sent to the CFO">{riskOpen}</b>}</button></nav><span className="muted">Saved in SQLite</span></div>
       {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
       {prefsError && <div className="rules-notice error" role="alert">{prefsError}</div>}
       {inspectError && <div className="rules-notice error" role="alert">{inspectError}<button onClick={() => setInspectError('')}>Dismiss</button></div>}
@@ -436,9 +439,9 @@ export default function App() {
       {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
       {workspace === 'transactions' && <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} />}
       <div className="ledger-column">
-      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
+      {workspace !== 'tasks' && workspace !== 'messages' && workspace !== 'risk' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
 
-      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
+      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'risk' ? <PaymentRiskPanel c={risk} loadedIds={rows.map(row => row.id)} totalCount={data?.totalBills ?? rows.length} as={as} onInspect={inspect} onEscalated={() => { void mailbox.refresh(); void dashboard.refresh().catch(() => {}); }} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
         {loadError ? (
           <div className="state">Could not load records ({loadError}). <button onClick={() => setCompanyId(companyId + '')}>Retry</button></div>
         ) : !data ? (

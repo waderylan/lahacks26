@@ -44,15 +44,19 @@ export class Mailbox {
   }
 }
 
+/** Starts a new thread from one employee to another. */
+export function postMail(db: ActionStore, fields: Omit<Mail, 'id' | 'threadId' | 'sentAt' | 'readAt'>) {
+  const id = uid();
+  const mail: Mail = { ...fields, id, threadId: id, sentAt: new Date().toISOString(), readAt: null };
+  db.put('mail', id, fields.companyId, mail);
+  return mail;
+}
+
 /** Delivers an approved rule draft from the approving employee to its recipient. Call inside the approval transaction. */
 export function deliverDraft(db: ActionStore, message: DraftMessage, from: string) {
   if (!message.employeeId) throw new Error('This draft has no recipient yet.');
-  const id = uid();
-  const mail: Mail = { id, companyId: message.companyId, threadId: id, from, to: message.employeeId, subject: message.subject, body: message.body,
-    sentAt: new Date().toISOString(), readAt: null, source: 'rule', draftId: message.id, ruleName: message.ruleName,
-    items: message.items.map(({ transactionId, billId }) => ({ transactionId, billId })) };
-  db.put('mail', id, message.companyId, mail);
-  return mail;
+  return postMail(db, { companyId: message.companyId, from, to: message.employeeId, subject: message.subject, body: message.body,
+    source: 'rule', draftId: message.id, ruleName: message.ruleName, items: message.items.map(({ transactionId, billId }) => ({ transactionId, billId })) });
 }
 
 export function mailRoutes(app: Express, mailbox: Mailbox) {

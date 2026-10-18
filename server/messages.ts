@@ -25,7 +25,7 @@ const visibleFields = (row: Row) => ({
   amount: formatCents(row.amountCents), item_names: row.itemNames, description: row.description, memo: row.memo, project: row.project,
 });
 
-async function chooseEmployee(req: DraftRequest, signal?: AbortSignal): Promise<{ employee: Employee; probability: number }> {
+export async function chooseEmployee(req: DraftRequest, signal?: AbortSignal): Promise<{ employee: Employee; probability: number }> {
   const state = { company: req.company, message_request: req.request, bills: req.bills.map(b => billFields(b.row, b.context)) };
   const criteria = Object.fromEntries(EMPLOYEES.map(e => [e.id, `${e.name}, ${e.title} (${e.department}). ${e.description}`]));
   const instructions =

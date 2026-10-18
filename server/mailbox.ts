@@ -27,9 +27,11 @@ export class Mailbox {
     if (!subject || subject.length > 200 || !body || body.length > 8000) throw new Error('Add a subject (up to 200 characters) and a message.');
     const original = replyTo === undefined ? undefined : this.db.get<Mail>('mail', String(replyTo));
     if (replyTo !== undefined && (!original || original.companyId !== companyId || ![original.from, original.to].includes(from))) throw new Error('You can only reply to a message you sent or received.');
+    // New messages may link up to 25 bills from this company (e.g. sent from the chat).
+    const linked = Array.isArray(input.items) ? input.items.slice(0, 25).map(item => this.data.row(companyId, String(item?.transactionId))).map(row => ({ transactionId: row.id, billId: row.billId })) : [];
     const id = uid();
     const mail: Mail = { id, companyId, threadId: original?.threadId ?? id, ...(original && { replyTo: original.id }), from, to, subject, body,
-      sentAt: new Date().toISOString(), readAt: null, source: 'direct', items: original?.items ?? [] };
+      sentAt: new Date().toISOString(), readAt: null, source: 'direct', items: original?.items ?? linked };
     this.db.put('mail', id, companyId, mail);
     return mail;
   }

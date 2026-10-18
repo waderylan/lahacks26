@@ -8,4 +8,4 @@ export interface Mail {
   items: { transactionId: string; billId: string }[];
 }
 export interface MailboxView { inbox: Mail[]; sent: Mail[]; unread: Record<string, number> }
-export interface MailInput { from: string; to: string; subject: string; body: string; replyTo?: string }
+export interface MailInput { from: string; to: string; subject: string; body: string; replyTo?: string; items?: Mail['items'] }

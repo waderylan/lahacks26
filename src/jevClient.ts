@@ -35,19 +35,24 @@ export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v2:choice-v1';
 export const judgmentKey = (row: Row, text: string) => JSON.stringify([CACHE_VERSION, row.companyId, row.id, text, evaluationEvidence(row)]);
 const MAX_JUDGMENTS = 10_000;
 const judgments = new Map<string, Promise<Outcome>>();
+const probabilities = new Map<string, number>();
+/** Jev's P(match) for a finished judgment; the chat uses it to show near misses when nothing matches. */
+export const pMatchFor = (row: Row, text: string) => probabilities.get(judgmentKey(row, text));
 function remember(key: string, promise: Promise<Outcome>) {
   judgments.set(key, promise);
-  while (judgments.size > MAX_JUDGMENTS) judgments.delete(judgments.keys().next().value!);
+  while (judgments.size > MAX_JUDGMENTS) { const oldest = judgments.keys().next().value!; judgments.delete(oldest); probabilities.delete(oldest); }
 }
-export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void): Promise<void> {
+export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void, onCost?: (nanoUsd: bigint) => void): Promise<void> {
   const missing = data.rows.filter(row => !judgments.has(judgmentKey(row, text)));
   for (let i = 0; i < missing.length; i += 20) {
     const batch = missing.slice(i, i + 20);
     const request = requestEvaluation(data.company.companyId, text, batch.map(r => r.id));
+    if (onCost) request.then(r => onCost(BigInt(r.costNanoUsd)), () => {});
     for (const row of batch) {
       const key = judgmentKey(row, text);
       const promise = request.then(({ results }) => {
         const result = results.find(r => r.id === row.id)!;
+        probabilities.set(key, result.pMatch);
         return ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[result.state];
       }).catch((error: Error) => { judgments.delete(key); throw error; });
       remember(key, promise);

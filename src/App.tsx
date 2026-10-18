@@ -13,6 +13,7 @@ import { actionLabel, type LocalTransaction } from './rules';
 import { useWorkspace, type RowPatch } from './useWorkspace';
 import { ActionPanel, TaskBoard } from './ActionPanel';
 import { RuleWizard } from './RuleWizard';
+import { ChatWidget } from './AskPanel';
 
 const DEFAULT_COMPANY = 'company-018';
 
@@ -525,6 +526,8 @@ export default function App() {
         <button className="ghost" onClick={() => setSelected(new Set())} disabled={selected.size === 0}>Clear selection</button>
         <button className="ghost" onClick={resetReview} disabled={dashboard.busy || !rows.length} title="Reset review for loaded bills in this company">Reset review state</button>
       </footer>}
+
+      <ChatWidget companyId={companyId} as={as} jevReady={!!jev?.configured} lifted={workspace === 'transactions'} onOpenBill={row => { setDrawerExtra(row); setDrawerId(row.id); }} onChanged={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} />
 
       {drawerRow && (
         <Drawer row={drawerRow} reviewed={drawerRow.dashboard?.reviewed ?? reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />

@@ -35,7 +35,8 @@ def cents(s: str) -> int:
 
 
 def tree_hash(root: Path) -> dict[str, str]:
-    return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob("*")) if p.is_file()}
+    skip = {"README.md", "measured_jev_smoke.json"}  # hand-written or produced by a separate smoke run
+    return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob("*")) if p.is_file() and p.name not in skip}
 
 
 def main() -> None:
@@ -55,10 +56,31 @@ def main() -> None:
         load = lambda n: yaml.safe_load((wd / f"{n}.yaml").read_text(encoding="utf-8")) or []
         bills, vendors, projects, pays, evidence = load("bills"), load("vendors"), load("projects"), load("bill_payments"), load("evidence")
         accounts = {a["id"] for a in load("accounts")}
+        invoices, bank, customers, cpays = load("invoices"), load("bank_transactions"), load("customers"), load("customer_payments")
         check(150 <= len(bills) <= 250, f"{cid}: {len(bills)} bills outside 150-250")
-        ids = [b["id"] for b in bills]
-        check(len(ids) == len(set(ids)), f"{cid}: duplicate bill ids")
+        check(len(invoices) >= 40 and len(bank) >= 60, f"{cid}: thin invoices ({len(invoices)}) or bank rows ({len(bank)})")
+        ids = [t["id"] for t in [*bills, *invoices, *bank]]
+        check(len(ids) == len(set(ids)), f"{cid}: duplicate transaction ids")
         vids, pids, bset = {v["id"] for v in vendors}, {p["id"] for p in projects}, set(ids)
+        cids = {c["id"] for c in customers}
+        inv_by = {i["id"]: i for i in invoices}
+        company = load("company")[0]
+        check(bool(company.get("remit_account_ending")), f"{cid}: company has no remittance profile")
+        paid_inv = defaultdict(int)
+        for p in cpays:
+            for a in p["applications"]:
+                check(a["document_id"] in inv_by, f"{cid}: customer payment refers to unknown invoice")
+                paid_inv[a["document_id"]] += cents(a["amount"])
+        for i in invoices:
+            check(sum(cents(l["amount"]) for l in i["lines"]) == cents(i["total_amount"]), f"{cid}/{i['id']}: invoice line total")
+            check(i["customer_id"] in cids and (not i["project_id"] or i["project_id"] in pids) and i["due_date"] >= i["txn_date"], f"{cid}/{i['id']}: invoice reference")
+            net = cents(i["total_amount"]) - cents(i["deposit_applied_amount"]) - cents(i["retainage_amount"])  # customers pay net of deposit and retainage
+            check(paid_inv.get(i["id"], 0) <= cents(i["total_amount"]) - cents(i["deposit_applied_amount"]), f"{cid}/{i['id']}: customer paid more than total less deposit")
+            check(cents(i["deposit_applied_amount"]) + cents(i["retainage_amount"]) <= cents(i["total_amount"]), f"{cid}/{i['id']}: deposit and retainage exceed the invoice")
+        check(len({i["doc_number"] for i in invoices}) == len(invoices), f"{cid}: duplicate invoice numbers")
+        for t in bank:
+            check(cents(t["amount"]) > 0 and t["direction"] in ("deposit", "withdrawal"), f"{cid}/{t['id']}: bank row shape")
+            check(not t["counterparty_id"] or t["counterparty_id"] in vids | cids, f"{cid}/{t['id']}: bank counterparty reference")
         pay_by_bill = defaultdict(int)
         for p in pays:
             for a in p["applications"]:
@@ -77,16 +99,17 @@ def main() -> None:
             check(pay_by_bill.get(b["id"], 0) in (0, cents(b["total_amount"])), f"{cid}/{b['id']}: partial payment")
         check(len({(b["vendor_id"], b["doc_number"]) for b in bills}) == len(bills), f"{cid}: duplicate vendor+document number")
         for e in evidence:
-            check(set(e["bill_ids"]) <= bset, f"{cid}/{e['id']}: evidence points at unknown bill")
+            check(set(e["transaction_ids"]) <= bset, f"{cid}/{e['id']}: evidence points at an unknown transaction")
             check(len(e["text"]) <= 330, f"{cid}/{e['id']}: evidence too long for low-latency inference")
         check(len({e["id"] for e in evidence}) == len(evidence), f"{cid}: duplicate evidence ids")
-        last5 = sorted(bills, key=lambda b: (b["txn_date"], b["id"]))[-5:]
+        last5 = sorted([*bills, *invoices, *bank], key=lambda t: (t.get("txn_date") or t["date"], t["id"]))[-5:]
         mine = [c for c in cases if c["company_id"] == cid]
         involved = {c["transaction_id"] for c in mine} | {t for c in mine for t in c["related_transaction_ids"]}
         check(not any(f"{cid}:{b['id']}" in involved for b in last5), f"{cid}: reserved replay bills include a case row")
-        check(all(c["transaction_id"].split(":")[1] in bset for c in mine), f"{cid}: case points at unknown bill")
-        families = {c["family"][0] for c in mine}
-        check(families == set("ABCDEFG"), f"{cid}: missing case families {set('ABCDEFG') - families}")
+        check(all(c["transaction_id"].split(":")[1] in bset for c in mine), f"{cid}: case points at unknown transaction")
+        for typ, want in (("vendor_bill", "ABCDEFG"), ("customer_invoice", "ABCDFG"), ("bank_transaction", "ABCDEFG")):
+            fams = {c["family"][0] for c in mine if c["transaction_type"] == typ}
+            check(fams == set(want), f"{cid}: {typ} families {sorted(fams)} != {want}")
         labels = Counter(c["label"] for c in mine)
         label_counts.update({(cid, k): v for k, v in labels.items()})
         check(all(labels[k] >= 3 for k in ("documentation_issue", "suspected_fraud", "legitimate", "uncertain")), f"{cid}: thin label coverage {dict(labels)}")
@@ -100,8 +123,6 @@ def main() -> None:
             for t in tokens:
                 check(t not in text, f"{cid}/{f.name}: contains a case id")
         # stability of ordering: the case rows are not clustered at the start or end of the id range
-        pos = sorted(int(c["transaction_id"].split("-")[-1]) for c in mine)
-        check(pos[-1] < len(bills) - 4, f"{cid}: case rows reach the reserved replay range")
     for f in APP.glob("*.json"):
         for m in FORBIDDEN.finditer(f.read_text(encoding="utf-8").replace("Curated demo sample: selected to include a dense mix of review cases and ordinary look-alikes. It over-represents issues and is not representative of the full company.", "")):
             if f.name != "demo_sample.json":

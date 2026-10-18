@@ -9,7 +9,7 @@ export class WorkspaceData {
   constructor(readonly store: ActionStore, private loadOriginal = loadCompanyBills, private loadAccounts = companyAccounts) {}
   bills(companyId: string): CompanyBills {
     const original = this.loadOriginal(companyId);
-    if (!this.imported.has(companyId)) { this.store.seed(companyId, original.rows); this.imported.add(companyId); }
+    if (!this.imported.has(companyId)) { this.store.seed(companyId, original.rows, original.datasetVersion); this.imported.add(companyId); }
     return { ...original, company: { ...original.company, source: 'workspace' }, rows: this.store.rows(companyId) };
   }
   row(companyId: string, id: string): Row {

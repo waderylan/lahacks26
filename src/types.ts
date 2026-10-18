@@ -37,6 +37,8 @@ export interface Row {
   projectRecord: Record<string, unknown> | null;
   evidence?: Evidence[];
   related?: RelatedBill[];
+  txnType?: 'bill' | 'invoice' | 'bank';
+  details?: Record<string, string>;
   provenance?: { description: string; memo: string } | null;
   workspaceChanges?: { account?: string; memo?: string };
   sourceVersion?: string;
@@ -49,6 +51,7 @@ export interface CompanyBills {
   sampled: boolean;
   rows: Row[];
   disclosure?: string;
+  datasetVersion?: string;
   reservedRows?: Row[];
   curatedSample?: boolean;
   referenceOptions?: { vendors: string[]; accounts: string[] };

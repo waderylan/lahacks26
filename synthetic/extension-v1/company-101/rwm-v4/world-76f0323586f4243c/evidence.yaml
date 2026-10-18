@@ -4,7 +4,7 @@
   title: Purchase order PO-6361
   text: 'PO-6361: 9393 x Wireless Earbuds, Bluetooth, delivery in batches as stock arrives.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00003
 - id: ev-0002
   kind: receiving_record
@@ -12,339 +12,742 @@
   title: Receiving report 6361
   text: Received 5871 x Wireless Earbuds, Bluetooth on Oct 15; balance of the order backordered.
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00003
 - id: ev-0003
+  kind: shipment_record
+  date: '2025-10-22'
+  title: Shipment record
+  text: Shipped on Oct 24 against the first order.
+  vendor_id: cust-customer-47
+  transaction_ids:
+  - inv-00002
+- id: ev-0004
   kind: purchase_order
   date: '2025-10-26'
   title: Purchase order PO-6334
   text: 'PO-6334: 387 + 290 x Wireless Earbuds, Bluetooth; the supplier will deliver in two shipments.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00012
   - bill-00016
-- id: ev-0004
+- id: ev-0005
+  kind: ap_payment_record
+  date: '2025-10-30'
+  title: Payment ACH6213754
+  text: Payment ACH6213754 of $500.00 applied to bill RENT-8025 on Oct 30; bill closed. Payee account on file ends 9034.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00004
+  - bill-00007
+- id: ev-0006
+  kind: ap_payment_record
+  date: '2025-10-30'
+  title: Payment ACH6213754
+  text: Payment ACH6213754 of $500.00 sent by ACH to an account ending 9034. The change entered in the vendor master has no
+    supporting form attached.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00004
+  - bill-00007
+- id: ev-0007
+  kind: ap_payment_record
+  date: '2025-11-05'
+  title: Payment ACH5776335
+  text: Payment ACH5776335 of $12.00 applied to bill UT-5320 on Nov 5; bill closed. Payee account on file ends 8929.
+  vendor_id: vend-water
+  transaction_ids:
+  - bank-00006
+  - bill-00008
+- id: ev-0008
   kind: receiving_record
   date: '2025-11-08'
   title: Receiving report 6334-A
   text: 'Shipment 1 received Nov 9: 387 x Wireless Earbuds, Bluetooth.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00012
-- id: ev-0005
-  kind: purchase_order
-  date: '2025-11-13'
-  title: Purchase order PO-6486
-  text: 'PO-6486: 350 x Wireless Earbuds, Bluetooth at $10.60, total $3,710.00. Net 7.'
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00017
-- id: ev-0006
+- id: ev-0009
+  kind: shipment_record
+  date: '2025-11-09'
+  title: Shipment record
+  text: Shipped on Nov 11 against a separate reorder.
+  vendor_id: cust-customer-47
+  transaction_ids:
+  - inv-00004
+- id: ev-0010
   kind: approval_log
   date: '2025-11-13'
   title: Approval AP-6442
   text: 'Approval AP-6442: invoice INV-3115 approved by the operations lead on Nov 14; amount within the referenced order.'
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00013
-- id: ev-0007
+  transaction_ids:
+  - bill-00014
+- id: ev-0011
   kind: receiving_record
   date: '2025-11-17'
   title: Receiving report 6334-B
   text: 'Shipment 2 received Nov 18: 290 x Wireless Earbuds, Bluetooth.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00016
-- id: ev-0008
-  kind: receiving_record
-  date: '2025-11-20'
-  title: Receiving report 6486
-  text: Received 350 x Wireless Earbuds, Bluetooth; count matches packing slip. No damage noted.
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00017
-- id: ev-0009
+- id: ev-0012
+  kind: ap_payment_record
+  date: '2025-11-25'
+  title: Payment ACH3809513
+  text: Payment ACH3809513 of $2,304.00 applied to bill INV-3830 on Nov 25; bill closed. Payee account on file ends 5260.
+  vendor_id: vend-logistics-vendor
+  transaction_ids:
+  - bank-00008
+  - bill-00019
+- id: ev-0013
   kind: ap_intake_log
   date: '2025-12-01'
   title: Invoice intake entry
   text: Invoice INV-2782 received by email and entered in the intake queue; not yet posted to the ledger. Sender asked that
     payment details be confirmed by reply email only.
   vendor_id: vend-operating-vendor
-  bill_ids:
+  transaction_ids:
+  - bill-00025
+- id: ev-0014
+  kind: ap_payment_record
+  date: '2025-12-04'
+  title: Payment ACH4998822
+  text: Payment ACH4998822 of $3,741.80 applied to bill INV-3138 on Dec 4; bill closed. Payee account on file ends 3341.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00012
+  - bill-00022
+- id: ev-0015
+  kind: receipt
+  date: '2025-12-04'
+  title: Card statement detail Dec 6
+  text: 'Receipt summary: poly mailers, label stock, thermal printer ribbons, one-month subscription to inventory software.'
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00026
+- id: ev-0016
+  kind: lease_schedule
+  date: '2025-12-06'
+  title: Lease schedule
+  text: Lease calls for a fixed weekly rent installment of the same amount; one payment per week.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00013
+- id: ev-0017
+  kind: ap_payment_record
+  date: '2025-12-09'
+  title: Payment ACH3298790
+  text: Payment ACH3298790 of $3,943.20 applied to bill INV-3150 on Dec 9; bill closed. Payee account on file ends 3341.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00014
   - bill-00024
-- id: ev-0010
-  kind: purchase_order
-  date: '2025-12-13'
-  title: Purchase order PO-6494
-  text: 'PO-6494: 487 x Wireless Earbuds, Bluetooth at $11.02, total $5,366.74. Net 7.'
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00032
-- id: ev-0011
-  kind: purchase_order
-  date: '2025-12-14'
-  title: Purchase order PO-6500
-  text: 'PO-6500: 480 x Wireless Earbuds, Bluetooth at $11.02, total $5,289.60. Net 7.'
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00033
-- id: ev-0012
+- id: ev-0018
+  kind: ap_payment_record
+  date: '2025-12-09'
+  title: Payment ACH9606412
+  text: Payment ACH9606412 of $500.00 applied to bill RENT-8037 on Dec 9; bill closed. Payee account on file ends 9034.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00013
+  - bill-00028
+- id: ev-0019
   kind: purchase_order
   date: '2025-12-14'
   title: Purchase order PO-6354
   text: 'PO-6354: 505 x Wireless Earbuds, Bluetooth, delivery to dock 3. Net 7.'
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00036
-- id: ev-0013
-  kind: receiving_record
-  date: '2025-12-20'
-  title: Receiving report 6494
-  text: Received 487 x Wireless Earbuds, Bluetooth; count matches packing slip. No damage noted.
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00032
-- id: ev-0014
-  kind: receipt
-  date: '2025-12-21'
-  title: Card statement detail Dec 23
-  text: 'Receipt summary: sample cartons from two packaging vendors; registration for regional ecommerce expo, business badge.'
-  vendor_id: vend-card
-  bill_ids:
-  - bill-00034
-- id: ev-0015
-  kind: receiving_record
-  date: '2025-12-23'
-  title: Receiving report 6500
-  text: Received 480 x Wireless Earbuds, Bluetooth; count matches packing slip. No damage noted.
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00033
-- id: ev-0016
+  transaction_ids:
+  - bill-00037
+- id: ev-0020
   kind: receipt
   date: '2025-12-24'
   title: Card statement detail Dec 26
   text: 'Receipt summary: sample cartons from two packaging vendors; registration for regional ecommerce expo, business badge.'
   vendor_id: vend-card
-  bill_ids:
-  - bill-00035
-- id: ev-0017
+  transaction_ids:
+  - bill-00036
+- id: ev-0021
   kind: receiving_record
   date: '2025-12-25'
   title: Receiving report 6354
   text: Received 313 x Wireless Earbuds, Bluetooth on Dec 26; the remaining units were not on the truck. Driver signed for
     a partial delivery.
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00036
-- id: ev-0018
+  transaction_ids:
+  - bill-00037
+- id: ev-0022
   kind: receipt
   date: '2025-12-29'
   title: Receipt detail
   text: Hardware store receipt, 6 items, total matches the statement; the copy provided does not itemize the items.
   vendor_id: vend-card
-  bill_ids:
-  - bill-00038
-- id: ev-0019
+  transaction_ids:
+  - bill-00039
+- id: ev-0023
+  kind: purchase_order
+  date: '2025-12-29'
+  title: Purchase order PO-6697
+  text: 'PO-6697: 300 x USB-C Charging Cable, 6 ft at $12.62, total $3,786.00. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00046
+- id: ev-0024
+  kind: receiving_record
+  date: '2026-01-05'
+  title: Receiving report 6697
+  text: Received 300 x USB-C Charging Cable, 6 ft; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00046
+- id: ev-0025
+  kind: ap_payment_record
+  date: '2026-01-07'
+  title: Payment ACH6016022
+  text: Payment ACH6016022 of $30.00 applied to bill UT-5340 on Jan 7; bill closed. Payee account on file ends 8929.
+  vendor_id: vend-water
+  transaction_ids:
+  - bank-00019
+  - bill-00042
+- id: ev-0026
+  kind: ap_payment_record
+  date: '2026-01-15'
+  title: Payment ACH8410517
+  text: Payment ACH8410517 of $446.56 applied to bill CS-202512-02 on Jan 15; bill closed. Payee account on file ends 9395.
+  vendor_id: vend-card
+  transaction_ids:
+  - bank-00021
+  - bill-00036
+- id: ev-0027
+  kind: cash_receipt
+  date: '2026-01-18'
+  title: Receipt CHK6893
+  text: Receipt of $296.65 from Nakamura & Daughters Goods applied to invoice INV-1011 on Jan 18.
+  vendor_id: cust-customer-52
+  transaction_ids:
+  - bank-00022
+  - inv-00012
+- id: ev-0028
   kind: vendor_change_request
   date: '2026-01-20'
   title: Bank change form BC-6394
   text: Bank change form BC-6394 signed by the vendor's controller and received Jan 20. Call-back to the number already on
     file completed Jan 22; vendor master updated the same day.
   vendor_id: vend-logistics-vendor
-  bill_ids:
-  - bill-00050
-- id: ev-0020
+  transaction_ids:
+  - bill-00051
+- id: ev-0029
+  kind: cash_receipt
+  date: '2026-01-20'
+  title: Receipt CHK7133
+  text: Receipt of $628.20 from Millbrook Brewing Company applied to invoice INV-1012 on Jan 20.
+  vendor_id: cust-customer-81
+  transaction_ids:
+  - bank-00024
+  - inv-00013
+- id: ev-0030
   kind: purchase_order
   date: '2026-01-23'
   title: Purchase order PO-6379
   text: 'PO-6379: pallet storage for 40 positions and standard pick/pack.'
   vendor_id: vend-logistics-vendor
-  bill_ids:
+  transaction_ids:
   - bill-00060
-- id: ev-0021
+- id: ev-0031
   kind: approval_log
   date: '2026-01-27'
   title: Approval log lookup
   text: 'Approval log: no approval entry recorded for invoice INV-2790. Invoices over $1,500 need a second approval from the
     operations lead.'
   vendor_id: vend-operating-vendor
-  bill_ids:
+  transaction_ids:
+  - bill-00052
+- id: ev-0032
+  kind: ap_payment_record
+  date: '2026-01-28'
+  title: Payment ACH8259434
+  text: Payment ACH8259434 of $19,802.94 applied to bill INV-3224 on Jan 28; bill closed. Payee account on file ends 3341.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00025
+  - bill-00048
+- id: ev-0033
+  kind: ap_payment_record
+  date: '2026-01-29'
+  title: Payment ACH9924802
+  text: Payment ACH9924802 of $4,207.94 sent by ACH to the account ending 5260, the account on file after the verified bank
+    change.
+  vendor_id: vend-logistics-vendor
+  transaction_ids:
+  - bank-00026
   - bill-00051
-- id: ev-0022
+- id: ev-0034
+  kind: ap_lookup
+  date: '2026-02-07'
+  title: Accounts payable lookup
+  text: No vendor master record, purchase order or open bill exists for this payee on or before Feb 7.
+  transaction_ids:
+  - bank-00027
+- id: ev-0035
   kind: change_order
   date: '2026-02-07'
   title: Change order CO-6379
   text: 'Change order CO-6379: adds kitting and relabeling for holiday bundles. Approved by the operations director on Feb
     16.'
   vendor_id: vend-logistics-vendor
-  bill_ids:
+  transaction_ids:
   - bill-00060
-- id: ev-0023
+- id: ev-0036
   kind: purchase_order
-  date: '2026-03-18'
-  title: Purchase order PO-6465
-  text: 'PO-6465: 1305 x USB-C Charging Cable, 6 ft at $12.60, total $16,443.00. Net 7.'
+  date: '2026-02-24'
+  title: Purchase order PO-6622
+  text: 'PO-6622: 200 x Phone Ring Holder Case, Adhesive at $15.15, total $3,030.00. Net 7.'
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00077
-- id: ev-0024
-  kind: purchase_order
-  date: '2026-03-18'
-  title: Purchase order PO-6468
-  text: 'PO-6468: 1254 x Phone Ring Holder Case, Adhesive at $14.99, total $18,797.46. Net 7.'
+  transaction_ids:
+  - bill-00066
+- id: ev-0037
+  kind: receiving_record
+  date: '2026-02-28'
+  title: Receiving report 6622
+  text: Received 200 x Phone Ring Holder Case, Adhesive; count matches packing slip. No damage noted.
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00078
-- id: ev-0025
+  transaction_ids:
+  - bill-00066
+- id: ev-0038
+  kind: customer_order
+  date: '2026-02-28'
+  title: Customer order
+  text: Customer order lists the goods only.
+  vendor_id: cust-customer-58
+  transaction_ids:
+  - inv-00028
+- id: ev-0039
+  kind: ap_payment_record
+  date: '2026-03-05'
+  title: Payment ACH4009423
+  text: Payment ACH4009423 of $500.00 applied to bill RENT-8061 on Mar 5; bill closed. Payee account on file ends 9034.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00033
+  - bill-00063
+- id: ev-0040
+  kind: change_order
+  date: '2026-03-06'
+  title: Order amendment AM-6579
+  text: 'Amendment AM-6579: adds expedited kitting. Approved by the customer on Mar 10.'
+  vendor_id: cust-customer-58
+  transaction_ids:
+  - inv-00028
+- id: ev-0041
   kind: purchase_order
   date: '2026-03-24'
   title: Purchase order PO-6367
   text: 'PO-6367: pallet storage for 40 positions and standard pick/pack. Kitting and relabeling are not part of this order.'
   vendor_id: vend-logistics-vendor
-  bill_ids:
+  transaction_ids:
   - bill-00085
-- id: ev-0026
-  kind: receiving_record
-  date: '2026-03-24'
-  title: Receiving report 6465
-  text: Received 1305 x USB-C Charging Cable, 6 ft; count matches packing slip. No damage noted.
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00077
-- id: ev-0027
-  kind: receiving_record
-  date: '2026-03-31'
-  title: Receiving report 6468
-  text: Received 1254 x Phone Ring Holder Case, Adhesive; count matches packing slip. No damage noted.
-  vendor_id: vend-supplier
-  bill_ids:
-  - bill-00078
-- id: ev-0028
+- id: ev-0042
   kind: receipt
   date: '2026-03-31'
   title: Card statement detail Apr 2
   text: 'Receipt summary: pallet wrap, box cutters, gloves, printer paper, cleaning supplies for dock.'
   vendor_id: vend-card
-  bill_ids:
-  - bill-00079
-- id: ev-0029
+  transaction_ids:
+  - bill-00078
+- id: ev-0043
+  kind: treasury_log
+  date: '2026-04-02'
+  title: Remittance change request
+  text: A request to change the remittance account was logged on Apr 3; approval is pending.
+  vendor_id: cust-customer-110
+  transaction_ids:
+  - inv-00035
+- id: ev-0044
   kind: purchase_order
-  date: '2026-04-14'
-  title: Purchase order PO-6476
-  text: 'PO-6476: 1091 x USB-C Charging Cable, 6 ft at $13.23, total $14,433.93. Net 7.'
+  date: '2026-04-03'
+  title: Purchase order PO-6631
+  text: 'PO-6631: 1040 x USB-C Charging Cable, 6 ft at $13.23, total $13,759.20. Net 7.'
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00090
-- id: ev-0030
+  transaction_ids:
+  - bill-00087
+- id: ev-0045
+  kind: shipment_record
+  date: '2026-04-08'
+  title: Shipment record
+  text: One shipment on Apr 10 against the customer order; no second shipment for this order.
+  vendor_id: cust-customer-78
+  transaction_ids:
+  - inv-00037
+- id: ev-0046
   kind: receiving_record
-  date: '2026-04-27'
-  title: Receiving report 6476
-  text: Received 1091 x USB-C Charging Cable, 6 ft; count matches packing slip. No damage noted.
+  date: '2026-04-16'
+  title: Receiving report 6631
+  text: Received 1040 x USB-C Charging Cable, 6 ft; count matches packing slip. No damage noted.
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00090
-- id: ev-0031
+  transaction_ids:
+  - bill-00087
+- id: ev-0047
+  kind: ap_payment_record
+  date: '2026-04-21'
+  title: Payment CHK4156
+  text: Payment CHK4156 of $5,940.00 applied to bill INV-2810 on Apr 21; bill closed. Payee account on file ends 2998.
+  vendor_id: vend-operating-vendor
+  transaction_ids:
+  - bank-00041
+  - bill-00088
+- id: ev-0048
+  kind: customer_order
+  date: '2026-04-29'
+  title: Customer order
+  text: Customer order lists the goods only; kitting is not part of this order.
+  vendor_id: cust-customer-131
+  transaction_ids:
+  - inv-00046
+- id: ev-0049
+  kind: purchase_order
+  date: '2026-05-02'
+  title: Purchase order PO-6638
+  text: 'PO-6638: 1220 x Wireless Earbuds, Bluetooth at $9.75, total $11,895.00. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00097
+- id: ev-0050
   kind: purchase_order
   date: '2026-05-11'
   title: Purchase order PO-6299
   text: 'PO-6299: 889 x Phone Case Assortment, Clear at the agreed unit price, one delivery to dock 3. Net 7.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00101
-  - bill-00107
-- id: ev-0032
+  - bill-00106
+- id: ev-0051
+  kind: receiving_record
+  date: '2026-05-15'
+  title: Receiving report 6638
+  text: Received 1220 x Wireless Earbuds, Bluetooth; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00097
+- id: ev-0052
+  kind: ap_payment_record
+  date: '2026-05-22'
+  title: Payment CHK8545
+  text: Payment CHK8545 of $10,764.00 applied to bill INV-3307 on May 22; bill closed. Payee account on file ends 3341.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00049
+  - bill-00096
+- id: ev-0053
+  kind: purchase_order
+  date: '2026-05-22'
+  title: Purchase order PO-6642
+  text: 'PO-6642: 766 x USB-C Charging Cable, 6 ft at $12.83, total $9,827.78. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00108
+- id: ev-0054
   kind: receiving_record
   date: '2026-05-22'
   title: Receiving report 6299
   text: 'One delivery on May 23: 889 x Phone Case Assortment, Clear counted against the packing slip. No second shipment received
     for this order.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00101
-- id: ev-0033
+- id: ev-0055
   kind: receipt
   date: '2026-05-23'
   title: Receipt detail
   text: 'Atlas Outfitters: travel duffel, leather watch strap, fragrance gift set. Cask & Ember: 2 entrees. No business purpose
     or attendee recorded; cardholder is the owner.'
   vendor_id: vend-card
-  bill_ids:
-  - bill-00104
-- id: ev-0034
+  transaction_ids:
+  - bill-00102
+- id: ev-0056
+  kind: company_profile
+  date: '2026-05-27'
+  title: Remittance profile
+  text: Customer payments are received in the account ending 1359. No remittance change request is on file.
+  vendor_id: cust-customer-60
+  transaction_ids:
+  - inv-00051
+- id: ev-0057
+  kind: receiving_record
+  date: '2026-06-01'
+  title: Receiving report 6642
+  text: Received 766 x USB-C Charging Cable, 6 ft; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00108
+- id: ev-0058
+  kind: distribution_record
+  date: '2026-06-08'
+  title: Owner distribution record
+  text: Quarterly distribution approved by the owner and the bookkeeper on Jun 8; within retained earnings.
+  transaction_ids:
+  - bank-00052
+- id: ev-0059
   kind: receipt
   date: '2026-06-10'
   title: Receipt detail
   text: Holiday gift baskets x 6 for top wholesale accounts; recipient list attached; within the $100 per-gift policy.
   vendor_id: vend-card
-  bill_ids:
-  - bill-00112
-- id: ev-0035
+  transaction_ids:
+  - bill-00111
+- id: ev-0060
   kind: receipt
   date: '2026-06-20'
   title: Receipt detail
   text: Roundtrip airfare and two hotel nights for the annual audit of the supplier's distribution center. Business purpose
     recorded; approved in advance by the operations director.
   vendor_id: vend-card
-  bill_ids:
-  - bill-00119
-- id: ev-0036
+  transaction_ids:
+  - bill-00118
+- id: ev-0061
+  kind: account_directory
+  date: '2026-06-20'
+  title: Account directory
+  text: The destination account ending 3302 is registered to the owner's personal checking in the owner profile.
+  transaction_ids:
+  - bank-00055
+- id: ev-0062
+  kind: cash_receipt
+  date: '2026-06-30'
+  title: Receipt ACH8525252
+  text: Receipt of $1,061.72 from Havenwood Sterling Warehousing Company applied to invoice INV-1053 on Jun 30.
+  vendor_id: cust-customer-126
+  transaction_ids:
+  - bank-00058
+  - inv-00055
+- id: ev-0063
+  kind: purchase_order
+  date: '2026-07-01'
+  title: Purchase order PO-6665
+  text: 'PO-6665: 767 x Car Phone Mount Case, Vent at $20.80, total $15,953.60. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00132
+- id: ev-0064
+  kind: purchase_order
+  date: '2026-07-05'
+  title: Purchase order PO-6652
+  text: 'PO-6652: 798 x Phone Ring Holder Case, Adhesive at $15.23, total $12,153.54. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00128
+- id: ev-0065
+  kind: order_record
+  date: '2026-07-05'
+  title: Order status
+  text: Customer cancelled the order before it was picked; no shipment was created.
+  vendor_id: cust-customer-106
+  transaction_ids:
+  - inv-00062
+- id: ev-0066
+  kind: receiving_record
+  date: '2026-07-11'
+  title: Receiving report 6652
+  text: Received 798 x Phone Ring Holder Case, Adhesive; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00128
+- id: ev-0067
+  kind: purchase_order
+  date: '2026-07-12'
+  title: Purchase order PO-6677
+  text: 'PO-6677: 711 x Wireless Earbuds, Bluetooth at $8.98, total $6,384.78. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00138
+- id: ev-0068
+  kind: receiving_record
+  date: '2026-07-15'
+  title: Receiving report 6665
+  text: Received 767 x Car Phone Mount Case, Vent; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00132
+- id: ev-0069
+  kind: ap_payment_record
+  date: '2026-07-23'
+  title: Payment ACH6573541
+  text: Payment ACH6573541 of $500.00 applied to bill RENT-8112 on Jul 23; bill closed. Payee account on file ends 9034.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00066
+  - bill-00136
+- id: ev-0070
+  kind: receiving_record
+  date: '2026-07-26'
+  title: Receiving report 6677
+  text: Received 711 x Wireless Earbuds, Bluetooth; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00138
+- id: ev-0071
+  kind: shipment_record
+  date: '2026-08-03'
+  title: Shipment record
+  text: Part of the order shipped on Aug 6, before the customer's cancellation request.
+  vendor_id: cust-customer-50
+  transaction_ids:
+  - inv-00070
+- id: ev-0072
+  kind: order_record
+  date: '2026-08-05'
+  title: Order status
+  text: Customer cancelled the remainder after the first shipment.
+  vendor_id: cust-customer-50
+  transaction_ids:
+  - inv-00070
+- id: ev-0073
   kind: service_agreement
   date: '2026-08-08'
   title: Statement of work
   text: 'Statement of work: one-time brand onboarding fee of $2,340.00, due at signing. No further onboarding charges are
     scheduled.'
   vendor_id: vend-operating-vendor
-  bill_ids:
-  - bill-00158
+  transaction_ids:
+  - bill-00159
   - bill-00165
-- id: ev-0037
+- id: ev-0074
+  kind: vendor_onboarding
+  date: '2026-08-13'
+  title: Vendor onboarding
+  text: Northgate Safety Training was approved as a new vendor on Aug 13 with a signed W-9 and bank letter; account ending
+    6191 verified by call-back.
+  transaction_ids:
+  - bank-00072
+- id: ev-0075
+  kind: ap_payment_record
+  date: '2026-08-13'
+  title: Payment history
+  text: The bill for this payee and amount was paid in full on Aug 13 (ref CHK7646) and is closed. No second bill is open.
+  vendor_id: vend-operating-vendor
+  transaction_ids:
+  - bank-00070
+  - bank-00071
+- id: ev-0076
+  kind: purchase_order
+  date: '2026-08-15'
+  title: Purchase order PO-6807
+  text: 'PO-6807: safety training session. Invoice 6807 received and approved.'
+  transaction_ids:
+  - bank-00072
+- id: ev-0077
   kind: receiving_record
   date: '2026-08-25'
   title: Receiving report prior order
   text: Received 727 x USB-C Charging Cable, 6 ft on Aug 26 against the earlier order.
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00150
-- id: ev-0038
+- id: ev-0078
+  kind: ap_payment_record
+  date: '2026-08-26'
+  title: Payment ACH9829629
+  text: Payment ACH9829629 applied to the earlier bill from this payee; bill closed.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00073
+- id: ev-0079
+  kind: purchase_order
+  date: '2026-08-29'
+  title: Purchase order PO-6690
+  text: 'PO-6690: 703 x USB-C Charging Cable, 6 ft at $13.71, total $9,638.13. Net 7.'
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00161
+- id: ev-0080
+  kind: receipt
+  date: '2026-09-01'
+  title: Card statement detail Sep 3
+  text: 'Receipt summary: sample cartons from two packaging vendors; registration for regional ecommerce expo, business badge.'
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00157
+- id: ev-0081
   kind: vendor_message
   date: '2026-09-05'
   title: Email asking to update remittance
   text: Email received from the vendor's billing mailbox asking AP to remit to an account ending 7731. The vendor master lists
     an account ending 3341. No signed bank change form on file; no call-back performed.
   vendor_id: vend-supplier
-  bill_ids:
-  - bill-00157
-- id: ev-0039
+  transaction_ids:
+  - bill-00158
+- id: ev-0082
   kind: purchase_order
   date: '2026-09-06'
   title: Purchase order PO-6339
   text: 'PO-6339: reorder of USB-C Charging Cable, 6 ft, delivery to dock 3.'
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00163
-- id: ev-0040
-  kind: receipt
-  date: '2026-09-06'
-  title: Card statement detail Sep 8
-  text: 'Receipt summary: sample cartons from two packaging vendors; registration for regional ecommerce expo, business badge.'
-  vendor_id: vend-card
-  bill_ids:
-  - bill-00160
-- id: ev-0041
+- id: ev-0083
+  kind: receivables_lookup
+  date: '2026-09-07'
+  title: Receivables lookup
+  text: No open invoice for this customer matches this amount; the deposit is unapplied.
+  vendor_id: cust-customer-125
+  transaction_ids:
+  - bank-00075
+- id: ev-0084
+  kind: receiving_record
+  date: '2026-09-08'
+  title: Receiving report 6690
+  text: Received 703 x USB-C Charging Cable, 6 ft; count matches packing slip. No damage noted.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bill-00161
+- id: ev-0085
+  kind: ap_payment_record
+  date: '2026-09-09'
+  title: Payment ACH5396148
+  text: Payment ACH5396148 applied to a later bill from this payee with its own invoice number; bill closed.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00078
+- id: ev-0086
+  kind: customer_agreement
+  date: '2026-09-12'
+  title: Customer agreement
+  text: Customer paid an agreed upfront deposit under the signed agreement; the invoice follows on delivery.
+  vendor_id: cust-customer-135
+  transaction_ids:
+  - bank-00080
+- id: ev-0087
   kind: receiving_record
   date: '2026-09-15'
   title: Receiving report 6339
   text: Received 727 x USB-C Charging Cable, 6 ft on Sep 16.
   vendor_id: vend-supplier
-  bill_ids:
+  transaction_ids:
   - bill-00163
-- id: ev-0042
+- id: ev-0088
+  kind: ap_payment_record
+  date: '2026-09-16'
+  title: Payment CHK7985
+  text: Payment CHK7985 of $7,281.56 sent by ACH to an account ending 7731. The vendor master lists an account ending 3341.
+  vendor_id: vend-supplier
+  transaction_ids:
+  - bank-00079
+  - bill-00158
+- id: ev-0089
+  kind: cash_receipt
+  date: '2026-09-24'
+  title: Receipt CHK5392
+  text: Receipt of $768.00 from Hollyhock Grocers Partners applied to invoice INV-1075 on Sep 24.
+  vendor_id: cust-customer-12
+  transaction_ids:
+  - bank-00081
+  - inv-00077
+- id: ev-0090
   kind: vendor_statement
   date: '2026-09-24'
   title: Vendor statement
   text: 'Statement of account lists one fulfillment invoice for the week ending Sep 21: INV-3933, $5,938.88. No second invoice
     for that week is listed.'
   vendor_id: vend-logistics-vendor
-  bill_ids:
+  transaction_ids:
   - bill-00166

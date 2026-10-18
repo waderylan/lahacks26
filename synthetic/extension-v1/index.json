@@ -14,10 +14,13 @@
     "derived_from": "company-018",
     "entity_counts": {
       "bills": 177,
+      "invoices": 87,
+      "bank_transactions": 82,
+      "transactions": 346,
       "bill_payments": 166,
       "vendors": 10,
       "projects": 0,
-      "evidence": 42
+      "evidence": 90
     }
   },
   {
@@ -35,10 +38,13 @@
     "derived_from": "company-042",
     "entity_counts": {
       "bills": 183,
+      "invoices": 55,
+      "bank_transactions": 82,
+      "transactions": 320,
       "bill_payments": 158,
       "vendors": 14,
       "projects": 7,
-      "evidence": 43
+      "evidence": 78
     }
   },
   {
@@ -56,10 +62,13 @@
     "derived_from": "company-035",
     "entity_counts": {
       "bills": 179,
+      "invoices": 49,
+      "bank_transactions": 82,
+      "transactions": 310,
       "bill_payments": 158,
       "vendors": 14,
       "projects": 4,
-      "evidence": 49
+      "evidence": 83
     }
   },
   {
@@ -77,10 +86,13 @@
     "derived_from": "company-037",
     "entity_counts": {
       "bills": 172,
-      "bill_payments": 151,
+      "invoices": 44,
+      "bank_transactions": 82,
+      "transactions": 298,
+      "bill_payments": 152,
       "vendors": 14,
       "projects": 3,
-      "evidence": 41
+      "evidence": 83
     }
   }
 ]

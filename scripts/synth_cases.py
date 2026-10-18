@@ -71,6 +71,7 @@ def T(c: Ctx, sel, *, desc=None, memo=None, fam, var, label, action, expect, why
         c.vendor_patch(b["vendor_id"], **{k: fmt(c, v, b, po=po) for k, v in patch.items()})
     c.retext(b, d, m, var)
     ids = _evs(c, ev, b, po=po)
+    c.tags[var] = b
     c.case(fam, var, label, action, b, evidence=ids, expect=expect, rationale=fmt(c, why, b, po=po), posting=posting, ledger=ledger,
            injection=({"fields": [f for f, v in (("description", d), ("memo", m)) if v is not None], "text": inj} if inj else None))
     return b
@@ -90,6 +91,7 @@ def F(c: Ctx, sel, *, new_desc, base_desc=None, base_memo=None, new_memo=None, d
                 ratio=ratio, paid=paid, project=project)
     ids = _evs(c, ev, b, n, po=po)
     amt = usd(cents(n["total_amount"]))
+    c.tags[var] = (b, n)
     c.case(fam, var, label, action, n, related=[b], evidence=ids, expect=expect, rel_expect=rel, rationale=fmt(c, why, b, n, po=po), posting=posting,
            ledger=ledger or f"Adds one posted bill of {amt}; accounts payable would be overstated by that amount until voided (synthetic review scope).")
     return b, n

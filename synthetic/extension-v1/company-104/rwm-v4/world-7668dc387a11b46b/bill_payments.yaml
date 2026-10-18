@@ -79,16 +79,6 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00009
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2025-12-05'
-  amount: '175.02'
-  applications:
-  - document_id: bill-00012
-    amount: '175.02'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00010
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2025-12-10'
@@ -98,7 +88,7 @@
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00011
+- id: bpay-00010
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2025-12-14'
@@ -108,7 +98,7 @@
     amount: '1357.59'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00012
+- id: bpay-00011
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2025-12-14'
@@ -118,40 +108,50 @@
     amount: '575.27'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00013
+- id: bpay-00012
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2025-12-19'
   amount: '575.28'
   applications:
-  - document_id: bill-00013
+  - document_id: bill-00012
     amount: '575.28'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00014
+- id: bpay-00013
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2025-12-24'
   amount: '500.00'
   applications:
-  - document_id: bill-00014
+  - document_id: bill-00013
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00015
+- id: bpay-00014
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2025-12-31'
   amount: '2172.15'
   applications:
-  - document_id: bill-00015
+  - document_id: bill-00014
     amount: '2172.15'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00015
+  vendor_id: vend-masonry
+  vendor_name: Castellano Menu Design LLC
+  txn_date: '2025-12-31'
+  amount: '577.25'
+  applications:
+  - document_id: bill-00015
+    amount: '577.25'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00016
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
-  txn_date: '2025-12-31'
+  txn_date: '2026-01-03'
   amount: '577.25'
   applications:
   - document_id: bill-00016
@@ -159,223 +159,223 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00017
-  vendor_id: vend-masonry
-  vendor_name: Castellano Menu Design LLC
-  txn_date: '2026-01-03'
-  amount: '577.25'
+  vendor_id: vend-equipment-vendor
+  vendor_name: Brightline Kitchen Equipment Co.
+  txn_date: '2026-01-04'
+  amount: '200.00'
   applications:
   - document_id: bill-00017
-    amount: '577.25'
+    amount: '200.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00018
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-01-04'
-  amount: '200.00'
-  applications:
-  - document_id: bill-00018
-    amount: '200.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00019
-  vendor_id: vend-equipment-vendor
-  vendor_name: Brightline Kitchen Equipment Co.
-  txn_date: '2026-01-04'
   amount: '30000.00'
   applications:
-  - document_id: bill-00019
+  - document_id: bill-00018
     amount: '30000.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00020
+- id: bpay-00019
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-01-07'
   amount: '577.25'
   applications:
-  - document_id: bill-00020
+  - document_id: bill-00019
     amount: '577.25'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00021
+- id: bpay-00020
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-01-07'
   amount: '500.00'
   applications:
-  - document_id: bill-00021
+  - document_id: bill-00020
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00022
+- id: bpay-00021
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-01-09'
   amount: '577.25'
   applications:
-  - document_id: bill-00022
+  - document_id: bill-00021
     amount: '577.25'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00023
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2026-01-14'
-  amount: '551.32'
-  applications:
-  - document_id: bill-00030
-    amount: '551.32'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00024
+- id: bpay-00022
   vendor_id: vend-card
   vendor_name: Summit Card Services
   txn_date: '2026-01-16'
   amount: '358.90'
   applications:
-  - document_id: bill-00032
+  - document_id: bill-00030
     amount: '358.90'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00025
+- id: bpay-00023
   vendor_id: vend-landscaping
   vendor_name: Clearwater Opal Bar Service
   txn_date: '2026-01-18'
   amount: '531.71'
   applications:
-  - document_id: bill-00023
+  - document_id: bill-00022
     amount: '531.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00026
+- id: bpay-00024
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2026-01-18'
   amount: '2753.21'
   applications:
-  - document_id: bill-00024
+  - document_id: bill-00023
     amount: '2753.21'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00027
+- id: bpay-00025
   vendor_id: vend-landscaping
   vendor_name: Clearwater Opal Bar Service
   txn_date: '2026-01-21'
   amount: '531.71'
   applications:
-  - document_id: bill-00025
+  - document_id: bill-00024
     amount: '531.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00028
+- id: bpay-00026
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-01-21'
   amount: '500.00'
   applications:
-  - document_id: bill-00026
+  - document_id: bill-00025
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00029
+- id: bpay-00027
   vendor_id: vend-landscaping
   vendor_name: Clearwater Opal Bar Service
   txn_date: '2026-01-22'
   amount: '531.72'
   applications:
-  - document_id: bill-00027
+  - document_id: bill-00026
     amount: '531.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00030
+- id: bpay-00028
   vendor_id: vend-landscaping
   vendor_name: Clearwater Opal Bar Service
   txn_date: '2026-01-23'
+  amount: '531.71'
+  applications:
+  - document_id: bill-00027
+    amount: '531.71'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00029
+  vendor_id: vend-landscaping
+  vendor_name: Clearwater Opal Bar Service
+  txn_date: '2026-01-24'
   amount: '531.71'
   applications:
   - document_id: bill-00028
     amount: '531.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
+- id: bpay-00030
+  vendor_id: vend-landscaping
+  vendor_name: Clearwater Opal Bar Service
+  txn_date: '2026-01-25'
+  amount: '531.72'
+  applications:
+  - document_id: bill-00029
+    amount: '531.72'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
 - id: bpay-00031
   vendor_id: vend-landscaping
   vendor_name: Clearwater Opal Bar Service
-  txn_date: '2026-01-24'
+  txn_date: '2026-01-28'
   amount: '531.71'
   applications:
-  - document_id: bill-00029
+  - document_id: bill-00031
     amount: '531.71'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00032
   vendor_id: vend-landscaping
   vendor_name: Clearwater Opal Bar Service
-  txn_date: '2026-01-25'
+  txn_date: '2026-01-29'
   amount: '531.72'
   applications:
-  - document_id: bill-00031
+  - document_id: bill-00032
     amount: '531.72'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00033
-  vendor_id: vend-landscaping
-  vendor_name: Clearwater Opal Bar Service
-  txn_date: '2026-01-28'
-  amount: '531.71'
-  applications:
-  - document_id: bill-00033
-    amount: '531.71'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00034
-  vendor_id: vend-landscaping
-  vendor_name: Clearwater Opal Bar Service
-  txn_date: '2026-01-29'
-  amount: '531.72'
-  applications:
-  - document_id: bill-00034
-    amount: '531.72'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00035
   vendor_id: vend-utilities
   vendor_name: Eastgate Municipal Utilities
   txn_date: '2026-02-02'
   amount: '575.00'
   applications:
-  - document_id: bill-00035
+  - document_id: bill-00033
     amount: '575.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00036
+- id: bpay-00034
   vendor_id: vend-insurer
   vendor_name: Jarvis Insurance Agency
   txn_date: '2026-02-02'
   amount: '1242.74'
   applications:
-  - document_id: bill-00036
+  - document_id: bill-00034
     amount: '1242.74'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00037
+- id: bpay-00035
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-02-03'
   amount: '300.00'
   applications:
-  - document_id: bill-00037
+  - document_id: bill-00035
     amount: '300.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00038
+- id: bpay-00036
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-02-06'
+  amount: '776.13'
+  applications:
+  - document_id: bill-00039
+    amount: '776.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00037
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-02-11'
   amount: '500.00'
   applications:
-  - document_id: bill-00040
+  - document_id: bill-00038
     amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00038
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-02-17'
+  amount: '363.52'
+  applications:
+  - document_id: bill-00042
+    amount: '363.52'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00039
@@ -384,7 +384,7 @@
   txn_date: '2026-02-25'
   amount: '500.00'
   applications:
-  - document_id: bill-00041
+  - document_id: bill-00040
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -394,7 +394,7 @@
   txn_date: '2026-02-25'
   amount: '1000.00'
   applications:
-  - document_id: bill-00042
+  - document_id: bill-00041
     amount: '1000.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -649,16 +649,6 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00066
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2026-05-01'
-  amount: '318.10'
-  applications:
-  - document_id: bill-00075
-    amount: '318.10'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00067
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-03'
@@ -668,7 +658,7 @@
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00068
+- id: bpay-00067
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-05-04'
@@ -678,7 +668,7 @@
     amount: '300.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00069
+- id: bpay-00068
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2026-05-06'
@@ -688,7 +678,7 @@
     amount: '21079.27'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00070
+- id: bpay-00069
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2026-05-06'
@@ -698,7 +688,7 @@
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00071
+- id: bpay-00070
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-07'
@@ -708,7 +698,7 @@
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00072
+- id: bpay-00071
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2026-05-08'
@@ -718,7 +708,7 @@
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00073
+- id: bpay-00072
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-09'
@@ -728,50 +718,60 @@
     amount: '1499.48'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00074
+- id: bpay-00073
   vendor_id: vend-card
   vendor_name: Summit Card Services
   txn_date: '2026-05-11'
   amount: '247.80'
   applications:
-  - document_id: bill-00083
+  - document_id: bill-00082
     amount: '247.80'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00075
+- id: bpay-00074
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-05-13'
   amount: '500.00'
   applications:
-  - document_id: bill-00076
+  - document_id: bill-00075
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00076
+- id: bpay-00075
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2026-05-13'
   amount: '1422.85'
   applications:
-  - document_id: bill-00077
+  - document_id: bill-00076
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00077
+- id: bpay-00076
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-13'
   amount: '1499.49'
   applications:
-  - document_id: bill-00078
+  - document_id: bill-00077
     amount: '1499.49'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00077
+  vendor_id: vend-sitework
+  vendor_name: Thornbury Union Planning
+  txn_date: '2026-05-15'
+  amount: '1422.85'
+  applications:
+  - document_id: bill-00078
+    amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00078
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
-  txn_date: '2026-05-15'
+  txn_date: '2026-05-17'
   amount: '1422.85'
   applications:
   - document_id: bill-00079
@@ -779,53 +779,53 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00079
-  vendor_id: vend-sitework
-  vendor_name: Thornbury Union Planning
-  txn_date: '2026-05-17'
-  amount: '1422.85'
-  applications:
-  - document_id: bill-00080
-    amount: '1422.85'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00080
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-20'
   amount: '1499.49'
   applications:
-  - document_id: bill-00081
+  - document_id: bill-00080
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00081
+- id: bpay-00080
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2026-05-22'
   amount: '1422.85'
   applications:
-  - document_id: bill-00084
+  - document_id: bill-00083
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00082
+- id: bpay-00081
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-22'
   amount: '1499.49'
   applications:
-  - document_id: bill-00085
+  - document_id: bill-00084
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00083
+- id: bpay-00082
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-24'
   amount: '1499.48'
   applications:
-  - document_id: bill-00086
+  - document_id: bill-00085
     amount: '1499.48'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00083
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-05-25'
+  amount: '524.09'
+  applications:
+  - document_id: bill-00095
+    amount: '524.09'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00084
@@ -834,7 +834,7 @@
   txn_date: '2026-05-27'
   amount: '500.00'
   applications:
-  - document_id: bill-00087
+  - document_id: bill-00086
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -844,7 +844,7 @@
   txn_date: '2026-05-27'
   amount: '1422.85'
   applications:
-  - document_id: bill-00088
+  - document_id: bill-00087
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
@@ -854,81 +854,71 @@
   txn_date: '2026-05-28'
   amount: '1499.49'
   applications:
-  - document_id: bill-00089
+  - document_id: bill-00088
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00087
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2026-05-28'
-  amount: '479.07'
-  applications:
-  - document_id: bill-00098
-    amount: '479.07'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00088
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2026-05-29'
   amount: '1422.85'
   applications:
-  - document_id: bill-00090
+  - document_id: bill-00089
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00089
+- id: bpay-00088
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-05-31'
   amount: '1499.49'
   applications:
-  - document_id: bill-00091
+  - document_id: bill-00090
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00090
+- id: bpay-00089
   vendor_id: vend-utilities
   vendor_name: Eastgate Municipal Utilities
   txn_date: '2026-06-02'
   amount: '1100.00'
   applications:
-  - document_id: bill-00092
+  - document_id: bill-00091
     amount: '1100.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00091
+- id: bpay-00090
   vendor_id: vend-insurer
   vendor_name: Jarvis Insurance Agency
   txn_date: '2026-06-02'
   amount: '690.41'
   applications:
-  - document_id: bill-00093
+  - document_id: bill-00092
     amount: '690.41'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00092
+- id: bpay-00091
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-06-03'
   amount: '300.00'
   applications:
-  - document_id: bill-00094
+  - document_id: bill-00093
     amount: '300.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00093
+- id: bpay-00092
   vendor_id: vend-sitework
   vendor_name: Thornbury Union Planning
   txn_date: '2026-06-04'
   amount: '1422.85'
   applications:
-  - document_id: bill-00095
+  - document_id: bill-00094
     amount: '1422.85'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00094
+- id: bpay-00093
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-06-04'
@@ -938,7 +928,7 @@
     amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00095
+- id: bpay-00094
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-06-06'
@@ -948,20 +938,30 @@
     amount: '1499.48'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00096
+- id: bpay-00095
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-06-10'
   amount: '500.00'
   applications:
-  - document_id: bill-00099
+  - document_id: bill-00098
     amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00096
+  vendor_id: vend-masonry
+  vendor_name: Castellano Menu Design LLC
+  txn_date: '2026-06-10'
+  amount: '1499.49'
+  applications:
+  - document_id: bill-00099
+    amount: '1499.49'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00097
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
-  txn_date: '2026-06-10'
+  txn_date: '2026-06-12'
   amount: '1499.49'
   applications:
   - document_id: bill-00100
@@ -969,89 +969,89 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00098
-  vendor_id: vend-masonry
-  vendor_name: Castellano Menu Design LLC
-  txn_date: '2026-06-12'
-  amount: '1499.49'
-  applications:
-  - document_id: bill-00101
-    amount: '1499.49'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00099
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2026-06-12'
-  amount: '357.21'
-  applications:
-  - document_id: bill-00105
-    amount: '357.21'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00100
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2026-06-17'
   amount: '47728.76'
   applications:
-  - document_id: bill-00102
+  - document_id: bill-00101
     amount: '47728.76'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00101
+- id: bpay-00099
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
   txn_date: '2026-06-18'
+  amount: '1525.25'
+  applications:
+  - document_id: bill-00102
+    amount: '1525.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00100
+  vendor_id: vend-masonry
+  vendor_name: Castellano Menu Design LLC
+  txn_date: '2026-06-20'
   amount: '1525.25'
   applications:
   - document_id: bill-00103
     amount: '1525.25'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00102
-  vendor_id: vend-masonry
-  vendor_name: Castellano Menu Design LLC
-  txn_date: '2026-06-20'
-  amount: '1525.25'
-  applications:
-  - document_id: bill-00104
-    amount: '1525.25'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00103
+- id: bpay-00101
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
   txn_date: '2026-06-24'
   amount: '1694.39'
   applications:
-  - document_id: bill-00106
+  - document_id: bill-00104
     amount: '1694.39'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00104
+- id: bpay-00102
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-06-24'
   amount: '500.00'
   applications:
-  - document_id: bill-00107
+  - document_id: bill-00105
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00105
+- id: bpay-00103
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2026-06-24'
   amount: '19359.23'
   applications:
-  - document_id: bill-00108
+  - document_id: bill-00106
     amount: '19359.23'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00104
+  vendor_id: vend-masonry
+  vendor_name: Castellano Menu Design LLC
+  txn_date: '2026-06-24'
+  amount: '1525.25'
+  applications:
+  - document_id: bill-00107
+    amount: '1525.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00105
+  vendor_id: vend-plumbing
+  vendor_name: Inlet Cove Food Production Co.
+  txn_date: '2026-06-26'
+  amount: '1694.40'
+  applications:
+  - document_id: bill-00108
+    amount: '1694.40'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00106
   vendor_id: vend-masonry
   vendor_name: Castellano Menu Design LLC
-  txn_date: '2026-06-24'
+  txn_date: '2026-06-27'
   amount: '1525.25'
   applications:
   - document_id: bill-00109
@@ -1061,27 +1061,27 @@
 - id: bpay-00107
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
-  txn_date: '2026-06-26'
-  amount: '1694.40'
+  txn_date: '2026-06-28'
+  amount: '1694.39'
   applications:
   - document_id: bill-00110
-    amount: '1694.40'
+    amount: '1694.39'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00108
-  vendor_id: vend-masonry
-  vendor_name: Castellano Menu Design LLC
-  txn_date: '2026-06-27'
-  amount: '1525.25'
+  vendor_id: vend-equipment-vendor
+  vendor_name: Brightline Kitchen Equipment Co.
+  txn_date: '2026-07-03'
+  amount: '300.00'
   applications:
   - document_id: bill-00111
-    amount: '1525.25'
+    amount: '300.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00109
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
-  txn_date: '2026-06-28'
+  txn_date: '2026-07-03'
   amount: '1694.39'
   applications:
   - document_id: bill-00112
@@ -1089,363 +1089,363 @@
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00110
-  vendor_id: vend-equipment-vendor
-  vendor_name: Brightline Kitchen Equipment Co.
-  txn_date: '2026-07-03'
-  amount: '300.00'
-  applications:
-  - document_id: bill-00113
-    amount: '300.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00111
-  vendor_id: vend-plumbing
-  vendor_name: Inlet Cove Food Production Co.
-  txn_date: '2026-07-03'
-  amount: '1694.39'
-  applications:
-  - document_id: bill-00114
-    amount: '1694.39'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00112
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
   txn_date: '2026-07-05'
   amount: '1694.39'
   applications:
-  - document_id: bill-00115
+  - document_id: bill-00113
     amount: '1694.39'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00113
+- id: bpay-00111
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-07-08'
   amount: '500.00'
   applications:
-  - document_id: bill-00116
+  - document_id: bill-00115
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00114
+- id: bpay-00112
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
   txn_date: '2026-07-09'
   amount: '1694.40'
   applications:
-  - document_id: bill-00118
+  - document_id: bill-00116
     amount: '1694.40'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00115
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2026-07-10'
-  amount: '382.90'
-  applications:
-  - document_id: bill-00123
-    amount: '382.90'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00116
+- id: bpay-00113
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
   txn_date: '2026-07-11'
+  amount: '1694.39'
+  applications:
+  - document_id: bill-00117
+    amount: '1694.39'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00114
+  vendor_id: vend-plumbing
+  vendor_name: Inlet Cove Food Production Co.
+  txn_date: '2026-07-15'
   amount: '1694.39'
   applications:
   - document_id: bill-00119
     amount: '1694.39'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00117
-  vendor_id: vend-plumbing
-  vendor_name: Inlet Cove Food Production Co.
-  txn_date: '2026-07-15'
-  amount: '1694.39'
-  applications:
-  - document_id: bill-00121
-    amount: '1694.39'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00118
+- id: bpay-00115
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
   txn_date: '2026-07-17'
   amount: '1694.39'
   applications:
-  - document_id: bill-00122
+  - document_id: bill-00120
     amount: '1694.39'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00119
+- id: bpay-00116
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-07-21'
+  amount: '637.05'
+  applications:
+  - document_id: bill-00124
+    amount: '637.05'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00117
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-07-22'
   amount: '500.00'
   applications:
-  - document_id: bill-00125
+  - document_id: bill-00122
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00120
+- id: bpay-00118
   vendor_id: vend-plumbing
   vendor_name: Inlet Cove Food Production Co.
   txn_date: '2026-07-22'
   amount: '1694.40'
   applications:
-  - document_id: bill-00126
+  - document_id: bill-00123
     amount: '1694.40'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00121
+- id: bpay-00119
   vendor_id: vend-card
   vendor_name: Summit Card Services
   txn_date: '2026-07-28'
   amount: '182.00'
   applications:
-  - document_id: bill-00130
+  - document_id: bill-00129
     amount: '182.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00122
+- id: bpay-00120
   vendor_id: vend-utilities
   vendor_name: Eastgate Municipal Utilities
   txn_date: '2026-08-01'
   amount: '1100.00'
   applications:
-  - document_id: bill-00127
+  - document_id: bill-00125
     amount: '1100.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00123
+- id: bpay-00121
   vendor_id: vend-insurer
   vendor_name: Jarvis Insurance Agency
   txn_date: '2026-08-01'
   amount: '690.41'
   applications:
-  - document_id: bill-00128
+  - document_id: bill-00126
     amount: '690.41'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00124
+- id: bpay-00122
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-08-02'
   amount: '300.00'
   applications:
-  - document_id: bill-00129
+  - document_id: bill-00127
     amount: '300.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00125
+- id: bpay-00123
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2026-08-07'
   amount: '19324.38'
   applications:
-  - document_id: bill-00131
+  - document_id: bill-00128
     amount: '19324.38'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00126
+- id: bpay-00124
   vendor_id: vend-electrical
   vendor_name: Xiong & Sons Equipment
   txn_date: '2026-08-08'
   amount: '1835.81'
   applications:
-  - document_id: bill-00132
+  - document_id: bill-00130
     amount: '1835.81'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00127
+- id: bpay-00125
   vendor_id: vend-electrical
   vendor_name: Xiong & Sons Equipment
   txn_date: '2026-08-12'
+  amount: '1835.82'
+  applications:
+  - document_id: bill-00131
+    amount: '1835.82'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00126
+  vendor_id: vend-landlord
+  vendor_name: Hearth Property Group
+  txn_date: '2026-08-12'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00132
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00127
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-08-12'
+  amount: '299.40'
+  applications:
+  - document_id: bill-00137
+    amount: '299.40'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00128
+  vendor_id: vend-electrical
+  vendor_name: Xiong & Sons Equipment
+  txn_date: '2026-08-14'
   amount: '1835.82'
   applications:
   - document_id: bill-00133
     amount: '1835.82'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00128
-  vendor_id: vend-landlord
-  vendor_name: Hearth Property Group
-  txn_date: '2026-08-12'
-  amount: '500.00'
-  applications:
-  - document_id: bill-00134
-    amount: '500.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
 - id: bpay-00129
-  vendor_id: vend-card
-  vendor_name: Summit Card Services
-  txn_date: '2026-08-12'
-  amount: '299.40'
-  applications:
-  - document_id: bill-00139
-    amount: '299.40'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00130
-  vendor_id: vend-electrical
-  vendor_name: Xiong & Sons Equipment
-  txn_date: '2026-08-14'
-  amount: '1835.82'
-  applications:
-  - document_id: bill-00135
-    amount: '1835.82'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00131
   vendor_id: vend-card
   vendor_name: Summit Card Services
   txn_date: '2026-08-14'
   amount: '500.56'
   applications:
-  - document_id: bill-00141
+  - document_id: bill-00139
     amount: '500.56'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00132
+- id: bpay-00130
   vendor_id: vend-electrical
   vendor_name: Xiong & Sons Equipment
   txn_date: '2026-08-16'
+  amount: '1835.81'
+  applications:
+  - document_id: bill-00134
+    amount: '1835.81'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00131
+  vendor_id: vend-electrical
+  vendor_name: Xiong & Sons Equipment
+  txn_date: '2026-08-21'
   amount: '1835.81'
   applications:
   - document_id: bill-00136
     amount: '1835.81'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00133
-  vendor_id: vend-electrical
-  vendor_name: Xiong & Sons Equipment
-  txn_date: '2026-08-21'
-  amount: '1835.81'
-  applications:
-  - document_id: bill-00138
-    amount: '1835.81'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00134
+- id: bpay-00132
   vendor_id: vend-electrical
   vendor_name: Xiong & Sons Equipment
   txn_date: '2026-08-23'
   amount: '1835.82'
   applications:
-  - document_id: bill-00140
+  - document_id: bill-00138
     amount: '1835.82'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00135
+- id: bpay-00133
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-08-26'
   amount: '500.00'
   applications:
-  - document_id: bill-00142
+  - document_id: bill-00140
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00136
+- id: bpay-00134
   vendor_id: vend-electrical
   vendor_name: Xiong & Sons Equipment
   txn_date: '2026-08-27'
   amount: '1835.82'
   applications:
-  - document_id: bill-00143
+  - document_id: bill-00141
     amount: '1835.82'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00137
+- id: bpay-00135
   vendor_id: vend-electrical
   vendor_name: Xiong & Sons Equipment
   txn_date: '2026-08-29'
   amount: '1835.81'
   applications:
-  - document_id: bill-00144
+  - document_id: bill-00142
     amount: '1835.81'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00138
+- id: bpay-00136
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-09-01'
   amount: '300.00'
   applications:
-  - document_id: bill-00145
+  - document_id: bill-00143
     amount: '300.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00139
+- id: bpay-00137
   vendor_id: vend-landlord
   vendor_name: Hearth Property Group
   txn_date: '2026-09-09'
   amount: '500.00'
   applications:
-  - document_id: bill-00146
+  - document_id: bill-00144
     amount: '500.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00140
+- id: bpay-00138
   vendor_id: vend-finishing
   vendor_name: Hollings & Sons Service Staff
   txn_date: '2026-09-13'
   amount: '1446.84'
   applications:
-  - document_id: bill-00147
+  - document_id: bill-00145
     amount: '1446.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00141
+- id: bpay-00139
   vendor_id: vend-materials
   vendor_name: Larkspur Grocers LLC
   txn_date: '2026-09-13'
   amount: '34295.57'
   applications:
-  - document_id: bill-00148
+  - document_id: bill-00146
     amount: '34295.57'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00142
+- id: bpay-00140
+  vendor_id: vend-landlord
+  vendor_name: Hearth Property Group
+  txn_date: '2026-09-15'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00161
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00141
   vendor_id: vend-finishing
   vendor_name: Hollings & Sons Service Staff
   txn_date: '2026-09-17'
   amount: '1446.84'
   applications:
-  - document_id: bill-00150
+  - document_id: bill-00148
+    amount: '1446.84'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00142
+  vendor_id: vend-finishing
+  vendor_name: Hollings & Sons Service Staff
+  txn_date: '2026-09-19'
+  amount: '1446.84'
+  applications:
+  - document_id: bill-00149
     amount: '1446.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00143
+  vendor_id: vend-landlord
+  vendor_name: Hearth Property Group
+  txn_date: '2026-09-23'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00150
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00144
   vendor_id: vend-finishing
   vendor_name: Hollings & Sons Service Staff
-  txn_date: '2026-09-19'
+  txn_date: '2026-09-23'
   amount: '1446.84'
   applications:
   - document_id: bill-00151
     amount: '1446.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00144
-  vendor_id: vend-landlord
-  vendor_name: Hearth Property Group
-  txn_date: '2026-09-23'
-  amount: '500.00'
-  applications:
-  - document_id: bill-00152
-    amount: '500.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
 - id: bpay-00145
-  vendor_id: vend-finishing
-  vendor_name: Hollings & Sons Service Staff
-  txn_date: '2026-09-23'
-  amount: '1446.84'
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-09-24'
+  amount: '270.60'
   applications:
-  - document_id: bill-00153
-    amount: '1446.84'
+  - document_id: bill-00158
+    amount: '270.60'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00146
@@ -1454,57 +1454,67 @@
   txn_date: '2026-09-26'
   amount: '1446.84'
   applications:
-  - document_id: bill-00154
+  - document_id: bill-00152
     amount: '1446.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00147
+  vendor_id: vend-card
+  vendor_name: Summit Card Services
+  txn_date: '2026-09-27'
+  amount: '357.21'
+  applications:
+  - document_id: bill-00159
+    amount: '357.21'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00148
   vendor_id: vend-insurer
   vendor_name: Jarvis Insurance Agency
   txn_date: '2026-09-30'
   amount: '690.41'
   applications:
-  - document_id: bill-00155
+  - document_id: bill-00153
     amount: '690.41'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00148
+- id: bpay-00149
   vendor_id: vend-utilities
   vendor_name: Eastgate Municipal Utilities
   txn_date: '2026-09-30'
   amount: '1100.00'
   applications:
-  - document_id: bill-00156
+  - document_id: bill-00154
     amount: '1100.00'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
-- id: bpay-00149
+- id: bpay-00150
   vendor_id: vend-equipment-vendor
   vendor_name: Brightline Kitchen Equipment Co.
   txn_date: '2026-10-01'
   amount: '300.00'
   applications:
-  - document_id: bill-00157
+  - document_id: bill-00155
     amount: '300.00'
-  payment_account_id: acct-checking
-  memo: Payment sent against vendor bill.
-- id: bpay-00150
-  vendor_id: vend-finishing
-  vendor_name: Hollings & Sons Service Staff
-  txn_date: '2026-10-01'
-  amount: '1446.84'
-  applications:
-  - document_id: bill-00158
-    amount: '1446.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.
 - id: bpay-00151
   vendor_id: vend-finishing
   vendor_name: Hollings & Sons Service Staff
+  txn_date: '2026-10-01'
+  amount: '1446.84'
+  applications:
+  - document_id: bill-00156
+    amount: '1446.84'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00152
+  vendor_id: vend-finishing
+  vendor_name: Hollings & Sons Service Staff
   txn_date: '2026-10-03'
   amount: '1446.84'
   applications:
-  - document_id: bill-00159
+  - document_id: bill-00157
     amount: '1446.84'
   payment_account_id: acct-checking
   memo: Payment sent against vendor bill.

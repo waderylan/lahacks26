@@ -102,6 +102,7 @@ class Ctx:
         self.patches: dict[str, dict] = {}
         self.cancelled: dict | None = None
         self.hold: set[str] = set()
+        self.tags: dict = {}
         self._n = 0
         self._po = 4100 + self.rng.randrange(0, 300)
         self.used_docs: set[str] = set()

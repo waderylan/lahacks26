@@ -21,3 +21,6 @@ artifacts/
 
 # Persistent dashboard database (never original dataset files).
 /workspace/
+
+# Local agent notes, not shared
+/agent-notes/

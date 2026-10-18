@@ -34,6 +34,10 @@ export interface RuleIssue {
   status: 'open' | 'resolved'; lastResult: Truth;
   flags: { label: string; removable: boolean }[]; taskIds: string[];
 }
+export interface RuleRunSummary {
+  ruleId: string; revision: number; checkedAt: string; transactionCount: number;
+  matches: number; uncertain: number; nonmatches: number; source: 'run' | 'arrival' | 'update';
+}
 export interface LocalTransaction { flags: string[]; tags: string[]; owner: string; automatedCheck: boolean }
 export type MessageStatus = 'pending' | 'approved' | 'rejected';
 export interface DraftMessage {

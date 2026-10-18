@@ -49,10 +49,6 @@ export function RuleStarters({ c, data, onInspect, onDemoSample }: {
         <b>{preset.name}</b><span>{preset.description}</span>
       </button>)}
     </div></details>
-    {c.store.rules.length > 0 && <section className="starter-saved" aria-label="Saved rules in this company">
-      <h3>Your saved rules ({c.store.rules.length})</h3>
-      <div>{c.store.rules.map(rule => <button key={rule.id} aria-pressed={c.draft?.id === rule.id} onClick={() => c.selectRule(rule.id)}>{rule.name}<span>Automatic {rule.enabled ? 'on' : 'off'}</span></button>)}</div>
-    </section>}
     <p className="starter-footnote">Adding a starter saves it with automatic runs off. Review the live results before Run once. Message drafts require approval.</p>
   </details>;
 }

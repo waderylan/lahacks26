@@ -1,0 +1,26 @@
+.company-rules-list { max-width:1400px; margin:0 auto 24px; background:var(--panel); border:1px solid var(--line); border-radius:9px; overflow:hidden; }
+.company-rules-help { font-size:12px; line-height:1.7; color:var(--muted); padding:18px 20px; margin:0; }
+.company-rules-scroll { overflow:auto; }
+.company-rules-table { width:100%; min-width:740px; border-collapse:collapse; text-align:left; font-size:12px; }
+.company-rules-table thead { color:var(--muted); background:#f1f5ef; }
+.company-rules-table th,.company-rules-table td { padding:18px 20px; border-bottom:1px solid var(--line); vertical-align:top; }
+.company-rules-table thead th { font-size:11px; font-weight:600; }
+.company-rules-table tbody th { width:32%; font-weight:400; }
+.company-rules-table tbody tr:last-child > * { border-bottom:0; }
+.company-rules-table small { display:block; font-size:11px; font-weight:400; color:var(--muted); margin-top:7px; line-height:1.6; }
+.company-rules-table .company-rule-name { font-size:14px; font-weight:600; color:var(--green); border:0; background:none; padding:0; text-align:left; }
+.company-rule-actions { display:flex; gap:7px; white-space:nowrap; }
+.company-rule-actions button { font-size:12px; }
+.company-rule-actions .company-rule-delete { color:var(--red); }
+.company-rule-switch { display:flex; align-items:center; gap:9px; border:0; background:none; font-size:12px; }
+.company-rule-switch-track { width:32px; height:19px; background:#a9b3ab; border-radius:12px; position:relative; flex-shrink:0; }
+.company-rule-switch-track::after { content:''; width:13px; height:13px; border-radius:50%; background:white; position:absolute; left:3px; top:3px; }
+.company-rule-switch[aria-checked=true] .company-rule-switch-track { background:var(--green); }
+.company-rule-switch[aria-checked=true] .company-rule-switch-track::after { left:16px; }
+.company-rule-confirm { font-size:12px; line-height:1.6; max-width:280px; background:var(--red-bg); padding:12px; border-radius:6px; margin-top:12px; }
+.company-rule-confirm p { margin:0 0 10px; }
+.company-rule-confirm button { font-size:11px; margin-right:6px; }
+.company-rules-empty { margin:0; padding:24px 20px; font-size:13px; color:var(--muted); }
+.wizard-all-rules { margin:0 auto 16px; max-width:1400px; }
+.wizard-all-rules button { font-size:12px; color:var(--green); }
+@media (max-width:800px) { .company-rules-table th,.company-rules-table td { padding:15px 12px; }.company-rules-help { padding:16px 12px; } }

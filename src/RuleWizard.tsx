@@ -23,7 +23,7 @@ const conditionText = (node: RuleNode): string => node.type === 'ai' ? node.text
 const directlyNegated = (node: RuleNode): string[] => 'children' in node ? node.type === 'not' && node.children[0] && !('children' in node.children[0]) ? [node.children[0].id] : node.children.flatMap(directlyNegated) : [];
 const outcomeOf = (c: RulesController, row: Row): Outcome => c.snapshots[row.id]?.result ?? 'pending';
 
-export function RuleWizard({ c, data, onInspect, onMessages, onDemoSample }: { c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onMessages: () => void; onDemoSample: () => void }) {
+export function RuleWizard({ c, data, onInspect, onMessages, onDemoSample, onBack }: { c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onMessages: () => void; onDemoSample: () => void; onBack: () => void }) {
   const [step, setStep] = useState(0);
   const [resultFilter, setResultFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -101,6 +101,7 @@ export function RuleWizard({ c, data, onInspect, onMessages, onDemoSample }: { c
   });
   const saveDisabled = Boolean(c.validation.length || c.storageError || c.busy || !draft.name.trim());
   return <main className="rule-wizard" aria-label="Rule setup">
+    <div className="wizard-all-rules"><button onClick={onBack}>All rules</button></div>
     <header className="wizard-page-heading"><div><h1>Build a rule in plain English</h1><p>Describe what to look for. Jev checks each {data.company.synthetic ? 'transaction' : 'bill'}.</p></div><div className="wizard-library"><label className="wizard-saved-label" htmlFor="saved-rule">Saved rules</label><select id="saved-rule" aria-label="Saved rules" disabled={!c.store.rules.length} value={c.saved?.id ?? ''} onChange={event => c.selectRule(event.target.value)}>{!c.saved && <option value="" disabled>{c.store.rules.length ? `${draft.name} · unsaved` : 'No saved rules yet'}</option>}{c.store.rules.map(rule => <option key={rule.id} value={rule.id}>{rule.name}{rule.enabled ? ' · automatic' : ''}</option>)}</select><button onClick={c.newRule}>New rule</button></div></header>
     <RuleStarters c={c} data={data} onInspect={onInspect} onDemoSample={onDemoSample} />
     <div className="wizard-layout">

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, rulePresets, savedPreset, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
+import { EMPTY_STORE, evaluateTree, exampleRule, rulePresets, savedPreset, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue, type RuleRunSummary } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
-interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[]; selectedRuleId?: string }
+interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[]; runs?: RuleRunSummary[]; selectedRuleId?: string }
 const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve)]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
@@ -19,6 +19,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const [message, setMessage] = useState('');
   const [automation, setAutomation] = useState<string[]>([]);
   const [issues, setIssues] = useState<RuleIssue[]>([]);
+  const [runs, setRuns] = useState<RuleRunSummary[]>([]);
   const [busy, setBusy] = useState(false);
   const pending = useRef(0);
   const commandError = useRef('');
@@ -29,12 +30,13 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     storeRef.current = reply.store;
     setAutomation(reply.automation); callbacks.current.onRows?.(reply.rows);
     setIssues(reply.issues ?? []);
+    setRuns(reply.runs ?? []);
     if (reply.replayed) callbacks.current.onArrival(reply.replayed);
     setStorageError('');
   }, []);
   useEffect(() => {
     const scope = companyId;
-    setReady(false); setStore(structuredClone(EMPTY_STORE)); setDraft(null); setIssues([]); setStorageError(''); setMessage(''); setBusy(false);
+    setReady(false); setStore(structuredClone(EMPTY_STORE)); setDraft(null); setIssues([]); setRuns([]); setStorageError(''); setMessage(''); setBusy(false);
     if (!scope) return;
     let disposed = false;
     const refresh = async (initial = false) => {
@@ -123,10 +125,17 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     const next = reply?.store.rules.find(rule => rule.id === draft.id); if (next) setDraft(next);
   };
   return {
-    store, issues, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
+    store, issues, runs, ready, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
     elapsed: timing.start ? Math.max(0, ((timing.end || now) - timing.start) / 1000) : 0,
     previewErrors: [...previewErrors], retry: () => setRetry(value => value + 1), save,
     toggleEnabled: () => saved && command({ type: 'toggle', id: saved.id, revision: saved.revision, enabled: !saved.enabled }, saved.enabled ? 'Automatic runs disabled.' : 'Runs automatically on new or changed bills.'),
+    toggleRule: (rule: Rule, enabled: boolean) => command({ type: 'toggle', id: rule.id, revision: rule.revision, enabled }, `${rule.name}: automatic runs ${enabled ? 'on' : 'off'}.`),
+    runRule: (rule: Rule) => command({ type: 'run-all', id: rule.id, revision: rule.revision }, `${rule.name}: run complete. Results are shown in the table.`),
+    deleteRule: async (rule: Rule) => {
+      const reply = await command({ type: 'delete', id: rule.id, revision: rule.revision }, `${rule.name} deleted. Existing tasks, flags, messages and history were kept.`);
+      if (reply && draft?.id === rule.id) setDraft(reply.store.rules[0] ?? exampleRule(companyId));
+      return Boolean(reply);
+    },
     runOnce: (ids?: string[]) => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids: ids ?? data!.rows.map(row => row.id) }, 'Run complete. View action history for details.'),
     replay: () => command({ type: 'replay' }, 'Original bill replayed. Actions are saved in SQLite.'),
     busy, automation, message, storageError, actor,
@@ -147,6 +156,7 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
       const reply = await command({ type: 'add-preset', presetId, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
       const rule = reply?.store.rules.find(rule => rule.id === reply.selectedRuleId);
       if (rule) setDraft(structuredClone(rule));
+      return Boolean(rule);
     },
     /** Reopen a saved starter, or begin a fresh unsaved draft for editing. */
     loadPreset: (id: string) => {

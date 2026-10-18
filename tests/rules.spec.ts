@@ -10,7 +10,7 @@ const store = async (page: Page) => {
   return (await (await page.request.get('/api/companies/company-018/rules')).json()).store;
 };
 const openRules = async (page: Page) => {
-  await page.goto('/?workspace=rules');
+  await page.goto('/?workspace=rules&editRule=1');
   await page.locator('.rule-starters > summary').click();
   await page.locator('.starter-more > summary').click();
   await page.locator('.starter-more').getByRole('button', { name: 'Memo needs clarification', exact: true }).click();
@@ -121,12 +121,12 @@ test('reset remains shared and saved rules survive, while phone layouts expose t
   await page.getByRole('button', { name: 'Save rule', exact: true }).click(); await store(page);
   await page.getByRole('button', { name: /^Run once/ }).click(); await store(page);
   await page.getByLabel('Run automatically', { exact: true }).click(); await expect(page.getByLabel('Run automatically', { exact: true })).toBeChecked(); const before = await store(page);
-  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test&workspace=rules'); await complete(page);
+  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test&workspace=rules&editRule=1'); await complete(page);
   const after = await store(page); expect(after.transactions).toEqual({}); expect(after.history).toEqual([]); expect(after.executions).toEqual([]);
   expect(after.arrivals['company-018']).toEqual([]); expect(after.rules).toEqual(before.rules.map((rule: any) => ({ ...rule, enabled: false })));
   expect(page.url()).not.toContain('resetDemo');
   const second = await browser.newContext();
-  try { const other = await second.newPage(); await other.goto(new URL('/?workspace=rules', page.url()).toString()); await complete(other); expect((await store(other)).history).toEqual([]); } finally { await second.close(); }
+  try { const other = await second.newPage(); await other.goto(new URL('/?workspace=rules&editRule=1', page.url()).toString()); await complete(other); expect((await store(other)).history).toEqual([]); } finally { await second.close(); }
   await page.setViewportSize({ width: 390, height: 844 });
   for (const name of ['Describe conditions', 'Choose actions', 'Review results']) {
     await step(page, name); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -158,7 +158,7 @@ test('Run once applies actions only to the matching bills in the filtered previe
 test('guided review retains invoice and bank type filters and transaction details', async ({ page, request }) => {
   const companies = await (await request.get('/api/companies')).json();
   const company = companies.find((item: any) => item.companyId === 'company-101');
-  await page.goto('/?workspace=rules');
+  await page.goto('/?workspace=rules&editRule=1');
   await page.getByLabel('Company', { exact: true }).fill(company.name);
   await page.getByLabel('Company', { exact: true }).press('Enter');
   await page.getByRole('button', { name: 'New rule', exact: true }).click();

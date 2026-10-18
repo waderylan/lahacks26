@@ -18,12 +18,31 @@ $env:WORKSPACE_DB = Join-Path (Get-Location) 'workspace/starters.sqlite'
 npm run dev
 ```
 
+## Manage company rules
+
+**Rules** opens a table of every saved rule for the selected company.
+
+- **Automatic** switches each rule on or off. On watches new or changed records;
+  it establishes a baseline without immediately running on historical records.
+- **Run** checks all available company transactions and applies the saved rule's
+  configured actions. It works while automatic runs are off and ignores the Rows
+  sample setting. Reserved records join after replay. Results and the check time
+  persist in SQLite, including runs with no matches. Editing a rule marks older
+  results with their original revision.
+- **Edit** opens the guided editor. **All rules** returns to this table.
+- **Delete** removes the saved rule and stops future automatic runs after an
+  inline confirmation. Existing tasks, flags, messages, and history are kept.
+  A stale editor cannot recreate the deleted rule, and a run still being
+  evaluated cannot apply actions after deletion.
+- **New rule** starts a blank draft. The collapsed **Rule starter packs** below
+  the table supplies editable examples.
+
 ## Add and edit a starter
 
 1. Open **Rules**. Expand **Rule starter packs** using its header or chevron.
    It starts collapsed and shows four accounting checks with
-   **Ready to add** or **Saved · Automatic on/off**. **Your saved rules** also
-   lists custom rules already in this company.
+   **Ready to add** or **Saved · Automatic on/off**. The company table lists
+   custom rules and saved examples together.
 2. **Add rule** immediately saves an editable starter with automatic runs off.
    It does not flag records, create tasks, generate messages, or run the rule.
    Repeated adds reopen the existing rule and preserve edits. **Open rule**
@@ -92,7 +111,7 @@ counts as a prediction.
 npm run typecheck
 npm test
 npm run build
-npx playwright test tests/ruleStarters.spec.ts tests/ruleOutcomes.spec.ts tests/combinedAutomation.spec.ts
+npx playwright test tests/companyRules.spec.ts tests/ruleStarters.spec.ts tests/ruleOutcomes.spec.ts tests/combinedAutomation.spec.ts
 # Optional live model smoke check; requires the preview and its configured server key:
 $env:RULES_TEST_URL = 'http://localhost:5194'
 node --import tsx scripts/smoke_rule_starters.ts

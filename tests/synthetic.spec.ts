@@ -12,7 +12,7 @@ for (const companyId of ['company-101', 'company-102', 'company-103', 'company-1
     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
     const state = async () => (await (await request.get(`/api/companies/${companyId}/rules`)).json()).store;
     const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
-    await page.goto('/?workspace=rules');
+    await page.goto('/?workspace=rules&editRule=1');
     await page.getByLabel('Company', { exact: true }).fill(company.name);
     const loaded = page.waitForResponse(response => response.url().includes(`/api/companies/${companyId}/bills?`) && response.ok());
     await page.getByLabel('Company', { exact: true }).press('Enter'); await loaded;
@@ -97,7 +97,7 @@ test('changing synthetic sample sizes preserves unsaved conditions, actions, and
   await request.patch('/api/settings', { data: { limit: 50, set: 'plain' } });
   const companies = await (await request.get('/api/companies')).json();
   const company = companies.find((item: any) => item.companyId === 'company-101');
-  await page.goto('/?workspace=rules');
+  await page.goto('/?workspace=rules&editRule=1');
   await page.getByLabel('Company', { exact: true }).fill(company.name);
   const loaded = page.waitForResponse(response => response.url().includes('/api/companies/company-101/bills?') && response.ok());
   await page.getByLabel('Company', { exact: true }).press('Enter'); await loaded;

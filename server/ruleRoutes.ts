@@ -28,6 +28,8 @@ export function ruleRoutes(app: Express, service: RuleService) {
       case 'add-preset': selectedRuleId = service.addPreset(id, command.presetId, command.sender); break;
       case 'toggle': service.toggle(id, command.id, command.revision, command.enabled); break;
       case 'run': await service.run(id, command.id, command.revision, command.ids); break;
+      case 'run-all': await service.runAll(id, command.id, command.revision); break;
+      case 'delete': service.delete(id, command.id, command.revision); break;
       case 'replay': replayed = await service.replay(id); break;
       case 'undo': service.undo(id, command.id); break;
       case 'metadata': service.updateMetadata(id, command.id, command.value, command.expectedVersion); break;

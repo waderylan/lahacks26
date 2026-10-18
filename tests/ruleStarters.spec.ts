@@ -6,7 +6,7 @@ test('starters add once, stay editable, retain saved status after reload, and ru
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
   try {
-    await page.goto(`${app.url}/?workspace=rules`);
+    await page.goto(`${app.url}/?workspace=rules&editRule=1`);
     await expect(page.locator('label[for="saved-rule"]')).toBeVisible();
     await expect(page.getByLabel('Saved rules', { exact: true })).toBeDisabled();
     await expect(page.getByLabel('Saved rules', { exact: true })).toContainText('No saved rules yet');
@@ -62,7 +62,7 @@ test('all four custom companies show a useful starter, public example, and indep
     ['Marrow & Vine Catering', 'Possible payment fraud', '7731'],
   ];
   try {
-    await page.goto(`${app.url}/?workspace=rules`);
+    await page.goto(`${app.url}/?workspace=rules&editRule=1`);
     for (const [company, preset, clue] of cases) {
       await page.getByLabel('Company', { exact: true }).fill(company);
       await page.getByLabel('Company', { exact: true }).press('Enter');
@@ -76,7 +76,7 @@ test('all four custom companies show a useful starter, public example, and indep
       await page.getByLabel('Close detail', { exact: true }).click();
       await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
       await expect(starter).toContainText('Saved · Automatic off');
-      await expect(page.getByLabel('Saved rules in this company')).toContainText(preset);
+      await expect(page.getByLabel('Saved rules', { exact: true })).toContainText(preset);
       await page.getByRole('button', { name: 'Use demo sample', exact: true }).click();
       await expect(page.locator('.starter-intro')).toContainText('Demo sample loaded');
       if (preset === 'Possible payment fraud') {

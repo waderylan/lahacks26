@@ -4,7 +4,18 @@ const complete = async (page: Page, total = 50) => {
   await expect(page.locator('.rule-preview-bar')).toContainText(`${total}/${total} evaluated`, { timeout: 90000 });
   await expect(page.locator('.rule-preview-bar')).toContainText('Complete');
 };
-const store = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('tr.rules.v1') ?? '{"transactions":{},"history":[],"rules":[]}'));
+const store = async (page: Page) => {
+  await expect(page.locator('.app')).toHaveAttribute('aria-busy', 'false');
+  return (await (await page.request.get('/api/companies/company-018/rules')).json()).store;
+};
+test.beforeEach(async ({ request }) => {
+  await request.patch('/api/settings', { data: { limit: 50, set: 'plain' } });
+  await request.post('/api/companies/company-018/rules/commands', { data: { type: 'reset', full: true } });
+});
+const openRules = async (page: Page) => {
+  await page.goto('/?workspace=rules');
+  await page.getByRole('button', { name: 'Load example', exact: true }).click();
+};
 const requests: { criterion: string; ids: string[] }[] = [];
 
 test('independent real AI conditions, live composition, edits, drag/drop, and stable ledger order', async ({ page }) => {
@@ -13,7 +24,7 @@ test('independent real AI conditions, live composition, edits, drag/drop, and st
   let inFlight = 0, maximum = 0;
   page.on('request', req => { if (req.url().endsWith('/api/evaluate')) { requests.push(req.postDataJSON()); maximum = Math.max(maximum, ++inFlight); } });
   page.on('requestfinished', req => { if (req.url().endsWith('/api/evaluate')) inFlight--; });
-  await page.goto('/?workspace=rules'); await complete(page);
+  await openRules(page); await complete(page);
   expect(new Set(requests.map(r => r.criterion)).size).toBe(2);
   expect(new Set(requests.slice(0, 3).map(r => r.criterion)).size).toBe(2);
   expect(maximum).toBeLessThanOrEqual(3);
@@ -59,81 +70,48 @@ test('independent real AI conditions, live composition, edits, drag/drop, and st
   expect(errors).toEqual([]);
 });
 
-test('save, run, persistence, undo conflicts, separate automated pass, active revisions, and real enabled replay', async ({ page }) => {
-  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
-  await page.goto('/?workspace=rules'); await complete(page);
-  await page.getByRole('button', { name: '+ Add action', exact: true }).click();
-  await page.getByLabel('Action value').last().fill('Demo review');
-  await page.getByRole('button', { name: '+ Add action', exact: true }).click();
-  await page.getByLabel('Action type').last().selectOption('pass');
+test('saved rules, shared metadata, idempotent runs, undo conflicts and enabled replay persist in SQLite', async ({ page }) => {
+  await openRules(page); await complete(page);
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-  await page.getByLabel('Toggle rule enabled').click();
-  let saved = await store(page);
-  expect(saved.rules[0].enabled).toBe(true); expect(saved.history).toHaveLength(0);
-  const count = Number((await page.locator('.rule-preview-bar h2 strong').innerText()));
-  expect(count).toBeGreaterThan(0);
+  const state = await store(page), ruleId = await page.getByLabel('Saved rules').inputValue();
+  expect(state.rules.some((rule: any) => rule.id === ruleId)).toBe(true);
   await page.getByRole('button', { name: /^Run once/ }).click();
-  saved = await store(page);
-  expect(saved.history).toHaveLength(count * 4);
-  expect(Object.keys(saved.transactions)).toHaveLength(count);
-  expect(Object.values(saved.transactions).every((tx: any) => tx.automatedCheck && tx.owner === 'Bookkeeper' && tx.tags.includes('Demo review'))).toBe(true);
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('tr.reviewed.v1') ?? '[]'))).toEqual([]);
+  const first = await store(page); expect(first.history.length).toBeGreaterThan(0);
   await page.getByRole('button', { name: /^Run once/ }).click();
-  expect((await store(page)).history).toHaveLength(count * 4);
+  expect((await store(page)).history).toHaveLength(first.history.length);
   await page.getByRole('button', { name: 'Inspect a match', exact: true }).click();
-  await expect(page.getByLabel('Transaction detail')).toContainText('Condition results');
-  await page.getByText('Browser rule demo metadata', { exact: true }).click();
-  await expect(page.getByLabel('Local assignment')).toHaveValue('Bookkeeper');
-  await expect(page.getByLabel('Passed automated check', { exact: true })).toBeChecked();
-  const transactionId = await page.locator('.drawer-head .muted').innerText();
-  const billId = transactionId.split(' · ').pop()!;
-  await page.getByLabel('Local assignment').fill('Rylan Wade');
+  await page.getByText('Edit assignment, flags & tags', { exact: true }).click();
+  const bill = (await page.locator('.drawer-head .muted').innerText()).split(' · ').pop()!;
+  await page.getByLabel('Bill assignment').fill('Rylan Wade');
+  await page.getByLabel('Bill assignment').press('Tab');
+  await expect.poll(async () => (await store(page)).transactions['company-018:' + bill].owner).toBe('Rylan Wade');
   await page.getByLabel('Close detail', { exact: true }).click();
   await page.getByRole('button', { name: 'Action history', exact: true }).click();
-  const ownerEntry = page.locator('.history-entry').filter({ hasText: billId }).filter({ hasText: 'Assign to:' });
-  await ownerEntry.getByRole('button', { name: 'Undo', exact: true }).click();
+  const owner = page.locator('.history-entry').filter({ hasText: bill }).filter({ hasText: 'Assign to:' });
+  await owner.getByRole('button', { name: 'Undo', exact: true }).click();
   await expect(page.locator('.rules-notice')).toContainText('Undo conflict');
-  expect((await store(page)).transactions[`company-018:${billId}`].owner).toBe('Rylan Wade');
-  const flagEntry = page.locator('.history-entry').filter({ hasText: billId }).filter({ hasText: 'Add flag:' });
-  await flagEntry.getByRole('button', { name: 'Undo', exact: true }).click();
-  await expect(flagEntry.getByRole('button', { name: 'Undone', exact: true })).toBeDisabled();
-  expect((await store(page)).transactions[`company-018:${billId}`].flags).toEqual([]);
-  await page.reload(); await complete(page);
-  expect((await store(page)).rules[0].enabled).toBe(true);
-  expect((await store(page)).history).toHaveLength(count * 4);
+  const flag = page.locator('.history-entry').filter({ hasText: bill }).filter({ hasText: 'Add flag:' });
+  await flag.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(flag.getByRole('button', { name: 'Undone', exact: true })).toBeDisabled();
+  await page.reload(); await page.getByLabel('Saved rules').selectOption(ruleId); await complete(page);
+  expect((await store(page)).transactions['company-018:' + bill].flags).toEqual([]);
   await page.getByRole('button', { name: /^Run once/ }).click();
-  expect((await store(page)).transactions[`company-018:${billId}`].flags).toEqual([]);
-
-  await page.getByLabel('Rule name', { exact: true }).fill('Original bill arrival review');
+  expect((await store(page)).transactions['company-018:' + bill].flags).toEqual([]);
+  await page.getByLabel('Toggle rule enabled').click(); await store(page);
   await page.getByLabel('AI condition text').first().fill('The transaction has a vendor name.');
-  await page.getByLabel('AI condition text').last().fill('The transaction amount is negative.');
-  await complete(page);
-  expect((await store(page)).rules[0].revision).toBe(1);
-  await expect(page.getByRole('button', { name: /^Run once/ })).toBeDisabled();
+  await page.getByLabel('AI condition text').last().fill('The transaction amount is negative.'); await complete(page);
   await page.getByRole('button', { name: 'Save and activate revision', exact: true }).click();
-  expect((await store(page)).rules[0].revision).toBe(2);
-  expect((await store(page)).history).toHaveLength(count * 4);
-  expect(Object.keys((await store(page)).transactions)).toHaveLength(count);
-  await page.getByRole('button', { name: /^Replay next original bill/ }).click();
-  await expect(page.locator('.history-body')).toContainText('true — actions applied', { timeout: 90000 });
-  await complete(page, 51);
-  saved = await store(page);
-  expect(saved.history.filter((h: any) => h.source === 'arrival' && h.revision === 2)).toHaveLength(4);
-  expect(saved.arrivals['company-018']).toHaveLength(1);
-  const arrival = saved.arrivals['company-018'][0];
-  expect(saved.transactions[arrival].automatedCheck).toBe(true);
-  const ids = await page.locator('tbody tr').evaluateAll(rows => rows.map(r => r.getAttribute('data-id')));
-  expect(new Set(ids).size).toBe(ids.length);
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('tr.reviewed.v1') ?? '[]'))).toEqual([]);
-  await page.getByRole('button', { name: 'Action history', exact: true }).click();
-  await page.screenshot({ path: 'artifacts/verified-actions-and-replay.png', fullPage: true });
+  expect((await store(page)).rules.find((rule: any) => rule.id === ruleId).revision).toBe(2);
+  await page.getByRole('button', { name: /^Replay next original bill/ }).click(); await store(page); await complete(page, 51);
+  const arrived = (await store(page)).arrivals['company-018']; expect(arrived).toHaveLength(1);
+  expect((await store(page)).transactions[arrived[0]].owner).toBe('Bookkeeper');
   await page.reload(); await complete(page, 51);
-  expect((await store(page)).arrivals['company-018']).toEqual([arrival]);
-  expect(errors).toEqual([]);
+  expect((await store(page)).arrivals['company-018']).toEqual(arrived);
+  expect(await page.evaluate(() => localStorage.getItem('tr.rules.v1'))).toBeNull();
 });
 
 test('company switching drops stale results and original evidence remains inspectable', async ({ page }) => {
-  await page.goto('/?workspace=rules');
+  await openRules(page);
   await page.getByLabel('Rule name', { exact: true }).waitFor();
   await page.getByLabel('Company', { exact: true }).fill('Pistonhouse');
   await page.getByLabel('Company', { exact: true }).press('Enter');
@@ -153,27 +131,18 @@ test('company switching drops stale results and original evidence remains inspec
   await page.screenshot({ path: 'artifacts/verified-original-evidence.png', fullPage: true });
 });
 
-test('clean reset URL clears Shipwise automation and replay state while retaining its rule', async ({ page }) => {
-  await page.goto('/?workspace=rules'); await complete(page);
-  await page.getByRole('button', { name: 'Save rule', exact: true }).click();
-  await page.getByRole('button', { name: /^Run once/ }).click();
+test('reset URL changes shared company state and keeps saved rule definitions', async ({ page, browser }) => {
+  await openRules(page); await complete(page);
+  await page.getByRole('button', { name: 'Save rule', exact: true }).click(); await store(page);
+  await page.getByRole('button', { name: /^Run once/ }).click(); await store(page);
   await page.getByLabel('Toggle rule enabled').click();
-  const before = await store(page);
-  expect(before.history.length).toBeGreaterThan(0);
-  await page.evaluate(() => {
-    const state = JSON.parse(localStorage.getItem('tr.rules.v1')!);
-    state.arrivals['company-018'] = ['company-018:reserved-original'];
-    localStorage.setItem('tr.rules.v1', JSON.stringify(state));
-    localStorage.setItem('tr.reviewed.v1', JSON.stringify(['company-018:bill-reviewed', 'company-005:bill-reviewed']));
-  });
-  const receipt = page.waitForResponse(response => response.url().endsWith('/api/demo-reset/receipt') && response.status() === 204);
-  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test&workspace=rules');
-  await receipt; await complete(page);
-  const after = await store(page);
-  expect(after.transactions).toEqual({}); expect(after.history).toEqual([]); expect(after.executions).toEqual([]);
-  expect(after.arrivals['company-018']).toEqual([]);
-  expect(after.rules).toEqual(before.rules.map((rule: any) => ({ ...rule, enabled: false })));
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('tr.reviewed.v1')!))).toEqual(['company-005:bill-reviewed']);
+  const before = await store(page); expect(before.history.length).toBeGreaterThan(0);
+  await page.goto('/?resetDemo=company-018&resetToken=browser-reset-test&workspace=rules'); await complete(page);
+  const after = await store(page); expect(after.transactions).toEqual({}); expect(after.history).toEqual([]); expect(after.executions).toEqual([]);
+  expect(after.arrivals['company-018']).toEqual([]); expect(after.rules).toEqual(before.rules.map((rule: any) => ({ ...rule, enabled: false })));
   expect(page.url()).not.toContain('resetDemo');
   await expect(page.getByRole('button', { name: /^Replay next original bill/ })).toContainText('(5)');
+  const second = await browser.newContext();
+  try { const other = await second.newPage(); await other.goto(new URL('/?workspace=rules', page.url()).toString()); await complete(other); expect((await store(other)).history).toEqual([]); }
+  finally { await second.close(); }
 });

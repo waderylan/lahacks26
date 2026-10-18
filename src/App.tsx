@@ -2,14 +2,13 @@ import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import { arrangeRows, sortByMatch } from './arrange';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useSemanticEval } from './useSemanticEval';
-import { readRuleStore, useRules } from './useRules';
-import { LocalStateEditor, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel } from './RulesPanel';
+import { useRules } from './useRules';
+import { LocalStateEditor, MessageCard, NotificationBell, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel, Toasts } from './RulesPanel';
 import { actionLabel, type LocalTransaction, type Outcome } from './rules';
 import { useWorkspace, type RowPatch } from './useWorkspace';
 import { ActionPanel, TaskBoard } from './ActionPanel';
 
 const DEFAULT_COMPANY = 'company-018';
-const PREFS_KEY = 'tr.prefs.v1';
 
 // Example prompts, grouped. The dropdown picks which group the chips show.
 const PROMPT_SETS: Record<string, { label: string; prompts: string[] }> = {
@@ -41,14 +40,6 @@ const PROMPT_SETS: Record<string, { label: string; prompts: string[] }> = {
   },
 };
 const ROW_LIMITS = [50, 100, 0]; // 0 = all bills
-function loadPrefs(): { set: string; limit: number } {
-  try {
-    const p = JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}');
-    return { set: p.set in PROMPT_SETS ? p.set : 'plain', limit: ROW_LIMITS.includes(p.limit) ? p.limit : 50 };
-  } catch {
-    return { set: 'plain', limit: 50 };
-  }
-}
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const money = (cents: number) => usd.format(cents / 100);
 const pct = (p: number) => `${Math.round(p * 100)}%`;
@@ -67,7 +58,7 @@ export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
   const [companyId, setCompanyId] = useState(DEFAULT_COMPANY);
-  const [workspace, setWorkspace] = useState<'transactions' | 'rules' | 'tasks'>(() => new URLSearchParams(location.search).get('workspace') === 'rules' ? 'rules' : 'transactions');
+  const [workspace, setWorkspace] = useState<'transactions' | 'rules' | 'tasks' | 'messages'>(() => new URLSearchParams(location.search).get('workspace') === 'rules' ? 'rules' : 'transactions');
   const [takeAction, setTakeAction] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
@@ -87,7 +78,8 @@ export default function App() {
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [widths, setWidths] = useState(DEFAULT_WIDTHS);
   const [now, setNow] = useState(performance.now());
-  const [prefs, setPrefs] = useState(loadPrefs);
+  const [prefs, setPrefs] = useState({ set: 'plain', limit: 50 });
+  const [prefsReady, setPrefsReady] = useState(false);
   const updateRows = useCallback((patches: RowPatch[]) => {
     setData(current => {
       if (!current || current.company.companyId !== companyId) return current;
@@ -95,24 +87,23 @@ export default function App() {
       let changed = false;
       const rows = current.rows.map(row => {
         const patch = updates.get(row.id);
-        if (!patch || patch.sourceVersion === row.sourceVersion) return row;
+        if (!patch || Number(patch.sourceVersion) <= Number(row.sourceVersion)) return row;
         changed = true; return { ...row, ...patch };
       });
       return changed ? { ...current, rows } : current;
     });
-    setDrawerExtra(current => { const patch = patches.find(row => row.id === current?.id); return current && patch ? { ...current, ...patch } : current; });
+    setDrawerExtra(current => { const patch = patches.find(row => row.id === current?.id); return current && patch && Number(patch.sourceVersion) > Number(current.sourceVersion) ? { ...current, ...patch } : current; });
   }, [companyId]);
   const dashboard = useWorkspace(companyId, updateRows);
-  const updatePrefs = (p: Partial<typeof prefs>) =>
-    setPrefs((cur) => {
-      const next = { ...cur, ...p };
-      try {
-        localStorage.setItem(PREFS_KEY, JSON.stringify(next));
-      } catch {}
-      return next;
-    });
+  const updatePrefs = (p: Partial<typeof prefs>) => {
+    void fetch('/api/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
+      .then(async response => { const body = await response.json(); if (!response.ok) throw new Error(body.error); setPrefs(body); })
+      .catch(error => setLoadError(error.message));
+  };
 
   useEffect(() => {
+    fetch('/api/settings').then(async response => { if (!response.ok) throw new Error('Could not load display preferences.'); return response.json(); })
+      .then(value => { setPrefs(value); setPrefsReady(true); }).catch(error => setLoadError(error.message));
     fetch('/api/companies').then((r) => r.json()).then(setCompanies).catch(() => {});
     fetch('/api/status').then((r) => r.json()).then((s) => setJev(s.jev)).catch(() => {});
   }, []);
@@ -120,6 +111,7 @@ export default function App() {
   // Load a company's records; never show another company's rows while loading.
   const loadSeq = useRef(0);
   useEffect(() => {
+    if (!prefsReady) return;
     const seq = ++loadSeq.current;
     setData(null);
     setLoadError(null);
@@ -130,12 +122,10 @@ export default function App() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: CompanyBills) => {
         if (seq !== loadSeq.current) return;
-        const arrived = readRuleStore().arrivals[companyId] ?? [];
-        const rows = [...d.rows, ...(d.reservedRows ?? []).filter(r => arrived.includes(r.id) && !d.rows.some(x => x.id === r.id))];
-        setData({ ...d, rows });
+        setData(d);
       })
       .catch((e: Error) => seq === loadSeq.current && setLoadError(e.message));
-  }, [companyId, prefs.limit]);
+  }, [companyId, prefs.limit, prefsReady]);
 
   // Debounce the criterion (~300 ms); empty input clears immediately.
   useEffect(() => {
@@ -152,7 +142,7 @@ export default function App() {
     if (!data) return;
     setReviewed(current => new Set([...current].filter(id => !id.startsWith(`${data.company.companyId}:`)).concat(data.rows.filter(row => row.dashboard?.reviewed).map(row => row.id))));
   }, [data]);
-  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules');
+  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); });
   const counts = useMemo(() => {
     const rev = rows.filter((r) => reviewed.has(r.id)).length;
     return { all: rows.length, needs: rows.length - rev, reviewed: rev };
@@ -284,7 +274,7 @@ export default function App() {
   const sidebarActions = workspace !== 'rules' || takeAction;
 
   return (
-    <div className="app">
+    <div className="app" aria-busy={rules.busy || dashboard.busy}>
       <header className="toolbar">
         <h1>Transaction Review</h1>
         <CompanyPicker companies={companies} value={companyId} onChange={(id) => id !== companyId && setCompanyId(id)} />
@@ -314,9 +304,10 @@ export default function App() {
           </span>
         )}
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
+        <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => { setWorkspace('transactions'); setTakeAction(false); }}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => { setWorkspace('rules'); setTakeAction(false); }}>Rules <span className="nav-caption">Build → Preview → Automate</span></button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button></nav><span className="muted">SQLite workspace · Original dataset preserved</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => { setWorkspace('transactions'); setTakeAction(false); }}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => { setWorkspace('rules'); setTakeAction(false); }}>Rules <span className="nav-caption">Build → Preview → Automate</span></button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{rules.store.messages.filter(message => message.status === 'pending').length > 0 && <b className="task-nav-count">{rules.store.messages.filter(message => message.status === 'pending').length}</b>}</button></nav><span className="muted">Saved in SQLite · Original dataset preserved</span></div>
       {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
 
       {workspace === 'transactions' && <section className="semantic">
@@ -386,11 +377,11 @@ export default function App() {
       <div className="workspace-body with-builder">
       {sidebarActions ? <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} /> : workspace === 'rules' && data && <RulesPanel controller={rules} data={data} />}
       <div className="ledger-column">
-      {workspace !== 'tasks' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span>{workspace === 'rules' && <button onClick={() => setTakeAction(!takeAction)}>{takeAction ? 'Edit rule' : 'Take action'}</button>}</div>}
+      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span>{workspace === 'rules' && <button onClick={() => setTakeAction(!takeAction)}>{takeAction ? 'Edit rule' : 'Take action'}</button>}</div>}
       {workspace === 'rules' && <RulePreviewBar c={rules} total={rows.length} onInspect={() => rules.matches[0] && setDrawerId(rules.matches[0].id)} />}
       {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
 
-      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : <main className="sheet-wrap">
+      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <section className="dashboard-board" aria-label="Messages"><div className="dashboard-board-heading"><h2>Messages</h2><span className="small muted">Saved in SQLite · Approval does not send email</span></div>{rules.store.messages.length ? rules.store.messages.map(message => <MessageCard key={message.id} message={message} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No messages yet. Add a Draft internal message action to a rule, save, and run it.</p>}</section> : <main className="sheet-wrap">
         {loadError ? (
           <div className="state">Could not load records ({loadError}). <button onClick={() => setCompanyId(companyId + '')}>Retry</button></div>
         ) : !data ? (
@@ -453,7 +444,7 @@ export default function App() {
           </div>
         )}
       </main>}
-      {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} />}
+      {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} onOpen={inspect} />}
       </div>
       </div>
 
@@ -481,6 +472,7 @@ export default function App() {
       {drawerRow && (
         <Drawer row={drawerRow} reviewed={drawerRow.dashboard?.reviewed ?? reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />
       )}
+      <Toasts notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onDismiss={rules.markNoticeToasted} />
     </div>
   );
 }
@@ -545,7 +537,8 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
       <div className="drawer-body">
         {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
         {r.dashboard && <><h3>Dashboard status · Saved in SQLite</h3><dl><dt>Status</dt><dd>{r.dashboard.reviewed ? 'Reviewed' : 'Needs review'}</dd><dt>Assigned to</dt><dd>{r.dashboard.owner || 'Unassigned'}</dd><dt>Flags</dt><dd>{r.dashboard.flags.join(', ') || 'None'}</dd><dt>Tags</dt><dd>{r.dashboard.tags.join(', ') || 'None'}</dd><dt>Tasks</dt><dd>{r.dashboard.taskIds.length}</dd></dl></>}
-        <details className="legacy-metadata"><summary>Browser rule demo metadata</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => rules.updateLocal(r.id, value)} /></details>
+        <details className="legacy-metadata"><summary>Edit assignment, flags & tags</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => { void rules.updateLocal(r.id, value, r.sourceVersion); }} /></details>
+        {rules.store.messages.filter(message => message.items.some(item => item.transactionId === r.id)).map(message => <MessageCard key={message.id} message={message} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}
         {r.workspaceChanges && Object.keys(r.workspaceChanges).length > 0 && <><h3>Original source values</h3><dl>{r.workspaceChanges.account !== undefined && <><dt>Category</dt><dd>{r.workspaceChanges.account}</dd></>}{r.workspaceChanges.memo !== undefined && <><dt>Memo</dt><dd>{r.workspaceChanges.memo || '(blank)'}</dd></>}</dl></>}
         <h3>Bill</h3>
         <dl>

@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+test.beforeEach(async ({ request }) => {
+  await request.patch('/api/settings', { data: { limit: 50, set: 'plain' } });
+});
+
 test('search, assigned tasks, visible filters, completion and a second browser share SQLite state', async ({ page, browser }) => {
   const owner = `Review team ${Date.now()}`;
   await page.goto('/');

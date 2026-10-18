@@ -8,6 +8,7 @@ data/
 __MACOSX/
 .env
 .env.*
+!.env.example
 node_modules/
 
 dist/

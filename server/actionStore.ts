@@ -65,4 +65,4 @@ export class ActionStore {
   }
 }
 let instance: ActionStore | undefined;
-export const actionStore = () => instance ??= new ActionStore(process.env.WORKSPACE_DB ?? path.resolve('workspace/actions.sqlite'));
+export const actionStore = () => instance ??= new ActionStore(process.env.WORKSPACE_DB || path.resolve('workspace/actions.sqlite'));

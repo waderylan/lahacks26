@@ -8,6 +8,9 @@ import { WorkspaceData } from './workspaceData.ts';
 import { ActionEngine } from './actionEngine.ts';
 import { SemanticService } from './semanticService.ts';
 import { actionRoutes } from './actionRoutes.ts';
+import { geminiConfigured, GEMINI_MODEL } from './messages.ts';
+import { RuleService } from './ruleService.ts';
+import { ruleRoutes } from './ruleRoutes.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -15,19 +18,13 @@ const database = actionStore();
 const workspace = new WorkspaceData(database);
 const semantics = new SemanticService(workspace);
 const actions = new ActionEngine(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
+const rules = new RuleService(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
 
 app.get('/api/status', (_req, res) => {
-  res.json({ jev: { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway' } });
+  res.json({ jev: { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway' }, gemini: { configured: geminiConfigured(), model: GEMINI_MODEL } });
 });
 
 app.get('/api/companies', (_req, res) => res.json(listCompanies()));
-
-app.post('/api/demo-reset/receipt', (req, res) => {
-  const r = req.body;
-  if (!/^company-\d{3}$/.test(r?.companyId) || typeof r?.token !== 'string') return res.sendStatus(400);
-  console.log('Demo reset receipt:', JSON.stringify({ companyId: r.companyId, token: r.token, actions: r.actions, history: r.history, arrivals: r.arrivals, enabledRules: r.enabledRules, humanReviewed: r.humanReviewed }));
-  res.sendStatus(204);
-});
 
 app.get('/api/companies/:id/bills', (req, res) => {
   try {
@@ -36,7 +33,9 @@ app.get('/api/companies/:id/bills', (req, res) => {
       const reservedRows = full.rows.slice(-5);
       const available = full.rows.slice(0, -5);
       const limit = Number(req.query.limit) || available.length;
-      const rows = limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
+      const sampled = limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
+      const arrivals = rules.snapshot(req.params.id).store.arrivals[req.params.id] ?? [];
+      const rows = [...sampled, ...reservedRows.filter(row => arrivals.includes(row.id))];
       return res.json({ ...full, rows, reservedRows, sampled: rows.length < available.length, referenceOptions: { vendors: [...new Set(full.rows.map(r => r.vendor))].sort(), accounts: [...new Set(full.rows.map(r => r.account))].sort() } });
     }
     const limit = Number(req.query.limit) || full.rows.length;
@@ -68,10 +67,16 @@ app.post('/api/evaluate', async (req, res) => {
 });
 
 actionRoutes(app, actions);
+ruleRoutes(app, rules);
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.
-const automationTimer = setInterval(() => { void actions.scan().catch(error => console.error('Automation:', (error as Error).message)); }, 10_000);
+const automationTimer = setInterval(() => {
+  void actions.scan().catch(error => console.error('Automation:', (error as Error).message));
+  void rules.scan().catch(error => console.error('Rules:', (error as Error).message));
+}, 10_000);
 automationTimer.unref();
+const draftTimer = setInterval(() => { void rules.drainDrafts().catch(error => console.error('Draft worker:', (error as Error).message)); }, 1000);
+draftTimer.unref();
 
 const server = createServer(app);
 const vite = await createVite({ server: { middlewareMode: true, hmr: { server } }, appType: 'spa' });

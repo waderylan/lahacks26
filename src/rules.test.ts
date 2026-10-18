@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compose, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, parseCents, resetCompanyDemo, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
+import { completeDraft, compose, MAX_MESSAGE_ITEMS, migrateMessage, decideMessage, DEFAULT_MESSAGE_ASK, EMPTY_STORE, emptyTransaction, evaluateTree, exampleRule, executeRule, leaves, migrateRule, parseCents, resetCompanyDemo, retryDraft, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule } from './rules';
 import type { Row } from './types';
 
-const row = { id: 'company-018:bill-original', companyId: 'company-018', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo' } as Row;
+const row = { id: 'company-018:bill-original', companyId: 'company-018', billId: 'bill-original', docNumber: 'BILL-1', date: '2026-01-15', amountCents: 1050, vendor: 'Original vendor', account: 'Inventory', memo: 'Original memo', description: 'Original description', itemNames: ['Widget'] } as Row;
 const snapshotFor = (rule: Rule, result: Outcome = 'true') => ({ result, conditions: { [leaves(rule.expression)[0].id]: result, [leaves(rule.expression)[1].id]: 'false' as Outcome } });
 
 test('three-valued truth tables preserve uncertainty, including under nested NOT', () => {
@@ -120,4 +120,76 @@ test('clean demo reset clears only the selected company and preserves disabled r
   assert.deepEqual(reset.transactions[otherRow.id], store.transactions[otherRow.id]);
   assert.deepEqual(reset.arrivals[otherRow.companyId], [otherRow.id]);
   assert.equal(store.rules[0].enabled, true);
+});
+
+test('message actions create pending drafts that Jev/Gemini complete, stay idempotent, and require approval', () => {
+  const rule = exampleRule(row.companyId);
+  rule.actions.push({ id: 'message', type: 'message', value: DEFAULT_MESSAGE_ASK, recipient: 'jev' });
+  assert.deepEqual(validateRule(rule), []);
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'blank', type: 'message', value: '   ', recipient: 'jev' }] }).length);
+  assert.ok(validateRule({ ...rule, actions: [{ id: 'nobody', type: 'message', value: 'Ask', recipient: 'emp-unknown' }] }).length);
+  assert.deepEqual(validateRule({ ...rule, actions: [{ id: 'manual', type: 'message', value: 'Ask', recipient: 'emp-ap' }] }), []);
+  assert.equal(migrateRule({ ...rule, actions: [{ id: 'old', type: 'message', value: 'Ask' }] }).actions[0].recipient, 'jev');
+  const snapshot = snapshotFor(rule);
+  const first = executeRule(structuredClone(EMPTY_STORE), rule, row, 'v1', snapshot, 'run');
+  assert.equal(first.messages.length, 1);
+  const pending = first.messages[0];
+  assert.equal(pending.generation, 'pending');
+  assert.equal(pending.routing, 'jev');
+  assert.equal(pending.employeeId, null);
+  assert.equal(pending.request, DEFAULT_MESSAGE_ASK);
+  assert.deepEqual(pending.items[0].context.map(c => c.result), leaves(rule.expression).map(n => snapshot.conditions[n.id]));
+  assert.match(decideMessage(first, pending.id, 'approved').error!, /still being written/);
+  assert.equal(executeRule(first, rule, row, 'v1', snapshot, 'run').messages.length, 1);
+  const ready = completeDraft(first, pending.id, { employeeId: 'emp-controller', routingProbability: 0.8, subject: 'Bill coding', body: 'Hi Marcus' });
+  assert.equal(ready.messages[0].generation, 'ready');
+  assert.equal(ready.messages[0].to, 'Marcus Bell');
+  assert.equal(ready.notices[0].tone, 'info');
+  assert.equal(completeDraft(ready, pending.id, { error: 'late' }), ready);
+  const failed = completeDraft(first, pending.id, { error: 'Gemini down' });
+  assert.equal(failed.messages[0].generation, 'error');
+  assert.equal(retryDraft(failed, pending.id).messages[0].generation, 'pending');
+  const manualRule = { ...rule, actions: [{ id: 'message', type: 'message' as const, value: 'Ask', recipient: 'emp-ap' }] };
+  const manual = executeRule(structuredClone(EMPTY_STORE), manualRule, row, 'v1', snapshot, 'run');
+  assert.equal(manual.messages[0].to, 'Priya Natarajan');
+  assert.equal(completeDraft(manual, manual.messages[0].id, { employeeId: 'emp-cfo', subject: 's', body: 'b' }).messages[0].generation, 'error');
+  const entry = ready.history.find(h => h.action?.type === 'message')!;
+  const undone = undoEntry(first, entry.id);
+  assert.equal(undone.error, undefined);
+  assert.equal(undone.store.messages.length, 0);
+  assert.equal(completeDraft(undone.store, pending.id, { employeeId: 'emp-ap', subject: 's', body: 'b' }), undone.store);
+  const decided = decideMessage(ready, pending.id, 'approved', 'Edited note');
+  assert.equal(decided.store.messages[0].status, 'approved');
+  assert.equal(decided.store.messages[0].edited, true);
+  assert.match(decided.store.notices[0].body!, /no email/);
+  assert.match(undoEntry(decided.store, entry.id).error!, /conflict/);
+  const otherRow = { ...row, id: 'company-005:bill-original', companyId: 'company-005' };
+  const otherRule = { ...exampleRule(otherRow.companyId), actions: [{ id: 'message', type: 'message' as const, value: DEFAULT_MESSAGE_ASK, recipient: 'jev' }] };
+  const mixed = executeRule({ ...structuredClone(ready), rules: [rule, otherRule] }, otherRule, otherRow, 'v1', { result: 'true', conditions: { [leaves(otherRule.expression)[0].id]: 'true', [leaves(otherRule.expression)[1].id]: 'false' } }, 'run');
+  const reset = resetCompanyDemo(mixed, row.companyId);
+  assert.equal(reset.messages.every(m => m.companyId === otherRow.companyId), true);
+  assert.equal(reset.notices.every(n => n.companyId === otherRow.companyId), true);
+});
+
+
+test('one run synthesizes its matches into one message per action; undo and stale results are handled', () => {
+  const rule = { ...exampleRule(row.companyId), actions: [{ id: 'message', type: 'message' as const, value: 'Ask', recipient: 'jev' }] };
+  const snapshot = snapshotFor(rule);
+  const rows = Array.from({ length: MAX_MESSAGE_ITEMS + 2 }, (_, i) => ({ ...row, id: `${row.companyId}:bill-${i}`, billId: `bill-${i}` }));
+  const run = rows.reduce((next, r) => executeRule(next, rule, r, 'v1', snapshot, 'run', 'batch-1'), structuredClone(EMPTY_STORE));
+  assert.deepEqual(run.messages.map(m => m.items.length).sort((a, b) => a - b), [2, MAX_MESSAGE_ITEMS]);
+  const [small] = run.messages.filter(m => m.items.length === 2);
+  const separate = executeRule(run, rule, { ...row, id: `${row.companyId}:bill-new`, billId: 'bill-new' }, 'v1', snapshot, 'arrival', 'batch-2');
+  assert.equal(separate.messages.length, 3);
+  const ids = small.items.map(i => i.transactionId);
+  assert.equal(completeDraft(run, small.id, { employeeId: 'emp-ap', subject: 's', body: 'b' }, [ids[0]]), run);
+  const ready = completeDraft(run, small.id, { employeeId: 'emp-ap', routingProbability: 0.9, subject: '2 bills', body: 'b' }, ids);
+  assert.equal(ready.messages.find(m => m.id === small.id)!.generation, 'ready');
+  const entry = ready.history.find(h => h.transactionId === ids[1] && h.action?.type === 'message')!;
+  const undone = undoEntry(ready, entry.id).store.messages.find(m => m.id === small.id)!;
+  assert.deepEqual(undone.items.map(i => i.transactionId), [ids[0]]);
+  assert.equal(undone.generation, 'pending');
+  assert.equal(undone.employeeId, null);
+  const legacy = migrateMessage({ ...small, items: undefined, transactionId: 'c:t', billId: 't', context: [] } as never);
+  assert.deepEqual(legacy.items, [{ transactionId: 'c:t', billId: 't', context: [] }]);
 });

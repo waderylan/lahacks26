@@ -1,0 +1,77 @@
+import { expect, test } from '@playwright/test';
+import { startRuleApp } from './fixtures/ruleApp';
+
+test('starters add once, stay editable, retain saved status after reload, and run outcome actions', async ({ page }) => {
+  const app = await startRuleApp();
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  const step = (name: string) => page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name, exact: true }).click();
+  try {
+    await page.goto(`${app.url}/?workspace=rules`);
+    const starter = page.getByRole('article', { name: 'Missing documentation starter', exact: true });
+    await expect(starter).toContainText('Ready to add');
+    await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
+    await expect(starter).toContainText('Saved · Automatic off');
+    await expect(page.getByLabel('Condition 1', { exact: true })).toContainText('unitemized receipt');
+    await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
+    await step('Choose actions');
+    await expect(page.getByLabel('Clear resolved issues')).toBeChecked();
+    await expect(page.getByRole('group', { name: 'When there is not enough information', exact: true }).getByLabel('Task owner')).toHaveValue('Priya Natarajan');
+    await step('Review results');
+    await page.getByLabel('Rule name', { exact: true }).fill('Receipt review for this company');
+    await page.getByRole('button', { name: 'Save rule', exact: true }).click();
+    await expect(starter).toContainText('Saved as Receipt review for this company');
+    await page.getByRole('button', { name: /Run once/ }).click();
+    await expect(page.getByLabel('Rule follow-up')).toContainText('2 open');
+    const snapshot = await (await page.request.get(`${app.url}/api/companies/company-018/rules`)).json();
+    expect(snapshot.store.rules).toHaveLength(1);
+    expect(snapshot.store.messages).toHaveLength(1);
+    expect(snapshot.rows.find((row: any) => row.id === 'company-018:bill-2').dashboard.flags).toContain('Needs documentation');
+    const state = await (await page.request.get(`${app.url}/api/companies/company-018/workspace`)).json();
+    expect(state.tasks).toHaveLength(2);
+    await page.reload();
+    await expect(starter).toContainText('Saved · Automatic off');
+    await starter.getByRole('button', { name: 'Open rule', exact: true }).click();
+    await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('This charge lacks supporting documentation.');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(starter.getByRole('button', { name: 'Open rule', exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: 'artifacts/rule-starters-mobile.png', fullPage: true });
+    expect(errors).toEqual([]);
+  } finally { await app.close(); }
+});
+
+test('all four custom companies show a useful starter, public example, and independently saved rules', async ({ page }) => {
+  const app = await startRuleApp({ synthetic: true });
+  const cases = [
+    ['Parcelmint Online Goods', 'Possible duplicate charges', 'phone-case'],
+    ['Tallowfield Home Renovations', 'Unsupported expenses', 'stand-down'],
+    ['Quillstone Creative Studio', 'Missing documentation', 'itemized'],
+    ['Marrow & Vine Catering', 'Possible payment fraud', '7731'],
+  ];
+  try {
+    await page.goto(`${app.url}/?workspace=rules`);
+    for (const [company, preset, clue] of cases) {
+      await page.getByLabel('Company', { exact: true }).fill(company);
+      await page.getByLabel('Company', { exact: true }).press('Enter');
+      const starter = page.getByRole('article', { name: `${preset} starter`, exact: true });
+      await expect(starter).toContainText('Try first for this company');
+      await expect(starter).toContainText(clue);
+      await expect(page.locator('.rule-starters > summary')).toContainText('0 of 4 added');
+      await starter.getByRole('button', { name: 'Inspect example', exact: true }).click();
+      await expect(page.getByLabel('Transaction detail')).toBeVisible();
+      await page.getByLabel('Close detail', { exact: true }).click();
+      await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
+      await expect(starter).toContainText('Saved · Automatic off');
+      await expect(page.locator('.rule-starters > summary')).toContainText('1 of 4 added');
+      await page.getByRole('button', { name: 'Use demo sample', exact: true }).click();
+      await expect(page.locator('.starter-intro')).toContainText('Demo sample loaded');
+      if (preset === 'Possible payment fraud') {
+        await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Choose actions', exact: true }).click();
+        await expect(page.getByLabel('Message recipient')).toHaveValue('emp-cfo');
+        await page.setViewportSize({ width: 1600, height: 1000 });
+        await page.screenshot({ path: 'artifacts/rule-starters-desktop.png', fullPage: true });
+      }
+      await page.getByLabel('Rows to load').selectOption('50');
+    }
+  } finally { await app.close(); }
+});

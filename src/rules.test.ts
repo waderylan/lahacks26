@@ -240,7 +240,8 @@ test('every rule preset builds a valid, editable rule; payment fraud routes matc
     assert.deepEqual(validateRule(rule), [], preset.name);
     assert.equal(rule.companyId, 'company-101'); assert.equal(rule.enabled, false);
   }
-  assert.equal(rulePresets(false).length, 2); assert.equal(rulePresets(true).length, 6);
+  assert.equal(rulePresets(false).length, 5); assert.equal(rulePresets(true).length, 9);
+  assert.equal(rulePresets(true).filter(preset => preset.starter).length, 4);
   const fraud = rulePresets(false).find(p => p.id === 'payment-fraud')!.build('company-101', 'emp-controller');
   assert.equal(leaves(fraud.expression).length, 3);
   const message = fraud.actions.find(a => a.type === 'message')!;

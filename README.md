@@ -44,6 +44,9 @@ total = sum_money(b["total_amount"] for b in all_bills)   # Decimal, never float
 
 ## Transaction Review demo
 
+See [RULE_STARTERS.md](RULE_STARTERS.md) for editable accounting starter packs,
+recommended examples across the four custom companies, and live Jev results.
+
 See [COMBINED_DEMO.md](COMBINED_DEMO.md) for the saved-search, rule-action, message,
 assignment, and resolution walkthrough.
 

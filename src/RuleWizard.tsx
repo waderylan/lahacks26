@@ -4,6 +4,7 @@ import type { RulesController } from './useRules';
 import { actionLabel, actionOutcome, actionsForOutcome, RESULT_LABELS, DEFAULT_MESSAGE_ASK, leaves, uid, validateRule, type Action, type Group, type Outcome, type RuleNode, type StandardCondition, type Truth } from './rules';
 import { EMPLOYEES, employeeById } from './employees';
 import { ResultBadge, RuleHistory, RuleIssueList } from './RulesPanel';
+import { RuleStarters } from './RuleStarters';
 import './ruleWizard.css';
 
 const groupLabel = { all: 'AND', any: 'OR', not: 'NOT' };
@@ -22,7 +23,7 @@ const conditionText = (node: RuleNode): string => node.type === 'ai' ? node.text
 const directlyNegated = (node: RuleNode): string[] => 'children' in node ? node.type === 'not' && node.children[0] && !('children' in node.children[0]) ? [node.children[0].id] : node.children.flatMap(directlyNegated) : [];
 const outcomeOf = (c: RulesController, row: Row): Outcome => c.snapshots[row.id]?.result ?? 'pending';
 
-export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onMessages: () => void }) {
+export function RuleWizard({ c, data, onInspect, onMessages, onDemoSample }: { c: RulesController; data: CompanyBills; onInspect: (id: string) => void; onMessages: () => void; onDemoSample: () => void }) {
   const [step, setStep] = useState(0);
   const [resultFilter, setResultFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -100,7 +101,8 @@ export function RuleWizard({ c, data, onInspect, onMessages }: { c: RulesControl
   });
   const saveDisabled = Boolean(c.validation.length || c.storageError || c.busy || !draft.name.trim());
   return <main className="rule-wizard" aria-label="Rule setup">
-    <header className="wizard-page-heading"><div><h1>Build a rule in plain English</h1><p>Describe what to look for. Jev checks each {data.company.synthetic ? 'transaction' : 'bill'}.</p></div><div className="wizard-library"><label className="sr-only" htmlFor="saved-rule">Saved rules</label><select id="saved-rule" aria-label="Saved rules" value={c.saved?.id ?? ''} onChange={event => c.selectRule(event.target.value)}>{!c.saved && <option value="" disabled>{draft.name} ? unsaved</option>}{c.store.rules.map(rule => <option key={rule.id} value={rule.id}>{rule.name}{rule.enabled ? ' · automatic' : ''}</option>)}</select><button onClick={c.newRule}>New rule</button><label className="sr-only" htmlFor="rule-preset">Start from a preset</label><select id="rule-preset" aria-label="Start from a preset" value={c.presetId} onChange={event => event.target.value && c.loadPreset(event.target.value)}><option value="">Start from a preset…</option>{c.presets.map(preset => <option key={preset.id} value={preset.id} title={preset.description}>{preset.name}</option>)}</select></div></header>
+    <header className="wizard-page-heading"><div><h1>Build a rule in plain English</h1><p>Describe what to look for. Jev checks each {data.company.synthetic ? 'transaction' : 'bill'}.</p></div><div className="wizard-library"><label className="sr-only" htmlFor="saved-rule">Saved rules</label><select id="saved-rule" aria-label="Saved rules" value={c.saved?.id ?? ''} onChange={event => c.selectRule(event.target.value)}>{!c.saved && <option value="" disabled>{draft.name} · unsaved</option>}{c.store.rules.map(rule => <option key={rule.id} value={rule.id}>{rule.name}{rule.enabled ? ' · automatic' : ''}</option>)}</select><button onClick={c.newRule}>New rule</button><label className="sr-only" htmlFor="rule-preset">Start from a preset</label><select id="rule-preset" aria-label="Start from a preset" value={c.presetId} onChange={event => event.target.value && c.loadPreset(event.target.value)}><option value="">Start from a preset…</option>{c.presets.map(preset => <option key={preset.id} value={preset.id} title={preset.description}>{preset.name}</option>)}</select></div></header>
+    <RuleStarters c={c} data={data} onInspect={onInspect} onDemoSample={onDemoSample} />
     <div className="wizard-layout">
       <nav className="wizard-steps" aria-label="Rule setup steps">{steps.map((label, index) => <button key={label} aria-current={step === index ? 'step' : undefined} onClick={() => go(index)}><span aria-hidden="true">{index + 1}</span>{label}</button>)}</nav>
       <section className="wizard-main">

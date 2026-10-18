@@ -1,7 +1,7 @@
 import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
   markNoticesRead, markNoticeToasted, migrateMessage, migrateRule, resetCompanyDemo, retryDraft,
-  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome,
+  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome, rulePresets, savedPreset,
   type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue, type HistoryEntry,
 } from '../src/rules.ts';
 import { standardResult } from '../src/rules.ts';
@@ -131,6 +131,22 @@ export class RuleService {
       this.db.put('rule-issue', issue.id, saved.companyId, issue);
     }
   }
+  /** Adding a starter never runs actions; repeated/concurrent clicks reopen the existing rule. */
+  addPreset(companyId: string, presetId: string, sender: string): string {
+    const company = this.data.bills(companyId).company;
+    const preset = rulePresets(Boolean(company.synthetic)).find(preset => preset.id === presetId);
+    if (!preset || !employeeById(sender)) throw new Error('Choose a valid rule starter and sender.');
+    return this.change(companyId, saved => {
+      const existing = savedPreset(saved.store.rules, preset, companyId);
+      if (existing) return existing.id;
+      const rule = preset.build(companyId, sender);
+      const errors = validateRule(rule);
+      if (errors.length) throw new Error(errors[0]);
+      saved.store.rules.push(rule);
+      return rule.id;
+    });
+  }
+
   save(companyId: string, input: Rule, expectedRevision: number | null, activate = false) {
     const errors = validateRule(input);
     if (errors.length || input.companyId !== companyId || typeof input.name !== 'string' || !input.name.trim() || input.name.length > 200 || typeof activate !== 'boolean' ||

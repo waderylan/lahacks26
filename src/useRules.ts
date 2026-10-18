@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, rulePresets, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
+import { EMPTY_STORE, evaluateTree, exampleRule, rulePresets, savedPreset, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot, type RuleIssue } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
-interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[] }
+interface Reply { store: RuleStore; automation: string[]; rows: RowPatch[]; replayed?: Row; issues?: RuleIssue[]; selectedRuleId?: string }
 const signature = (rule: Rule) => JSON.stringify([rule.name, rule.expression, rule.actions, Boolean(rule.autoResolve)]);
 
 /** `actor` is the signed-in employee; approved drafts are sent from them. */
@@ -16,8 +16,6 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
   const [ready, setReady] = useState(false);
   const [storageError, setStorageError] = useState('');
   const [draft, setDraft] = useState<Rule | null>(null);
-  // Which preset the current draft was started from; tied to the draft's id so switching rules clears it.
-  const [fromPreset, setFromPreset] = useState<{ presetId: string; draftId: string } | null>(null);
   const [message, setMessage] = useState('');
   const [automation, setAutomation] = useState<string[]>([]);
   const [issues, setIssues] = useState<RuleIssue[]>([]);
@@ -145,13 +143,19 @@ export function useRules(data: CompanyBills | null, onArrival: (row: Row) => voi
     remaining: data?.reservedRows?.filter(row => !(store.arrivals[companyId] ?? []).includes(row.id)).length ?? 0,
     selectRule: (id: string) => { const rule = storeRef.current.rules.find(rule => rule.id === id); if (rule) { setDraft(structuredClone(rule)); setMessage(''); } },
     presets: rulePresets(Boolean(data?.company.synthetic)),
-    presetId: fromPreset && fromPreset.draftId === draft?.id ? fromPreset.presetId : '',
-    /** Replaces the draft with a fresh, unsaved copy of a preset so its criteria can be read and edited. */
+    presetId: draft?.presetId ?? '',
+    addPreset: async (presetId: string) => {
+      const reply = await command({ type: 'add-preset', presetId, sender: actor || 'emp-ap' }, 'Starter ready. Edit its conditions and actions, then review results. No actions were run.');
+      const rule = reply?.store.rules.find(rule => rule.id === reply.selectedRuleId);
+      if (rule) setDraft(structuredClone(rule));
+    },
+    /** Reopen a saved starter, or begin a fresh unsaved draft for editing. */
     loadPreset: (id: string) => {
       const preset = rulePresets(Boolean(data?.company.synthetic)).find(preset => preset.id === id);
       if (!preset) return;
-      const rule = preset.build(companyId, actor || 'emp-ap');
-      setDraft(rule); setFromPreset({ presetId: preset.id, draftId: rule.id }); setMessage('');
+      const existing = savedPreset(storeRef.current.rules, preset, companyId);
+      const rule = existing ?? preset.build(companyId, actor || 'emp-ap');
+      setDraft(structuredClone(rule)); setMessage('');
     },
     newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
     decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),

@@ -22,9 +22,10 @@ export function ruleRoutes(app: Express, service: RuleService) {
   }));
   app.post('/api/companies/:id/rules/commands', route(async (req, res) => {
     const id = company(req), command = req.body ?? {};
-    let replayed;
+    let replayed, selectedRuleId;
     switch (command.type) {
       case 'save': service.save(id, command.rule, command.expectedRevision, command.activate); break;
+      case 'add-preset': selectedRuleId = service.addPreset(id, command.presetId, command.sender); break;
       case 'toggle': service.toggle(id, command.id, command.revision, command.enabled); break;
       case 'run': await service.run(id, command.id, command.revision, command.ids); break;
       case 'replay': replayed = await service.replay(id); break;
@@ -39,6 +40,6 @@ export function ruleRoutes(app: Express, service: RuleService) {
       case 'reset': service.reset(id, command.full === true); break;
       default: throw new Error('Unknown workspace command.');
     }
-    res.json({ ...service.snapshot(id), replayed });
+    res.json({ ...service.snapshot(id), replayed, selectedRuleId });
   }));
 }

@@ -64,8 +64,8 @@ test('migrated messages, approvals, notifications, rules and preferences are sha
     await page.getByRole('button', { name: 'Rules', exact: false }).first().click();
     await other.getByRole('button', { name: /^Notifications/ }).click();
     await other.getByRole('button', { name: 'Rules', exact: false }).first().click();
-    await page.getByRole('button', { name: 'View matching rows', exact: true }).click();
-    await other.getByRole('button', { name: 'View matching rows', exact: true }).click();
+    await page.getByRole('button', { name: 'View all results', exact: true }).click();
+    await other.getByRole('button', { name: 'View all results', exact: true }).click();
     await expect(other.getByLabel('Rule name', { exact: true })).toHaveValue(rule.name);
     await page.getByLabel('Rule name', { exact: true }).fill('Saved by the first browser');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click(); await settled(page);

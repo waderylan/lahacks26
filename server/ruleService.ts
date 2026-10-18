@@ -1,7 +1,7 @@
 import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
   markNoticesRead, markNoticeToasted, migrateMessage, migrateRule, resetCompanyDemo, retryDraft,
-  transactionVersion, undoEntry, uid, validateRule, draftSender,
+  transactionVersion, undoEntry, uid, validateRule, draftSender, actionsForOutcome,
   type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot,
 } from '../src/rules.ts';
 import { standardResult } from '../src/rules.ts';
@@ -115,7 +115,9 @@ export class RuleService {
         saved.store = executeRule(saved.store, rule, row, version(row), snapshots[row.id], source, batchId);
         if (source !== 'run') (saved.watches[id] ??= {})[row.id] = version(row);
       }
-      saved.log = [`${source === 'run' ? 'Run once' : source === 'arrival' ? 'Replay' : 'Updated bills'}: ${rows.filter(row => snapshots[row.id].result === 'true').length}/${rows.length} matched; actions saved in SQLite.`, ...saved.log].slice(0, 20);
+      const counts = ['true', 'uncertain', 'false'].map(result => rows.filter(row => snapshots[row.id].result === result).length);
+      const actedOn = rows.filter(row => actionsForOutcome(rule, snapshots[row.id].result).length).length;
+      saved.log = [`${source === 'run' ? 'Run once' : source === 'arrival' ? 'Replay' : 'Updated transactions'}: ${counts[0]} match, ${counts[1]} not enough information, ${counts[2]} no match. Actions configured for ${actedOn} transactions.`, ...saved.log].slice(0, 20);
     });
     void this.drainDrafts();
   }
@@ -221,7 +223,7 @@ export class RuleService {
       const company = this.data.bills(companyId).company;
       const evidence = this.db.get<Record<string, Row>>('message-evidence', message.id) ?? {};
       const result = await this.writer({ company: { name: company.name.replace(/ \u2014 review scenarios$/, ''), industry: company.industry },
-        request: message.request ?? '', recipient: message.routing === 'jev' ? 'jev' : message.employeeId ?? '',
+        request: message.request ?? '', recipient: message.routing === 'jev' ? 'jev' : message.employeeId ?? '', outcome: message.outcome ?? 'true',
         bills: message.items.map(item => ({ row: evidence[item.transactionId] ?? this.data.row(companyId, item.transactionId), context: item.context })) }, AbortSignal.timeout(90_000));
       this.change(companyId, saved => { if (saved.store.messages.some(current => current.id === message.id && itemKey(current) === itemKey(message))) saved.store = completeDraft(saved.store, message.id, result, ids); });
     } catch (error) {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { actionLabel, draftSender, messageBills, emptyTransaction, evaluateTree, type DraftMessage, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
+import { actionLabel, draftSender, messageBills, emptyTransaction, evaluateTree, RESULT_LABELS, type DraftMessage, type LocalTransaction, type Outcome, type RuleNode, type Snapshot } from './rules';
 import type { RulesController } from './useRules';
 import { employeeById } from './employees';
 const labels = { all: 'AND', any: 'OR', not: 'NOT', ai: 'English condition', standard: 'Filter' };
@@ -14,7 +14,7 @@ export function RuleHistory({ c, companyId, onOpen }: { c: RulesController; comp
   const pending = messages.filter(m => m.status === 'pending').length;
   return <section className={`rule-history ${open ? 'expanded' : ''}`} aria-label="Action history"><div className="history-toolbar"><button aria-expanded={open} onClick={() => setOpen(!open)}>{open ? '▾' : '▸'} Activity <b>{history.length}</b></button><button className={tab === 'history' ? 'active' : 'ghost'} onClick={() => { setTab('history'); setOpen(true); }}>Action history</button><button className={tab === 'messages' ? 'active' : 'ghost'} onClick={() => { setTab('messages'); setOpen(true); }}>Messages{pending ? ` · ${pending}` : ''}</button><button className={tab === 'replay' ? 'active' : 'ghost'} onClick={() => { setTab('replay'); setOpen(true); }}>Replay log</button><span className="spacer" /><button disabled={c.busy || !c.remaining || Boolean(c.storageError)} onClick={() => { setTab('replay'); setOpen(true); void c.replay(); }}>{c.busy ? 'Evaluating replay…' : 'Replay next original bill'} <b>({c.remaining})</b></button><button className="ghost" disabled={c.busy || Boolean(c.storageError)} onClick={c.reset}>Reset demo action state</button></div>
     {open && <div className="history-body">{tab === 'messages' ? messages.length ? messages.map(m => <MessageCard key={m.id} message={m} actor={c.actor} onDecide={c.decideMessage} onRetry={c.retryDraft} onOpen={onOpen} />) : <p className="muted">No drafts yet. Add a Draft internal message action, save, and run the rule.</p> : tab === 'history' ? history.length ? history.map(h => <div className="history-entry" key={h.id}>
-      <div><b>{h.transactionId.split(':').pop()}</b> · {h.action ? actionLabel(h.action) : `Rule result: ${h.snapshot.result}`}<span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
+      <div><b>{h.transactionId.split(':').pop()}</b> · {h.action ? actionLabel(h.action) : 'Rule evaluated'} <ResultBadge value={h.snapshot.result} /><span className="muted"> · {h.ruleName} r{h.revision} · {h.source} · {new Date(h.timestamp).toLocaleTimeString()}</span>
         <div className="small muted">{h.action && `${JSON.stringify(h.previous)} → ${JSON.stringify(h.resulting)} · `}Version {h.transactionVersion} · Rule result: {h.snapshot.result}</div>
         {h.snapshot.expression && <details className="history-evidence"><summary>View condition results</summary><RuleEvidence node={h.snapshot.expression} snapshot={h.snapshot} /></details>}
       </div>{h.action && <button disabled={Boolean(h.undoneAt) || c.busy} onClick={() => c.undo(h.id)}>{h.undoneAt ? 'Undone' : 'Undo'}</button>}
@@ -54,6 +54,7 @@ export function MessageCard({ message, actor, onDecide, onRetry, onOpen }: { mes
         <div className="message-meta"><span>Message</span><span className="message-status">{generation === 'error' ? 'Draft failed' : message.routing === 'jev' && !message.employeeId ? 'Jev is choosing a recipient…' : 'Gemini is writing…'}</span></div>
         <h3>{messageBills(message)} · {message.ruleName} r{message.revision}</h3>
         <p className="muted">Request: {message.request}</p>
+        {message.outcome && <p className="muted">Rule result: {RESULT_LABELS[message.outcome]}</p>}
         {generation === 'error' && <p className="muted">{message.generationError}</p>}
       </div>
     </div>
@@ -71,6 +72,7 @@ export function MessageCard({ message, actor, onDecide, onRetry, onOpen }: { mes
         <p className="muted">From {senderName} · To {message.to}{employee && ` · ${employee.title}`} · {messageBills(message)} · {message.ruleName} r{message.revision}</p>
         {message.routing === 'jev' && employee && <p className="muted" title={employee.description}>Recipient chosen by Jev{Number.isFinite(message.routingProbability) && ` · ${Math.round(message.routingProbability! * 100)}% confidence`}</p>}
         {message.request && <p className="muted">Request: {message.request}</p>}
+        {message.outcome && <p className="muted">Rule result: {RESULT_LABELS[message.outcome]}</p>}
         <MessageEvidence message={message} onOpen={onOpen} />
         <p className="muted">{message.reason}</p>
       </div>

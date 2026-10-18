@@ -48,6 +48,16 @@
 .wizard-money { display:flex; align-items:center; gap:7px; }
 .wizard-money input { width:100%; }
 .wizard-action { margin-bottom:22px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+.wizard-outcome { min-width:0; margin:0 0 28px; padding:18px 20px 22px; border:1px solid var(--line); border-radius:7px; }
+.wizard-outcome legend { padding:0 7px; font-size:14px; font-weight:600; }
+.wizard-outcome > .wizard-help { margin:0 0 18px; }
+.wizard-outcome.outcome-uncertain { border-color:#cbbd91; }
+.wizard-no-action { color:var(--muted); font-size:12px; margin:0 0 14px; }
+.wizard-branch-summary { margin:14px 0; font-size:12px; }
+.wizard-branch-summary > b { font-weight:600; }
+.wizard-branch-summary p { margin:5px 0; }
+.wizard-planned-actions { min-width:170px; max-width:260px; white-space:normal; line-height:1.6; }
+.wizard-planned-actions p { margin:4px 0; }
 .wizard-action-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; font-size:12px; font-weight:600; }
 .wizard-action-heading button { padding:5px 0; font-size:11px; }
 .wizard-action > select { width:100%; }

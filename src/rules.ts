@@ -12,7 +12,12 @@ export type ActionType = 'flag' | 'assign' | 'tag' | 'pass' | 'message';
  * For `message`, `value` is the reviewer's short request, `recipient` is an employee ID or 'jev' (Jev picks),
  * and `sender` is the employee who approves the drafts and sends them.
  */
-export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string };
+export type Action = { id: string; type: ActionType; value: string; recipient?: string; sender?: string; when?: Truth };
+export const RESULT_LABELS: Record<Truth, string> = { true: 'Match', uncertain: 'Not enough information', false: 'No match' };
+/** Actions saved before outcome branches were added still run only on matches. */
+export const actionOutcome = (action: Action): Truth => action.when ?? 'true';
+export const actionsForOutcome = (rule: Rule, outcome: Outcome): Action[] =>
+  rule.actions.filter(action => actionOutcome(action) === outcome);
 /** Drafts and rules saved before senders existed are sent from AP, the default reviewer. */
 export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
@@ -26,6 +31,7 @@ export interface DraftMessage {
   /** Every bill this message covers; a run batches all its matches into one message (up to MAX_MESSAGE_ITEMS). */
   items: MessageItem[]; batchId: string;
   ruleId: string; ruleName: string; revision: number; actionId: string;
+  outcome?: Truth;
   to: string; subject: string; body: string; reason: string;
   status: MessageStatus; edited: boolean; createdAt: string; decidedAt?: string;
   /** Absent on drafts saved before generated messages; those are ready. */
@@ -164,7 +170,10 @@ export function validateRule(input: unknown): string[] {
   visit(r.expression, 1);
   if (!Array.isArray(r.actions) || !r.actions.length) errors.push('Choose at least one action.');
   else r.actions.forEach(a => {
+    if (!a || typeof a !== 'object') { errors.push('Complete each action.'); return; }
     checkId(a.id);
+    if (a.when !== undefined && !['true', 'false', 'uncertain'].includes(a.when)) errors.push('Choose a result for each action.');
+    if (a.when === 'uncertain' && a.type === 'pass') errors.push('Uncertain results cannot be marked checked.');
     if (!['flag', 'assign', 'tag', 'pass', 'message'].includes(a.type) || (a.type !== 'pass' && (typeof a.value !== 'string' || !a.value.trim()))) errors.push('Complete each action.');
     else if (a.type === 'message' && a.value.length > 500) errors.push('Message requests must be 500 characters or fewer.');
     else if (a.type === 'message' && a.recipient !== 'jev' && !employeeById(a.recipient)) errors.push('Choose a message recipient or let Jev choose.');
@@ -210,7 +219,7 @@ export function createDraft(row: Row, rule: Rule, action: Action, snapshot: Snap
   const employee = routing === 'manual' ? employeeById(action.recipient) : undefined;
   return {
     id: uid(), companyId: row.companyId, items: [messageItem(row, rule, snapshot)], batchId,
-    ruleId: rule.id, ruleName: rule.name, revision: rule.revision, actionId: action.id,
+    ruleId: rule.id, ruleName: rule.name, revision: rule.revision, actionId: action.id, outcome: snapshot.result as Truth,
     to: employee?.name ?? 'Choosing recipient…', subject: '', body: '',
     reason: `Drafted by rule “${rule.name}” r${rule.revision}. Nothing has been sent.`,
     status: 'pending', edited: false, createdAt: new Date().toISOString(),
@@ -272,8 +281,9 @@ export function executeRule(store: RuleStore, rule: Rule, row: Row, version: str
   if (snapshot.result === 'pending' || snapshot.result === 'error' || Object.values(snapshot.conditions).some(v => v === 'pending' || v === 'error')) return store;
   let next: RuleStore = { ...store, transactions: { ...store.transactions }, history: [...store.history], executions: [...store.executions, executionKey], messages: [...(store.messages ?? [])], notices: [...(store.notices ?? [])] };
   const record = (key: string, action: Action | null, previous: unknown, resulting: unknown) => next.history.unshift({ id: uid(), key, ruleId: rule.id, ruleName: rule.name, revision: rule.revision, companyId: row.companyId, transactionId: row.id, transactionVersion: version, action: action ? structuredClone(action) : null, timestamp: new Date().toISOString(), previous, resulting, snapshot: { ...structuredClone(snapshot), expression: structuredClone(rule.expression) }, source });
-  if (snapshot.result !== 'true') { if (source !== 'run') record(executionKey, null, null, snapshot.result); return next; }
-  for (const action of rule.actions) {
+  const actions = actionsForOutcome(rule, snapshot.result);
+  if (!actions.length) { if (source !== 'run') record(executionKey, null, null, snapshot.result); return next; }
+  for (const action of actions) {
     const key = `${prefix}:${action.id}`;
     if (next.executions.includes(key)) continue;
     next.executions.push(key);

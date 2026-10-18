@@ -61,6 +61,7 @@ test('English conditions use real independent Jev judgments; AND/OR and action e
 
 test('guided save and run persist, remain idempotent, protect later edits on undo, and keep enabled replay', async ({ page }) => {
   await openRules(page); await complete(page); await step(page, 'Review matches');
+  await page.getByLabel('Preview rows').selectOption('true');
   await page.getByRole('button', { name: 'Save rule', exact: true }).click();
   await store(page);
   await expect(page.getByLabel('Saved rules')).not.toHaveValue('');
@@ -133,13 +134,14 @@ test('reset remains shared and saved rules survive, while phone layouts expose t
 
 test('Run once applies actions only to the matching bills in the filtered preview', async ({ page }) => {
   await openRules(page); await complete(page); await step(page, 'Review matches');
+  await page.getByLabel('Preview rows').selectOption('true');
   const matchingRows = page.locator('.wizard-table tbody tr');
   expect(await matchingRows.count()).toBeGreaterThan(1);
   const firstId = (await matchingRows.first().getAttribute('data-id'))!;
   await page.getByLabel('Search visible bills', { exact: true }).fill(firstId.split(':')[1]);
   await expect(matchingRows).toHaveCount(1);
   await page.getByRole('button', { name: 'Save rule', exact: true }).click(); await store(page);
-  await page.getByRole('button', { name: 'Run once · 1 match', exact: true }).click();
+  await page.getByRole('button', { name: 'Run once · 1 transaction', exact: true }).click();
   const result = await store(page);
   expect(result.history.length).toBeGreaterThan(0);
   expect([...new Set(result.history.map((entry: any) => entry.transactionId))]).toEqual([firstId]);

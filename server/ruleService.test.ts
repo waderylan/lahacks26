@@ -37,6 +37,33 @@ async function eventually(check: () => boolean) {
   assert.fail('Expected worker to settle.');
 }
 
+test('outcome actions are rechecked server-side and uncertain drafts retain their trigger through approval', async t => {
+  const { db, data } = setup(); t.after(() => db.db.close());
+  let writtenOutcome: string | undefined;
+  const service = new RuleService(db, data, async (_company, _text, rows) => Object.fromEntries(rows.map(row => [row.id, row.billId === 'bill-1' ? 'match' : row.billId === 'bill-2' ? 'uncertain' : 'no_match'])), async request => {
+    writtenOutcome = request.outcome; return draft;
+  });
+  const rule: Rule = { ...makeRule(), expression: { id: 'check', type: 'ai', text: 'Needs review', label: '' }, actions: [
+    { id: 'match', type: 'flag', value: 'Check charge' },
+    { id: 'uncertain', type: 'message', value: 'Request receipt', recipient: 'jev', sender: 'emp-ap', when: 'uncertain' },
+    { id: 'nonmatch', type: 'tag', value: 'No issue', when: 'false' },
+  ] };
+  service.save(companyId, rule, null);
+  await service.run(companyId, rule.id, 1, [row(1).id, row(2).id, row(3).id]);
+  await eventually(() => service.snapshot(companyId).store.messages[0]?.generation === 'ready');
+  assert.deepEqual(data.row(companyId, row(1).id).dashboard?.flags, ['Check charge']);
+  assert.deepEqual(data.row(companyId, row(2).id).dashboard?.flags, []);
+  assert.deepEqual(data.row(companyId, row(3).id).dashboard?.tags, ['No issue']);
+  assert.equal(writtenOutcome, 'uncertain');
+  const message = service.snapshot(companyId).store.messages[0];
+  assert.equal(message.outcome, 'uncertain');
+  assert.equal(db.list('mail', companyId).length, 0);
+  service.decide(companyId, message.id, 'approved', message.body, message.body, 'emp-ap');
+  assert.equal(db.list('mail', companyId).length, 1);
+  await service.run(companyId, rule.id, 1, [row(1).id, row(2).id, row(3).id]);
+  assert.equal(service.snapshot(companyId).store.messages.length, 1);
+});
+
 test('rules, messages, approvals, notification flags, bill metadata and arrivals survive database reopen', async () => {
   const filename = path.join(os.tmpdir(), `lahacks-rules-${crypto.randomUUID()}.sqlite`);
   const first = setup(filename), rule = makeRule();

@@ -66,13 +66,13 @@ test('all four custom companies show a useful starter, public example, and indep
       const starter = page.getByRole('article', { name: `${preset} starter`, exact: true });
       await expect(starter).toContainText('Try first for this company');
       await expect(starter).toContainText(clue);
-      await expect(page.locator('.rule-starters > summary')).toContainText('0 of 4 added');
+      await expect(page.locator('.rule-starters > summary')).toContainText('Editable examples');
       await starter.getByRole('button', { name: 'Inspect example', exact: true }).click();
       await expect(page.getByLabel('Transaction detail')).toBeVisible();
       await page.getByLabel('Close detail', { exact: true }).click();
       await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
       await expect(starter).toContainText('Saved · Automatic off');
-      await expect(page.locator('.rule-starters > summary')).toContainText('1 of 4 added');
+      await expect(page.getByLabel('Saved rules in this company')).toContainText(preset);
       await page.getByRole('button', { name: 'Use demo sample', exact: true }).click();
       await expect(page.locator('.starter-intro')).toContainText('Demo sample loaded');
       if (preset === 'Possible payment fraud') {

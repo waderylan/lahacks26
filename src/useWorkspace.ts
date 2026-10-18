@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Row } from './types';
-import type { AccountOption, ActionPlan, ActionSelection, ActionState, BillAction, ReviewTask } from './actionTypes';
+import type { AccountOption, ActionState, ReviewTask } from './actionTypes';
+import { usePolling } from './usePolling';
 
 export type RowPatch = Pick<Row, 'id' | 'companyId'> & Partial<Row>;
-type State = ActionState & { accounts: AccountOption[]; owners: string[] };
-const empty = (): State => ({ tasks: [], runs: [], automations: [], accounts: [], owners: [] });
-export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => void) {
+type State = Pick<ActionState, 'tasks' | 'runs'> & { accounts: AccountOption[]; owners: string[] };
+const empty = (): State => ({ tasks: [], runs: [], accounts: [], owners: [] });
+/** `pollMs` is how often tasks and receipts are re-read while the tab is visible; 0 pauses polling. */
+export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => void, pollMs = 10_000) {
   const [state, setState] = useState<State>(empty);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -24,13 +26,13 @@ export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => vo
       if (pollFailed.current) { pollFailed.current = false; setError(''); }
     }
   }, [companyId]);
+  const poll = useCallback(() => refresh().catch(error => { if (current.current === companyId) { pollFailed.current = true; setError(error.message); } }), [companyId, refresh]);
   useEffect(() => {
     setState(empty()); setError(''); setBusy(false); pollFailed.current = false;
-    const poll = () => refresh().catch(error => { if (current.current === companyId) { pollFailed.current = true; setError(error.message); } });
     void poll();
-    const timer = setInterval(() => void poll(), 10_000);
-    return () => { clearInterval(timer); sequence.current++; };
-  }, [companyId, refresh]);
+    return () => { sequence.current++; };
+  }, [companyId, refresh, poll]);
+  usePolling(() => void poll(), pollMs);
   const request = async <T,>(path: string, body: unknown, method = 'POST'): Promise<T> => {
     if (busy) throw new Error('Wait for the current action to finish.');
     setBusy(true); setError('');
@@ -49,13 +51,10 @@ export function useWorkspace(companyId: string, onRows: (rows: RowPatch[]) => vo
   };
   return {
     ...state, busy, error, clearError: () => setError(''), refresh,
-    preview: (selection: ActionSelection, action: BillAction) => request<ActionPlan>('/actions/preview', { selection, action }),
-    apply: async (planId: string) => (await request<{ plan: ActionPlan }>(`/actions/${planId}/apply`, {})).plan,
     undo: (planId: string, billId: string) => request(`/actions/${planId}/undo`, { billId }),
+    /** Manual human review of explicit records. Separate from task status and rule results. */
     review: (ids: string[], reviewed: boolean) => request('/actions/review', { ids, reviewed }),
     updateTask: (task: ReviewTask, status: ReviewTask['status']) => request(`/tasks/${task.id}`, { status, updatedAt: task.updatedAt }, 'PATCH'),
-    automate: (selection: ActionSelection, action: BillAction) => request('/automations', { selection, action }),
-    pause: (id: string) => request(`/automations/${id}/pause`, {}),
   };
 }
 export type WorkspaceController = ReturnType<typeof useWorkspace>;

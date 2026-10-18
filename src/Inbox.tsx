@@ -16,11 +16,10 @@ export function EmployeeTabs({ value, unread, onChange }: { value: string; unrea
   return <label className="employee-switcher">Viewing as<select aria-label="Signed in as" value={value} onChange={event => onChange(event.target.value)}>{EMPLOYEES.map(person => <option key={person.id} value={person.id}>{person.name}{unread[person.id] ? ` (${unread[person.id]} unread)` : ''}</option>)}</select></label>;
 }
 
-type Folder = 'inbox' | 'sent' | 'approvals';
+export type Folder = 'inbox' | 'sent' | 'approvals';
 type Compose = { to: string; subject: string; body: string; replyTo?: string };
 
-export function Inbox({ mailbox, as, approvals, pendingApprovals, onInspect }: { mailbox: MailboxController; as: string; approvals: ReactNode; pendingApprovals: number; onInspect: (transactionId: string) => void }) {
-  const [folder, setFolder] = useState<Folder>('inbox');
+export function Inbox({ mailbox, as, approvals, pendingApprovals, folder, onFolder: setFolder, onInspect }: { mailbox: MailboxController; as: string; approvals: ReactNode; pendingApprovals: number; folder: Folder; onFolder: (folder: Folder) => void; onInspect: (transactionId: string) => void }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [compose, setCompose] = useState<Compose | null>(null);
   const [sending, setSending] = useState(false);
@@ -45,7 +44,7 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, onInspect }: {
   const unread = mailbox.unread[as] ?? 0;
 
   return <section className="dashboard-board inbox" aria-label="Messages">
-    <div className="dashboard-board-heading"><h2>Messages · {nameOf(as)}</h2><span className="small muted">Internal messages saved in SQLite · nothing is emailed</span></div>
+    <div className="dashboard-board-heading"><h2>Messages · {nameOf(as)}</h2><span className="small muted">Internal messages · nothing is emailed</span></div>
     {mailbox.error && <div className="rules-notice error" role="alert">{mailbox.error}</div>}
     <div className="inbox-layout">
       <nav className="inbox-folders" aria-label="Message folders">
@@ -54,7 +53,7 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, onInspect }: {
           <button key={id} className={folder === id ? 'on' : ''} aria-pressed={folder === id} onClick={() => { setFolder(id); setOpenId(null); }}>{label}{count > 0 && <b>{count}</b>}</button>)}
       </nav>
       {folder === 'approvals' ? <div className="inbox-approvals">
-        <p className="small muted">Drafts written by rules. Approving sends the message from {nameOf(as)} to the recipient's inbox.</p>
+        <p className="small muted">Rules write drafts and name the employee they are sent from. Only that employee can approve a draft, which sends it to the recipient’s inbox. You are viewing as {nameOf(as)}.</p>
         {approvals}
       </div> : <>
         <ul className="inbox-list" aria-label={folder === 'sent' ? 'Sent messages' : 'Received messages'}>
@@ -88,7 +87,7 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, onInspect }: {
               </div></div>
               <pre className="message-body">{mail.body}</pre>
             </div>)}
-            {open.items.length > 0 && <p className="message-bills"><span className="small muted">Bills:</span>{open.items.map(item => <button key={item.transactionId} className="ghost" onClick={() => onInspect(item.transactionId)}>{item.billId}</button>)}</p>}
+            {open.items.length > 0 && <p className="message-bills"><span className="small muted">Transactions:</span>{open.items.map(item => <button key={item.transactionId} className="ghost" onClick={() => onInspect(item.transactionId)}>{item.billId}</button>)}</p>}
             <div className="message-actions"><button className="primary" onClick={() => reply(thread[thread.length - 1] ?? open)}>Reply</button></div>
           </article> : <p className="dashboard-empty">Select a message to read it.</p>}
         </div>

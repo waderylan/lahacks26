@@ -41,3 +41,23 @@ test('chat answers get a matching chart shape', () => {
   assert.equal(chartForAnswer('count').measure, 'count');
   assert.equal(chartForAnswer('upcoming').groupBy, 'due');
 });
+
+test('graph questions are detected and shaped by their wording', async () => {
+  const { graphRequest } = await import('./charts.ts');
+  assert.equal(graphRequest('How much did we spend on utilities?', 'total').wanted, false);
+  assert.deepEqual(graphRequest('graph utilities by month', 'total'), { wanted: true, spec: { groupBy: 'month', measure: 'spend', kind: 'bar' } });
+  assert.deepEqual(graphRequest('chart electronics spend by vendor', 'total').spec, { groupBy: 'vendor', measure: 'spend', kind: 'hbar' });
+  assert.deepEqual(graphRequest('plot how many repair bills per month', 'count').spec, { groupBy: 'month', measure: 'count', kind: 'bar' });
+  assert.deepEqual(graphRequest('show the trend of rent over time', 'total').spec, { groupBy: 'month', measure: 'spend', kind: 'line' });
+  assert.deepEqual(graphRequest('visualize what we owe by due date', 'upcoming').spec, { groupBy: 'due', measure: 'open', kind: 'bar' });
+});
+
+test('chart titles start with a capital and drop the "graph" command', async () => {
+  const { chartTitle } = await import('./charts.ts');
+  assert.equal(chartTitle('graph utilities by month'), 'Utilities by month');
+  assert.equal(chartTitle('chart electronics spend by vendor?'), 'Electronics spend by vendor');
+  assert.equal(chartTitle('show me a graph of rent over time'), 'Rent over time');
+  assert.equal(chartTitle('can you plot how many repair bills per month'), 'How many repair bills per month');
+  assert.equal(chartTitle('utilities by month'), 'Utilities by month');
+  assert.equal(chartTitle('graph'), 'Graph');
+});

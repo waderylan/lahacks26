@@ -10,6 +10,9 @@ const loading = new Set<string>();
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach(l => l());
 const EMPTY: ChartSpec[] = [];
+/** A chart answering a chat question, shown on its own until Refresh. Not saved: it lasts for this page visit only. */
+const focus = new Map<string, ChartSpec | null>();
+export function showOnDashboard(companyId: string, chart: ChartSpec) { focus.set(companyId, chart); notify(); }
 
 function load(companyId: string) {
   if (charts.has(companyId) || loading.has(companyId)) return;
@@ -28,11 +31,16 @@ function save(companyId: string, next: ChartSpec[]) {
 export function useDashboard(companyId: string) {
   useEffect(() => load(companyId), [companyId]);
   const list = useSyncExternalStore(cb => { listeners.add(cb); return () => listeners.delete(cb); }, () => charts.get(companyId) ?? EMPTY);
+  const focused = useSyncExternalStore(cb => { listeners.add(cb); return () => listeners.delete(cb); }, () => focus.get(companyId) ?? null);
   const current = () => charts.get(companyId) ?? STARTER_CHARTS;
   return {
     charts: list,
     ready: charts.has(companyId),
-    add: (chart: ChartSpec) => save(companyId, [chart, ...current()]),
+    focus: focused,
+    setFocus: (chart: ChartSpec) => showOnDashboard(companyId, chart),
+    clearFocus: () => { focus.set(companyId, null); notify(); },
+    // New charts go after the existing ones, so the starter charts stay first.
+    add: (chart: ChartSpec) => save(companyId, [...current(), chart]),
     replace: (id: string, chart: ChartSpec) => save(companyId, current().map(c => (c.id === id ? { ...chart, id, starter: false } : c))),
     update: (id: string, patch: Partial<ChartSpec>) => save(companyId, current().map(c => (c.id === id ? { ...c, ...patch } : c))),
     remove: (id: string) => save(companyId, current().filter(c => c.id !== id)),

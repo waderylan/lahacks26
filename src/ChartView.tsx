@@ -6,7 +6,7 @@ const usdShort = new Intl.NumberFormat('en-US', { style: 'currency', currency: '
 export const formatValue = (measure: Measure, v: number, short = false) => (measure === 'count' ? `${v} ${v === 1 ? 'bill' : 'bills'}` : short ? usdShort.format(v / 100) : money(v));
 
 /** One series, drawn as SVG. Hover (or focus) a mark to see its exact value. */
-export function ChartView({ points, kind, measure, height = 200 }: { points: Point[]; kind: ChartKind; measure: Measure; height?: number }) {
+export function ChartView({ points, kind, measure, height = 200, width = 640 }: { points: Point[]; kind: ChartKind; measure: Measure; height?: number; width?: number }) {
   const [hover, setHover] = useState<number | null>(null);
   if (!points.length || points.every(p => p.value === 0)) return <p className="chart-empty muted">No bills to chart.</p>;
   const max = Math.max(...points.map(p => p.value), 1);
@@ -25,7 +25,8 @@ export function ChartView({ points, kind, measure, height = 200 }: { points: Poi
     );
   }
 
-  const W = 640, H = height, pad = { l: 8, r: 8, t: 12, b: 26 };
+  // width/height set the shape: the drawing scales to the card's width, so a wider shape stays flatter.
+  const W = width, H = height, pad = { l: 8, r: 8, t: 12, b: 26 };
   const innerW = W - pad.l - pad.r, innerH = H - pad.t - pad.b;
   const step = innerW / points.length;
   const x = (i: number) => pad.l + step * i + step / 2;

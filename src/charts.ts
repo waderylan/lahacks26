@@ -69,3 +69,32 @@ export function chartForAnswer(intent: string): Pick<ChartSpec, 'groupBy' | 'mea
   if (intent === 'upcoming') return { groupBy: 'due', measure: 'open', kind: 'bar' };
   return { groupBy: 'month', measure: 'spend', kind: 'bar' };
 }
+
+/**
+ * Whether a chat question asks for a graph, and how to group and measure it from its wording
+ * ("chart spend by vendor", "graph how many bills per month"). Falls back to the answer's own shape.
+ */
+export function graphRequest(question: string, intent: string): { wanted: boolean; spec: Pick<ChartSpec, 'groupBy' | 'measure' | 'kind'> } {
+  const q = question.toLowerCase();
+  const wanted = /\b(graph|chart|plot|visuali[sz]e|visual|trend|over time|breakdown)\b/.test(q);
+  const spec = { ...chartForAnswer(intent) };
+  if (/\b(by|per|each|across) (vendor|supplier|payee)s?\b|\bwhich vendors?\b|\btop vendors?\b/.test(q)) spec.groupBy = 'vendor';
+  else if (/\b(by|per|each|across) (account|category|categories)\b/.test(q)) spec.groupBy = 'account';
+  else if (/\b(by|per|each) (month|week)\b|\bmonthly\b|\bover time\b|\btrend\b/.test(q)) spec.groupBy = 'month';
+  else if (/\b(due|overdue|upcoming|unpaid|owe)\b/.test(q)) spec.groupBy = 'due';
+  if (/\bhow many\b|\bnumber of\b|\bcount\b/.test(q)) spec.measure = 'count';
+  else if (/\b(unpaid|owe|open balance|outstanding)\b/.test(q) || spec.groupBy === 'due') spec.measure = 'open';
+  else if (spec.measure === 'open') spec.measure = 'spend'; // open balance only fits due-date charts
+  if (/\bline\b|\btrend\b|\bover time\b/.test(q) && spec.groupBy === 'month') spec.kind = 'line';
+  else spec.kind = spec.groupBy === 'vendor' || spec.groupBy === 'account' ? 'hbar' : spec.kind === 'hbar' ? 'bar' : spec.kind;
+  return { wanted, spec };
+}
+
+/** Chart title from a chat question: drops a leading "graph"/"chart"/"plot me…" and starts with a capital letter. */
+export function chartTitle(question: string): string {
+  const t = question.trim().replace(/[?.!]+$/, '')
+    .replace(/^(please\s+)?(can you\s+)?(graph|chart|plot|visuali[sz]e|show|draw|make)(\s+me)?(\s+(a|an|the))?(\s+(graph|chart|plot|visual))?(\s+of)?\s+/i, '')
+    .trim();
+  const title = t || question.trim();
+  return (title.charAt(0).toUpperCase() + title.slice(1)).slice(0, 120);
+}

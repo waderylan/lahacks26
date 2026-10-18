@@ -80,3 +80,11 @@ test('explicit my-work wording wins over a different Jev reading', () => {
   const q2 = 'anything I should look at today';
   assert.equal(combineUnderstanding(q2, parseQuestion(q2, LATEST), jev('my_work', 'everything', 'none'), LATEST).intent, 'my_work');
 });
+
+test('"may" the verb is not read as the month May', () => {
+  assert.equal(parseQuestion('Which bills may be duplicates?', LATEST).period, null);
+  assert.equal(parseQuestion('Which bills may be duplicates in May?', LATEST).period?.label, 'May');
+  assert.equal(parseQuestion('How much did we spend in May?', LATEST).period?.label, 'May');
+  assert.equal(parseQuestion('Show bills from May 2026', LATEST).period?.label, 'May 2026');
+  assert.equal(parseQuestion('How much did we spend in March?', LATEST).period?.label, 'March');
+});

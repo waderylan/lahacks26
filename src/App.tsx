@@ -159,6 +159,7 @@ export default function App() {
 
   // Load a company's records; never show another company's rows while loading.
   const loadSeq = useRef(0);
+  const [reloadKey, setReloadKey] = useState(0);
   useEffect(() => {
     if (!prefsReady) return;
     const seq = ++loadSeq.current;
@@ -174,7 +175,7 @@ export default function App() {
         setData(d);
       })
       .catch((e: Error) => seq === loadSeq.current && setLoadError(e.message));
-  }, [companyId, rowLimit, prefsReady]);
+  }, [companyId, rowLimit, prefsReady, reloadKey]);
 
   // Debounce the criterion (~300 ms); empty input clears immediately.
   useEffect(() => {
@@ -184,7 +185,8 @@ export default function App() {
   }, [input]);
 
   // Changing the semantic query clears manual selection.
-  useEffect(() => setSelected(new Set()), [query]);
+  // Bulk buttons act on the selection, so it must never include rows the current view hides.
+  useEffect(() => setSelected(new Set()), [query, tab]);
 
   const rows = data?.rows ?? [];
   useEffect(() => {
@@ -436,14 +438,14 @@ export default function App() {
       {workspace === 'rules' && (rules.storageError || rules.message) && <div className={`rules-notice ${rules.storageError ? 'error' : ''}`} role="status">{rules.storageError || rules.message}</div>}
       {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Jev evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
       {workspace === 'rules' && data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
-      {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
+      {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? <>Could not load bills: {loadError} <button onClick={() => setReloadKey(key => key + 1)}>Retry</button></> : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
       {workspace === 'transactions' && <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} />}
       <div className="ledger-column">
       {workspace !== 'tasks' && workspace !== 'messages' && workspace !== 'risk' && <div className="dashboard-ledger-toolbar">{isSynthetic && <label>Type<select aria-label="Transaction type filter" value={typeFilter} onChange={event => { setTypeFilter(event.target.value); setSelected(new Set()); }}><option value="all">All types</option><option value="bill">Vendor bills</option><option value="invoice">Customer invoices</option><option value="bank">Bank transactions</option></select></label>}<label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} {isSynthetic ? 'transactions' : 'bills'} shown</span></div>}
 
-      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'risk' ? <PaymentRiskPanel c={risk} loadedIds={rows.map(row => row.id)} totalCount={data?.totalBills ?? rows.length} as={as} onInspect={inspect} onEscalated={() => { void mailbox.refresh(); void dashboard.refresh().catch(() => {}); }} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
+      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'risk' ? <PaymentRiskPanel c={risk} loadedIds={rows.map(row => row.id)} totalCount={data?.totalBills ?? rows.length} as={as} onInspect={inspect} onEscalated={() => { void mailbox.refresh(); void dashboard.refresh().catch(() => {}); }} /> : workspace === 'messages' ? <Inbox key={companyId} mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
         {loadError ? (
-          <div className="state">Could not load records ({loadError}). <button onClick={() => setCompanyId(companyId + '')}>Retry</button></div>
+          <div className="state">Could not load records ({loadError}). <button onClick={() => setReloadKey(key => key + 1)}>Retry</button></div>
         ) : !data ? (
           <div className="state">Loading {companies.find((c) => c.companyId === companyId)?.name ?? 'company'} records…</div>
         ) : (

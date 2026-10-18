@@ -29,21 +29,26 @@ export class SemanticService {
   }
   async evaluateRows(companyId: string, criterion: string, rows: Row[], signal?: AbortSignal): Promise<{ results: RecordResult[]; costNanoUsd: string }> {
     const company = this.data.bills(companyId).company;
-    const missing = rows.filter(row => !this.cache.has(this.key(companyId, criterion, row)));
+    // This call's answers are kept locally: the shared cache can evict entries while batches are awaited.
+    const found = new Map<string, RecordResult>();
+    for (const row of rows) { const hit = this.cache.get(this.key(companyId, criterion, row)); if (hit) found.set(row.id, hit); }
+    const missing = rows.filter(row => !found.has(row.id));
     let cost = 0n;
     const batches = Array.from({ length: Math.ceil(missing.length / 20) }, (_, index) => missing.slice(index * 20, index * 20 + 20));
     await Promise.all(batches.map(batch => this.bounded(async () => {
       signal?.throwIfAborted();
-      const response = await this.evaluate({ company: { name: company.name.replace(/ \u2014 review scenarios$/, ''), industry: company.industry }, criterion, ids: batch.map(row => row.id) }, signal, batch);
+      // Each batch gets its own timeout so one hung gateway call can't hold a slot (or the rule scanner) forever.
+      const batchSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(90_000)]) : AbortSignal.timeout(90_000);
+      const response = await this.evaluate({ company: { name: company.name.replace(/ \u2014 review scenarios$/, ''), industry: company.industry }, criterion, ids: batch.map(row => row.id) }, batchSignal, batch);
       cost += BigInt(response.costNanoUsd);
       for (const row of batch) {
         const result = response.results.find(result => result.id === row.id);
         if (!result || !['match', 'no_match', 'uncertain'].includes(result.state)) throw new Error('Incomplete model result. Retry the search.');
-        this.cache.set(this.key(companyId, criterion, row), result);
+        this.cache.set(this.key(companyId, criterion, row), result); found.set(row.id, result);
       }
       while (this.cache.size > 10_000) this.cache.delete(this.cache.keys().next().value!);
     })));
-    return { results: rows.map(row => this.cache.get(this.key(companyId, criterion, row))!), costNanoUsd: String(cost) };
+    return { results: rows.map(row => found.get(row.id)!), costNanoUsd: String(cost) };
   }
   async judge(companyId: string, criterion: string, rows: Row[]) {
     const { results } = await this.evaluateRows(companyId, criterion, rows);

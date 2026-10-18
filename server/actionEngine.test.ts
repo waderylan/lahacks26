@@ -189,3 +189,16 @@ test('SemanticService never starts more than three evaluate batches at once', as
   await semantics.evaluateRows(companyId, 'equipment', rows);
   assert.equal(peak, 3);
 });
+
+test('pausing an automation while its scan waits on Jev stops the action and stays paused', async t => {
+  const { store, data } = setup(); t.after(() => store.db.close());
+  let pauseDuringJudge: (() => void) | undefined;
+  const engine = new ActionEngine(store, data, async (_company, _criterion, rows) => { pauseDuringJudge?.(); return Object.fromEntries(rows.map(row => [row.id, 'match' as const])); });
+  const rule = await engine.automate(companyId, { ...selection(), criterion: 'Equipment', scope: 'matches' }, { type: 'flag', label: 'Check receipt' });
+  await engine.scan();
+  const edit = await engine.preview(companyId, selection(), { type: 'memo', text: 'New equipment memo' }); engine.apply(companyId, edit.id);
+  pauseDuringJudge = () => engine.pauseAutomation(companyId, rule.id);
+  await engine.scan();
+  assert.deepEqual(data.row(companyId, row(1).id).dashboard?.flags, [], 'no flag applied after the pause');
+  assert.equal(store.state(companyId).automations[0].enabled, false, 'the pause was not overwritten');
+});

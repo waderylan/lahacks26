@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { employeeById } from './employees';
 import { formatCents } from './jevEvidence';
 import type { RiskResult, RiskState } from './paymentRisk';
@@ -11,18 +11,22 @@ export function usePaymentRisk(companyId: string) {
   const [state, setState] = useState<RiskState>(EMPTY);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
+  // A slow reply for a company we've since left must not land in the current one.
+  const current = useRef(companyId); current.current = companyId;
   const call = useCallback(async (path: string, body?: unknown) => {
     const response = await fetch(`/api/companies/${companyId}/payment-risk${path}`, body === undefined ? undefined : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const reply = await response.json();
     if (!response.ok) throw new Error(reply.error ?? 'Payment check failed.');
-    setState(reply); setError('');
+    if (current.current !== companyId) return false;
+    setState(reply); setError(''); return true;
   }, [companyId]);
-  useEffect(() => { setState(EMPTY); setError(''); if (companyId) void call('').catch(e => setError((e as Error).message)); }, [companyId, call]);
+  useEffect(() => { setState(EMPTY); setError(''); setRunning(false); if (companyId) void call('').catch(e => { if (current.current === companyId) setError((e as Error).message); }); }, [companyId, call]);
   const run = async (body: unknown, after?: () => void) => {
+    const scope = companyId;
     setRunning(true);
-    try { await call(body && typeof body === 'object' && 'as' in body ? '/escalate' : '/check', body); after?.(); }
-    catch (e) { setError((e as Error).message); }
-    finally { setRunning(false); }
+    try { if (await call(body && typeof body === 'object' && 'as' in body ? '/escalate' : '/check', body)) after?.(); }
+    catch (e) { if (current.current === scope) setError((e as Error).message); }
+    finally { if (current.current === scope) setRunning(false); }
   };
   return { ...state, running, error,
     check: (ids: string[] | 'all') => run(ids === 'all' ? { all: true } : { ids }),

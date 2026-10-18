@@ -133,6 +133,12 @@ export default function App() {
   // The curated sample exists only for synthetic extension companies.
   const isSynthetic = companies.find((c) => c.companyId === companyId)?.synthetic === true;
   const rowLimit = prefs.limit === -1 && !isSynthetic ? 50 : prefs.limit;
+  // With Custom data on (including when remembered from a previous visit) the selected company must be one of the custom ones.
+  useEffect(() => {
+    if (!customOnly || !companies.length || companies.find((c) => c.companyId === companyId)?.synthetic) return;
+    const first = companies.find((c) => c.synthetic);
+    if (first) setCompanyId(first.companyId);
+  }, [customOnly, companies, companyId]);
   const updatePrefs = (p: Partial<typeof prefs>) => {
     void fetch('/api/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
       .then(async response => { const body = await response.json(); if (!response.ok) throw new Error(body.error); setPrefs(body); })

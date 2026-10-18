@@ -17,6 +17,7 @@ import { TaskBoard } from './TaskBoard';
 import { Explore, emptyExplore } from './Explore';
 import { RulesWorkspace } from './RulesWorkspace';
 import { Dashboard } from './Dashboard';
+import { Evaluation } from './Evaluation';
 import { ALL_RECORDS, type RuleScope } from './ruleScope';
 import { uid, type Rule, type RuleNode } from './rules';
 import type { SearchDefinition } from './savedSearchTypes';
@@ -39,9 +40,9 @@ export default function App() {
     const first = companies.find((c) => c.synthetic);
     if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
   };
-  const [workspace, setWorkspaceState] = useState<'explore' | 'dashboard' | 'rules' | 'tasks' | 'messages'>(() => {
+  const [workspace, setWorkspaceState] = useState<'explore' | 'dashboard' | 'rules' | 'tasks' | 'messages' | 'evaluation'>(() => {
     const selected = new URLSearchParams(location.search).get('workspace');
-    return selected === 'dashboard' || selected === 'rules' || selected === 'tasks' || selected === 'messages' ? selected : 'explore';
+    return selected === 'dashboard' || selected === 'rules' || selected === 'tasks' || selected === 'messages' || selected === 'evaluation' ? selected : 'explore';
   });
   const setWorkspace = (next: typeof workspace) => { const url = new URL(location.href); url.searchParams.set('workspace', next); history.replaceState(null, '', url); setWorkspaceState(next); };
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
@@ -185,13 +186,14 @@ export default function App() {
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'dashboard', 'rules', 'tasks', 'messages'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages' }[value]}{value === 'tasks' && dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav><span className="muted">{workspace === 'explore' ? 'View transactions' : workspace === 'rules' ? 'Run actions and recurring checks' : 'Saved in your workspace'}</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace">{(['explore', 'dashboard', 'rules', 'tasks', 'messages', 'evaluation'] as const).map(value => <button key={value} className={workspace === value ? 'on' : ''} aria-current={workspace === value ? 'page' : undefined} onClick={() => { setDrawerId(null); setWorkspace(value); }}>{{ explore: 'Explore', dashboard: 'Dashboard', rules: 'Rules', tasks: 'Tasks & activity', messages: 'Messages', evaluation: 'Evaluation' }[value]}{value === 'tasks' && dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}{value === 'messages' && pendingApprovals + (mailbox.unread[as] ?? 0) > 0 && <b className="task-nav-count">{pendingApprovals + (mailbox.unread[as] ?? 0)}</b>}</button>)}</nav><span className="muted">{workspace === 'explore' ? 'View transactions' : workspace === 'rules' ? 'Run actions and recurring checks' : 'Saved in your workspace'}</span></div>
       {(dashboard.error || prefsError || inspectError || loadError || rules.storageError) && <div className="rules-notice error" role="alert">{dashboard.error || prefsError || inspectError || loadError || rules.storageError}</div>}
       {workspace === 'rules' && rules.message && <div className="rules-notice" role="status">{rules.message}</div>}
       {workspace === 'rules' && editor !== null && rules.previewErrors.length > 0 && <div className="rules-notice error" role="alert">Some records could not be checked. <button onClick={rules.retry}>Retry failed checks</button></div>}
       {data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
       {!data ? <main className="wizard-loading" role="status">{loadError || 'Loading transactions?'}</main> : <>
         <div className="workspace-page" hidden={workspace !== 'explore'}><Explore key={companyId} data={data} active={workspace === 'explore'} definition={definition} onChange={setDefinition} onInspect={inspect} onCreateRule={createRule} onRefresh={refreshExplore} editingRule={exploreRule?.name} onUpdateRule={updateRule} onLeaveRule={() => setExploreRule(null)} /></div>
+        {workspace === 'evaluation' && <div className="insight-body"><Evaluation /></div>}
         {workspace === 'dashboard' && <div className="insight-body"><Dashboard companyId={companyId} /></div>}
         {workspace === 'rules' && <RulesWorkspace c={rules} data={data} editor={editor} onEditor={setEditor} onInspect={inspect} onMessages={() => setWorkspace('messages')} onExplore={openRuleInExplore} onDemoSample={() => updatePrefs({ limit: -1 })} paymentRisk={<details className="rules-payment-risk"><summary>Fraud checks: payment risk and duplicates</summary><nav className="check-switch" aria-label="Fraud checks">{(Object.keys(CHECKS) as CheckKind[]).map(kind => <button key={kind} className={checkKind === kind ? 'on' : ''} aria-pressed={checkKind === kind} onClick={() => setCheckKind(kind)}>{CHECKS[kind].title}</button>)}</nav><ReviewCheckPanel key={checkKind} c={checks[checkKind]} loadedIds={data.rows.map(row => row.id)} totalCount={data.totalBills} as={as} onInspect={inspect} onEscalated={() => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }} /></details>} />}
         {workspace === 'tasks' && <div className="workspace-body"><div className="workspace-center"><TaskBoard c={dashboard} onInspect={inspect} /></div></div>}

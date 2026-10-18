@@ -5,6 +5,7 @@ import { evaluationEvidence } from '../src/jevEvidence.ts';
 import type { Row } from '../src/types.ts';
 import { judgeInstructions, OPTIONS, type MatchState, type RecordResult } from './jev.ts';
 import { INTENTS, PERIODS, SCOPE, type Understanding } from './understand.ts';
+import type { Decision, DecisionInput } from './modelContract.ts';
 
 /**
  * Gemini option for the chat. The AI Gateway key is for Jev only; everything here calls Gemini
@@ -88,4 +89,24 @@ export async function routeWithGemini(company: { name: string; industry: string 
   const employee = employeeById(String(json.employee));
   if (!employee) throw new Error('Gemini did not pick a known employee.');
   return { employeeId: employee.id, probability: NaN };
+}
+
+/**
+ * Benchmark baseline (scripts/benchmark_semantic_models.ts): Gemini judges a batch of cases that share a
+ * company and criterion, with exactly Jev's instructions and answer options, on GEMINI_API_KEY.
+ * Gemini gives no probabilities, so pMatch is null rather than invented.
+ */
+export async function evaluateGeminiInputs(inputs: DecisionInput[], model: ChatGeminiModel): Promise<{ results: Decision[]; tokens: number; ms: number }> {
+  if (!inputs.length) return { results: [], tokens: 0, ms: 0 };
+  if (inputs.some(x => x.criterion !== inputs[0].criterion || JSON.stringify(x.company) !== JSON.stringify(inputs[0].company))) throw new Error('Gemini comparison batches must share company and criterion');
+  const { json, tokens, ms } = await askJson(model,
+    'You classify accounting transactions. ' + judgeInstructions('<each ref>').replace('the transaction with ref "<each ref>"', 'each transaction') +
+    ` Options: ${describe(OPTIONS)} Reply with only a JSON object mapping every ref to "match", "no_match" or "uncertain".`,
+    { company: inputs[0].company, criterion: inputs[0].criterion, transactions: inputs.map((x, i) => ({ ref: `t${i}`, ...x.transaction })) });
+  const results = inputs.map((_, i) => {
+    const state = json[`t${i}`];
+    if (state !== 'match' && state !== 'no_match' && state !== 'uncertain') throw new Error(`Gemini skipped ref t${i}`);
+    return { state, pMatch: null } as Decision;
+  });
+  return { results, tokens, ms };
 }

@@ -18,6 +18,7 @@ import { duplicatesCheck } from './duplicates.ts';
 import { ReviewCheck, reviewCheckRoutes } from './reviewChecks.ts';
 import { SavedSearchService, savedSearchRoutes } from './savedSearches.ts';
 import { ChatStore, chatRoutes } from './chat.ts';
+import { evaluationRoutes } from './evaluation.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -98,6 +99,7 @@ reviewCheckRoutes(app, { 'payment-risk': new ReviewCheck(database, workspace, pa
 savedSearches.retireMonitoring();
 savedSearchRoutes(app, savedSearches);
 chatRoutes(app, new ChatStore(database, workspace));
+evaluationRoutes(app);
 // Enabled dashboard actions keep running while this server is open, even after
 // the browser closes. Their baseline prevents implicit historical backfills.
 const automationTimer = setInterval(() => {

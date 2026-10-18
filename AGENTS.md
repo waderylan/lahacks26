@@ -14,6 +14,12 @@ Keep the floating **Ask your books** assistant (`src/AskPanel.tsx`). It supports
 - `npm run dev` serves the app at http://localhost:5173 (needs `AI_GATEWAY_API_KEY` in `.env`; `GEMINI_API_KEY` for message drafts).
 - `npm test` discovers source/server unit and API tests. `npm run typecheck` checks server, client, fixtures, and TypeScript scripts. `npm run test:browser` uses isolated fixtures by default.
 
+## Hosted demo
+
+- Frontend: https://waderylan.github.io/lahacks26/app/ (built by `.github/workflows/pages.yml` on push to `main`; slideshow stays under `docs/`).
+- API: https://lahacks26-api.vercel.app (Vercel Hobby project `lahacks26-api`, built by `scripts/build_vercel.mjs`, starts from `server/seed/actions.sqlite`). `AI_GATEWAY_API_KEY`, `ALLOWED_ORIGINS`, and `GEMINI_KEY_PRIVATE` live only in Vercel env.
+- Gemini key: never commit it in plaintext. Run `node --env-file=.env scripts/encrypt_gemini_key.mjs`, commit only `config/gemini-key.enc`, push to `main`; the API picks it up within a minute without a redeploy.
+
 ## Rules
 
 - SQLite (`workspace/actions.sqlite`, configurable with `WORKSPACE_DB`) is the source of truth for all durable application state. Keep rule actions, dashboard metadata, messages/decisions, notifications, replay state, settings, and background jobs server-side; browser storage is not used for application state.

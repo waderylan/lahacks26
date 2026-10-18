@@ -5,6 +5,7 @@ import { waitUntil } from '@vercel/functions';
 import { actionStore } from './actionStore.ts';
 import { createReviewApp } from './app.ts';
 import { allowedOrigins } from './actionRoutes.ts';
+import { loadSharedGeminiKey } from './sharedGeminiKey.ts';
 
 /**
  * Vercel Function entry for the hosted demo. Keys stay in Vercel env vars; the GitHub Pages
@@ -40,7 +41,8 @@ app.use((req, res, next) => {
 
 // No long-lived timers on serverless: run rule scans and draft writing after requests instead.
 let lastKick = 0;
-app.use((_req, _res, next) => {
+app.use(async (_req, _res, next) => {
+  await loadSharedGeminiKey();
   if (Date.now() - lastKick > 5_000) {
     lastKick = Date.now();
     waitUntil(Promise.allSettled([runtime.rules.scan(), runtime.rules.drainDrafts()]));

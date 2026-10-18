@@ -1,16 +1,6 @@
 import type { Row } from './types';
 
-export type RiskVerdict = 'suspicious' | 'cannot_tell' | 'safe';
-export interface RiskResult {
-  id: string; verdict: RiskVerdict;
-  /** Jev's probability for the chosen verdict, and for `suspicious` specifically (used for ordering). */
-  probability: number; pSuspicious: number;
-  signals: string[]; checkedAt: string;
-  /** Enough to list the transaction without loading it. */
-  summary: { billId: string; docNumber: string; vendor: string; date: string; amountCents: number; txnType?: Row['txnType'] };
-}
-export interface RiskState { results: Record<string, RiskResult>; escalated: Record<string, { at: string; by: string }> }
-export const RISK_FLAG = 'Possible payment diversion';
+// Result types and the flag label live in reviewChecks.ts (shared by every Jev review check).
 
 const ENDING = /account(?:\s+number)?\s+ending(?:\s+in)?\s+(\d{4})/gi;
 const CHANGE_REQUEST = /(bank|account|remit\w*|payment details)[^.]{0,40}\b(changed|new|update[ds]?|switch(ed)?)\b|\bnew (bank|account)\b/i;

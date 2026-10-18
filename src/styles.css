@@ -523,3 +523,8 @@ table.sheet { border-collapse: separate; border-spacing: 0; table-layout: fixed;
 .risk-escalate { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:4px 0 16px; }
 .risk-quiet summary { cursor:pointer; font-size:12px; color:var(--muted); margin:12px 0 8px; }
 .payment-risk .dashboard-board-heading p { max-width:720px; margin:4px 0 0; }
+.checks-workspace { display:flex; flex-direction:column; flex:1; min-height:0; }
+.check-switch { display:flex; gap:6px; padding:12px 24px 0; background:var(--panel); }
+.check-switch button { display:inline-flex; align-items:center; gap:6px; }
+.check-switch button.on { font-weight:600; background:#eef3f0; border-color:#9fbfae; }
+.risk-original { font-size:11px; padding:1px 8px; border-radius:999px; background:#eaf1f8; color:#2d5f86; border:1px solid #b9d1e4; }

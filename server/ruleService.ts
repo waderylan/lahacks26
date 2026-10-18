@@ -12,6 +12,7 @@ import type { WorkspaceData } from './workspaceData.ts';
 import type { Judge } from './actionEngine.ts';
 import { draftMessage, type DraftRequest } from './messages.ts';
 import { deliverDraft } from './mailbox.ts';
+import { forgetEscalations } from './reviewChecks.ts';
 import { employeeById } from '../src/employees.ts';
 
 interface SavedState { companyId: string; store: RuleStore; watches: Record<string, Record<string, string>>; log: string[] }
@@ -173,9 +174,7 @@ export class RuleService {
       if (full) { saved.watches = {}; for (const row of this.data.bills(companyId).rows.filter(row => row.dashboard?.reviewed)) this.db.write({ ...row, dashboard: { ...row.dashboard!, reviewed: false } }, row.sourceVersion!); }
       saved.log = [];
       this.db.removeAll('mail', companyId);
-      // The escalation mail and flags are gone, so forget the escalations too (Jev's results stay cached).
-      const risk = this.db.get<{ escalated?: Record<string, unknown> }>('payment-risk', companyId);
-      if (risk?.escalated && Object.keys(risk.escalated).length) this.db.put('payment-risk', companyId, companyId, { ...risk, escalated: {} });
+      forgetEscalations(this.db, companyId);
     });
   }
   importLegacy(companyId: string, legacy: RuleStore, reviewed: string[] = []) {

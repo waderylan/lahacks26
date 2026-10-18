@@ -1,0 +1,20 @@
+- id: company-main
+  legal_name: Parcelmint Online Goods LLC
+  trade_name: Parcelmint Online Goods
+  industry_naics: '454110'
+  industry_title: Electronic Shopping and Mail-Order Houses
+  email: accounts@parcelmintonlinegoods.example
+  phone: (555) 410-7721
+  website: https://www.parcelmintonlinegoods.example
+  address:
+    line1: 2214 Dockside Parkway
+    city: Toledo
+    state: OH
+    postal_code: '43604'
+    country: United States
+    line2: null
+  fiscal_year_start_month: 1
+  opening_sim_day: 0
+  opening_date: '2025-10-06'
+  remit_bank: Harbor & Vine Bank
+  remit_account_ending: '1359'

@@ -1,0 +1,1667 @@
+{
+  "schema": 1,
+  "seed": 20261017,
+  "prompts": [
+    {
+      "id": "P01",
+      "prompt": "Find descriptions that contain words but don't explain what was purchased.",
+      "family": "A",
+      "scope": "broad",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00049",
+            "company-101:bill-00050",
+            "company-101:bill-00076",
+            "company-101:bill-00104",
+            "company-101:bill-00142",
+            "company-101:inv-00029"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00068",
+            "company-101:bill-00071",
+            "company-101:bill-00117",
+            "company-101:bill-00169",
+            "company-101:inv-00011"
+          ],
+          "counts": {
+            "match": 6,
+            "uncertain": 0,
+            "lookalike_no_match": 5
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00050",
+            "company-102:bill-00086",
+            "company-102:bill-00144",
+            "company-102:bill-00162",
+            "company-102:inv-00008"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00058",
+            "company-102:bill-00027",
+            "company-102:bill-00039",
+            "company-102:bill-00146",
+            "company-102:inv-00019"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 5
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00050",
+            "company-103:bill-00098",
+            "company-103:bill-00139",
+            "company-103:bill-00147",
+            "company-103:inv-00043"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00046",
+            "company-103:bill-00026",
+            "company-103:bill-00042",
+            "company-103:bill-00166",
+            "company-103:inv-00047"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 5
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00052",
+            "company-104:bill-00031",
+            "company-104:bill-00155",
+            "company-104:bill-00157",
+            "company-104:inv-00002"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00027",
+            "company-104:bill-00040",
+            "company-104:bill-00067",
+            "company-104:bill-00091",
+            "company-104:inv-00029"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 5
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P02",
+      "prompt": "Find bills whose description is blank or only a placeholder.",
+      "family": "A",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00019",
+            "company-101:bank-00050",
+            "company-101:bill-00009",
+            "company-101:bill-00089",
+            "company-101:bill-00113",
+            "company-101:bill-00116",
+            "company-101:bill-00135",
+            "company-101:inv-00015"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00117"
+          ],
+          "counts": {
+            "match": 8,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00026",
+            "company-102:bank-00072",
+            "company-102:bill-00007",
+            "company-102:bill-00047",
+            "company-102:bill-00074",
+            "company-102:bill-00088",
+            "company-102:bill-00089",
+            "company-102:bill-00157",
+            "company-102:inv-00005"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00039"
+          ],
+          "counts": {
+            "match": 9,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00009",
+            "company-103:bank-00041",
+            "company-103:bill-00013",
+            "company-103:bill-00022",
+            "company-103:bill-00029",
+            "company-103:bill-00079",
+            "company-103:bill-00102",
+            "company-103:bill-00122",
+            "company-103:inv-00018"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00042"
+          ],
+          "counts": {
+            "match": 9,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00006",
+            "company-104:bank-00034",
+            "company-104:bill-00050",
+            "company-104:bill-00078",
+            "company-104:bill-00085",
+            "company-104:bill-00108",
+            "company-104:bill-00138",
+            "company-104:bill-00151",
+            "company-104:inv-00037"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00067"
+          ],
+          "counts": {
+            "match": 9,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P03",
+      "prompt": "Find records where the memo contradicts the purchase details.",
+      "family": "B",
+      "scope": "broad",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00056",
+            "company-101:bank-00059",
+            "company-101:bill-00044",
+            "company-101:bill-00045",
+            "company-101:bill-00095",
+            "company-101:bill-00098",
+            "company-101:bill-00160",
+            "company-101:inv-00066"
+          ],
+          "reference_uncertain": [
+            "company-101:bill-00155",
+            "company-101:inv-00025"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00040",
+            "company-101:bill-00032",
+            "company-101:bill-00061",
+            "company-101:inv-00041"
+          ],
+          "counts": {
+            "match": 8,
+            "uncertain": 2,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00013",
+            "company-102:bank-00065",
+            "company-102:bill-00036",
+            "company-102:bill-00112",
+            "company-102:bill-00114",
+            "company-102:bill-00130",
+            "company-102:bill-00136",
+            "company-102:bill-00171",
+            "company-102:inv-00031"
+          ],
+          "reference_uncertain": [
+            "company-102:bill-00058",
+            "company-102:inv-00034"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00002",
+            "company-102:bill-00077",
+            "company-102:bill-00083",
+            "company-102:inv-00010"
+          ],
+          "counts": {
+            "match": 9,
+            "uncertain": 2,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00061",
+            "company-103:bank-00072",
+            "company-103:bill-00023",
+            "company-103:bill-00027",
+            "company-103:bill-00066",
+            "company-103:bill-00091",
+            "company-103:bill-00093",
+            "company-103:bill-00096",
+            "company-103:inv-00028"
+          ],
+          "reference_uncertain": [
+            "company-103:bill-00045",
+            "company-103:inv-00015"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00022",
+            "company-103:bill-00018",
+            "company-103:bill-00108",
+            "company-103:inv-00017"
+          ],
+          "counts": {
+            "match": 9,
+            "uncertain": 2,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00029",
+            "company-104:bank-00070",
+            "company-104:bill-00022",
+            "company-104:bill-00043",
+            "company-104:bill-00076",
+            "company-104:bill-00100",
+            "company-104:bill-00142",
+            "company-104:bill-00156",
+            "company-104:inv-00006"
+          ],
+          "reference_uncertain": [
+            "company-104:bill-00088",
+            "company-104:inv-00010"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00040",
+            "company-104:bill-00006",
+            "company-104:bill-00120",
+            "company-104:inv-00038"
+          ],
+          "counts": {
+            "match": 9,
+            "uncertain": 2,
+            "lookalike_no_match": 4
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P04",
+      "prompt": "Find bills that may charge twice for the same underlying work.",
+      "family": "C",
+      "scope": "broad",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00106",
+            "company-101:bill-00165",
+            "company-101:bill-00171"
+          ],
+          "reference_uncertain": [
+            "company-101:bill-00069"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00012",
+            "company-101:bill-00016",
+            "company-101:bill-00150",
+            "company-101:bill-00163"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 1,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00034",
+            "company-102:bill-00046",
+            "company-102:bill-00067"
+          ],
+          "reference_uncertain": [
+            "company-102:bill-00121"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00010",
+            "company-102:bill-00016",
+            "company-102:bill-00158",
+            "company-102:bill-00167"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 1,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00025",
+            "company-103:bill-00073",
+            "company-103:bill-00089"
+          ],
+          "reference_uncertain": [
+            "company-103:bill-00110"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00076",
+            "company-103:bill-00084",
+            "company-103:bill-00117",
+            "company-103:bill-00134"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 1,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00081",
+            "company-104:bill-00114",
+            "company-104:bill-00147"
+          ],
+          "reference_uncertain": [
+            "company-104:bill-00036"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00128",
+            "company-104:bill-00135",
+            "company-104:bill-00152",
+            "company-104:bill-00164"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 1,
+            "lookalike_no_match": 4
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P05",
+      "prompt": "Find payment-instruction changes that conflict with the vendor records.",
+      "family": "F",
+      "scope": "broad",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00025",
+            "company-101:bill-00158"
+          ],
+          "reference_uncertain": [
+            "company-101:bill-00007"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00051",
+            "company-101:bill-00122"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00123",
+            "company-102:bill-00166"
+          ],
+          "reference_uncertain": [
+            "company-102:bill-00014"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00087",
+            "company-102:bill-00116"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00044",
+            "company-103:bill-00146"
+          ],
+          "reference_uncertain": [
+            "company-103:bill-00159"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00014",
+            "company-103:bill-00069"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00001",
+            "company-104:bill-00097"
+          ],
+          "reference_uncertain": [
+            "company-104:bill-00161"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00048",
+            "company-104:bill-00119"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P06",
+      "prompt": "Find bills claiming work or goods that the purchase order, receiving or project records don't support.",
+      "family": "D",
+      "scope": "broad",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00037"
+          ],
+          "reference_uncertain": [
+            "company-101:bill-00085",
+            "company-101:inv-00046"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00003",
+            "company-101:bill-00060",
+            "company-101:inv-00028"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 2,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00125",
+            "company-102:bill-00132",
+            "company-102:bill-00145"
+          ],
+          "reference_uncertain": [
+            "company-102:bill-00060",
+            "company-102:inv-00029"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00066",
+            "company-102:bill-00073",
+            "company-102:bill-00097",
+            "company-102:bill-00110",
+            "company-102:bill-00138",
+            "company-102:inv-00047"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 2,
+            "lookalike_no_match": 6
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00003",
+            "company-103:bill-00154",
+            "company-103:bill-00163"
+          ],
+          "reference_uncertain": [
+            "company-103:bill-00077",
+            "company-103:inv-00012"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00012",
+            "company-103:bill-00062",
+            "company-103:bill-00141",
+            "company-103:bill-00148",
+            "company-103:bill-00161",
+            "company-103:inv-00001"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 2,
+            "lookalike_no_match": 6
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00037",
+            "company-104:bill-00044",
+            "company-104:bill-00121"
+          ],
+          "reference_uncertain": [
+            "company-104:bill-00117",
+            "company-104:inv-00033"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00023",
+            "company-104:bill-00083",
+            "company-104:bill-00089",
+            "company-104:bill-00113",
+            "company-104:bill-00118",
+            "company-104:inv-00039"
+          ],
+          "counts": {
+            "match": 3,
+            "uncertain": 2,
+            "lookalike_no_match": 6
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P07",
+      "prompt": "Find transaction text that tries to influence the reviewer or bypass checks.",
+      "family": "G",
+      "scope": "broad",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00060",
+            "company-101:bill-00004",
+            "company-101:bill-00052",
+            "company-101:bill-00063",
+            "company-101:inv-00014"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00029",
+            "company-101:bill-00014",
+            "company-101:bill-00019",
+            "company-101:inv-00045"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00053",
+            "company-102:bill-00098",
+            "company-102:bill-00107",
+            "company-102:bill-00131",
+            "company-102:inv-00020"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00066",
+            "company-102:bill-00068",
+            "company-102:bill-00081",
+            "company-102:inv-00053"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00066",
+            "company-103:bill-00002",
+            "company-103:bill-00104",
+            "company-103:bill-00124",
+            "company-103:inv-00011"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00060",
+            "company-103:bill-00064",
+            "company-103:bill-00156",
+            "company-103:inv-00003"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 4
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00011",
+            "company-104:bill-00075",
+            "company-104:bill-00130",
+            "company-104:bill-00149",
+            "company-104:inv-00042"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00063",
+            "company-104:bill-00072",
+            "company-104:bill-00123",
+            "company-104:inv-00041"
+          ],
+          "counts": {
+            "match": 5,
+            "uncertain": 0,
+            "lookalike_no_match": 4
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P08",
+      "prompt": "Find bills whose text claims an approval that the approval records don't show.",
+      "family": "G",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00052"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00014"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00107"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00081"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00104"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00064"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00130"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00123"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P09",
+      "prompt": "Find bills dated after the project they reference was cancelled.",
+      "family": "D",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [],
+          "counts": {
+            "match": 0,
+            "uncertain": 0,
+            "lookalike_no_match": 0
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00145"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00110",
+            "company-102:bill-00120",
+            "company-102:bill-00138"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00163"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00148",
+            "company-103:bill-00151",
+            "company-103:bill-00161"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00121"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00089",
+            "company-104:bill-00102",
+            "company-104:bill-00118"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 3
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P10",
+      "prompt": "Find card bills where the receipt shows something different from the business purpose stated.",
+      "family": "E",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00102"
+          ],
+          "reference_uncertain": [
+            "company-101:bill-00039"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00111",
+            "company-101:bill-00118"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00064"
+          ],
+          "reference_uncertain": [
+            "company-102:bill-00053"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00080",
+            "company-102:bill-00101"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00037"
+          ],
+          "reference_uncertain": [
+            "company-103:bill-00055"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00058",
+            "company-103:bill-00100"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00030"
+          ],
+          "reference_uncertain": [
+            "company-104:bill-00137"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00082",
+            "company-104:bill-00129"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P11",
+      "prompt": "Find goods bills where the receiving record shows fewer units than were billed.",
+      "family": "D",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00037"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00003"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00125"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00073"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00003"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00141"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00044"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00023"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P12",
+      "prompt": "Find one-time fees that were billed more than once for the same period.",
+      "family": "C",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00165"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 0
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00034"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 0
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00025"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 0
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00081"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 0
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P13",
+      "prompt": "Find urgent or secretive requests combined with a change of payment details.",
+      "family": "F",
+      "scope": "narrow",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bill-00025",
+            "company-101:bill-00158"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bill-00122"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bill-00123",
+            "company-102:bill-00166"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bill-00116"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bill-00044",
+            "company-103:bill-00146"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bill-00014"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bill-00001",
+            "company-104:bill-00097"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bill-00048"
+          ],
+          "counts": {
+            "match": 2,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P14",
+      "prompt": "Find invoices for work, projects or orders that were cancelled before the invoice date.",
+      "family": "D",
+      "scope": "invoice",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:inv-00062"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:inv-00070"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:inv-00041"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:inv-00027",
+            "company-102:inv-00030",
+            "company-102:inv-00040"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:inv-00040"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:inv-00032",
+            "company-103:inv-00037",
+            "company-103:inv-00038"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:inv-00036"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:inv-00027",
+            "company-104:inv-00028",
+            "company-104:inv-00035"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 3
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P15",
+      "prompt": "Find invoices that ask the customer to pay a different account than the company's own remittance details.",
+      "family": "F",
+      "scope": "invoice",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:inv-00051"
+          ],
+          "reference_uncertain": [
+            "company-101:inv-00035"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:inv-00071"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:inv-00023"
+          ],
+          "reference_uncertain": [
+            "company-102:inv-00045"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:inv-00033"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:inv-00026"
+          ],
+          "reference_uncertain": [
+            "company-103:inv-00021"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:inv-00039"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:inv-00005"
+          ],
+          "reference_uncertain": [
+            "company-104:inv-00015"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:inv-00018"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P16",
+      "prompt": "Find bank payments sent to an account that doesn't match the vendor's records.",
+      "family": "F",
+      "scope": "bank",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00079"
+          ],
+          "reference_uncertain": [
+            "company-101:bank-00004"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00026"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00063"
+          ],
+          "reference_uncertain": [
+            "company-102:bank-00008"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00044"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00020"
+          ],
+          "reference_uncertain": [
+            "company-103:bank-00077"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00032"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00055"
+          ],
+          "reference_uncertain": [
+            "company-104:bank-00077"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00065"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P17",
+      "prompt": "Find bank payments that may have paid the same bill twice.",
+      "family": "C",
+      "scope": "bank",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00071"
+          ],
+          "reference_uncertain": [
+            "company-101:bank-00015"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00013",
+            "company-101:bank-00073",
+            "company-101:bank-00078"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00042"
+          ],
+          "reference_uncertain": [
+            "company-102:bank-00022"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00036",
+            "company-102:bank-00047",
+            "company-102:bank-00051"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00015"
+          ],
+          "reference_uncertain": [
+            "company-103:bank-00027"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00048",
+            "company-103:bank-00058",
+            "company-103:bank-00062"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 3
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00031"
+          ],
+          "reference_uncertain": [
+            "company-104:bank-00013"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00002",
+            "company-104:bank-00032",
+            "company-104:bank-00037"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 3
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P18",
+      "prompt": "Find bank payments to a payee with no vendor record, purchase order or open bill.",
+      "family": "D",
+      "scope": "bank",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00027"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00072"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00024"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00027"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00014"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00042"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00010"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00053"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P19",
+      "prompt": "Find bank transfers to personal accounts that are described as business expenses.",
+      "family": "E",
+      "scope": "bank",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00055"
+          ],
+          "reference_uncertain": [
+            "company-101:bank-00076"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00052"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00055"
+          ],
+          "reference_uncertain": [
+            "company-102:bank-00071"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00023"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00063"
+          ],
+          "reference_uncertain": [
+            "company-103:bank-00056"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00070"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00017"
+          ],
+          "reference_uncertain": [
+            "company-104:bank-00061"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00073"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P20",
+      "prompt": "Find invoices that may bill the same stage or order twice.",
+      "family": "C",
+      "scope": "invoice",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:inv-00039"
+          ],
+          "reference_uncertain": [
+            "company-101:inv-00078"
+          ],
+          "reference_negative_lookalikes": [
+            "company-101:inv-00002",
+            "company-101:inv-00004"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:inv-00043"
+          ],
+          "reference_uncertain": [
+            "company-102:inv-00016"
+          ],
+          "reference_negative_lookalikes": [
+            "company-102:inv-00009",
+            "company-102:inv-00011"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:inv-00049"
+          ],
+          "reference_uncertain": [
+            "company-103:inv-00027"
+          ],
+          "reference_negative_lookalikes": [
+            "company-103:inv-00005",
+            "company-103:inv-00006"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:inv-00019"
+          ],
+          "reference_uncertain": [
+            "company-104:inv-00014"
+          ],
+          "reference_negative_lookalikes": [
+            "company-104:inv-00040",
+            "company-104:inv-00043"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 1,
+            "lookalike_no_match": 2
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    },
+    {
+      "id": "P21",
+      "prompt": "Find bank deposits that don't match any customer invoice.",
+      "family": "D",
+      "scope": "bank",
+      "per_company": {
+        "company-101": {
+          "reference_matches": [
+            "company-101:bank-00075"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-101:bank-00080"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-102": {
+          "reference_matches": [
+            "company-102:bank-00061"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-102:bank-00005"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-103": {
+          "reference_matches": [
+            "company-103:bank-00055"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-103:bank-00076"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        },
+        "company-104": {
+          "reference_matches": [
+            "company-104:bank-00025"
+          ],
+          "reference_uncertain": [],
+          "reference_negative_lookalikes": [
+            "company-104:bank-00007"
+          ],
+          "counts": {
+            "match": 1,
+            "uncertain": 0,
+            "lookalike_no_match": 1
+          }
+        }
+      },
+      "note": "Reference outcomes come from the authored case manifest. They are not Jev results."
+    }
+  ],
+  "measured_jev_results": null,
+  "note": "measured_jev_results is filled only by smoke runs, separately from these reference outcomes."
+}

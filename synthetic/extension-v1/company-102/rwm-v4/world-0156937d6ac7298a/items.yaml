@@ -1,0 +1,63 @@
+- id: item-demolition
+  name: Demolition
+  sku: DEMOLITI
+  description: Demolition carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-electrical
+  name: Electrical
+  sku: ELECTRIC
+  description: Electrical carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-finishing
+  name: Finishing
+  sku: FINISHIN
+  description: Finishing carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-landscaping
+  name: Landscaping
+  sku: LANDSCAP
+  description: Landscaping carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-masonry
+  name: Masonry
+  sku: MASONRY
+  description: Masonry carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-plumbing
+  name: Plumbing
+  sku: PLUMBING
+  description: Plumbing carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-sitework
+  name: Site preparation
+  sku: SITEWORK
+  description: Site preparation carried out as part of a contracted project.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip

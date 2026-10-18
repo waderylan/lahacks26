@@ -1,0 +1,54 @@
+- id: item-electrical
+  name: Equipment and service
+  sku: ELECTRIC
+  description: Equipment and service carried out as part of a contracted engagement.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-finishing
+  name: Plating and presentation
+  sku: FINISHIN
+  description: Plating and presentation carried out as part of a contracted engagement.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-landscaping
+  name: Bar service
+  sku: LANDSCAP
+  description: Bar service carried out as part of a contracted engagement.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-masonry
+  name: Menu development
+  sku: MASONRY
+  description: Menu development carried out as part of a contracted engagement.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-plumbing
+  name: Food production
+  sku: PLUMBING
+  description: Food production carried out as part of a contracted engagement.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip
+- id: item-sitework
+  name: Event planning
+  sku: SITEWORK
+  description: Event planning carried out as part of a contracted engagement.
+  item_type: service
+  unit_price_amount: '0.00'
+  unit_cost_amount: '0.00'
+  income_account_id: acct-construction-income
+  purchase_account_id: acct-wip

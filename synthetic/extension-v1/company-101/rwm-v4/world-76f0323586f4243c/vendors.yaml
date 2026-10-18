@@ -1,0 +1,229 @@
+- id: vend-bank
+  display_name: Brightwater Savings Bank
+  company_name: Brightwater Savings Bank
+  contact_given_name: Javier
+  contact_family_name: Rosenthal
+  email: javier.rosenthal@brightwatersavingsbank.example
+  phone: (555) 059-0597
+  address:
+    line1: 9231 Mandrel Street
+    city: Mobile
+    state: AL
+    postal_code: '36678'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: lender
+  joined_sim_day: 120
+  joined_date: '2026-02-03'
+  payee_bank: Marlowe National Bank
+  payee_account_ending: '1197'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-electricity
+  display_name: Cedar Park Power & Light
+  company_name: Cedar Park Power & Light
+  contact_given_name: Lucia
+  contact_family_name: Nakagawa
+  email: lucia.nakagawa@cedarparkpowerlight.example
+  phone: (555) 862-1903
+  address:
+    line1: 5791 Loading Dock Road
+    city: Davenport
+    state: IA
+    postal_code: '52806'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: utility
+  joined_sim_day: 14
+  joined_date: '2025-10-20'
+  payee_bank: Lakeshore Trust
+  payee_account_ending: '3145'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-equipment-vendor
+  display_name: Novotny Racking & Warehouse Equipment
+  company_name: Novotny Racking & Warehouse Equipment
+  contact_given_name: Thandiwe
+  contact_family_name: Danforth
+  email: thandiwe.danforth@novotnyrackingwarehouseequip.example
+  phone: (555) 338-4405
+  address:
+    line1: 5622 Grommet Lane
+    city: Erie
+    state: PA
+    postal_code: '16502'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: operating
+  joined_sim_day: 336
+  joined_date: '2026-09-07'
+  payee_bank: Lakeshore Trust
+  payee_account_ending: '1369'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-government
+  display_name: City of Havenwood
+  company_name: City of Havenwood
+  contact_given_name: Fenna
+  contact_family_name: Ulloa
+  email: fenna.ulloa@cityofhavenwood.example
+  phone: (555) 291-8780
+  address:
+    line1: 9327 Gantry Lane
+    city: Providence
+    state: RI
+    postal_code: 02900
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: government
+  joined_sim_day: 91
+  joined_date: '2026-01-05'
+  payee_bank: Harbor & Vine Bank
+  payee_account_ending: '9141'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-landlord
+  display_name: Keystone Property Group
+  company_name: Keystone Property Group
+  contact_given_name: Mateo
+  contact_family_name: Zabala
+  email: mateo.zabala@keystonepropertygroup.example
+  phone: (555) 986-6638
+  address:
+    line1: 837 Palletier Drive
+    city: Chattanooga
+    state: TN
+    postal_code: '37442'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: premises
+  joined_sim_day: 7
+  joined_date: '2025-10-13'
+  payee_bank: Marlowe National Bank
+  payee_account_ending: '9034'
+  payee_details_last_changed: '2025-10-23'
+  payee_change_verification: Change entered by AP clerk; supporting form not attached
+- id: vend-logistics-vendor
+  display_name: Timberline Fulfillment Partners
+  company_name: Timberline Fulfillment Partners
+  contact_given_name: Quentin
+  contact_family_name: Eskildsen
+  email: quentin.eskildsen@timberlinefulfillmentpartner.example
+  phone: (555) 537-8010
+  address:
+    line1: 3107 Millrace Drive
+    city: Akron
+    state: OH
+    postal_code: '44353'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: operating
+  joined_sim_day: 14
+  joined_date: '2025-10-20'
+  payee_bank: Marlowe National Bank
+  payee_account_ending: '5260'
+  payee_details_last_changed: '2026-01-22'
+  payee_change_verification: Bank change form signed by vendor officer; call-back to phone on file completed
+- id: vend-operating-vendor
+  display_name: Lanternwood Marketing Group
+  company_name: Lanternwood Marketing Group
+  contact_given_name: Fabian
+  contact_family_name: Fairbairn
+  email: fabian.fairbairn@lanternwoodmarketinggroup.example
+  phone: (555) 678-6216
+  address:
+    line1: 1515 Wharfinger Lane
+    city: Lubbock
+    state: TX
+    postal_code: '79410'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: operating
+  joined_sim_day: 56
+  joined_date: '2025-12-01'
+  payee_bank: Pinecrest Credit Union
+  payee_account_ending: '2998'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-supplier
+  display_name: Halvorsen Consumer Electronics Wholesale
+  company_name: Halvorsen Consumer Electronics Wholesale
+  contact_given_name: Jonas
+  contact_family_name: Dagher
+  email: jonas.dagher@halvorsenconsumerelectronics.example
+  phone: (555) 940-2344
+  address:
+    line1: 6598 Handcart Way
+    city: Duluth
+    state: MN
+    postal_code: '55831'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  supply_role: product
+  joined_sim_day: 4
+  joined_date: '2025-10-10'
+  payee_bank: Pinecrest Credit Union
+  payee_account_ending: '3341'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-water
+  display_name: Glenmoor Water District
+  company_name: Glenmoor Water District
+  contact_given_name: Emeka
+  contact_family_name: Oyelaran
+  email: emeka.oyelaran@glenmoorwaterdistrict.example
+  phone: (555) 451-7276
+  address:
+    line1: 949 Dockhouse Lane
+    city: Davenport
+    state: IA
+    postal_code: '52878'
+    country: United States
+    line2: null
+  payment_terms: Due on receipt
+  payment_terms_days: 0
+  supply_role: utility
+  joined_sim_day: 14
+  joined_date: '2025-10-20'
+  payee_bank: Northmark Savings
+  payee_account_ending: '8929'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding
+- id: vend-card
+  display_name: Meridian Business Card Services
+  company_name: Meridian Business Card Services
+  contact_given_name: Priya
+  contact_family_name: Lindgren
+  email: billing@meridianbusinesscardservices.example
+  phone: (555) 301-9902
+  address:
+    line1: 100 Commerce Plaza
+    city: Wilmington
+    state: DE
+    postal_code: '19801'
+    country: United States
+    line2: null
+  payment_terms: Net 20
+  payment_terms_days: 20
+  supply_role: card
+  joined_date: '2025-10-06'
+  payee_bank: Lakeshore Trust
+  payee_account_ending: '9395'
+  payee_details_last_changed: '2025-10-06'
+  payee_change_verification: Bank letter and voided check on file at onboarding

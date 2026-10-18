@@ -1,0 +1,1580 @@
+- id: bpay-00001
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2025-11-12'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00001
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00002
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2025-11-26'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00002
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00003
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2025-12-03'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00003
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00004
+  vendor_id: vend-insurer
+  vendor_name: Opal Casualty & Surety
+  txn_date: '2025-12-04'
+  amount: '887.67'
+  applications:
+  - document_id: bill-00004
+    amount: '887.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00005
+  vendor_id: vend-utilities
+  vendor_name: Alder Creek Gas & Electric
+  txn_date: '2025-12-04'
+  amount: '230.00'
+  applications:
+  - document_id: bill-00005
+    amount: '230.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00006
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2025-12-06'
+  amount: '789.99'
+  applications:
+  - document_id: bill-00008
+    amount: '789.99'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00007
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2025-12-14'
+  amount: '1293.47'
+  applications:
+  - document_id: bill-00006
+    amount: '1293.47'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00008
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2025-12-14'
+  amount: '480.20'
+  applications:
+  - document_id: bill-00007
+    amount: '480.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00009
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2025-12-17'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00009
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00010
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2025-12-19'
+  amount: '480.20'
+  applications:
+  - document_id: bill-00010
+    amount: '480.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00011
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2025-12-31'
+  amount: '589.82'
+  applications:
+  - document_id: bill-00011
+    amount: '589.82'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00012
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2025-12-31'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00012
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00013
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-01-02'
+  amount: '589.82'
+  applications:
+  - document_id: bill-00013
+    amount: '589.82'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00014
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-01-07'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00014
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00015
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-01-08'
+  amount: '589.83'
+  applications:
+  - document_id: bill-00015
+    amount: '589.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00016
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-01-13'
+  amount: '16400.00'
+  applications:
+  - document_id: bill-00017
+    amount: '16400.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00017
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-01-16'
+  amount: '1522.13'
+  applications:
+  - document_id: bill-00018
+    amount: '1522.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00018
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-01-17'
+  amount: '460.80'
+  applications:
+  - document_id: bill-00019
+    amount: '460.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00019
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-01-21'
+  amount: '1522.12'
+  applications:
+  - document_id: bill-00020
+    amount: '1522.12'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00020
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-01-21'
+  amount: '460.80'
+  applications:
+  - document_id: bill-00021
+    amount: '460.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00021
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-01-25'
+  amount: '460.80'
+  applications:
+  - document_id: bill-00022
+    amount: '460.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00022
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2026-01-28'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00023
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00023
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-01-28'
+  amount: '1522.13'
+  applications:
+  - document_id: bill-00024
+    amount: '1522.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00024
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-01-28'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00025
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00025
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-01-31'
+  amount: '1522.12'
+  applications:
+  - document_id: bill-00026
+    amount: '1522.12'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00026
+  vendor_id: vend-utilities
+  vendor_name: Alder Creek Gas & Electric
+  txn_date: '2026-02-02'
+  amount: '1115.00'
+  applications:
+  - document_id: bill-00027
+    amount: '1115.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00027
+  vendor_id: vend-insurer
+  vendor_name: Opal Casualty & Surety
+  txn_date: '2026-02-02'
+  amount: '887.67'
+  applications:
+  - document_id: bill-00028
+    amount: '887.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00028
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-02-05'
+  amount: '1522.13'
+  applications:
+  - document_id: bill-00029
+    amount: '1522.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00029
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-02-07'
+  amount: '1522.13'
+  applications:
+  - document_id: bill-00030
+    amount: '1522.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00030
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-02-08'
+  amount: '945.19'
+  applications:
+  - document_id: bill-00031
+    amount: '945.19'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00031
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-02-13'
+  amount: '945.19'
+  applications:
+  - document_id: bill-00032
+    amount: '945.19'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00032
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-02-18'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00033
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00033
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-02-19'
+  amount: '945.19'
+  applications:
+  - document_id: bill-00035
+    amount: '945.19'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00034
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-02-19'
+  amount: '36900.00'
+  applications:
+  - document_id: bill-00036
+    amount: '36900.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00035
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-02-21'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00037
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00036
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-02-22'
+  amount: '945.20'
+  applications:
+  - document_id: bill-00038
+    amount: '945.20'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00037
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-02-27'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00039
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00038
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-01'
+  amount: '1700.84'
+  applications:
+  - document_id: bill-00040
+    amount: '1700.84'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00039
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-05'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00041
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00040
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-06'
+  amount: '871.22'
+  applications:
+  - document_id: bill-00042
+    amount: '871.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00041
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-08'
+  amount: '871.23'
+  applications:
+  - document_id: bill-00043
+    amount: '871.23'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00042
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-03-08'
+  amount: '763.48'
+  applications:
+  - document_id: bill-00049
+    amount: '763.48'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00043
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-03-11'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00044
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00044
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-12'
+  amount: '871.22'
+  applications:
+  - document_id: bill-00045
+    amount: '871.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00045
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-13'
+  amount: '871.22'
+  applications:
+  - document_id: bill-00047
+    amount: '871.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00046
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-15'
+  amount: '871.22'
+  applications:
+  - document_id: bill-00048
+    amount: '871.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00047
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-03-15'
+  amount: '443.80'
+  applications:
+  - document_id: bill-00053
+    amount: '443.80'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00048
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-19'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00050
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00049
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-20'
+  amount: '871.22'
+  applications:
+  - document_id: bill-00051
+    amount: '871.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00050
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-22'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00052
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00051
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-25'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00054
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00052
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-03-27'
+  amount: '1700.84'
+  applications:
+  - document_id: bill-00055
+    amount: '1700.84'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00053
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-03-31'
+  amount: '476.17'
+  applications:
+  - document_id: bill-00063
+    amount: '476.17'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00054
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-04-01'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00056
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00055
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-04-01'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00057
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00056
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-04-01'
+  amount: '388.60'
+  applications:
+  - document_id: bill-00064
+    amount: '388.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00057
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-04-02'
+  amount: '797.25'
+  applications:
+  - document_id: bill-00058
+    amount: '797.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00058
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-04-04'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00059
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00059
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-04-04'
+  amount: '797.25'
+  applications:
+  - document_id: bill-00060
+    amount: '797.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00060
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-04-07'
+  amount: '189.94'
+  applications:
+  - document_id: bill-00069
+    amount: '189.94'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00061
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-04-09'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00061
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00062
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-04-09'
+  amount: '797.25'
+  applications:
+  - document_id: bill-00062
+    amount: '797.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00063
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-04-11'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00065
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00064
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-04-12'
+  amount: '797.25'
+  applications:
+  - document_id: bill-00066
+    amount: '797.25'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00065
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-04-16'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00068
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00066
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-04-22'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00070
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00067
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-04-24'
+  amount: '1700.83'
+  applications:
+  - document_id: bill-00071
+    amount: '1700.83'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00068
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-04-24'
+  amount: '764.37'
+  applications:
+  - document_id: bill-00072
+    amount: '764.37'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00069
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-04-24'
+  amount: '5479.38'
+  applications:
+  - document_id: bill-00073
+    amount: '5479.38'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00070
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-04-26'
+  amount: '764.38'
+  applications:
+  - document_id: bill-00074
+    amount: '764.38'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00071
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-04-29'
+  amount: '712.50'
+  applications:
+  - document_id: bill-00080
+    amount: '712.50'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00072
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-05-01'
+  amount: '764.37'
+  applications:
+  - document_id: bill-00075
+    amount: '764.37'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00073
+  vendor_id: vend-insurer
+  vendor_name: Opal Casualty & Surety
+  txn_date: '2026-05-03'
+  amount: '887.67'
+  applications:
+  - document_id: bill-00076
+    amount: '887.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00074
+  vendor_id: vend-utilities
+  vendor_name: Alder Creek Gas & Electric
+  txn_date: '2026-05-03'
+  amount: '1100.00'
+  applications:
+  - document_id: bill-00077
+    amount: '1100.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00075
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-05-06'
+  amount: '764.37'
+  applications:
+  - document_id: bill-00078
+    amount: '764.37'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00076
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-05-08'
+  amount: '1768.13'
+  applications:
+  - document_id: bill-00079
+    amount: '1768.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00077
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-05-13'
+  amount: '1768.12'
+  applications:
+  - document_id: bill-00081
+    amount: '1768.12'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00078
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-05-13'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00082
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00079
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-05-16'
+  amount: '853.21'
+  applications:
+  - document_id: bill-00083
+    amount: '853.21'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00080
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-05-16'
+  amount: '1768.13'
+  applications:
+  - document_id: bill-00084
+    amount: '1768.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00081
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2026-05-20'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00085
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00082
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-05-20'
+  amount: '853.22'
+  applications:
+  - document_id: bill-00086
+    amount: '853.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00083
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-05-21'
+  amount: '1768.12'
+  applications:
+  - document_id: bill-00087
+    amount: '1768.12'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00084
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-05-22'
+  amount: '279.86'
+  applications:
+  - document_id: bill-00092
+    amount: '279.86'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00085
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-05-23'
+  amount: '853.22'
+  applications:
+  - document_id: bill-00088
+    amount: '853.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00086
+  vendor_id: vend-plumbing
+  vendor_name: Keaton Plumbing Contractors
+  txn_date: '2026-05-24'
+  amount: '1768.13'
+  applications:
+  - document_id: bill-00089
+    amount: '1768.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00087
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-05-27'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00090
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00088
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-05-28'
+  amount: '853.22'
+  applications:
+  - document_id: bill-00091
+    amount: '853.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00089
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-06-01'
+  amount: '20800.00'
+  applications:
+  - document_id: bill-00093
+    amount: '20800.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00090
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-06-03'
+  amount: '853.22'
+  applications:
+  - document_id: bill-00094
+    amount: '853.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00091
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-06-03'
+  amount: '199.00'
+  applications:
+  - document_id: bill-00101
+    amount: '199.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00092
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-06-05'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00095
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00093
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-06-06'
+  amount: '853.21'
+  applications:
+  - document_id: bill-00096
+    amount: '853.21'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00094
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-06-10'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00097
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00095
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-06-11'
+  amount: '853.22'
+  applications:
+  - document_id: bill-00098
+    amount: '853.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00096
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-06-11'
+  amount: '1881.68'
+  applications:
+  - document_id: bill-00099
+    amount: '1881.68'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00097
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-06-13'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00100
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00098
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2026-06-17'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00102
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00099
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-06-17'
+  amount: '1881.69'
+  applications:
+  - document_id: bill-00103
+    amount: '1881.69'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00100
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-06-17'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00104
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00101
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-06-18'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00105
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00102
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-06-19'
+  amount: '853.22'
+  applications:
+  - document_id: bill-00106
+    amount: '853.22'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00103
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-06-20'
+  amount: '1881.69'
+  applications:
+  - document_id: bill-00107
+    amount: '1881.69'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00104
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-06-21'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00108
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00105
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-06-25'
+  amount: '1881.68'
+  applications:
+  - document_id: bill-00109
+    amount: '1881.68'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00106
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-06-26'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00110
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00107
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-06-30'
+  amount: '1552.17'
+  applications:
+  - document_id: bill-00111
+    amount: '1552.17'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00108
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-07-01'
+  amount: '1881.68'
+  applications:
+  - document_id: bill-00112
+    amount: '1881.68'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00109
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-07-01'
+  amount: '1794.00'
+  applications:
+  - document_id: bill-00113
+    amount: '1794.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00110
+  vendor_id: vend-utilities
+  vendor_name: Alder Creek Gas & Electric
+  txn_date: '2026-07-02'
+  amount: '1580.00'
+  applications:
+  - document_id: bill-00114
+    amount: '1580.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00111
+  vendor_id: vend-insurer
+  vendor_name: Opal Casualty & Surety
+  txn_date: '2026-07-02'
+  amount: '887.67'
+  applications:
+  - document_id: bill-00115
+    amount: '887.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00112
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-07-03'
+  amount: '507.56'
+  applications:
+  - document_id: bill-00116
+    amount: '507.56'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00113
+  vendor_id: vend-electrical
+  vendor_name: Sterling Electrical Services
+  txn_date: '2026-07-05'
+  amount: '1881.69'
+  applications:
+  - document_id: bill-00117
+    amount: '1881.69'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00114
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-07-08'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00118
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00115
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-09'
+  amount: '1693.95'
+  applications:
+  - document_id: bill-00119
+    amount: '1693.95'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00116
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-12'
+  amount: '1693.96'
+  applications:
+  - document_id: bill-00120
+    amount: '1693.96'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00117
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-16'
+  amount: '1693.96'
+  applications:
+  - document_id: bill-00122
+    amount: '1693.96'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00118
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-17'
+  amount: '530.85'
+  applications:
+  - document_id: bill-00123
+    amount: '530.85'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00119
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-19'
+  amount: '1693.96'
+  applications:
+  - document_id: bill-00124
+    amount: '1693.96'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00120
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-07-22'
+  amount: '28700.00'
+  applications:
+  - document_id: bill-00125
+    amount: '28700.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00121
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-22'
+  amount: '530.85'
+  applications:
+  - document_id: bill-00126
+    amount: '530.85'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00122
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-07-24'
+  amount: '1429.87'
+  applications:
+  - document_id: bill-00127
+    amount: '1429.87'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00123
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-24'
+  amount: '1693.96'
+  applications:
+  - document_id: bill-00128
+    amount: '1693.96'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00124
+  vendor_id: vend-masonry
+  vendor_name: Driftwood Masonry Co.
+  txn_date: '2026-07-25'
+  amount: '1693.95'
+  applications:
+  - document_id: bill-00129
+    amount: '1693.95'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00125
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-07-26'
+  amount: '1429.87'
+  applications:
+  - document_id: bill-00130
+    amount: '1429.87'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00126
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-07-29'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00131
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00127
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-07-31'
+  amount: '1429.88'
+  applications:
+  - document_id: bill-00133
+    amount: '1429.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00128
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-08-01'
+  amount: '323.91'
+  applications:
+  - document_id: bill-00139
+    amount: '323.91'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00129
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-08-05'
+  amount: '1429.87'
+  applications:
+  - document_id: bill-00134
+    amount: '1429.87'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00130
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-08-05'
+  amount: '540.67'
+  applications:
+  - document_id: bill-00135
+    amount: '540.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00131
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-08-08'
+  amount: '540.67'
+  applications:
+  - document_id: bill-00136
+    amount: '540.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00132
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-08-08'
+  amount: '1429.88'
+  applications:
+  - document_id: bill-00137
+    amount: '1429.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00133
+  vendor_id: vend-card
+  vendor_name: Harborline Card
+  txn_date: '2026-08-10'
+  amount: '209.60'
+  applications:
+  - document_id: bill-00147
+    amount: '209.60'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00134
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2026-08-12'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00140
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00135
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-08-13'
+  amount: '540.67'
+  applications:
+  - document_id: bill-00141
+    amount: '540.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00136
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-08-13'
+  amount: '1429.87'
+  applications:
+  - document_id: bill-00142
+    amount: '1429.87'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00137
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-08-16'
+  amount: '1429.88'
+  applications:
+  - document_id: bill-00143
+    amount: '1429.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00138
+  vendor_id: vend-landscaping
+  vendor_name: Novotny & Sons Landscaping
+  txn_date: '2026-08-16'
+  amount: '540.68'
+  applications:
+  - document_id: bill-00144
+    amount: '540.68'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00139
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-08-19'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00146
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00140
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-08-21'
+  amount: '1429.87'
+  applications:
+  - document_id: bill-00148
+    amount: '1429.87'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00141
+  vendor_id: vend-finishing
+  vendor_name: Espinoza Finishing Contractors
+  txn_date: '2026-08-26'
+  amount: '1429.88'
+  applications:
+  - document_id: bill-00149
+    amount: '1429.88'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00142
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-08-26'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00150
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00143
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-08-29'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00151
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00144
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-09-03'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00152
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00145
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-09-06'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00153
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00146
+  vendor_id: vend-government
+  vendor_name: Inlet Cove County Treasurer
+  txn_date: '2026-09-09'
+  amount: '1000.00'
+  applications:
+  - document_id: bill-00154
+    amount: '1000.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00147
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-09-09'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00155
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00148
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-09-11'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00156
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00149
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-09-16'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00157
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00150
+  vendor_id: vend-materials
+  vendor_name: Redwood Clearwater Building Supply
+  txn_date: '2026-09-18'
+  amount: '5944.61'
+  applications:
+  - document_id: bill-00158
+    amount: '5944.61'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00151
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-09-19'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00159
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00152
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-09-23'
+  amount: '843.06'
+  applications:
+  - document_id: bill-00160
+    amount: '843.06'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00153
+  vendor_id: vend-sitework
+  vendor_name: Kiln Hollow Sitework Co.
+  txn_date: '2026-09-24'
+  amount: '1407.13'
+  applications:
+  - document_id: bill-00161
+    amount: '1407.13'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00154
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-09-26'
+  amount: '843.06'
+  applications:
+  - document_id: bill-00162
+    amount: '843.06'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00155
+  vendor_id: vend-landlord
+  vendor_name: Lindqvist Property Management
+  txn_date: '2026-09-30'
+  amount: '500.00'
+  applications:
+  - document_id: bill-00163
+    amount: '500.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00156
+  vendor_id: vend-insurer
+  vendor_name: Opal Casualty & Surety
+  txn_date: '2026-09-30'
+  amount: '887.67'
+  applications:
+  - document_id: bill-00164
+    amount: '887.67'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00157
+  vendor_id: vend-utilities
+  vendor_name: Alder Creek Gas & Electric
+  txn_date: '2026-09-30'
+  amount: '1430.00'
+  applications:
+  - document_id: bill-00165
+    amount: '1430.00'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.
+- id: bpay-00158
+  vendor_id: vend-demolition
+  vendor_name: Jankowski Demolition Contractors
+  txn_date: '2026-10-01'
+  amount: '843.06'
+  applications:
+  - document_id: bill-00166
+    amount: '843.06'
+  payment_account_id: acct-checking
+  memo: Payment sent against vendor bill.

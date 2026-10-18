@@ -1,0 +1,69 @@
+- id: cust-client-1
+  display_name: Imani Eriksdottir
+  company_name: Imani Eriksdottir
+  contact_given_name: Imani
+  contact_family_name: Eriksdottir
+  email: imani.eriksdottir@homemail.example
+  phone: (555) 558-5748
+  address:
+    line1: 3932 Reelwright Road
+    city: Lubbock
+    state: TX
+    postal_code: '79481'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 28
+  joined_date: '2025-11-03'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-2
+  display_name: Bertram Lefebvre
+  company_name: Bertram Lefebvre
+  contact_given_name: Bertram
+  contact_family_name: Lefebvre
+  email: bertram.lefebvre@postbox.example
+  phone: (555) 947-5946
+  address:
+    line1: 2882 Cordage Avenue
+    city: Albany
+    state: NY
+    postal_code: '12287'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 112
+  joined_date: '2026-01-26'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''
+- id: cust-client-3
+  display_name: Bertram Tarkington
+  company_name: Bertram Tarkington
+  contact_given_name: Bertram
+  contact_family_name: Tarkington
+  email: bertram.tarkington@homemail.example
+  phone: (555) 280-2442
+  address:
+    line1: 4375 Gantry Lane
+    city: Wichita
+    state: KS
+    postal_code: '67266'
+    country: United States
+    line2: null
+  payment_terms: Net 7
+  payment_terms_days: 7
+  credit_limit_amount: '0.00'
+  joined_sim_day: 168
+  joined_date: '2026-03-23'
+  ended_sim_day: null
+  ended_date: null
+  ended_sim_event_id: null
+  notes: ''

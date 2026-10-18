@@ -1,38 +1,50 @@
 import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
-import { listCompanies, loadCompanyBills, loadCompanyBillsLimited } from './data.ts';
+import { demoSample, listCompanies } from './data.ts';
 import { QwenReadinessError } from './qwen.ts';
-import { evaluateSelected, providerStatus, type Provider } from './evaluator.ts';
+import { providerStatus, type Provider } from './evaluator.ts';
+import { actionStore } from './actionStore.ts';
+import { WorkspaceData } from './workspaceData.ts';
+import { ActionEngine } from './actionEngine.ts';
+import { SemanticService } from './semanticService.ts';
+import { actionRoutes } from './actionRoutes.ts';
+import { geminiConfigured, GEMINI_MODEL } from './messages.ts';
+import { RuleService } from './ruleService.ts';
+import { ruleRoutes } from './ruleRoutes.ts';
+import { Mailbox, mailRoutes } from './mailbox.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
+const database = actionStore();
+const workspace = new WorkspaceData(database);
+const semantics = new SemanticService(workspace);
+const actions = new ActionEngine(database, workspace, (companyId, criterion, rows, provider) => semantics.judge(companyId, criterion, rows, provider));
+const rules = new RuleService(database, workspace, (companyId, criterion, rows, provider) => semantics.judge(companyId, criterion, rows, provider));
 
 app.get('/api/status', (req, res) => {
   const provider: Provider = req.query.model === 'qwen' ? 'qwen' : 'jev';
-  res.json({ jev: providerStatus(provider), providers: { jev: providerStatus('jev'), qwen: providerStatus('qwen') } });
+  res.json({ jev: providerStatus(provider), providers: { jev: providerStatus('jev'), qwen: providerStatus('qwen') }, gemini: { configured: geminiConfigured(), model: GEMINI_MODEL } });
 });
 
 app.get('/api/companies', (_req, res) => res.json(listCompanies()));
 
-app.post('/api/demo-reset/receipt', (req, res) => {
-  const r = req.body;
-  if (!/^company-\d{3}$/.test(r?.companyId) || typeof r?.token !== 'string') return res.sendStatus(400);
-  console.log('Demo reset receipt:', JSON.stringify({ companyId: r.companyId, token: r.token, actions: r.actions, history: r.history, arrivals: r.arrivals, enabledRules: r.enabledRules, humanReviewed: r.humanReviewed }));
-  res.sendStatus(204);
-});
-
 app.get('/api/companies/:id/bills', (req, res) => {
   try {
-    const full = loadCompanyBills(req.params.id);
+    const full = workspace.bills(req.params.id);
     if (req.query.reserve === '1' && !full.company.scenario) {
       const reservedRows = full.rows.slice(-5);
       const available = full.rows.slice(0, -5);
-      const limit = Number(req.query.limit) || available.length;
-      const rows = limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
-      return res.json({ ...full, rows, reservedRows, sampled: rows.length < available.length, referenceOptions: { vendors: [...new Set(full.rows.map(r => r.vendor))].sort(), accounts: [...new Set(full.rows.map(r => r.account))].sort() } });
+      const curated = Number(req.query.limit) === -1 ? demoSample(req.params.id) : null;
+      const limit = Number(req.query.limit) > 0 ? Number(req.query.limit) : available.length;
+      const sampled = curated ? available.filter(row => curated.ids.has(row.billId)) : limit < available.length ? Array.from({ length: limit }, (_, i) => available[Math.floor(i * available.length / limit)]) : available;
+      const arrivals = rules.snapshot(req.params.id).store.arrivals[req.params.id] ?? [];
+      const rows = [...sampled, ...reservedRows.filter(row => arrivals.includes(row.id))];
+      return res.json({ ...full, rows, reservedRows, sampled: rows.length < available.length, ...(curated && { curatedSample: true, disclosure: `${full.disclosure ?? ''} ${curated.disclosure}`.trim() }), referenceOptions: { vendors: [...new Set(full.rows.map(r => r.vendor))].sort(), accounts: [...new Set(full.rows.map(r => r.account))].sort() } });
     }
-    res.json(loadCompanyBillsLimited(req.params.id, Number(req.query.limit) || undefined));
+    const limit = Number(req.query.limit) || full.rows.length;
+    const rows = limit < full.rows.length ? Array.from({ length: limit }, (_, index) => full.rows[Math.floor(index * full.rows.length / limit)]) : full.rows;
+    res.json({ ...full, rows, sampled: rows.length < full.rows.length });
   } catch (e) {
     res.status(404).json({ error: (e as Error).message });
   }
@@ -49,13 +61,10 @@ app.post('/api/evaluate', async (req, res) => {
   const ac = new AbortController();
   res.on('close', () => !res.writableEnded && ac.abort());
   try {
-    const { company, rows } = loadCompanyBills(String(companyId));
+    const { rows } = workspace.bills(String(companyId));
     if (ids.some((id: string) => !rows.some(row => row.id === id))) return res.status(400).json({ error: 'Unknown or cross-company transaction ID' });
-    const { results, costNanoUsd, costKind } = await evaluateSelected(provider,
-      { company: { name: company.name.replace(/ — review scenarios$/, ''), industry: company.industry }, criterion: criterion.slice(0, 500), ids: ids.map(String) },
-      ac.signal,
-    );
-    res.json({ results, costNanoUsd, costKind, model: providerStatus(provider).model });
+    const { results, costNanoUsd } = await semantics.evaluateRows(String(companyId), criterion.slice(0, 500), ids.map((id: string) => rows.find(row => row.id === id)!), ac.signal, provider);
+    res.json({ results, costNanoUsd, model: providerStatus(provider).model, costKind: provider === 'qwen' ? 'gpu_time_unavailable' : 'request' });
   } catch (e) {
     if (ac.signal.aborted) return;
     if (e instanceof QwenReadinessError) return res.status(503).json({ error: e.message + ' No actions were applied.' });
@@ -63,6 +72,19 @@ app.post('/api/evaluate', async (req, res) => {
     res.status(502).json({ error: 'Model request failed; no failed record is treated as false' });
   }
 });
+
+actionRoutes(app, actions);
+ruleRoutes(app, rules);
+mailRoutes(app, new Mailbox(database, workspace));
+// Enabled dashboard actions keep running while this server is open, even after
+// the browser closes. Their baseline prevents implicit historical backfills.
+const automationTimer = setInterval(() => {
+  void actions.scan().catch(error => console.error('Automation:', (error as Error).message));
+  void rules.scan().catch(error => console.error('Rules:', (error as Error).message));
+}, 10_000);
+automationTimer.unref();
+const draftTimer = setInterval(() => { void rules.drainDrafts().catch(error => console.error('Draft worker:', (error as Error).message)); }, 1000);
+draftTimer.unref();
 
 const server = createServer(app);
 const vite = await createVite({ server: { middlewareMode: true, hmr: { server } }, appType: 'spa' });

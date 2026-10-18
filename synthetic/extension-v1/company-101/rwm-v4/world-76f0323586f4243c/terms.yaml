@@ -1,0 +1,6 @@
+- id: terms-net-0
+  name: Due on receipt
+  days: 0
+- id: terms-net-7
+  name: Net 7
+  days: 7

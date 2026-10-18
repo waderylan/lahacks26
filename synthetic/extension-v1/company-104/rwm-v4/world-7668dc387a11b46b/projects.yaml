@@ -1,0 +1,66 @@
+- id: proj-00001
+  name: Private event catering for Imani Eriksdottir
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  project_kind: private event catering
+  contract_amount: '23664.61'
+  original_contract_amount: '22250.00'
+  change_orders:
+  - date: '2025-11-22'
+    amount: '1414.61'
+  started_sim_day: 28
+  started_date: '2025-11-03'
+  planned_finish_sim_day: 75
+  planned_finish_date: '2025-12-20'
+  reschedules: []
+  completed_sim_day: 85
+  completed_date: '2025-12-30'
+  status: completed
+  status_history:
+  - date: '2025-11-03'
+    status: active
+  - date: '2025-12-30'
+    status: completed
+- id: proj-00002
+  name: Wedding catering contract for Bertram Lefebvre
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  project_kind: wedding catering contract
+  contract_amount: '484111.50'
+  original_contract_amount: '472665.37'
+  change_orders:
+  - date: '2026-05-15'
+    amount: '11446.13'
+  started_sim_day: 112
+  started_date: '2026-01-26'
+  planned_finish_sim_day: 326
+  planned_finish_date: '2026-08-28'
+  reschedules: []
+  completed_sim_day: 360
+  completed_date: '2026-10-01'
+  status: completed
+  status_history:
+  - date: '2026-01-26'
+    status: active
+  - date: '2026-10-01'
+    status: completed
+- id: proj-00003
+  name: Wedding catering contract for Bertram Tarkington
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  project_kind: wedding catering contract
+  contract_amount: '520732.46'
+  original_contract_amount: '520732.46'
+  change_orders: []
+  started_sim_day: 168
+  started_date: '2026-03-23'
+  planned_finish_sim_day: 401
+  planned_finish_date: '2026-11-11'
+  reschedules: []
+  status: cancelled
+  status_history:
+  - date: '2026-03-23'
+    status: active
+  - date: '2026-06-01'
+    status: cancelled
+  cancelled_date: '2026-06-01'

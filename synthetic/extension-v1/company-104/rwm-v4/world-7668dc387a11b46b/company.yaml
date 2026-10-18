@@ -1,0 +1,20 @@
+- id: company-main
+  legal_name: Marrow & Vine Catering LLC
+  trade_name: Marrow & Vine Catering
+  industry_naics: '722320'
+  industry_title: Caterers
+  email: accounts@marrowvinecatering.example
+  phone: (555) 658-3394
+  website: https://www.marrowvinecatering.example
+  address:
+    line1: 63 Stillwater Road
+    city: Worcester
+    state: MA
+    postal_code: 01608
+    country: United States
+    line2: null
+  fiscal_year_start_month: 1
+  opening_sim_day: 0
+  opening_date: '2025-10-06'
+  remit_bank: Northmark Savings
+  remit_account_ending: '6293'

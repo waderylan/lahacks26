@@ -1,0 +1,222 @@
+- id: acct-checking
+  name: Business Checking
+  classification: asset
+  account_type: bank
+  account_subtype: checking
+  description: Operating bank account; every settlement moves through it.
+- id: acct-receivable
+  name: Accounts Receivable
+  classification: asset
+  account_type: accounts_receivable
+  account_subtype: accounts_receivable
+  description: Amounts invoiced to customers and not yet collected.
+- id: acct-inventory
+  name: Inventory Asset
+  classification: asset
+  account_type: other_current_asset
+  account_subtype: inventory
+  description: Goods bought for resale, held at cost until sold.
+- id: acct-wip
+  name: Work in Progress
+  classification: asset
+  account_type: other_current_asset
+  account_subtype: other_current_assets
+  description: Project costs incurred and not yet recognized against revenue.
+- id: acct-retainage
+  name: Retainage Receivable
+  classification: asset
+  account_type: other_current_asset
+  account_subtype: other_current_assets
+  description: Amounts earned but withheld by clients until a project completes.
+- id: acct-equipment
+  name: Equipment
+  classification: asset
+  account_type: fixed_asset
+  account_subtype: machinery_and_equipment
+  description: Equipment owned by the business, at cost.
+- id: acct-accumulated-depreciation
+  name: Accumulated Depreciation
+  classification: asset
+  account_type: fixed_asset
+  account_subtype: accumulated_depreciation
+  description: Depreciation charged against owned equipment to date.
+- id: acct-payable
+  name: Accounts Payable
+  classification: liability
+  account_type: accounts_payable
+  account_subtype: accounts_payable
+  description: Amounts billed by vendors and not yet paid.
+- id: acct-wages-payable
+  name: Wages Payable
+  classification: liability
+  account_type: other_current_liability
+  account_subtype: other_current_liabilities
+  description: Wages earned by employees and not yet paid.
+- id: acct-credit-card
+  name: Credit Card
+  classification: liability
+  account_type: credit_card
+  account_subtype: credit_card
+  description: Revolving card balance drawn against short-term costs.
+- id: acct-credit-line
+  name: Line of Credit
+  classification: liability
+  account_type: long_term_liability
+  account_subtype: notes_payable
+  description: Drawn principal on the operating credit line.
+- id: acct-accrued-interest
+  name: Accrued Interest
+  classification: liability
+  account_type: other_current_liability
+  account_subtype: other_current_liabilities
+  description: Interest incurred but not yet billed by the lender.
+- id: acct-tax-payable
+  name: Income Tax Payable
+  classification: liability
+  account_type: other_current_liability
+  account_subtype: other_current_liabilities
+  description: Assessed income tax not yet paid.
+- id: acct-customer-deposits
+  name: Customer Deposits
+  classification: liability
+  account_type: other_current_liability
+  account_subtype: other_current_liabilities
+  description: Client money held before the work it pays for is earned.
+- id: acct-undeposited-funds
+  name: Undeposited Funds
+  classification: asset
+  account_type: other_current_asset
+  account_subtype: undeposited_funds
+  description: Card takings captured at the register and not yet settled to the bank.
+- id: acct-opening-equity
+  name: Opening Balance Equity
+  classification: equity
+  account_type: equity
+  account_subtype: opening_balance_equity
+  description: The owner's starting stake, recorded once when the books open.
+- id: acct-owner-distributions
+  name: Owner Distributions
+  classification: equity
+  account_type: equity
+  account_subtype: owner_distributions
+  description: Cash the owner has drawn out of the business; reduces equity.
+- id: acct-construction-income
+  name: Construction Income
+  classification: revenue
+  account_type: income
+  account_subtype: service_fee_income
+  description: Revenue recognized on accepted project milestones.
+- id: acct-cogs
+  name: Cost of Goods Sold
+  classification: expense
+  account_type: cost_of_goods_sold
+  account_subtype: supplies_and_materials_cogs
+  description: Cost of the goods sold, recognized as each sale is delivered.
+- id: acct-job-materials
+  name: Job Materials
+  classification: expense
+  account_type: cost_of_goods_sold
+  account_subtype: supplies_and_materials_cogs
+  description: Materials consumed on projects.
+- id: acct-subcontractors
+  name: Subcontractors
+  classification: expense
+  account_type: cost_of_goods_sold
+  account_subtype: other_costs_of_service_cos
+  description: Trade contractors engaged to carry out project work.
+- id: acct-equipment-rental
+  name: Equipment Rental
+  classification: expense
+  account_type: cost_of_goods_sold
+  account_subtype: equipment_rental_cos
+  description: Plant and machinery hired for project work.
+- id: acct-wage-expense
+  name: Wage Expense
+  classification: expense
+  account_type: expense
+  account_subtype: payroll_expenses
+  description: Wages earned by employees, recognized when they are earned.
+- id: acct-manager-wages
+  name: Project Manager Wages
+  classification: expense
+  account_type: expense
+  account_subtype: payroll_expenses
+  description: Supervision payroll, carried as overhead rather than against a job.
+- id: acct-operating-expense
+  name: Operating Expense
+  classification: expense
+  account_type: expense
+  account_subtype: other_business_expenses
+  description: Routine running costs not separately classified.
+- id: acct-rent
+  name: Rent and Lease
+  classification: expense
+  account_type: expense
+  account_subtype: rent_or_lease_of_buildings
+  description: Premises rent and lease costs.
+- id: acct-utilities
+  name: Utilities
+  classification: expense
+  account_type: expense
+  account_subtype: utilities
+  description: Electricity, water and other metered supply.
+- id: acct-insurance
+  name: Insurance
+  classification: expense
+  account_type: expense
+  account_subtype: insurance
+  description: Business and project insurance premiums.
+- id: acct-repairs
+  name: Repairs and Maintenance
+  classification: expense
+  account_type: expense
+  account_subtype: repair_and_maintenance
+  description: Upkeep of premises and equipment.
+- id: acct-marketing
+  name: Advertising and Marketing
+  classification: expense
+  account_type: expense
+  account_subtype: advertising_promotional
+  description: Campaigns and outreach intended to win work.
+- id: acct-professional-fees
+  name: Legal and Professional Fees
+  classification: expense
+  account_type: expense
+  account_subtype: legal_professional_fees
+  description: Accountancy, legal, estimating and similar engaged services.
+- id: acct-freight
+  name: Shipping and Delivery
+  classification: expense
+  account_type: expense
+  account_subtype: shipping_freight_delivery
+  description: Outbound carriage on customer shipments.
+- id: acct-permits
+  name: Taxes and Licenses
+  classification: expense
+  account_type: expense
+  account_subtype: taxes_paid
+  description: Permits, licences and statutory fees other than income tax.
+- id: acct-bad-debt
+  name: Bad Debts
+  classification: expense
+  account_type: expense
+  account_subtype: bad_debts
+  description: Receivables judged uncollectable and written off.
+- id: acct-depreciation
+  name: Depreciation
+  classification: expense
+  account_type: expense
+  account_subtype: depreciation
+  description: Periodic charge spreading equipment cost over its working life.
+- id: acct-interest-expense
+  name: Interest Expense
+  classification: expense
+  account_type: other_expense
+  account_subtype: interest_paid
+  description: Interest on drawn credit.
+- id: acct-income-tax
+  name: Income Tax Expense
+  classification: expense
+  account_type: other_expense
+  account_subtype: other_miscellaneous_expense
+  description: Income tax assessed on the period's profit.

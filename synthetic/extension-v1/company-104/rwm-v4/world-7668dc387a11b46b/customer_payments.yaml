@@ -1,0 +1,310 @@
+- id: rcpt-00001
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2025-12-18'
+  amount: '506.46'
+  applications:
+  - document_id: inv-00002
+    amount: '506.46'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00002
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2025-12-18'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00004
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00003
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2025-12-19'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00001
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00004
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2025-12-20'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00005
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00005
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2025-12-26'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00007
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00006
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2026-01-06'
+  amount: '359.76'
+  applications:
+  - document_id: inv-00008
+    amount: '359.76'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00007
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2026-01-08'
+  amount: '351.34'
+  applications:
+  - document_id: inv-00009
+    amount: '351.34'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00008
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2026-01-20'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00012
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00009
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2026-03-09'
+  amount: '9153.74'
+  applications:
+  - document_id: inv-00010
+    amount: '9153.74'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00010
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-03-09'
+  amount: '6417.64'
+  applications:
+  - document_id: inv-00015
+    amount: '6417.64'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00011
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2026-03-20'
+  amount: '1499.45'
+  applications:
+  - document_id: inv-00006
+    amount: '1499.45'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00012
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-03-24'
+  amount: '4736.91'
+  applications:
+  - document_id: inv-00016
+    amount: '4736.91'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00013
+  customer_id: cust-client-1
+  customer_name: Imani Eriksdottir
+  txn_date: '2026-03-28'
+  amount: '9673.92'
+  applications:
+  - document_id: inv-00013
+    amount: '9673.92'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00014
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-04-08'
+  amount: '7346.16'
+  applications:
+  - document_id: inv-00018
+    amount: '7346.16'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00015
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-05-12'
+  amount: '3992.60'
+  applications:
+  - document_id: inv-00021
+    amount: '3992.60'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00016
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-05-18'
+  amount: '8352.90'
+  applications:
+  - document_id: inv-00023
+    amount: '8352.90'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00017
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-05-21'
+  amount: '7218.22'
+  applications:
+  - document_id: inv-00022
+    amount: '7218.22'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00018
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-06-01'
+  amount: '9708.04'
+  applications:
+  - document_id: inv-00025
+    amount: '9708.04'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00019
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-06-04'
+  amount: '6565.58'
+  applications:
+  - document_id: inv-00026
+    amount: '6565.58'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00020
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-06-06'
+  amount: '4542.90'
+  applications:
+  - document_id: inv-00024
+    amount: '4542.90'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00021
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-06-11'
+  amount: '3417.57'
+  applications:
+  - document_id: inv-00027
+    amount: '3417.57'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00022
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-06-12'
+  amount: '10370.49'
+  applications:
+  - document_id: inv-00030
+    amount: '10370.49'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00023
+  customer_id: cust-client-3
+  customer_name: Bertram Tarkington
+  txn_date: '2026-06-28'
+  amount: '4612.97'
+  applications:
+  - document_id: inv-00031
+    amount: '4612.97'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00024
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-07-03'
+  amount: '126606.80'
+  applications:
+  - document_id: inv-00029
+    amount: '126606.80'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00025
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-07-09'
+  amount: '3563.84'
+  applications:
+  - document_id: inv-00034
+    amount: '3563.84'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00026
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-07-20'
+  amount: '9929.73'
+  applications:
+  - document_id: inv-00037
+    amount: '9929.73'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00027
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-08-04'
+  amount: '71072.78'
+  applications:
+  - document_id: inv-00038
+    amount: '71072.78'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00028
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-08-16'
+  amount: '5142.70'
+  applications:
+  - document_id: inv-00039
+    amount: '5142.70'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00029
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-09-11'
+  amount: '4896.75'
+  applications:
+  - document_id: inv-00042
+    amount: '4896.75'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00030
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-09-13'
+  amount: '4607.62'
+  applications:
+  - document_id: inv-00041
+    amount: '4607.62'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00031
+  customer_id: cust-client-2
+  customer_name: Bertram Lefebvre
+  txn_date: '2026-09-15'
+  amount: '60771.26'
+  applications:
+  - document_id: inv-00040
+    amount: '60771.26'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.

@@ -1,0 +1,410 @@
+- id: rcpt-00001
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2025-12-11'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00001
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00002
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2025-12-25'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00003
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00003
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2026-01-06'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00006
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00004
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2026-01-13'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00004
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00005
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2026-01-24'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00007
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00006
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-01-27'
+  amount: '4745.44'
+  applications:
+  - document_id: inv-00008
+    amount: '4745.44'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00007
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-02-26'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00013
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00008
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2026-02-28'
+  amount: '7391.30'
+  applications:
+  - document_id: inv-00005
+    amount: '7391.30'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00009
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-03-03'
+  amount: '2306.51'
+  applications:
+  - document_id: inv-00014
+    amount: '2306.51'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00010
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2026-03-20'
+  amount: '1432.06'
+  applications:
+  - document_id: inv-00002
+    amount: '1432.06'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00011
+  customer_id: cust-client-1
+  customer_name: Delacroix Brewing Co.
+  txn_date: '2026-03-29'
+  amount: '9239.14'
+  applications:
+  - document_id: inv-00009
+    amount: '9239.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00012
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-04-12'
+  amount: '1892.15'
+  applications:
+  - document_id: inv-00018
+    amount: '1892.15'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00013
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-05-20'
+  amount: '130453.13'
+  applications:
+  - document_id: inv-00019
+    amount: '130453.13'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00014
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-05-29'
+  amount: '716.85'
+  applications:
+  - document_id: inv-00021
+    amount: '716.85'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00015
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-06-01'
+  amount: '407.48'
+  applications:
+  - document_id: inv-00023
+    amount: '407.48'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00016
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-06-03'
+  amount: '381.81'
+  applications:
+  - document_id: inv-00026
+    amount: '381.81'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00017
+  customer_id: cust-client-4
+  customer_name: Copperfield Zephyr Confections & Co.
+  txn_date: '2026-06-09'
+  amount: '4184.04'
+  applications:
+  - document_id: inv-00025
+    amount: '4184.04'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00018
+  customer_id: cust-client-4
+  customer_name: Copperfield Zephyr Confections & Co.
+  txn_date: '2026-06-22'
+  amount: '3111.05'
+  applications:
+  - document_id: inv-00027
+    amount: '3111.05'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00019
+  customer_id: cust-client-4
+  customer_name: Copperfield Zephyr Confections & Co.
+  txn_date: '2026-06-22'
+  amount: '4231.84'
+  applications:
+  - document_id: inv-00028
+    amount: '4231.84'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00020
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-06-24'
+  amount: '52714.28'
+  applications:
+  - document_id: inv-00024
+    amount: '52714.28'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00021
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-07-03'
+  amount: '1916.92'
+  applications:
+  - document_id: inv-00033
+    amount: '1916.92'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00022
+  customer_id: cust-client-5
+  customer_name: Northstar Elmsworth Provisions
+  txn_date: '2026-07-18'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00036
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00023
+  customer_id: cust-client-4
+  customer_name: Copperfield Zephyr Confections & Co.
+  txn_date: '2026-07-19'
+  amount: '4071.95'
+  applications:
+  - document_id: inv-00038
+    amount: '4071.95'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00024
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-07-22'
+  amount: '19569.23'
+  applications:
+  - document_id: inv-00017
+    amount: '19569.23'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00025
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-07-28'
+  amount: '19569.23'
+  applications:
+  - document_id: inv-00020
+    amount: '19569.23'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00026
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-08-01'
+  amount: '27886.15'
+  applications:
+  - document_id: inv-00015
+    amount: '27886.15'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00027
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-08-02'
+  amount: '39138.47'
+  applications:
+  - document_id: inv-00029
+    amount: '39138.47'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00028
+  customer_id: cust-client-5
+  customer_name: Northstar Elmsworth Provisions
+  txn_date: '2026-08-04'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00039
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00029
+  customer_id: cust-client-3
+  customer_name: Northfield Quilting
+  txn_date: '2026-08-17'
+  amount: '1956.92'
+  applications:
+  - document_id: inv-00012
+    amount: '1956.92'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00030
+  customer_id: cust-client-6
+  customer_name: Keystone Hardware Holdings
+  txn_date: '2026-09-09'
+  amount: '2265.24'
+  applications:
+  - document_id: inv-00045
+    amount: '2265.24'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00031
+  customer_id: cust-client-5
+  customer_name: Northstar Elmsworth Provisions
+  txn_date: '2026-09-20'
+  amount: '13085.39'
+  applications:
+  - document_id: inv-00042
+    amount: '13085.39'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00032
+  customer_id: cust-client-5
+  customer_name: Northstar Elmsworth Provisions
+  txn_date: '2026-09-22'
+  amount: '8869.56'
+  applications:
+  - document_id: inv-00037
+    amount: '8869.56'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00033
+  customer_id: cust-client-6
+  customer_name: Keystone Hardware Holdings
+  txn_date: '2026-09-23'
+  amount: '6755.84'
+  applications:
+  - document_id: inv-00048
+    amount: '6755.84'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00034
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-09-24'
+  amount: '92250.03'
+  applications:
+  - document_id: inv-00044
+    amount: '92250.03'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00035
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-09-27'
+  amount: '69436.42'
+  applications:
+  - document_id: inv-00034
+    amount: '69436.42'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00036
+  customer_id: cust-client-6
+  customer_name: Keystone Hardware Holdings
+  txn_date: '2026-09-27'
+  amount: '6411.52'
+  applications:
+  - document_id: inv-00046
+    amount: '6411.52'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00037
+  customer_id: cust-client-5
+  customer_name: Northstar Elmsworth Provisions
+  txn_date: '2026-09-30'
+  amount: '1718.47'
+  applications:
+  - document_id: inv-00031
+    amount: '1718.47'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00038
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Works
+  txn_date: '2026-10-01'
+  amount: '5857.14'
+  applications:
+  - document_id: inv-00010
+    amount: '5857.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00039
+  customer_id: cust-client-7
+  customer_name: Opal Granite Bay Supply
+  txn_date: '2026-10-03'
+  amount: '652.25'
+  applications:
+  - document_id: inv-00049
+    amount: '652.25'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00040
+  customer_id: cust-client-7
+  customer_name: Opal Granite Bay Supply
+  txn_date: '2026-10-13'
+  amount: '663.36'
+  applications:
+  - document_id: inv-00053
+    amount: '663.36'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00041
+  customer_id: cust-client-7
+  customer_name: Opal Granite Bay Supply
+  txn_date: '2026-10-15'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00052
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.

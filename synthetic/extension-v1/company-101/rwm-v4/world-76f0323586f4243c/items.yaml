@@ -1,0 +1,54 @@
+- id: item-00001
+  name: Wireless Earbuds, Bluetooth
+  sku: WEB-01-844
+  description: True-wireless Bluetooth earbuds with case, pack of twenty.
+  item_type: non_inventory
+  unit_price_amount: '16.00'
+  unit_cost_amount: '10.10'
+  income_account_id: acct-product-income
+  purchase_account_id: acct-inventory
+- id: item-00002
+  name: USB-C Charging Cable, 6 ft
+  sku: UCC-06-213
+  description: Braided six-foot USB-C cables, bulk pack of fifty.
+  item_type: non_inventory
+  unit_price_amount: '19.20'
+  unit_cost_amount: '12.62'
+  income_account_id: acct-product-income
+  purchase_account_id: acct-inventory
+- id: item-00003
+  name: Phone Ring Holder Case, Adhesive
+  sku: PRH-1H-726
+  description: Adhesive phone ring holders in assorted finishes, hundred count.
+  item_type: non_inventory
+  unit_price_amount: '22.40'
+  unit_cost_amount: '15.15'
+  income_account_id: acct-product-income
+  purchase_account_id: acct-inventory
+- id: item-00004
+  name: Phone Case Assortment, Clear
+  sku: PCA-50-836
+  description: Clear protective phone cases in assorted models, pack of fifty.
+  item_type: non_inventory
+  unit_price_amount: '25.60'
+  unit_cost_amount: '17.67'
+  income_account_id: acct-product-income
+  purchase_account_id: acct-inventory
+- id: item-00005
+  name: Car Phone Mount Case, Vent
+  sku: CPM-40-276
+  description: Air-vent car phone mounts, bulk case of forty.
+  item_type: non_inventory
+  unit_price_amount: '28.80'
+  unit_cost_amount: '20.20'
+  income_account_id: acct-product-income
+  purchase_account_id: acct-inventory
+- id: item-00006
+  name: Reusable Storage Bag Set
+  sku: RSB-30-347
+  description: Silicone reusable storage bag sets, case of thirty.
+  item_type: non_inventory
+  unit_price_amount: '32.00'
+  unit_cost_amount: '22.72'
+  income_account_id: acct-product-income
+  purchase_account_id: acct-inventory

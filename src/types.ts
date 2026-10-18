@@ -5,7 +5,13 @@ export interface CompanySummary {
   profile: string;
   billCount: number;
   scenario?: boolean;
+  synthetic?: boolean;
+  derivedFrom?: string;
+  source?: 'workspace';
 }
+
+export interface Evidence { id: string; kind: string; date: string; title: string; text: string }
+export interface RelatedBill { id: string; docNumber: string; vendor: string; date: string; amountCents: number; description: string; memo: string }
 
 export interface Row {
   id: string;
@@ -29,7 +35,14 @@ export interface Row {
   payments: { id: string; date: string; amountCents: number; account: string }[];
   vendorRecord: Record<string, unknown> | null;
   projectRecord: Record<string, unknown> | null;
+  evidence?: Evidence[];
+  related?: RelatedBill[];
+  txnType?: 'bill' | 'invoice' | 'bank';
+  details?: Record<string, string>;
   provenance?: { description: string; memo: string } | null;
+  workspaceChanges?: { account?: string; memo?: string };
+  sourceVersion?: string;
+  dashboard?: { owner: string; flags: string[]; tags: string[]; reviewed: boolean; automatedCheck: boolean; taskIds: string[] };
 }
 
 export interface CompanyBills {
@@ -38,7 +51,9 @@ export interface CompanyBills {
   sampled: boolean;
   rows: Row[];
   disclosure?: string;
+  datasetVersion?: string;
   reservedRows?: Row[];
+  curatedSample?: boolean;
   referenceOptions?: { vendors: string[]; accounts: string[] };
 }
 

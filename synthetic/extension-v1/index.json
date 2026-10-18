@@ -1,0 +1,98 @@
+[
+  {
+    "company_id": "company-101",
+    "display_name": "Parcelmint Online Goods",
+    "industry_naics": "454110",
+    "industry_title": "Electronic Shopping and Mail-Order Houses",
+    "profile": "wholesale",
+    "archetype": "synthetic_extension",
+    "size_tier": "large",
+    "dataset_id": "world-76f0323586f4243c",
+    "business_status": "open",
+    "distressed": false,
+    "synthetic_extension": true,
+    "derived_from": "company-018",
+    "entity_counts": {
+      "bills": 177,
+      "invoices": 87,
+      "bank_transactions": 82,
+      "transactions": 346,
+      "bill_payments": 166,
+      "vendors": 10,
+      "projects": 0,
+      "evidence": 90
+    }
+  },
+  {
+    "company_id": "company-102",
+    "display_name": "Tallowfield Home Renovations",
+    "industry_naics": "236118",
+    "industry_title": "Residential Remodelers",
+    "profile": "construction",
+    "archetype": "synthetic_extension",
+    "size_tier": "medium",
+    "dataset_id": "world-0156937d6ac7298a",
+    "business_status": "open",
+    "distressed": false,
+    "synthetic_extension": true,
+    "derived_from": "company-042",
+    "entity_counts": {
+      "bills": 183,
+      "invoices": 55,
+      "bank_transactions": 82,
+      "transactions": 320,
+      "bill_payments": 158,
+      "vendors": 14,
+      "projects": 7,
+      "evidence": 78
+    }
+  },
+  {
+    "company_id": "company-103",
+    "display_name": "Quillstone Creative Studio",
+    "industry_naics": "541810",
+    "industry_title": "Advertising Agencies",
+    "profile": "construction",
+    "archetype": "synthetic_extension",
+    "size_tier": "small",
+    "dataset_id": "world-ea28fad6297e8d6d",
+    "business_status": "open",
+    "distressed": false,
+    "synthetic_extension": true,
+    "derived_from": "company-035",
+    "entity_counts": {
+      "bills": 179,
+      "invoices": 49,
+      "bank_transactions": 82,
+      "transactions": 310,
+      "bill_payments": 158,
+      "vendors": 14,
+      "projects": 4,
+      "evidence": 83
+    }
+  },
+  {
+    "company_id": "company-104",
+    "display_name": "Marrow & Vine Catering",
+    "industry_naics": "722320",
+    "industry_title": "Caterers",
+    "profile": "construction",
+    "archetype": "synthetic_extension",
+    "size_tier": "large",
+    "dataset_id": "world-7668dc387a11b46b",
+    "business_status": "open",
+    "distressed": false,
+    "synthetic_extension": true,
+    "derived_from": "company-037",
+    "entity_counts": {
+      "bills": 172,
+      "invoices": 44,
+      "bank_transactions": 82,
+      "transactions": 298,
+      "bill_payments": 152,
+      "vendors": 14,
+      "projects": 3,
+      "evidence": 83
+    }
+  }
+]

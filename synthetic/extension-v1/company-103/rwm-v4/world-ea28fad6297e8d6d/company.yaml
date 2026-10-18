@@ -1,0 +1,20 @@
+- id: company-main
+  legal_name: Quillstone Creative Studio LLC
+  trade_name: Quillstone Creative Studio
+  industry_naics: '541810'
+  industry_title: Advertising Agencies
+  email: accounts@quillstonecreativestudio.example
+  phone: (555) 903-2260
+  website: https://www.quillstonecreativestudio.example
+  address:
+    line1: 415 Foundry Lane
+    city: Dayton
+    state: OH
+    postal_code: '45402'
+    country: United States
+    line2: null
+  fiscal_year_start_month: 1
+  opening_sim_day: 0
+  opening_date: '2025-10-06'
+  remit_bank: Lakeshore Trust
+  remit_account_ending: '6573'

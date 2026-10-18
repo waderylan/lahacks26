@@ -1,0 +1,758 @@
+- id: ev-0001
+  kind: purchase_order
+  date: '2025-10-04'
+  title: Purchase order PO-7191
+  text: 'PO-7191: print run of 5,000 point-of-sale kits for Ibarra & Daughters Pottery. Net 30.'
+  vendor_id: vend-materials
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00003
+- id: ev-0002
+  kind: service_agreement
+  date: '2025-10-13'
+  title: Subcontract terms
+  text: 'Subcontract terms: one-time measurement setup of $1,458.00, billed once. No further setup charges.'
+  vendor_id: vend-sitework
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00016
+  - bill-00025
+- id: ev-0003
+  kind: receiving_record
+  date: '2025-10-15'
+  title: Delivery receipt 7191
+  text: Received 3,100 kits on Oct 16; the printer shipped the balance later. Receiving clerk signed for a partial delivery.
+  vendor_id: vend-materials
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00003
+- id: ev-0004
+  kind: completion_record
+  date: '2025-10-16'
+  title: Work sign-off Oct 17
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00004
+- id: ev-0005
+  kind: contract_terms
+  date: '2025-10-21'
+  title: Contract scope
+  text: Contract scope covers the agreed stages only.
+  vendor_id: cust-client-1
+  project_id: proj-00001
+  transaction_ids:
+  - inv-00001
+- id: ev-0006
+  kind: completion_record
+  date: '2025-10-21'
+  title: Work sign-off Oct 22
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00005
+- id: ev-0007
+  kind: completion_record
+  date: '2025-10-27'
+  title: Work sign-off Oct 27
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-sitework
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00006
+- id: ev-0008
+  kind: change_order
+  date: '2025-11-04'
+  title: Change order CO-7414
+  text: 'Change order CO-7414: adds the extra scope. Approved by the client and the project manager on Nov 12.'
+  vendor_id: cust-client-1
+  project_id: proj-00001
+  transaction_ids:
+  - inv-00001
+- id: ev-0009
+  kind: completion_record
+  date: '2025-11-28'
+  title: Work sign-off Nov 28
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00024
+- id: ev-0010
+  kind: completion_record
+  date: '2025-12-02'
+  title: Work sign-off Dec 5
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00030
+- id: ev-0011
+  kind: ap_payment_record
+  date: '2025-12-03'
+  title: Payment ACH8074020
+  text: Payment ACH8074020 of $1,000.00 applied to bill REF-2743 on Dec 3; bill closed. Payee account on file ends 2815.
+  vendor_id: vend-government
+  transaction_ids:
+  - bank-00005
+  - bill-00009
+- id: ev-0012
+  kind: acceptance_record
+  date: '2025-12-03'
+  title: Acceptance record
+  text: Stage accepted on Dec 5.
+  vendor_id: cust-client-2
+  project_id: proj-00002
+  transaction_ids:
+  - inv-00005
+- id: ev-0013
+  kind: ap_payment_record
+  date: '2025-12-07'
+  title: Payment CHK2086
+  text: Payment CHK2086 of $1,699.76 applied to bill INV-5976 on Dec 7; bill closed. Payee account on file ends 1873.
+  vendor_id: vend-sitework
+  transaction_ids:
+  - bank-00007
+  - bill-00013
+- id: ev-0014
+  kind: receipt
+  date: '2025-12-09'
+  title: Card statement detail Dec 11
+  text: 'Receipt summary: catered lunch for client workshop, shoot-day craft services, listed attendees.'
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00032
+- id: ev-0015
+  kind: receipt
+  date: '2025-12-18'
+  title: Receipt detail
+  text: 'Harbor Wine Merchants: 3 bottles reserve red, cheese board. Resort spa: day pass x 2. No client or attendee recorded;
+    cardholder is the owner.'
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00037
+- id: ev-0016
+  kind: ap_payment_record
+  date: '2025-12-21'
+  title: Payment WIR6789479
+  text: Payment WIR6789479 of $38,700.00 applied to bill INV-4338 on Dec 21; bill closed. Payee account on file ends 6994.
+  vendor_id: vend-materials
+  transaction_ids:
+  - bank-00009
+  - bill-00020
+- id: ev-0017
+  kind: acceptance_record
+  date: '2025-12-21'
+  title: Acceptance record
+  text: Next stage accepted on Dec 23.
+  vendor_id: cust-client-2
+  project_id: proj-00002
+  transaction_ids:
+  - inv-00006
+- id: ev-0018
+  kind: completion_record
+  date: '2025-12-24'
+  title: Work sign-off Dec 25
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00041
+- id: ev-0019
+  kind: contract_terms
+  date: '2025-12-25'
+  title: Contract scope
+  text: Contract scope covers the agreed stages only. No change order is on file for this project.
+  vendor_id: cust-client-1
+  project_id: proj-00001
+  transaction_ids:
+  - inv-00012
+- id: ev-0020
+  kind: vendor_message
+  date: '2025-12-30'
+  title: Email asking to update remittance
+  text: Email received from the vendor's billing mailbox asking AP to remit to an account ending 7731. The vendor master lists
+    an account ending 1434. No signed bank change form on file; no call-back performed.
+  vendor_id: vend-masonry
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00044
+- id: ev-0021
+  kind: ap_payment_record
+  date: '2026-01-01'
+  title: Payment history
+  text: The bill for this payee and amount was paid in full on Jan 1 (ref ACH4929863) and is closed. No second bill is open.
+  vendor_id: vend-masonry
+  transaction_ids:
+  - bank-00013
+  - bank-00015
+- id: ev-0022
+  kind: completion_record
+  date: '2026-01-02'
+  title: Work sign-off Jan 2
+  text: Site lead confirmed the billed work for Brand campaign for Quarry Hill Creamery was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00046
+- id: ev-0023
+  kind: purchase_order
+  date: '2026-01-03'
+  title: Purchase order PO-7218
+  text: 'PO-7218: programmatic placement only. Out-of-home placements and permits are not included in this order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00062
+- id: ev-0024
+  kind: ap_lookup
+  date: '2026-01-04'
+  title: Accounts payable lookup
+  text: No vendor master record, purchase order or open bill exists for this payee on or before Jan 4.
+  transaction_ids:
+  - bank-00014
+- id: ev-0025
+  kind: receipt
+  date: '2026-01-12'
+  title: Receipt detail
+  text: Office store receipt; items are not itemized on the copy provided.
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00055
+- id: ev-0026
+  kind: ap_payment_record
+  date: '2026-01-16'
+  title: Payment ACH8557756
+  text: Payment ACH8557756 of $1,573.47 applied to bill INV-8714 on Jan 16; bill closed. Payee account on file ends 1434.
+  vendor_id: vend-masonry
+  transaction_ids:
+  - bank-00017
+  - bill-00035
+- id: ev-0027
+  kind: completion_record
+  date: '2026-01-19'
+  title: Work sign-off Jan 19
+  text: Site lead confirmed the billed work for Brand campaign for Quarry Hill Creamery was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00056
+- id: ev-0028
+  kind: change_order
+  date: '2026-01-19'
+  title: Change order CO-7218
+  text: 'Change order CO-7218: adds out-of-home placements and permits at the client''s request. Approved by the account director
+    and the client on Jan 29.'
+  vendor_id: vend-plumbing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00062
+- id: ev-0029
+  kind: receipt
+  date: '2026-01-21'
+  title: Receipt detail
+  text: Catered lunch for the Ibarra & Daughters Pottery workshop, 11 attendees listed, within meal policy.
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00058
+- id: ev-0030
+  kind: completion_record
+  date: '2026-01-21'
+  title: Work sign-off Jan 21
+  text: Site lead confirmed the billed work for Brand campaign for Quarry Hill Creamery was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00057
+- id: ev-0031
+  kind: completion_record
+  date: '2026-01-27'
+  title: Work sign-off Jan 27
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-plumbing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00061
+- id: ev-0032
+  kind: ap_payment_record
+  date: '2026-01-30'
+  title: Payment ACH4576589
+  text: Payment ACH4576589 of $1,573.46 sent by ACH to an account ending 7731. The vendor master lists an account ending 1434.
+  vendor_id: vend-masonry
+  transaction_ids:
+  - bank-00020
+  - bill-00044
+- id: ev-0033
+  kind: ap_payment_record
+  date: '2026-01-31'
+  title: Payment ACH2831871
+  text: Payment ACH2831871 of $1,573.46 applied to bill INV-8777 on Jan 31; bill closed. Payee account on file ends 1434.
+  vendor_id: vend-masonry
+  transaction_ids:
+  - bank-00021
+  - bill-00045
+- id: ev-0034
+  kind: completion_record
+  date: '2026-02-02'
+  title: Work sign-off Feb 4
+  text: Site lead confirmed the billed work for Brand campaign for Quarry Hill Creamery was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00065
+- id: ev-0035
+  kind: approval_log
+  date: '2026-02-02'
+  title: Approval AP-7280
+  text: 'Approval AP-7280: invoice INV-4809 approved by the operations lead on Feb 3; amount within the referenced order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00064
+- id: ev-0036
+  kind: purchase_order
+  date: '2026-02-03'
+  title: Purchase order PO-7211
+  text: 'PO-7211: programmatic placement only. Out-of-home placements and permits are not included in this order.'
+  vendor_id: vend-plumbing
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00077
+- id: ev-0037
+  kind: ap_payment_record
+  date: '2026-02-05'
+  title: Payment ACH5564514
+  text: Payment ACH5564514 of $1,412.43 applied to bill INV-8792 on Feb 5; bill closed. Payee account on file ends 1434.
+  vendor_id: vend-masonry
+  transaction_ids:
+  - bank-00025
+  - bill-00049
+- id: ev-0038
+  kind: purchase_order
+  date: '2026-02-05'
+  title: Purchase order PO-7161
+  text: 'PO-7161: Quarry Hill Creamery package billed in two progress installments (60% and 40%).'
+  vendor_id: vend-materials
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00076
+  - bill-00084
+- id: ev-0039
+  kind: vendor_change_request
+  date: '2026-02-05'
+  title: Bank change form BC-7235
+  text: Bank change form BC-7235 signed by the vendor's controller and received Feb 5. Call-back to the number already on
+    file completed Feb 7; vendor master updated the same day.
+  vendor_id: vend-plumbing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00069
+- id: ev-0040
+  kind: vendor_statement
+  date: '2026-02-17'
+  title: Vendor statement
+  text: 'Statement of account lists one invoice for this period: INV-4829, $1,812.88. No second invoice for the period is
+    listed.'
+  vendor_id: vend-plumbing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00071
+- id: ev-0041
+  kind: completion_record
+  date: '2026-02-25'
+  title: Work sign-off Feb 25
+  text: Milestone 1 (60%) signed off on site.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00076
+- id: ev-0042
+  kind: ap_payment_record
+  date: '2026-02-28'
+  title: Payment ACH4952891
+  text: Payment ACH4952891 of $1,812.88 applied to bill INV-4801 on Feb 28; bill closed. Payee account on file ends 5260.
+  vendor_id: vend-plumbing
+  transaction_ids:
+  - bank-00031
+  - bill-00062
+- id: ev-0043
+  kind: completion_record
+  date: '2026-03-11'
+  title: Work sign-off Mar 11
+  text: Milestone 2 (40%) signed off on site.
+  vendor_id: vend-materials
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00084
+- id: ev-0044
+  kind: ap_payment_record
+  date: '2026-03-13'
+  title: Payment ACH2671074
+  text: Payment ACH2671074 of $1,812.88 sent by ACH to the account ending 5260, the account on file after the verified bank
+    change.
+  vendor_id: vend-plumbing
+  transaction_ids:
+  - bank-00032
+  - bill-00069
+- id: ev-0045
+  kind: completion_record
+  date: '2026-03-13'
+  title: Work sign-off Mar 13
+  text: Call sheet shows one production day for Ibarra & Daughters Pottery in this period; no second shoot day was scheduled.
+  vendor_id: vend-electrical
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00086
+- id: ev-0046
+  kind: completion_record
+  date: '2026-03-14'
+  title: Work sign-off Mar 17
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-electrical
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00087
+- id: ev-0047
+  kind: receipt
+  date: '2026-04-02'
+  title: Receipt detail
+  text: Airfare and two hotel nights for the regional marketing conference. Business purpose recorded; approved in advance
+    by the account director.
+  vendor_id: vend-card
+  transaction_ids:
+  - bill-00100
+- id: ev-0048
+  kind: completion_record
+  date: '2026-04-05'
+  title: Work sign-off Apr 6
+  text: Site lead confirmed the billed work for Brand campaign for Quarry Hill Creamery was completed and inspected. Quantities
+    consistent with the schedule of values.
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00101
+- id: ev-0049
+  kind: approval_log
+  date: '2026-04-15'
+  title: Approval log lookup
+  text: 'Approval log: no approval entry recorded for invoice INV-7298. Invoices over $1,500 need a second approval from the
+    operations lead.'
+  vendor_id: vend-electrical
+  project_id: proj-00002
+  transaction_ids:
+  - bill-00104
+- id: ev-0050
+  kind: completion_record
+  date: '2026-04-15'
+  title: Work sign-off Apr 17
+  text: Site lead confirmed the billed work for Brand campaign for Ibarra & Daughters Pottery was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-finishing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00106
+- id: ev-0051
+  kind: treasury_log
+  date: '2026-04-20'
+  title: Remittance change request
+  text: A request to change the remittance account was logged on Apr 21; approval is pending.
+  vendor_id: cust-client-2
+  project_id: proj-00002
+  transaction_ids:
+  - inv-00021
+- id: ev-0052
+  kind: vendor_onboarding
+  date: '2026-04-21'
+  title: Vendor onboarding
+  text: Northgate Safety Training was approved as a new vendor on Apr 21 with a signed W-9 and bank letter; account ending
+    6191 verified by call-back.
+  transaction_ids:
+  - bank-00042
+- id: ev-0053
+  kind: purchase_order
+  date: '2026-04-23'
+  title: Purchase order PO-7555
+  text: 'PO-7555: safety training session. Invoice 7555 received and approved.'
+  transaction_ids:
+  - bank-00042
+- id: ev-0054
+  kind: ap_payment_record
+  date: '2026-04-24'
+  title: Payment ACH1572523
+  text: Payment ACH1572523 of $1,921.24 applied to bill INV-7250 on Apr 24; bill closed. Payee account on file ends 1701.
+  vendor_id: vend-electrical
+  transaction_ids:
+  - bank-00041
+  - bill-00092
+- id: ev-0055
+  kind: cash_receipt
+  date: '2026-05-02'
+  title: Receipt ACH2409386
+  text: Receipt of $1,394.05 from Quarry Hill Creamery applied to invoice INV-1018 on May 2.
+  vendor_id: cust-client-2
+  transaction_ids:
+  - bank-00043
+  - inv-00019
+- id: ev-0056
+  kind: lease_schedule
+  date: '2026-05-10'
+  title: Lease schedule
+  text: Lease calls for a fixed weekly rent installment of the same amount; one payment per week.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00048
+- id: ev-0057
+  kind: ap_payment_record
+  date: '2026-05-13'
+  title: Payment ACH8914449
+  text: Payment ACH8914449 of $500.00 applied to bill RENT-2002 on May 13; bill closed. Payee account on file ends 9034.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00048
+  - bill-00103
+- id: ev-0058
+  kind: completion_record
+  date: '2026-05-13'
+  title: Work sign-off May 13
+  text: Crew hours and progress for the week confirmed by the site lead.
+  vendor_id: vend-finishing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00117
+- id: ev-0059
+  kind: receivables_lookup
+  date: '2026-06-03'
+  title: Receivables lookup
+  text: No open invoice for this customer matches this amount; the deposit is unapplied.
+  vendor_id: cust-client-2
+  transaction_ids:
+  - bank-00055
+- id: ev-0060
+  kind: cash_receipt
+  date: '2026-06-03'
+  title: Receipt ACH9485864
+  text: Receipt of $3,336.14 from Quarry Hill Creamery applied to invoice INV-1022 on Jun 3.
+  vendor_id: cust-client-2
+  transaction_ids:
+  - bank-00054
+  - inv-00023
+- id: ev-0061
+  kind: completion_record
+  date: '2026-06-03'
+  title: Work sign-off Jun 3
+  text: Crew hours and progress for the week confirmed by the site lead.
+  vendor_id: vend-finishing
+  project_id: proj-00001
+  transaction_ids:
+  - bill-00134
+- id: ev-0062
+  kind: company_profile
+  date: '2026-06-09'
+  title: Remittance profile
+  text: Customer payments are received in the account ending 6573. No remittance change request is on file.
+  vendor_id: cust-client-2
+  project_id: proj-00002
+  transaction_ids:
+  - inv-00026
+- id: ev-0063
+  kind: purchase_order
+  date: '2026-06-10'
+  title: Purchase order PO-7198
+  text: 'PO-7198: print run of 5,000 point-of-sale kits, delivered in two drops.'
+  vendor_id: vend-materials
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00141
+- id: ev-0064
+  kind: ap_payment_record
+  date: '2026-06-19'
+  title: Payment ACH2656320
+  text: Payment ACH2656320 applied to the earlier bill from this payee; bill closed.
+  vendor_id: vend-finishing
+  transaction_ids:
+  - bank-00058
+- id: ev-0065
+  kind: receiving_record
+  date: '2026-06-23'
+  title: Delivery receipt 7198
+  text: Received 3,100 kits on Jun 24; remaining kits scheduled for next week.
+  vendor_id: vend-materials
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00141
+- id: ev-0066
+  kind: ap_intake_log
+  date: '2026-06-30'
+  title: Invoice intake entry
+  text: Invoice INV-2911 received by email and entered in the intake queue; not yet posted to the ledger. Sender asked that
+    payment details be confirmed by reply email only.
+  vendor_id: vend-demolition
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00146
+- id: ev-0067
+  kind: ap_payment_record
+  date: '2026-07-03'
+  title: Payment ACH6129632
+  text: Payment ACH6129632 applied to a later bill from this payee with its own invoice number; bill closed.
+  vendor_id: vend-finishing
+  transaction_ids:
+  - bank-00062
+- id: ev-0068
+  kind: account_directory
+  date: '2026-07-06'
+  title: Account directory
+  text: The destination account ending 3302 is registered to the owner's personal checking in the owner profile.
+  transaction_ids:
+  - bank-00063
+- id: ev-0069
+  kind: completion_record
+  date: '2026-07-27'
+  title: Work sign-off Jul 28
+  text: Site lead confirmed the billed work for Campaign refresh for Balewa & Sons Warehousing was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00155
+- id: ev-0070
+  kind: completion_record
+  date: '2026-08-04'
+  title: Work sign-off Aug 4
+  text: Site lead confirmed the billed work for Campaign refresh for Balewa & Sons Warehousing was completed and inspected.
+    Quantities consistent with the schedule of values.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00157
+- id: ev-0071
+  kind: completion_record
+  date: '2026-08-05'
+  title: Work sign-off Aug 5
+  text: Site lead signed off the Balewa & Sons Warehousing work completed on Aug 4, before the cancellation notice.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00161
+- id: ev-0072
+  kind: project_milestone
+  date: '2026-08-10'
+  title: 'Project status: Balewa & Sons Warehousing'
+  text: Client cancelled the contract on Aug 10. Work already completed and signed off before that date remains billable.
+  vendor_id: vend-masonry
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00161
+- id: ev-0073
+  kind: project_milestone
+  date: '2026-08-10'
+  title: 'Project status: Balewa & Sons Warehousing'
+  text: Client cancelled the contract on Aug 10. All subcontractors were told in writing to stand down; no further work was
+    authorized after that date.
+  vendor_id: vend-demolition
+  project_id: proj-00003
+  transaction_ids:
+  - bill-00148
+  - bill-00163
+- id: ev-0074
+  kind: project_milestone
+  date: '2026-08-10'
+  title: 'Notice to proceed: Sandoval Movers Co.'
+  text: Notice to proceed issued Aug 10. No site access or work was authorized before that date.
+  vendor_id: vend-sitework
+  project_id: proj-00004
+  transaction_ids:
+  - bill-00154
+- id: ev-0075
+  kind: distribution_record
+  date: '2026-08-11'
+  title: Owner distribution record
+  text: Quarterly distribution approved by the owner and the bookkeeper on Aug 11; within retained earnings.
+  transaction_ids:
+  - bank-00070
+- id: ev-0076
+  kind: project_milestone
+  date: '2026-08-20'
+  title: 'Project status: Balewa & Sons Warehousing'
+  text: Client cancelled the contract on Aug 10. Work accepted before that date remains billable.
+  vendor_id: cust-client-3
+  project_id: proj-00003
+  transaction_ids:
+  - inv-00038
+- id: ev-0077
+  kind: acceptance_record
+  date: '2026-08-20'
+  title: Acceptance record
+  text: Client accepted the work on Aug 2, before the cancellation notice.
+  vendor_id: cust-client-3
+  project_id: proj-00003
+  transaction_ids:
+  - inv-00038
+- id: ev-0078
+  kind: cash_receipt
+  date: '2026-08-22'
+  title: Receipt WIR8396055
+  text: Receipt of $129,000.00 from Ibarra & Daughters Pottery applied to invoice INV-1011 on Aug 22.
+  vendor_id: cust-client-1
+  transaction_ids:
+  - bank-00073
+  - inv-00012
+- id: ev-0079
+  kind: project_milestone
+  date: '2026-08-26'
+  title: 'Project status: Balewa & Sons Warehousing'
+  text: Client cancelled the contract on Aug 10. No further work was performed or accepted after that date.
+  vendor_id: cust-client-3
+  project_id: proj-00003
+  transaction_ids:
+  - inv-00040
+- id: ev-0080
+  kind: cash_receipt
+  date: '2026-08-28'
+  title: Receipt WIR3455313
+  text: Receipt of $121,500.00 from Quarry Hill Creamery applied to invoice INV-1014 on Aug 28.
+  vendor_id: cust-client-2
+  transaction_ids:
+  - bank-00075
+  - inv-00015
+- id: ev-0081
+  kind: customer_agreement
+  date: '2026-09-05'
+  title: Customer agreement
+  text: Customer paid an agreed upfront deposit under the signed agreement; the invoice follows on delivery.
+  vendor_id: cust-client-2
+  transaction_ids:
+  - bank-00076
+- id: ev-0082
+  kind: acceptance_record
+  date: '2026-09-16'
+  title: Acceptance record
+  text: Client accepted the stage once on Sep 18; no second acceptance recorded for this stage.
+  vendor_id: cust-client-4
+  project_id: proj-00004
+  transaction_ids:
+  - inv-00048
+- id: ev-0083
+  kind: ap_payment_record
+  date: '2026-09-16'
+  title: Payment ACH3142897
+  text: Payment ACH3142897 of $500.00 sent by ACH to an account ending 9034. The change entered in the vendor master has no
+    supporting form attached.
+  vendor_id: vend-landlord
+  transaction_ids:
+  - bank-00077
+  - bill-00159

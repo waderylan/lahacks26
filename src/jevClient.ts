@@ -1,5 +1,5 @@
 import type { CompanyBills, RecordResult, Row } from './types';
-import { transactionVersion, type Outcome } from './rules';
+import type { Outcome } from './rules';
 
 let modelRevision = 'pending-status';
 export function setModelRevision(version: string) { if (version !== modelRevision) { modelRevision = version; judgments.clear(); } }
@@ -36,7 +36,7 @@ export async function requestEvaluation(companyId: string, criterion: string, id
 }
 export const evaluationIdentity = () => `${selectedProvider()}:${modelRevision}`;
 export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v1:choice-v1';
-export const judgmentKey = (row: Row, text: string) => JSON.stringify([selectedProvider(), modelRevision, CACHE_VERSION, row.companyId, row.id, transactionVersion(row), text]);
+export const judgmentKey = (row: Row, text: string) => JSON.stringify([selectedProvider(), modelRevision, CACHE_VERSION, row.companyId, row.id, row.date, row.vendor, row.account, row.memo, row.amountCents, row.description, row.itemNames, text]);
 const judgments = new Map<string, Promise<Outcome>>();
 export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void): Promise<void> {
   const missing = data.rows.filter(row => !judgments.has(judgmentKey(row, text)));

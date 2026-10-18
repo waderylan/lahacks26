@@ -1,0 +1,20 @@
+- id: company-main
+  legal_name: Tallowfield Home Renovations LLC
+  trade_name: Tallowfield Home Renovations
+  industry_naics: '236118'
+  industry_title: Residential Remodelers
+  email: accounts@tallowfieldhomerenovations.example
+  phone: (555) 276-0148
+  website: https://www.tallowfieldhomerenovations.example
+  address:
+    line1: 880 Millrace Street
+    city: Rochester
+    state: NY
+    postal_code: '14608'
+    country: United States
+    line2: null
+  fiscal_year_start_month: 1
+  opening_sim_day: 0
+  opening_date: '2025-10-06'
+  remit_bank: Lakeshore Trust
+  remit_account_ending: '1913'

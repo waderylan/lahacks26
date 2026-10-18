@@ -1,0 +1,198 @@
+{
+  "note": "Measured Jev outcomes on the curated demo sample (enriched, not representative). Reference labels are authored and were not tuned to these results.",
+  "runs": [
+    {
+      "company": "company-102",
+      "prompt_id": "P14",
+      "prompt": "Find invoices for work, projects or orders that were cancelled before the invoice date.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.005868786,
+      "reference_matches": 1,
+      "measured_matches": 2,
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 1,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [
+        "company-102:inv-00041"
+      ],
+      "extra": [
+        "company-102:bill-00132",
+        "company-102:bill-00145"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P15",
+      "prompt": "Find invoices that ask the customer to pay a different account than the company's own remittance details.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.005870256,
+      "reference_matches": 1,
+      "measured_matches": 6,
+      "true_positives": 1,
+      "false_positives": 5,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:inv-00045": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bank-00063",
+        "company-102:bill-00014",
+        "company-102:bill-00123",
+        "company-102:bill-00166",
+        "company-102:inv-00045"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P16",
+      "prompt": "Find bank payments sent to an account that doesn't match the vendor's records.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.005868786,
+      "reference_matches": 1,
+      "measured_matches": 6,
+      "true_positives": 1,
+      "false_positives": 5,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bank-00008": "uncertain"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bank-00005",
+        "company-102:bank-00055",
+        "company-102:bill-00123",
+        "company-102:inv-00023",
+        "company-102:inv-00045"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P17",
+      "prompt": "Find bank payments that may have paid the same bill twice.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.00586761,
+      "reference_matches": 1,
+      "measured_matches": 7,
+      "true_positives": 1,
+      "false_positives": 6,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [
+        "company-102:bank-00047",
+        "company-102:bank-00051"
+      ],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bank-00022": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bank-00022",
+        "company-102:bank-00047",
+        "company-102:bank-00051",
+        "company-102:bank-00054",
+        "company-102:bank-00062",
+        "company-102:bank-00066"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P18",
+      "prompt": "Find bank payments to a payee with no vendor record, purchase order or open bill.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.005869374,
+      "reference_matches": 1,
+      "measured_matches": 2,
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [],
+      "extra": [
+        "company-102:bank-00055"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P19",
+      "prompt": "Find bank transfers to personal accounts that are described as business expenses.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.005867904,
+      "reference_matches": 1,
+      "measured_matches": 1,
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:bank-00071": "no_match"
+      },
+      "missed": [],
+      "extra": []
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P20",
+      "prompt": "Find invoices that may bill the same stage or order twice.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.00586761,
+      "reference_matches": 1,
+      "measured_matches": 19,
+      "true_positives": 1,
+      "false_positives": 17,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 1,
+      "reference_uncertain_answered": {
+        "company-102:inv-00016": "match"
+      },
+      "missed": [],
+      "extra": [
+        "company-102:bank-00051",
+        "company-102:bill-00046",
+        "company-102:bill-00062",
+        "company-102:bill-00066",
+        "company-102:bill-00067",
+        "company-102:bill-00081",
+        "company-102:bill-00083",
+        "company-102:bill-00087",
+        "company-102:bill-00107",
+        "company-102:bill-00117",
+        "company-102:bill-00121",
+        "company-102:inv-00010",
+        "company-102:inv-00012",
+        "company-102:inv-00016",
+        "company-102:inv-00017",
+        "company-102:inv-00030",
+        "company-102:inv-00041"
+      ]
+    },
+    {
+      "company": "company-102",
+      "prompt_id": "P21",
+      "prompt": "Find bank deposits that don't match any customer invoice.",
+      "rows_evaluated": 140,
+      "cost_usd": 0.005867316,
+      "reference_matches": 1,
+      "measured_matches": 1,
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "lookalikes_wrongly_matched": [],
+      "reference_uncertain": 0,
+      "reference_uncertain_answered": {},
+      "missed": [],
+      "extra": []
+    }
+  ]
+}

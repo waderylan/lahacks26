@@ -1,0 +1,380 @@
+- id: rcpt-00001
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2025-12-09'
+  amount: '1859.01'
+  applications:
+  - document_id: inv-00002
+    amount: '1859.01'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00002
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2025-12-17'
+  amount: '3922.98'
+  applications:
+  - document_id: inv-00003
+    amount: '3922.98'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00003
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-01-02'
+  amount: '3539.51'
+  applications:
+  - document_id: inv-00004
+    amount: '3539.51'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00004
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-01-22'
+  amount: '3720.23'
+  applications:
+  - document_id: inv-00007
+    amount: '3720.23'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00005
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-01-26'
+  amount: '3212.03'
+  applications:
+  - document_id: inv-00009
+    amount: '3212.03'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00006
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-01-28'
+  amount: '6303.51'
+  applications:
+  - document_id: inv-00010
+    amount: '6303.51'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00007
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-01-29'
+  amount: '2045.15'
+  applications:
+  - document_id: inv-00008
+    amount: '2045.15'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00008
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-02-06'
+  amount: '3639.37'
+  applications:
+  - document_id: inv-00011
+    amount: '3639.37'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00009
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-02-12'
+  amount: '6210.89'
+  applications:
+  - document_id: inv-00013
+    amount: '6210.89'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00010
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-02-12'
+  amount: '4382.49'
+  applications:
+  - document_id: inv-00014
+    amount: '4382.49'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00011
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-04-18'
+  amount: '1974.34'
+  applications:
+  - document_id: inv-00018
+    amount: '1974.34'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00012
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-05-02'
+  amount: '1394.05'
+  applications:
+  - document_id: inv-00019
+    amount: '1394.05'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00013
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-05-29'
+  amount: '1638.23'
+  applications:
+  - document_id: inv-00022
+    amount: '1638.23'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00014
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-06-03'
+  amount: '3336.14'
+  applications:
+  - document_id: inv-00023
+    amount: '3336.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00015
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-06-03'
+  amount: '4933.14'
+  applications:
+  - document_id: inv-00024
+    amount: '4933.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00016
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-07-10'
+  amount: '3173.03'
+  applications:
+  - document_id: inv-00026
+    amount: '3173.03'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00017
+  customer_id: cust-client-3
+  customer_name: Balewa & Sons Warehousing
+  txn_date: '2026-08-05'
+  amount: '1205.77'
+  applications:
+  - document_id: inv-00031
+    amount: '1205.77'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00018
+  customer_id: cust-client-3
+  customer_name: Balewa & Sons Warehousing
+  txn_date: '2026-08-10'
+  amount: '729.50'
+  applications:
+  - document_id: inv-00032
+    amount: '729.50'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00019
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-08-15'
+  amount: '107500.01'
+  applications:
+  - document_id: inv-00025
+    amount: '107500.01'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00020
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-08-17'
+  amount: '72565.57'
+  applications:
+  - document_id: inv-00016
+    amount: '72565.57'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00021
+  customer_id: cust-client-3
+  customer_name: Balewa & Sons Warehousing
+  txn_date: '2026-08-17'
+  amount: '1185.95'
+  applications:
+  - document_id: inv-00033
+    amount: '1185.95'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00022
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-08-18'
+  amount: '73017.07'
+  applications:
+  - document_id: inv-00020
+    amount: '73017.07'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00023
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-08-22'
+  amount: '129000.00'
+  applications:
+  - document_id: inv-00012
+    amount: '129000.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00024
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-08-25'
+  amount: '57857.14'
+  applications:
+  - document_id: inv-00017
+    amount: '57857.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00025
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-08-28'
+  amount: '121500.00'
+  applications:
+  - document_id: inv-00015
+    amount: '121500.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00026
+  customer_id: cust-client-3
+  customer_name: Balewa & Sons Warehousing
+  txn_date: '2026-08-28'
+  amount: '1002.97'
+  applications:
+  - document_id: inv-00034
+    amount: '1002.97'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00027
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-08-30'
+  amount: '118862.44'
+  applications:
+  - document_id: inv-00028
+    amount: '118862.44'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00028
+  customer_id: cust-client-1
+  customer_name: Ibarra & Daughters Pottery
+  txn_date: '2026-08-31'
+  amount: '6142.85'
+  applications:
+  - document_id: inv-00001
+    amount: '6142.85'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00029
+  customer_id: cust-client-3
+  customer_name: Balewa & Sons Warehousing
+  txn_date: '2026-08-31'
+  amount: '489.16'
+  applications:
+  - document_id: inv-00036
+    amount: '489.16'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00030
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-09-03'
+  amount: '57857.14'
+  applications:
+  - document_id: inv-00021
+    amount: '57857.14'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00031
+  customer_id: cust-client-2
+  customer_name: Quarry Hill Creamery
+  txn_date: '2026-09-11'
+  amount: '5785.71'
+  applications:
+  - document_id: inv-00005
+    amount: '5785.71'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00032
+  customer_id: cust-client-4
+  customer_name: Sandoval Movers Co.
+  txn_date: '2026-09-23'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00039
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00033
+  customer_id: cust-client-4
+  customer_name: Sandoval Movers Co.
+  txn_date: '2026-09-24'
+  amount: '650.55'
+  applications:
+  - document_id: inv-00042
+    amount: '650.55'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00034
+  customer_id: cust-client-3
+  customer_name: Balewa & Sons Warehousing
+  txn_date: '2026-09-28'
+  amount: '20007.69'
+  applications:
+  - document_id: inv-00037
+    amount: '20007.69'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00035
+  customer_id: cust-client-4
+  customer_name: Sandoval Movers Co.
+  txn_date: '2026-10-03'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00041
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00036
+  customer_id: cust-client-4
+  customer_name: Sandoval Movers Co.
+  txn_date: '2026-10-03'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00046
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00037
+  customer_id: cust-client-4
+  customer_name: Sandoval Movers Co.
+  txn_date: '2026-10-09'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00045
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.
+- id: rcpt-00038
+  customer_id: cust-client-4
+  customer_name: Sandoval Movers Co.
+  txn_date: '2026-10-12'
+  amount: '350.00'
+  applications:
+  - document_id: inv-00044
+    amount: '350.00'
+  deposit_account_id: acct-checking
+  memo: Payment received against invoice.

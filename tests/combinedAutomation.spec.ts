@@ -16,9 +16,9 @@ test('Explore becomes an action rule; assignments, tasks, recurring checks, and 
     await page.getByRole('button', { name: 'Save new view', exact: true }).click();
     await expect(page.getByLabel('Saved views')).toContainText('Receipt review');
     await page.getByRole('button', { name: 'Create rule', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'What should happen for each result?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Actions' })).toBeVisible();
     await expect(page.locator('.rule-scope-note')).toContainText('Vendor bills');
-    const uncertain = page.getByRole('group', { name: 'When there is not enough information', exact: true });
+    const uncertain = page.getByRole('group', { name: 'Uncertain', exact: true });
     const add = () => uncertain.getByRole('button', { name: 'Add action for uncertain results', exact: true }).click();
     await add(); await uncertain.getByLabel('Action value').fill('Needs receipt');
     await add(); await uncertain.getByLabel('Action type').last().selectOption('assign');
@@ -27,7 +27,7 @@ test('Explore becomes an action rule; assignments, tasks, recurring checks, and 
     await uncertain.getByLabel('Task title').fill('Verify this receipt');
     await uncertain.getByLabel('Task owner').selectOption('emp-ap');
     await page.getByLabel('Clear resolved issues').check();
-    await step('Review results'); await page.getByLabel('Rule name').fill('Request missing receipt');
+    await step('Preview'); await page.getByLabel('Rule name').fill('Request missing receipt');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click();
     const saved = async () => (await (await page.request.get(`${app.url}/api/companies/company-101/rules`)).json()).store;
     expect((await saved()).history).toEqual([]);
@@ -52,11 +52,11 @@ test('Explore becomes an action rule; assignments, tasks, recurring checks, and 
     await expect(page.getByLabel('Transaction detail')).toContainText('Needs receipt');
     await expect(page.getByLabel('Supporting details title')).toHaveCount(0);
     await expect(page.getByLabel('Transaction detail').getByRole('button', { name: 'Mark reviewed' })).toHaveCount(0);
-    await expect(page.getByLabel('Transaction detail').getByRole('button', { name: 'Continue in Tasks & activity' })).toBeVisible();
+    await expect(page.getByLabel('Transaction detail').getByRole('button', { name: 'Review in Tasks & activity' })).toBeVisible();
     await page.getByLabel('Close detail', { exact: true }).click();
     await workspace('Rules');
-    await page.getByRole('button', { name: 'Edit rule', exact: true }).click();
-    await step('Review results');
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
+    await step('Preview');
     await page.locator('tr[data-id="company-101:bill-1"] .wizard-vendor').click();
     const drawer = page.getByLabel('Transaction detail');
     await drawer.getByLabel('Supporting details title').fill('Receipt verification');

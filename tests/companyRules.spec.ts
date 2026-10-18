@@ -26,17 +26,17 @@ test('the company rules table toggles, runs, edits and deletes saved rules with 
     await row.getByRole('switch').click(); await expect(row.getByRole('switch')).toBeChecked();
     await page.reload(); await expect(row.getByRole('switch')).toBeChecked();
     await row.getByRole('switch').click(); await expect(row.getByRole('switch')).not.toBeChecked();
-    await row.getByRole('button', { name: 'Edit rule', exact: true }).click();
+    await row.getByRole('button', { name: 'Edit', exact: true }).click();
     await expect(page.getByRole('main', { name: 'Rule setup', exact: true })).toBeVisible();
-    await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Review results', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Preview', exact: true }).click();
     await page.getByLabel('Rule name', { exact: true }).fill('Receipt review');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click();
     await page.getByRole('button', { name: 'All rules', exact: true }).click();
     row = table.getByRole('row').filter({ hasText: 'Receipt review' });
-    await expect(row).toContainText('Results from revision 1');
+    await expect(row).toContainText('Rule changed. Run again to update results.');
     await row.getByRole('button', { name: 'Run all records', exact: true }).click();
     await row.getByRole('button', { name: 'Run rule on all records', exact: true }).click();
-    await expect(row).not.toContainText('Results from revision 1');
+    await expect(row).not.toContainText('Rule changed. Run again to update results.');
     await page.setViewportSize({ width: 390, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: 'artifacts/company-rules-mobile.png', fullPage: true });
@@ -61,7 +61,7 @@ test('the empty table opens new rules and shows only the selected company’s sa
   const app = await startRuleApp({ mode: 'real-four-company' });
   try {
     await page.goto(`${app.url}/?workspace=rules`);
-    await expect(page.getByText('No saved rules for this company.', { exact: false })).toBeVisible();
+    await expect(page.getByText('No saved rules.', { exact: false })).toBeVisible();
     await page.getByRole('button', { name: 'New rule', exact: true }).click();
     await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('');
     await page.getByRole('button', { name: 'All rules', exact: true }).click();

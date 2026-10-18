@@ -7,8 +7,8 @@
 .chat-pop { position:fixed; right:20px; bottom:74px; z-index:40; width:400px; height:min(620px, calc(100vh - 120px)); display:flex; flex-direction:column; background:var(--bg); border:1px solid var(--line); border-radius:10px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.14); }
 .chat-pop.lifted { bottom:126px; height:min(620px, calc(100vh - 172px)); }
 .chat-pop-head { display:flex; align-items:center; gap:8px; padding:10px 10px 10px 12px; background:var(--panel); border-bottom:1px solid var(--line); }
-.chat-pop-head div { display:flex; flex-direction:column; line-height:1.25; }
-.chat-pop-head small { color:var(--muted); font-size:11px; }
+.chat-pop-head div { min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+.chat-pop-head small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:11px; }
 .chat-pop .chat { flex:1; min-height:0; }
 .chat { height:100%; display:flex; flex-direction:column; min-height:0; }
 .chat-log { flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
@@ -88,7 +88,9 @@
 .act-preview { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; }
 .act-done { margin:8px 0 0; padding:6px 10px; border-radius:6px; background:var(--green-bg); color:var(--green); font-size:12px; }
 @media (max-width: 520px) { .chat-pop, .chat-pop.lifted { right:8px; left:8px; width:auto; } .fab-label { display:none; } .chat-fab { padding:0 14px; } }
-.chat-pop-head .model-pick select { font:inherit; font-size:11px; padding:3px 4px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--text); max-width:150px; }
+.chat-pop-head .model-pick { min-width:0; flex-shrink:1; }
+.chat-pop-head .icon-btn { flex-shrink:0; }
+.chat-pop-head .model-pick select { width:100%; font:inherit; font-size:11px; padding:3px 4px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--text); max-width:150px; }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .model-choice { display:flex; flex-direction:column; gap:6px; margin:4px 0 8px; }
 .model-choice button { display:flex; flex-direction:column; align-items:flex-start; gap:1px; text-align:left; padding:8px 10px; }

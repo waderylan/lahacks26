@@ -16,8 +16,8 @@ import type { CompanyBills, Row } from './types';
 /** What the signed-in employee has waiting, read fresh from SQLite when they ask. */
 interface Plate { tasks: ReviewTask[]; assignedIds: string[]; unread: Pick<Mail, 'id' | 'from' | 'subject' | 'sentAt'>[]; approvals: number }
 
-/** reading: the model's understanding of the question; 'choose' while waiting for the user to pick a model, 'pending' while it reads, 'rules' when the text-rule fallback was used. */
-interface Turn { evaluation?: EvaluationContext; id: string; model: ChatModel; createdAt: string; question: string; parsed: ParsedQuestion; scope: Row[]; run: SemanticRun | null; reading: Understanding | 'choose' | 'pending' | 'rules'; plate?: Plate | 'loading' | { error: string }; /** The answer's chart was shown on the Dashboard. */ graphed?: boolean }
+/** reading: the model's understanding, pending request, or text-rule fallback. */
+interface Turn { evaluation?: EvaluationContext; id: string; model: ChatModel; createdAt: string; question: string; parsed: ParsedQuestion; scope: Row[]; run: SemanticRun | null; reading: Understanding | 'pending' | 'rules'; plate?: Plate | 'loading' | { error: string }; /** The answer's chart was shown on the Dashboard. */ graphed?: boolean }
 
 /** Compact form saved in SQLite; rebuilt into a Turn against the company's current bills. */
 interface StoredTurn {
@@ -41,10 +41,6 @@ const understand = (question: string, model: ChatModel) => api<Understanding>('/
 let currentModel: ChatModel = 'jev';
 const modelListeners = new Set<() => void>();
 function setModel(m: ChatModel) { currentModel = m; modelListeners.forEach(l => l()); }
-// Unless the user ticks "use this for the rest of the chat", every question asks which model should answer.
-let rememberModel = false;
-function setRemember(on: boolean) { rememberModel = on; modelListeners.forEach(l => l()); }
-function useRemember() { return useSyncExternalStore(cb => { modelListeners.add(cb); return () => modelListeners.delete(cb); }, () => rememberModel); }
 function useModel() { return useSyncExternalStore(cb => { modelListeners.add(cb); return () => modelListeners.delete(cb); }, () => currentModel); }
 let availability: Promise<{ jev: boolean; gemini: boolean }> | null = null;
 function useAvailability() {
@@ -74,7 +70,7 @@ function toStored(turn: Turn, as: string): StoredTurn {
     criterion: turn.parsed.criterion, periodLabel: turn.parsed.period?.label ?? null, scopeIds: turn.scope.map(r => r.id), outcomes,
     costNano: String(turn.run?.costNano ?? 0n), ms: turn.run && turn.run.finishedAt !== null ? Math.round(turn.run.finishedAt - turn.run.startedAt) : 0,
     model: turn.model, tokens: turn.run?.tokens, graphed: turn.graphed,
-    reading: turn.reading === 'pending' || turn.reading === 'choose' ? 'rules' : turn.reading, ...(turn.plate && typeof turn.plate === 'object' && 'tasks' in turn.plate && { plate: turn.plate }),
+    reading: turn.reading === 'pending' ? 'rules' : turn.reading, ...(turn.plate && typeof turn.plate === 'object' && 'tasks' in turn.plate && { plate: turn.plate }),
   };
 }
 function fromStored(s: StoredTurn, rows: Row[]): Turn {
@@ -156,7 +152,7 @@ export function ChatWidget(props: ChatProps) {
             <span className="bot-avatar">✦</span>
             <div><b>Ask your books</b><small>{data?.company.name ?? 'Loading…'} · as {firstName(props.as)}</small></div>
             <span className="spacer" />
-            <HeaderModel />
+            <ModelPicker />
             {turns.length > 0 && <button className="icon-btn" title="Clear conversation" onClick={clear}>↺</button>}
             <button className="icon-btn" aria-label="Close chat" onClick={() => setOpen(false)}>✕</button>
           </div>
@@ -203,21 +199,14 @@ function graphOnDashboard(turn: Turn, data: CompanyBills) {
   openDashboard?.();
 }
 
-/** When a model is remembered, the header shows it and lets the user change it or go back to being asked. */
-function HeaderModel() {
-  const remember = useRemember();
-  if (!remember) return null;
-  return <><ModelPicker /><button className="icon-btn" title="Ask me which model for every question" onClick={() => setRemember(false)}>?</button></>;
-}
-
 function ModelPicker() {
   const model = useModel();
   const avail = useAvailability();
   return (
-    <label className="model-pick" title="Jev uses the AI Gateway key; Gemini models use the Gemini key">
+    <label className="model-pick" title="Chat model">
       <span className="sr-only">Model</span>
       <select aria-label="Model" value={model} onChange={e => setModel(e.target.value as ChatModel)}>
-        {CHAT_MODELS.map(m => <option key={m.id} value={m.id} disabled={!!avail && (m.id === 'jev' ? !avail.jev : !avail.gemini)}>{m.label} · {m.note}</option>)}
+        {CHAT_MODELS.map(m => <option key={m.id} value={m.id} disabled={!!avail && (m.id === 'jev' ? !avail.jev : !avail.gemini)}>{m.label}</option>)}
       </select>
     </label>
   );
@@ -245,21 +234,13 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
       .catch(() => loaded.delete(key));
   }, [key, companyId, as, data.rows]);
 
-  const remember = useRemember();
   const ask = (question: string) => {
     const q = question.trim();
     if (!q) return;
     setInput('');
-    const turn: Turn = { id: uid(), model, createdAt: new Date().toISOString(), question: q, parsed: parseQuestion(q, latest), scope: [], run: null, reading: 'choose' };
+    const turn: Turn = { id: uid(), model, createdAt: new Date().toISOString(), question: q, parsed: parseQuestion(q, latest), scope: [], run: null, reading: 'pending' };
     setTurns(key, t => [...t, turn]);
-    // Ask which model should answer, unless the user chose to keep one for the rest of the chat.
-    if (remember) answerWith(turn, model);
-  };
-  const choose = (turnId: string, m: ChatModel, keep: boolean) => {
-    setModel(m);
-    if (keep) setRemember(true);
-    const turn = (conversations.get(key) ?? EMPTY).find(t => t.id === turnId);
-    if (turn && turn.reading === 'choose') answerWith(turn, m);
+    answerWith(turn, model);
   };
   const answerWith = (base: Turn, m: ChatModel) => {
     const q = base.question, id = base.id;
@@ -300,16 +281,16 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
           <div className="chat-empty">
             <div className="hero-orb">✦</div>
             <h2>Ask {data.company.name}'s books</h2>
-            <p>Ask in plain English, {firstName(as)}. {modelLabel(model)} reads your question and all {data.rows.length} bills; every number is added up exactly from the bills it finds, and you can act on them right here.</p>
+            <p>What would you like to check, {firstName(as)}?</p>
             <div className="suggest-grid">
-              {suggestions.map(s => <button key={s} className="suggest" onClick={() => ask(s)}>{s}<span>→</span></button>)}
+              {suggestions.slice(0, 3).map(s => <button key={s} className="suggest" onClick={() => ask(s)}>{s}<span>→</span></button>)}
             </div>
           </div>
         )}
         {turns.map((t, i) => (
           <div key={t.id} className="turn">
             <div className="msg user">{t.question}</div>
-            <div className="msg-row"><span className="bot-avatar sm">✦</span><Answer turn={t} data={data} as={as} jevReady={readyFor(t.model)} onChoose={choose} availability={avail} onOpenBill={onOpenBill} onAsk={ask} onChanged={onChanged} isLast={i === turns.length - 1} suggestions={suggestions} /></div>
+            <div className="msg-row"><span className="bot-avatar sm">✦</span><Answer turn={t} data={data} as={as} jevReady={readyFor(t.model)} onOpenBill={onOpenBill} onAsk={ask} onChanged={onChanged} isLast={i === turns.length - 1} suggestions={suggestions} /></div>
           </div>
         ))}
         <div ref={endRef} />
@@ -319,13 +300,13 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
       <form className="chat-input" onSubmit={e => { e.preventDefault(); voice.stop(); ask(input); }}>
         <input value={input} onChange={e => setInput(e.target.value)} placeholder={voice.listening ? 'Listening… speak your question' : busy ? 'Working…' : `Ask about ${data.company.name}'s spending…`} maxLength={300} autoFocus />
         {voice.supported && <button type="button" className={`mic ${voice.listening ? 'on' : ''}`} onClick={voice.listening ? voice.stop : voice.start} aria-pressed={voice.listening} aria-label={voice.listening ? 'Stop listening' : 'Ask by voice'} title={voice.listening ? 'Stop listening' : 'Ask by voice (sends when you pause)'}>🎤</button>}
-        <button className="send" disabled={!input.trim() || (remember && model === 'jev' && Boolean(available?.jev) && !evaluation.context)} aria-label="Send">↑</button>
+        <button className="send" disabled={!input.trim() || (model === 'jev' && Boolean(available?.jev) && !evaluation.context)} aria-label="Send">↑</button>
       </form>
     </div>
   );
 }
 
-function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, onAsk, onChanged, isLast, suggestions }: { turn: Turn; data: CompanyBills; as: string; jevReady: boolean; onChoose: (turnId: string, model: ChatModel, keep: boolean) => void; availability: { jev: boolean; gemini: boolean } | null; onOpenBill: (row: Row) => void; onAsk: (q: string) => void; onChanged?: () => void; isLast: boolean; suggestions: string[] }) {
+function Answer({ turn, data, as, jevReady, onOpenBill, onAsk, onChanged, isLast, suggestions }: { turn: Turn; data: CompanyBills; as: string; jevReady: boolean; onOpenBill: (row: Row) => void; onAsk: (q: string) => void; onChanged?: () => void; isLast: boolean; suggestions: string[] }) {
   const { parsed, scope, run, reading } = turn;
   const [now, setNow] = useState(performance.now());
   const [showAll, setShowAll] = useState(false);
@@ -338,13 +319,12 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
 
   const followUps = suggestions.filter(s => s !== turn.question).slice(0, 3);
   const footer = <><HowTo turn={turn} secs={run ? ((run.finishedAt ?? now) - run.startedAt) / 1000 : 0} />{isLast && <FollowUps items={followUps} onAsk={onAsk} />}</>;
-  if (reading === 'choose') return <ModelChoice turn={turn} availability={availability} onChoose={onChoose} />;
-  if (reading === 'pending') return <div className="msg bot scanning"><div className="scan-line"><span className="dots"><i /><i /><i /></span> {modelLabel(turn.model)} is reading your question…</div></div>;
+  if (reading === 'pending') return <div className="msg bot scanning"><div className="scan-line"><span className="dots"><i /><i /><i /></span> {modelLabel(turn.model)} is checking…</div></div>;
   if (parsed.intent === 'my_work') return <PlateAnswer turn={turn} data={data} as={as} onOpenBill={onOpenBill} footer={footer} />;
   if (parsed.intent === 'upcoming') return <UpcomingAnswer turn={turn} data={data} as={as} model={turn.model} question={turn.question} onOpenBill={onOpenBill} onChanged={onChanged} footer={footer} />;
 
   const periodText = parsed.period ? ` in ${parsed.period.label}` : ' this year';
-  if (parsed.criterion && !jevReady) return <div className="msg bot"><span className="err">{turn.model === 'jev' ? 'Jev is not configured (AI_GATEWAY_API_KEY missing)' : `${modelLabel(turn.model)} needs GEMINI_API_KEY in .env`}, so I can't judge bills by meaning.</span></div>;
+  if (parsed.criterion && !jevReady) return <div className="msg bot"><span className="err">{modelLabel(turn.model)} is unavailable. Select another model in the header.</span></div>;
   if (!scope.length) return <div className="msg bot">There are no bills{periodText}.</div>;
 
   const matches = parsed.criterion ? scope.filter(r => run?.outcomes[r.id] === 'true') : scope;
@@ -357,7 +337,7 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
     const pctDone = run ? run.done / Math.max(run.total, 1) : 0;
     return (
       <div className="msg bot scanning">
-        <div className="scan-line"><span className="dots"><i /><i /><i /></span> Reading {run ? `${run.done} of ${run.total}` : scope.length} bills{periodText} against your question…</div>
+        <div className="scan-line"><span className="dots"><i /><i /><i /></span> Checking {run ? `${run.done} of ${run.total}` : scope.length} bills{periodText}…</div>
         <div className="scan-bar"><span style={{ width: `${pctDone * 100}%` }} /></div>
         <div className="scan-meta">{matches.length} matches so far · {money(cents)} · {secs.toFixed(1)}s</div>
       </div>
@@ -369,9 +349,9 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
   if (failed.length) {
     return (
       <div className="msg bot">
-        <p className="lead"><span className="err">{modelLabel(turn.model)} couldn't check {failed.length === scope.length ? 'any' : `${failed.length} of the ${scope.length}`} bills</span>, so I don't have a reliable answer yet.</p>
-        <p className="muted small">{run?.error ? `${turn.model === 'jev' ? 'The AI Gateway' : 'Gemini'} returned: ${run.error}. ` : ''}This is usually temporary. Nothing was counted.</p>
-        {matches.length > 0 && <p className="muted small">So far {plural(matches.length, 'bill')} ({money(cents)}) matched among the bills that were checked.</p>}
+        <p className="lead"><span className="err">{modelLabel(turn.model)} couldn't check {failed.length === scope.length ? 'any' : `${failed.length} of the ${scope.length}`} bills</span>.</p>
+        <details className="howto"><summary>Details</summary><p>{run?.error || 'Check failed.'}</p></details>
+        {matches.length > 0 && <p className="muted small">{plural(matches.length, 'bill')} matched · {money(cents)} · partial results</p>}
         <button className="primary" onClick={() => onAsk(turn.question)}>Try again</button>
         {footer}
       </div>
@@ -384,10 +364,10 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
     const top = groupTotals(scope, r => r.account || '(none)').sort((a, b) => b.cents - a.cents).slice(0, 4);
     return (
       <div className="msg bot">
-        <p className="lead">I checked all {plural(scope.length, 'bill')}{periodText}, and <b>none of them match your question</b>.</p>
-        {unsure.length > 0 && <p className="muted small">◐ {plural(unsure.length, 'bill')} ({money(sumCents(unsure))}) {unsure.length === 1 ? 'was' : 'were'} too vague to decide.</p>}
+        <p className="lead">No matches in {plural(scope.length, 'bill')}{periodText}.</p>
+        {unsure.length > 0 && <p className="muted small">{plural(unsure.length, 'bill')} uncertain · {money(sumCents(unsure))} excluded</p>}
         {near.length > 0 && <><div className="sub-h">Closest bills (not counted)</div><BillList rows={near.map(x => x.r)} onOpen={onOpenBill} /></>}
-        <div className="sub-h">What {data.company.name} does pay for{periodText}</div>
+        <div className="sub-h">Top categories{periodText}</div>
         <div className="stat-chips">{top.map(t => <span key={t.label}><b>{t.label}</b>{money(t.cents)}</span>)}</div>
         {footer}
       </div>
@@ -416,37 +396,17 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
     <div className="msg bot">
       <p className="lead">{headline}</p>
       {turn.graphed ? <GraphedNote turn={turn} data={data} /> : detail}
-      {unsure.length > 0 && <p className="muted small">◐ {plural(unsure.length, 'more bill')} ({money(sumCents(unsure))}) {unsure.length === 1 ? 'was' : 'were'} too vague to decide and {unsure.length === 1 ? 'is' : 'are'} not counted.</p>}
+      {unsure.length > 0 && <p className="muted small">{plural(unsure.length, 'bill')} uncertain · {money(sumCents(unsure))} excluded</p>}
       {matches.length > 0 && (
         <>
           <div className="sub-h">Largest bills</div>
           <BillList rows={showAll ? sorted : sorted.slice(0, 4)} onOpen={onOpenBill} />
           {sorted.length > 4 && <button className="linkish" onClick={() => setShowAll(s => !s)}>{showAll ? 'Show fewer' : `Show all ${sorted.length}`}</button>}
-          {!turn.graphed && <button className="chip graph-btn" onClick={() => graphOnDashboard(turn, data)}>📊 Show as a graph on the Dashboard</button>}
+          {!turn.graphed && <button className="chip graph-btn" onClick={() => graphOnDashboard(turn, data)}>Show on Dashboard</button>}
           <ActOnBills companyId={data.company.companyId} as={as} model={turn.model} rows={matches} label={shortTopic || turn.question} onChanged={onChanged} />
         </>
       )}
       {footer}
-    </div>
-  );
-}
-
-function ModelChoice({ turn, availability, onChoose }: { turn: Turn; availability: { jev: boolean; gemini: boolean } | null; onChoose: (turnId: string, model: ChatModel, keep: boolean) => void }) {
-  const [keep, setKeep] = useState(false);
-  return (
-    <div className="msg bot">
-      <p>Which model should answer this?</p>
-      <div className="model-choice">
-        {CHAT_MODELS.map(m => {
-          const off = !!availability && (m.id === 'jev' ? !availability.jev : !availability.gemini);
-          return (
-            <button key={m.id} className={m.id === turn.model ? 'primary' : ''} disabled={off} title={off ? (m.id === 'jev' ? 'AI_GATEWAY_API_KEY is not set' : 'GEMINI_API_KEY is not set') : undefined} onClick={() => onChoose(turn.id, m.id, keep)}>
-              <b>{m.label}</b><small>{m.blurb}</small>
-            </button>
-          );
-        })}
-      </div>
-      <label className="model-keep"><input type="checkbox" checked={keep} onChange={e => setKeep(e.target.checked)} /> Use this for the rest of the chat (don't ask again)</label>
     </div>
   );
 }
@@ -460,10 +420,10 @@ function PlateAnswer({ turn, data, as, onOpenBill, footer }: { turn: Turn; data:
   const nothing = !plate.tasks.length && !assigned.length && !plate.unread.length && !plate.approvals;
   return (
     <div className="msg bot">
-      <p className="lead">{nothing ? <>Nothing is waiting for you, {firstName(as)}. 🎉</> : <>{firstName(as)}, you have <b>{plural(plate.tasks.length, 'open task')}</b>, <b>{plural(assigned.length, 'bill')}</b> assigned to you, <b>{plural(plate.unread.length, 'unread message')}</b> and <b>{plural(plate.approvals, 'draft')}</b> awaiting your approval.</>}</p>
+      <p className="lead">{nothing ? <>No pending work, {firstName(as)}.</> : <>{firstName(as)}, you have <b>{plural(plate.tasks.length, 'open task')}</b>, <b>{plural(assigned.length, 'bill')}</b> assigned to you, <b>{plural(plate.unread.length, 'unread message')}</b> and <b>{plural(plate.approvals, 'draft')}</b> awaiting your approval.</>}</p>
       {plate.tasks.length > 0 && <><div className="sub-h">Open tasks</div><div className="bill-list">{plate.tasks.slice(0, 6).map(t => <button key={t.id} className="bill" onClick={() => { const r = byId.get(t.billId); if (r) onOpenBill(r); }}><span className="bill-date">{t.dueDate.slice(5)}</span><span className="bill-main"><b>{t.title}</b><small>{t.vendor}</small></span><span className="bill-amt">{byId.get(t.billId) ? money(byId.get(t.billId)!.amountCents) : ''}</span></button>)}</div></>}
-      {assigned.length > 0 && <><div className="sub-h">Bills assigned to you, not yet reviewed</div><BillList rows={assigned.slice(0, 6)} onOpen={onOpenBill} /></>}
-      {plate.unread.length > 0 && <><div className="sub-h">Unread messages (open the Messages tab)</div><div className="bill-list">{plate.unread.slice(0, 5).map(m => <div key={m.id} className="bill static"><span className="bill-date">{m.sentAt.slice(5, 10)}</span><span className="bill-main"><b>{m.subject}</b><small>from {employeeById(m.from)?.name ?? m.from}</small></span><span /></div>)}</div></>}
+      {assigned.length > 0 && <><div className="sub-h">Your unreviewed bills</div><BillList rows={assigned.slice(0, 6)} onOpen={onOpenBill} /></>}
+      {plate.unread.length > 0 && <><div className="sub-h">Unread messages</div><div className="bill-list">{plate.unread.slice(0, 5).map(m => <div key={m.id} className="bill static"><span className="bill-date">{m.sentAt.slice(5, 10)}</span><span className="bill-main"><b>{m.subject}</b><small>from {employeeById(m.from)?.name ?? m.from}</small></span><span /></div>)}</div></>}
       {footer}
     </div>
   );
@@ -474,12 +434,12 @@ function UpcomingAnswer({ turn, data, as, model, question, onOpenBill, onChanged
   const overdue = p.windows.find(w => w.id === 'overdue')!;
   return (
     <div className="msg bot">
-      <p className="lead">{p.open.length ? <><span className="big">{money(p.total)}</span> is still open across {plural(p.open.length, 'bill')} as of {p.asOf}{overdue.bills.length ? <>, and <b>{money(overdue.cents)}</b> of it is overdue</> : ''}.</> : <>Every bill is paid as of {p.asOf}. 🎉</>}</p>
+      <p className="lead">{p.open.length ? <><span className="big">{money(p.total)}</span> is still open across {plural(p.open.length, 'bill')} as of {p.asOf}{overdue.bills.length ? <>, and <b>{money(overdue.cents)}</b> of it is overdue</> : ''}.</> : <>All bills paid as of {p.asOf}.</>}</p>
       {p.open.length > 0 && <>
         {turn.graphed ? <GraphedNote turn={turn} data={data} /> : <Breakdown items={p.windows.filter(w => w.bills.length).map(w => ({ label: w.label, cents: w.cents, count: w.bills.length }))} />}
         <div className="sub-h">Next due</div>
         <BillList rows={p.open.slice(0, 5)} onOpen={onOpenBill} amount={openCents} />
-        {!turn.graphed && <button className="chip graph-btn" onClick={() => graphOnDashboard(turn, data)}>📊 Show as a graph on the Dashboard</button>}
+        {!turn.graphed && <button className="chip graph-btn" onClick={() => graphOnDashboard(turn, data)}>Show on Dashboard</button>}
         <ActOnBills companyId={data.company.companyId} as={as} model={model} rows={p.open} label={question} onChanged={onChanged} />
       </>}
       {footer}
@@ -489,7 +449,7 @@ function UpcomingAnswer({ turn, data, as, model, question, onOpenBill, onChanged
 
 /** In place of an in-chat chart: the chart is on the Dashboard; this brings it back after a Refresh. */
 function GraphedNote({ turn, data }: { turn: Turn; data: CompanyBills }) {
-  return <p className="graphed-note">📊 Shown as a graph on the Dashboard. <button className="linkish" onClick={() => graphOnDashboard(turn, data)}>Show it again</button></p>;
+  return <p className="graphed-note">Chart added to Dashboard. <button className="linkish" onClick={() => graphOnDashboard(turn, data)}>Open chart</button></p>;
 }
 
 // ---------- #1 Take action on an answer's bills (team's action engine; previews before applying) ----------
@@ -530,14 +490,15 @@ function ActOnBills({ companyId, as, model, rows, label, onChanged }: { companyI
   });
   const apply = () => run(async () => {
     const { plan: receipt } = await api<{ plan: ActionPlan }>(`/api/companies/${companyId}/actions/${plan!.id}/apply`, { method: 'POST', json: {} });
-    setDone(`${receipt.items.filter(i => i.status === 'succeeded').length} ${receipt.action.type === 'task' ? `tasks created for ${receipt.action.owner}` : receipt.action.type === 'assign' ? `bills assigned to ${receipt.action.owner}` : 'bills updated'}. Undo any of them in Tasks & activity.`); setPlan(null); setKind(null); window.dispatchEvent(new Event('workspace-changed')); onChanged?.();
+    const changed = receipt.items.filter(i => i.status === 'succeeded').length;
+    setDone(`${receipt.action.type === 'task' ? `${plural(changed, 'task')} created for ${receipt.action.owner}` : receipt.action.type === 'assign' ? `${plural(changed, 'bill')} assigned to ${receipt.action.owner}` : `${plural(changed, 'bill')} updated`}. Undo in Tasks & activity.`); setPlan(null); setKind(null); window.dispatchEvent(new Event('workspace-changed')); onChanged?.();
   });
   const send = () => run(async () => {
     const lines = rows.slice(0, 25).map(r => `- ${r.docNumber || r.billId} · ${r.vendor} · ${money(r.amountCents)} · ${r.date}`).join('\n');
-    const request = text.trim() || `Please take a look at these bills about: ${label}`;
+    const request = text.trim() || `Review these bills: ${label}`;
     const to = owner === 'jev' ? (await api<{ employeeId: string }>(`/api/companies/${companyId}/route`, { method: 'POST', json: { ids, request, model } })).employeeId : owner;
     await api(`/api/companies/${companyId}/mail`, { method: 'POST', json: { from: as, to, subject: `${rows.length} ${rows.length === 1 ? 'bill' : 'bills'}: ${label}`.slice(0, 200), body: `Hi ${firstName(to)},\n\n${request}\n\n${lines}${rows.length > 25 ? `\n…and ${rows.length - 25} more` : ''}\n\n${employeeById(as)?.name ?? ''}`, items: rows.slice(0, 25).map(r => ({ transactionId: r.id, billId: r.billId })) } });
-    setDone(`Sent to ${employeeById(to)?.name ?? to}${owner === 'jev' ? ` (picked by ${ai})` : ''}. It's in their Messages inbox.`); setKind(null); onChanged?.();
+    setDone(`Sent to ${employeeById(to)?.name ?? to}${owner === 'jev' ? ` (picked by ${ai})` : ''} · internal inbox.`); setKind(null); onChanged?.();
   });
   const ready = plan ? plan.items.filter(i => i.status === 'ready').length : 0;
   return (
@@ -546,13 +507,13 @@ function ActOnBills({ companyId, as, model, rows, label, onChanged }: { companyI
       <div className="act-buttons">{(Object.keys(ACT_LABELS) as ActKind[]).map(k => <button key={k} className={`chip ${kind === k ? 'on' : ''}`} onClick={() => choose(k)}>{ACT_LABELS[k]}</button>)}</div>
       {kind && (
         <div className="act-form">
-          {(kind === 'task' || kind === 'assign' || kind === 'message') && <label>{kind === 'message' ? 'To' : 'Owner'}<select value={owner} onChange={e => { setOwner(e.target.value); setPlan(null); }}>{(kind === 'message' || kind === 'task' || kind === 'assign') && <option value="jev">✦ Let {ai} choose the right person</option>}{EMPLOYEES.map(e => <option key={e.id} value={e.id}>{e.name} · {e.title}</option>)}</select></label>}
-          {(kind === 'task' || kind === 'flag' || kind === 'tag' || kind === 'message') && <label>{kind === 'task' ? 'Task' : kind === 'message' ? 'Your ask' : 'Label'}<input value={text} maxLength={kind === 'task' ? 200 : kind === 'message' ? 500 : 100} placeholder={kind === 'message' ? `Please take a look at these bills about: ${label}` : ''} onChange={e => { setText(e.target.value); setPlan(null); }} /></label>}
+          {(kind === 'task' || kind === 'assign' || kind === 'message') && <label>{kind === 'message' ? 'To' : 'Owner'}<select value={owner} onChange={e => { setOwner(e.target.value); setPlan(null); }}>{(kind === 'message' || kind === 'task' || kind === 'assign') && <option value="jev">Let {ai} choose</option>}{EMPLOYEES.map(e => <option key={e.id} value={e.id}>{e.name} · {e.title}</option>)}</select></label>}
+          {(kind === 'task' || kind === 'flag' || kind === 'tag' || kind === 'message') && <label>{kind === 'task' ? 'Task' : kind === 'message' ? 'Message' : 'Label'}<input value={text} maxLength={kind === 'task' ? 200 : kind === 'message' ? 500 : 100} placeholder={kind === 'message' ? `Review these bills: ${label}` : ''} onChange={e => { setText(e.target.value); setPlan(null); }} /></label>}
           {kind === 'task' && <label>Due<input type="date" value={due} onChange={e => { setDue(e.target.value); setPlan(null); }} /></label>}
           {kind === 'message'
             ? <button className="primary" disabled={busy} onClick={() => void send()}>{busy ? 'Sending…' : 'Send message'}</button>
             : !plan ? <button className="primary" disabled={busy || ((kind === 'flag' || kind === 'tag' || kind === 'task') && !text.trim())} onClick={() => void preview()}>{busy ? 'Checking…' : 'Preview'}</button>
-            : <div className="act-preview">{picked && <span>{ai} picked <b>{nameOf(picked.employeeId)}</b> ({employeeById(picked.employeeId)?.title}{Number.isFinite(picked.probability) ? `, ${Math.round(picked.probability * 100)}% sure` : ''}).</span>}<span>{ready} will change{plan.items.length - ready ? `, ${plan.items.length - ready} skipped (already set)` : ''}.</span><button className="primary" disabled={busy || !ready} onClick={() => void apply()}>{busy ? 'Applying…' : `Apply to ${ready}`}</button><button className="ghost" onClick={() => setPlan(null)}>Cancel</button></div>}
+            : <div className="act-preview">{picked && <span>{ai} picked <b>{nameOf(picked.employeeId)}</b> ({employeeById(picked.employeeId)?.title}).</span>}<span>{ready} will change{plan.items.length - ready ? `, ${plan.items.length - ready} skipped (already set)` : ''}.</span><button className="primary" disabled={busy || !ready} onClick={() => void apply()}>{busy ? 'Applying…' : `Apply to ${ready}`}</button><button className="ghost" onClick={() => setPlan(null)}>Cancel</button></div>}
         </div>
       )}
       {done && <p className="act-done" role="status">✓ {done}</p>}
@@ -566,22 +527,22 @@ function HowTo({ turn: { model, parsed, scope, run, reading }, secs }: { turn: T
   const understood = typeof reading === 'object' ? reading : null;
   const ai = modelLabel(model);
   const gemini = model !== 'jev';
-  const usage = gemini ? `${((run?.tokens ?? 0) + (understood?.tokens ?? 0)).toLocaleString()} tokens on the Gemini key` : spend((run?.costNano ?? 0n) + BigInt(understood?.costNanoUsd ?? '0'));
+  const usage = gemini ? `${((run?.tokens ?? 0) + (understood?.tokens ?? 0)).toLocaleString()} tokens` : spend((run?.costNano ?? 0n) + BigInt(understood?.costNanoUsd ?? '0'));
   const local = parsed.intent === 'my_work' || parsed.intent === 'upcoming';
-  const sure = understood && Number.isFinite(understood.confidence.intent) ? ` (${Math.round(understood.confidence.intent * 100)}% sure)` : '';
+  const sure = understood && Number.isFinite(understood.confidence.intent) ? ` (${Math.round(understood.confidence.intent * 100)}% confidence)` : '';
   return (
     <details className="howto">
-      <summary>⚡ {understood ? `${ai} read your question in ${(understood.ms / 1000).toFixed(2)}s` : 'Text rules read your question'}{run ? ` · then ${run.done}/${run.total} bills in ${secs.toFixed(1)}s` : local ? ' · answered from saved data' : ' · exact sum'} · {usage}</summary>
+      <summary>How it worked</summary>
       <ul>
-        <li>Model: {ai} ({gemini ? 'Gemini key' : 'AI Gateway key'}).</li>
+        <li>Model: {ai} · {usage}{run ? ` · ${run.done}/${run.total} bills · ${secs.toFixed(1)}s` : ''}</li>
         {understood
-          ? <li>{ai} understood: you want {INTENT_TEXT[understood.intent]}{sure}{local ? '' : <>, about {understood.scope === 'specific' ? 'a specific kind of spending' : 'all spending'}, period “{understood.period.replace(/_/g, ' ')}”</>}.</li>
-          : <li>{ai} wasn't used to read the question; the built-in text rules were.</li>}
-        {parsed.intent === 'my_work' && <li>Read from the shared workspace: open tasks and unreviewed bills whose owner is you, your unread inbox, and rule drafts waiting for your approval.</li>}
-        {parsed.intent === 'upcoming' && <li>Open balance = bill total minus payments applied, grouped by due date relative to the latest date in the books. No AI involved.</li>}
-        {!local && <li>Period: {parsed.period ? `${parsed.period.label} (${scope.length} bills)` : `whole year (${scope.length} bills)`}, filtered by date, not AI.</li>}
-        {!local && (parsed.criterion ? <li>{ai} then judged each bill against your question{understood ? ' itself' : <> as: <q>{parsed.criterion}</q></>}{gemini ? ', up to 100 bills per request' : ', one judgment per bill'}. Only definite matches count.</li> : <li>No topic, so every bill in the period counts.</li>)}
-        {!local && <li>Totals are exact integer-cent sums of the bills listed.</li>}
+          ? <li>Request: {INTENT_TEXT[understood.intent]}{sure}{local ? '' : <>, about {understood.scope === 'specific' ? 'a specific kind of spending' : 'all spending'}, period “{understood.period.replace(/_/g, ' ')}”</>}.</li>
+          : <li>Question parsed with text rules.</li>}
+        {parsed.intent === 'my_work' && <li>Your open tasks, unreviewed bills, unread messages and pending approvals.</li>}
+        {parsed.intent === 'upcoming' && <li>Open balance = bill total minus linked payments. Due dates are relative to the latest date in the books.</li>}
+        {!local && <li>Period: {parsed.period ? `${parsed.period.label} (${scope.length} bills)` : `whole year (${scope.length} bills)`}.</li>}
+        {!local && (parsed.criterion ? <li>{ai} checked: <q>{parsed.criterion}</q>. Totals include matches only.</li> : <li>All bills in the period included.</li>)}
+        {!local && <li>Totals sum the listed bills in cents.</li>}
         {run?.error && <li className="err">Some bills failed: {run.error}</li>}
       </ul>
     </details>

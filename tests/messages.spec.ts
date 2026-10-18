@@ -20,7 +20,7 @@ test('rule messages remain drafts until the sender approves, then appear in the 
     await card.getByRole('button', { name: 'Edit', exact: true }).click();
     await card.getByLabel('Edit draft message').fill('Please attach the receipt for this maintenance charge.');
     await card.getByRole('button', { name: 'Approve', exact: true }).click();
-    await expect(card).toContainText('Sent to inbox');
+    await expect(card).toContainText('Approved · sent to internal inbox');
     await page.getByLabel('Signed in as').selectOption('emp-controller');
     await page.getByRole('navigation', { name: 'Message folders' }).getByRole('button', { name: /^Inbox/ }).click();
     await page.getByLabel('Received messages').getByRole('button').click();

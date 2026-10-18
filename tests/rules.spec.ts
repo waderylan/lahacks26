@@ -7,14 +7,14 @@ test('Run applies to every evaluated preview record, not only the displayed resu
     await page.goto(`${app.url}/?workspace=rules`);
     await page.getByRole('button', { name: 'New rule', exact: true }).click();
     await page.getByLabel('Condition 1', { exact: true }).fill('This charge is a duplicate.');
-    await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 evaluated · Complete');
-    await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Choose actions', exact: true }).click();
+    await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 checked · Complete');
+    await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Actions', exact: true }).click();
     await page.getByRole('button', { name: 'Add action', exact: true }).click();
     await page.getByLabel('Action value').fill('Possible duplicate');
-    const uncertain = page.getByRole('group', { name: 'When there is not enough information', exact: true });
+    const uncertain = page.getByRole('group', { name: 'Uncertain', exact: true });
     await uncertain.getByRole('button', { name: 'Add action for uncertain results', exact: true }).click();
     await uncertain.getByLabel('Action value').fill('Needs receipt');
-    await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Review results', exact: true }).click();
+    await page.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Preview', exact: true }).click();
     await page.getByLabel('Preview rows').selectOption('true');
     await expect(page.locator('.wizard-table tbody tr')).toHaveCount(1);
     await page.getByLabel('Rule name').fill('Duplicate review');

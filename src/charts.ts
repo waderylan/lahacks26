@@ -25,7 +25,7 @@ export interface ChartSpec {
 export interface Point { label: string; key: string; value: number; count: number }
 
 export const GROUP_LABELS: Record<GroupBy, string> = { month: 'Month', vendor: 'Vendor', account: 'Account', due: 'Due date' };
-export const MEASURE_LABELS: Record<Measure, string> = { spend: 'Vendor-bill amount', count: 'Transaction count', open: 'Vendor-bill open amount', receivable: 'Invoice open amount', bank_in: 'Bank deposits', bank_out: 'Bank withdrawals' };
+export const MEASURE_LABELS: Record<Measure, string> = { spend: 'Vendor bills total', count: 'Transaction count', open: 'Unpaid vendor bills', receivable: 'Unpaid invoices', bank_in: 'Bank deposits', bank_out: 'Bank withdrawals' };
 export const KIND_LABELS: Record<ChartKind, string> = { bar: 'Bars', line: 'Line', hbar: 'Horizontal bars' };
 
 export const STARTER_CHARTS: ChartSpec[] = [

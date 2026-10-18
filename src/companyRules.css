@@ -25,7 +25,11 @@
 .wizard-all-rules button { font-size:12px; color:var(--green); }
 @media (max-width:800px) { .company-rules-table th,.company-rules-table td { padding:15px 12px; }.company-rules-help { padding:16px 12px; } }
 
-.company-rules .rules-explanation { max-width:1400px; margin:0 auto 22px; }
+.company-rules .rules-help { max-width:1400px; margin:0 auto 22px; font-size:12px; color:var(--muted); line-height:1.6; }
+.rules-help summary { cursor:pointer; width:fit-content; }
+.rules-help dl { max-width:780px; display:grid; grid-template-columns:120px minmax(0,1fr); gap:12px 20px; }
+.rules-help dt { color:var(--text); font-weight:600; }
+.rules-help dd { margin:0; }
 .company-rule-definition { font-size:11px; line-height:1.7; font-weight:400; margin-top:10px; }
 .company-rule-definition summary { cursor:pointer; color:var(--muted); }
 .company-rule-definition p { overflow-wrap:anywhere; white-space:normal; }

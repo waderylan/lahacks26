@@ -44,17 +44,17 @@ test('Dashboard supports focused chart creation and visibly enforces the shared 
     await page.getByRole('button', { name: 'Add chart', exact: true }).click();
     await page.getByLabel('Chart title', { exact: true }).fill('Selected purchase');
     await page.getByLabel('Chart record IDs').fill('company-101:bill-2');
-    await page.getByLabel('Measure', { exact: true }).selectOption('count');
-    await page.getByRole('button', { name: 'Keep on dashboard', exact: true }).click();
+    await page.getByLabel('Measure').selectOption('count');
+    await page.getByRole('button', { name: 'Save chart', exact: true }).click();
     await expect(page.getByRole('region', { name: 'Selected purchase', exact: true })).toContainText('1 transaction');
     await page.reload(); await expect(page.getByRole('region', { name: 'Selected purchase', exact: true })).toBeVisible();
     const url = app.url + '/api/companies/company-101/dashboard', current = await (await page.request.get(url)).json();
     const charts = Array.from({ length: 24 }, (_, i) => ({ ...current.charts[0], id: `card-${i}`, title: `Card ${i}` }));
     expect((await page.request.put(url, { data: { charts, expectedRevision: current.revision } })).ok()).toBeTruthy();
-    await page.getByRole('button', { name: 'Refresh dashboard', exact: true }).click(); await expect(page.locator('.chart-card')).toHaveCount(24);
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click(); await expect(page.locator('.chart-card')).toHaveCount(24);
     await page.getByRole('button', { name: 'Add chart', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'Keep on dashboard', exact: true })).toBeDisabled();
-    await expect(page.getByRole('status')).toContainText('24 charts');
+    await expect(page.getByRole('button', { name: 'Save chart', exact: true })).toBeDisabled();
+    await expect(page.locator('.focus-chart')).toContainText('24 charts maximum');
   } finally { await app.close(); }
 });
 
@@ -84,9 +84,10 @@ test('provider switching keeps company 104, search conditions and the unsaved ru
     await page.getByRole('navigation', { name: 'Workspace', exact: true }).getByRole('button', { name: 'Rules', exact: true }).click();
     await page.getByRole('button', { name: 'New rule', exact: true }).click();
     await page.getByLabel('Condition 1', { exact: true }).fill('Keep this unsaved condition');
-    await page.getByLabel('Evaluation model').selectOption('qwen');
+    await expect(page.getByLabel('Evaluation model')).toHaveValue('jev');
+    await page.getByLabel('Rule evaluation provider').selectOption('qwen');
     await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('Keep this unsaved condition');
-    await expect(page.getByLabel('Rule evaluation provider')).toHaveValue('jev');
+    await expect(page.getByLabel('Rule evaluation provider')).toHaveValue('qwen');
     expect(await page.evaluate(() => (window as any).followupMarker)).toBe('same-document');
     expect(new URL(page.url()).searchParams.get('company')).toBe('company-104');
   } finally { await app.close(); }
@@ -106,8 +107,8 @@ test('Refresh dashboard reloads changed records and restored records without pag
     const chart = page.getByRole('region', { name: 'One record', exact: true }); await expect(chart).toContainText(row.account);
     const preview = await (await page.request.post(base + '/actions/preview', { data: { selection: { ids: [row.id], scope: 'selected' }, action: { type: 'category', accountId: account.id } } })).json();
     expect((await page.request.post(base + '/actions/' + preview.id + '/apply', { data: {} })).ok()).toBeTruthy();
-    await page.getByRole('button', { name: 'Refresh dashboard', exact: true }).click(); await expect(chart).toContainText(account.name);
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click(); await expect(chart).toContainText(account.name);
     expect((await page.request.post(base + '/rules/commands', { data: { type: 'reset', full: true } })).ok()).toBeTruthy();
-    await page.getByRole('button', { name: 'Refresh dashboard', exact: true }).click(); await expect(chart).toContainText(row.account);
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click(); await expect(chart).toContainText(row.account);
   } finally { await app.close(); }
 });

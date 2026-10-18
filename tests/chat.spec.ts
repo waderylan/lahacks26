@@ -10,7 +10,6 @@ async function ask(page: Page, question: string) {
   const chat = page.getByRole('dialog', { name: 'Ask your books', exact: true });
   await chat.locator('.chat-input input').fill(question);
   await chat.getByRole('button', { name: 'Send', exact: true }).click();
-  await chat.locator('.model-choice button').filter({ hasText: 'Fast, one judgment' }).click();
   return chat;
 }
 
@@ -18,9 +17,14 @@ test('Ask your books restores semantic answers, previewed tasks and durable conv
   const app = await startRuleApp();
   try {
     await page.goto(app.url);
-    await openChat(page);
+    const greeting = await openChat(page);
+    await expect(greeting.getByLabel('Model', { exact: true })).toHaveValue('jev');
+    await expect(greeting.locator('.suggest-grid button')).toHaveCount(3);
+    await expect(greeting.locator('.model-choice')).toHaveCount(0);
     const chat = await ask(page, 'Show me bills for repairs');
     await expect(chat.locator('.lead')).toContainText('1 matching bill');
+    await expect(chat.locator('.howto summary')).toHaveText('How it worked');
+    await expect(chat.locator('.howto')).not.toHaveAttribute('open');
     const base = `${app.url}/api/companies/company-101`;
     expect((await (await page.request.get(base + '/workspace')).json()).tasks).toHaveLength(0);
     await chat.getByRole('button', { name: /Create tasks/ }).click();
@@ -28,7 +32,7 @@ test('Ask your books restores semantic answers, previewed tasks and durable conv
     await expect(chat.locator('.act-preview')).toContainText('Jev picked');
     expect((await (await page.request.get(base + '/workspace')).json()).tasks).toHaveLength(0);
     await chat.getByRole('button', { name: 'Apply to 1', exact: true }).click();
-    await expect(chat.locator('.act-done')).toContainText('1 tasks created');
+    await expect(chat.locator('.act-done')).toContainText('1 task created');
     const state = await (await page.request.get(base + '/workspace')).json();
     expect(state.tasks).toHaveLength(1);
     expect(state.tasks[0].owner).toBe('emp-ap');
@@ -50,7 +54,7 @@ test('chat graphs use the current Dashboard save flow and survive reload', async
     const chat = await ask(page, 'Graph all spending by month');
     await expect(page.getByRole('main', { name: 'Dashboard', exact: true })).toBeVisible();
     await chat.getByRole('button', { name: 'Close chat', exact: true }).click();
-    await page.getByRole('button', { name: 'Keep on dashboard', exact: true }).click();
+    await page.getByRole('button', { name: 'Save chart', exact: true }).click();
     await expect(page.locator('.chart-card')).toHaveCount(5);
     const data = await (await page.request.get(app.url + '/api/companies/company-101/dashboard')).json();
     expect(data.revision).toBe(1);

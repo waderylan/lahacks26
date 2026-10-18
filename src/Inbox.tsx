@@ -44,7 +44,7 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, folder, onFold
   const unread = mailbox.unread[as] ?? 0;
 
   return <section className="dashboard-board inbox" aria-label="Messages">
-    <div className="dashboard-board-heading"><h2>Messages · {nameOf(as)}</h2><span className="small muted">Internal messages · nothing is emailed</span></div>
+    <div className="dashboard-board-heading"><h2>Messages · {nameOf(as)}</h2><span className="small muted">Internal inbox</span></div>
     {mailbox.error && <div className="rules-notice error" role="alert">{mailbox.error}</div>}
     <div className="inbox-layout">
       <nav className="inbox-folders" aria-label="Message folders">
@@ -53,7 +53,6 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, folder, onFold
           <button key={id} className={folder === id ? 'on' : ''} aria-pressed={folder === id} onClick={() => { setFolder(id); setOpenId(null); }}>{label}{count > 0 && <b>{count}</b>}</button>)}
       </nav>
       {folder === 'approvals' ? <div className="inbox-approvals">
-        <p className="small muted">Rules write drafts and name the employee they are sent from. Only that employee can approve a draft, which sends it to the recipient’s inbox. You are viewing as {nameOf(as)}.</p>
         {approvals}
       </div> : <>
         <ul className="inbox-list" aria-label={folder === 'sent' ? 'Sent messages' : 'Received messages'}>
@@ -66,14 +65,14 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, folder, onFold
                 <span className="inbox-subject">{mail.subject}</span>
                 <span className="inbox-preview muted">{mail.body.replace(/\s+/g, ' ').slice(0, 90)}</span></span>
             </button></li>;
-          }) : <li className="dashboard-empty">{folder === 'sent' ? 'Nothing sent yet. Compose a message, or approve a rule draft from Approvals.' : `No messages for ${firstName(as)} yet.`}</li>}
+          }) : <li className="dashboard-empty">{folder === 'sent' ? 'No sent messages.' : `No messages for ${firstName(as)} yet.`}</li>}
         </ul>
         <div className="inbox-reader">
           {compose ? <form className="inbox-compose" onSubmit={e => { e.preventDefault(); void send(); }}>
             <h3>{compose.replyTo ? 'Reply' : 'New message'}</h3>
             <label className="field-label">From<input value={`${nameOf(as)} · ${employeeById(as)?.title}`} disabled /></label>
             <label className="field-label">To<select aria-label="Message to" value={compose.to} disabled={Boolean(compose.replyTo)} onChange={e => setCompose({ ...compose, to: e.target.value })}>
-              {EMPLOYEES.filter(e => e.id !== as).map(e => <option key={e.id} value={e.id}>{e.name} — {e.title}</option>)}</select></label>
+              {EMPLOYEES.filter(e => e.id !== as).map(e => <option key={e.id} value={e.id}>{e.name} · {e.title}</option>)}</select></label>
             <label className="field-label">Subject<input aria-label="Message subject" maxLength={200} value={compose.subject} onChange={e => setCompose({ ...compose, subject: e.target.value })} /></label>
             <label className="field-label">Message<textarea aria-label="Message body" maxLength={8000} rows={8} value={compose.body} onChange={e => setCompose({ ...compose, body: e.target.value })} /></label>
             {sendError && <p className="rules-notice error" role="alert">{sendError}</p>}
@@ -89,7 +88,7 @@ export function Inbox({ mailbox, as, approvals, pendingApprovals, folder, onFold
             </div>)}
             {open.items.length > 0 && <p className="message-bills"><span className="small muted">Transactions:</span>{open.items.map(item => <button key={item.transactionId} className="ghost" onClick={() => onInspect(item.transactionId)}>{item.billId}</button>)}</p>}
             <div className="message-actions"><button className="primary" onClick={() => reply(thread[thread.length - 1] ?? open)}>Reply</button></div>
-          </article> : <p className="dashboard-empty">Select a message to read it.</p>}
+          </article> : <p className="dashboard-empty">Select a message.</p>}
         </div>
       </>}
     </div>

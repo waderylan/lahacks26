@@ -28,7 +28,7 @@ test('grouped views reopen across browsers without actions and convert into inde
     await expect(other.getByLabel('Group logic').last()).toHaveValue('not');
     await expect(other.getByLabel('Explore result', { exact: true })).toHaveValue('uncertain');
     await other.getByRole('button', { name: 'Create rule', exact: true }).click();
-    await other.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Describe conditions', exact: true }).click();
+    await other.getByRole('navigation', { name: 'Rule setup steps' }).getByRole('button', { name: 'Conditions', exact: true }).click();
     await other.getByLabel('Condition 1', { exact: true }).fill('A changed rule condition');
     await other.getByRole('navigation', { name: 'Workspace', exact: true }).getByRole('button', { name: 'Explore', exact: true }).click();
     await expect(other.getByLabel('Condition 1', { exact: true })).toHaveValue('This charge needs supporting documents.');
@@ -69,7 +69,7 @@ test('Jev answers are reused when regrouping, refreshing, and converting to a ru
   await expect(page.getByRole('status').filter({ hasText: 'Records refreshed' })).toBeVisible();
   expect(checks).toBe(first);
   await page.getByRole('button', { name: 'Create rule', exact: true }).click();
-  await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 evaluated · Complete');
+  await expect(page.getByLabel('Evaluation progress')).toContainText('8/8 checked · Complete');
   expect(checks).toBe(first);
 });
 

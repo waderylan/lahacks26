@@ -11,8 +11,8 @@ import type { CompanyBills } from './types';
 export function Dashboard({ companyId }: { companyId: string }) {
   const records = useFullRecords(companyId);
   if (records.error && !records.data) return <div className="state">Could not load bills ({records.error}). <button onClick={() => { void records.refresh(); }}>Retry</button></div>;
-  if (!records.data) return <div className="state">Loading the full year of bills…</div>;
-  if (!records.data.rows.length) return <div className="state">This company has no bills.</div>;
+  if (!records.data) return <div className="state">Loading transactions…</div>;
+  if (!records.data.rows.length) return <div className="state">No transactions.</div>;
   return <DashboardBody data={records.data} reload={() => { void records.refresh(); }} reloading={records.busy} />;
 }
 
@@ -27,31 +27,31 @@ function DashboardBody({ data, reload, reloading }: { data: CompanyBills; reload
     if (await (target === 'new' ? dash.add(chart) : dash.replace(target, chart))) dash.clearFocus();
   };
   return (
-    <div className="dash">
+    <div className="dash" role="main" aria-label="Dashboard">
       <div className="dash-head">
         <div>
           <h2>{data.company.name}</h2>
           <p className="muted">{data.company.industry} · {kpi.bills} bills, {dates[0]} → {dates[dates.length - 1]} · balances as of {kpi.asOf}</p>
         </div>
         <div className="dash-actions">
-          <button className="ghost" disabled={reloading || dash.busy} onClick={() => { reload(); void dash.refresh(); }} title="Reload the latest bills and saved charts">Refresh dashboard</button>
-          <button className="ghost" disabled={dash.busy} onClick={() => dash.setFocus({ id: crypto.randomUUID(), title: 'New chart', groupBy: 'month', measure: 'spend', kind: 'bar' })} title="Build a chart by hand">Add chart</button>
+          <button className="ghost" disabled={reloading || dash.busy} onClick={() => { reload(); void dash.refresh(); }} title="Reload transactions and charts">Refresh</button>
+          <button className="ghost" disabled={dash.busy} onClick={() => dash.setFocus({ id: crypto.randomUUID(), title: 'New chart', groupBy: 'month', measure: 'spend', kind: 'bar' })} title="Create a chart">Add chart</button>
           <button className="ghost" disabled={dash.busy || !dash.ready} onClick={() => { void dash.reset(); }} title="Restore the four starter charts">Reset charts</button>
         </div>
       </div>
       <div className="dash-kpis">
-        <div><span>Billed spend</span><b>{money(kpi.billSpend)}</b></div>
-        <div><span>Bills</span><b>{kpi.bills}</b></div>
-        <div><span>Open payables</span><b>{money(kpi.payables)}</b></div>
-        <div><span>Overdue</span><b className={kpi.overdue ? 'warn' : ''}>{money(kpi.overdue)}</b></div>
+        <div><span>Vendor bills total</span><b>{money(kpi.billSpend)}</b></div>
+        <div><span>Vendor bills</span><b>{kpi.bills}</b></div>
+        <div><span>Unpaid vendor bills</span><b>{money(kpi.payables)}</b></div>
+        <div><span>Overdue vendor bills</span><b className={kpi.overdue ? 'warn' : ''}>{money(kpi.overdue)}</b></div>
       </div>
       {dash.error && <p className="err small" role="alert">{dash.error} <button className="linkish" disabled={dash.busy} onClick={() => { void dash.retry(); }}>Retry</button></p>}
       {dash.focus ? <FocusChart chart={dash.focus} data={data} charts={dash.charts} busy={dash.busy} onChange={patch => dash.setFocus({ ...dash.focus!, ...patch })} onRefresh={dash.clearFocus} onKeep={target => { void keep(target); }} /> : <>
-      <p className="dash-tip">Ask the <b>Ask your books</b> bubble for a graph (for example “graph utilities by month” or “chart spend by vendor”) and it shows here on its own. <b>↻ Refresh</b> brings these charts back.</p>
+      <p className="dash-tip">Ask <b>Ask your books</b> to “graph utilities by month”. <b>Back to charts</b> returns to saved charts.</p>
       {!dash.ready ? <div className="state">Loading charts…</div> : (
         <div className="dash-grid">
           {dash.charts.map(c => <ChartCard key={c.id} chart={c} data={data} busy={dash.busy} onChange={patch => { void dash.update(c.id, patch); }} onRemove={() => { void dash.remove(c.id); }} />)}
-          {!dash.charts.length && <div className="state">No charts. Use Reset charts, or add one from the chat.</div>}
+          {!dash.charts.length && <div className="state">No charts. Add a chart or reset the starters.</div>}
         </div>
       )}
       </>}
@@ -68,25 +68,25 @@ function FocusChart({ chart, data, charts, busy, onChange, onRefresh, onKeep }: 
   return (
     <>
     <div className="focus-bar">
-      <button className="primary" onClick={onRefresh} title="Go back to the dashboard charts">↻ Refresh</button>
-      <span className="muted small">{chart.source ? 'Showing only the chart for your chat question.' : 'Building a new chart.'} Refresh brings back the dashboard charts.</span>
+      <button className="primary" onClick={onRefresh} title="Return to saved charts">Back to charts</button>
+      <span className="muted small">{chart.source ? 'Chart from your question.' : 'New chart.'}</span>
     </div>
     <section className="card chart-card focus-chart from-chat">
       <div className="chart-head">
         <div>
-          <span className="focus-label">{chart.source ? 'Answer from the chat' : 'New chart'}</span>
+          <span className="focus-label">{chart.source ? 'From chat' : 'New chart'}</span>
           {chart.source ? <h3>{chart.title}</h3> : <label className="chart-field">Chart title<input value={chart.title} maxLength={120} onChange={e => onChange({ title: e.target.value })} /></label>}
-          <p className="muted small">{chart.source && <>“{chart.source.question}” · bills picked by {modelLabel(chart.source.model as ChatModel)} · </>}{points.reduce((s, p) => s + p.count, 0)} {chart.measure === 'count' ? 'transactions' : 'bills'} · <b>{formatValue(chart.measure, total)}</b></p>
-          {!chart.source && <label className="chart-field">Only these bills (optional)<input aria-label="Chart record IDs" placeholder="All bills; or comma-separated bill IDs" value={chart.ids?.join(', ') ?? ''} onChange={e => onChange({ ids: e.target.value.trim() ? e.target.value.split(',').map(id => id.trim()).filter(Boolean) : undefined })} /></label>}
+          <p className="muted small">{chart.source && <>“{chart.source.question}” · {modelLabel(chart.source.model as ChatModel)} · </>}{points.reduce((s, p) => s + p.count, 0)} {chart.measure === 'count' ? 'transactions' : 'bills'} · <b>{formatValue(chart.measure, total)}</b></p>
+          {!chart.source && <label className="chart-field">Record IDs (optional)<input aria-label="Chart record IDs" placeholder="All bills, or comma-separated IDs" value={chart.ids?.join(', ') ?? ''} onChange={e => onChange({ ids: e.target.value.trim() ? e.target.value.split(',').map(id => id.trim()).filter(Boolean) : undefined })} /></label>}
         </div>
       </div>
       <ChartView points={points} kind={chart.kind} measure={chart.measure} width={1000} height={300} />
       <div className="chart-controls">
         <ChartControls chart={chart} busy={busy} onChange={onChange} />
         <span className="spacer" />
-        <label>Keep it<select value={target} onChange={e => setTarget(e.target.value)}><option value="new">as a new dashboard chart</option>{charts.map(c => <option key={c.id} value={c.id}>instead of “{c.title}”</option>)}</select></label>
-        <button disabled={busy || full} onClick={() => onKeep(target)}>Keep on dashboard</button>
-        {full && <span className="muted small">The dashboard holds {CHART_LIMIT} charts; replace or remove one first.</span>}
+        <label>Save to<select value={target} onChange={e => setTarget(e.target.value)}><option value="new">New chart</option>{charts.map(c => <option key={c.id} value={c.id}>Replace “{c.title}”</option>)}</select></label>
+        <button disabled={busy || full} onClick={() => onKeep(target)}>Save chart</button>
+        {full && <span className="muted small">{CHART_LIMIT} charts maximum. Replace or remove a chart.</span>}
       </div>
     </section>
     </>
@@ -99,16 +99,16 @@ function ChartCard({ chart, data, busy, onChange, onRemove }: { chart: ChartSpec
   // Count what the chart actually includes (e.g. spend charts skip invoices and bank lines).
   const billCount = points.reduce((s, p) => s + p.count, 0);
   return (
-    <section className={`card chart-card ${chart.source ? 'from-chat' : ''}`}>
+    <section className={`card chart-card ${chart.source ? 'from-chat' : ''}`} aria-label={chart.title}>
       <div className="chart-head">
         <div>
           <h3>{chart.title}</h3>
           <p className="muted small">
-            {chart.source ? <>From chat · “{chart.source.question}” · bills picked by {modelLabel(chart.source.model as ChatModel)} · {billCount} {chart.measure === 'count' ? 'transactions' : 'bills'}</> : <>{billCount} {chart.measure === 'count' ? 'transactions' : 'bills'}</>}
+            {chart.source ? <>From chat · “{chart.source.question}” · {modelLabel(chart.source.model as ChatModel)} · {billCount} {chart.measure === 'count' ? 'transactions' : 'bills'}</> : <>{billCount} {chart.measure === 'count' ? 'transactions' : 'bills'}</>}
             {' · '}<b>{formatValue(chart.measure, total)}</b>
           </p>
         </div>
-        <button className="icon-btn" disabled={busy} title={chart.starter ? 'Remove this chart (Reset charts brings it back)' : 'Remove this chart'} onClick={onRemove} aria-label={`Remove ${chart.title}`}>✕</button>
+        <button className="icon-btn" disabled={busy} title={chart.starter ? 'Remove starter chart' : 'Remove this chart'} onClick={onRemove} aria-label={`Remove ${chart.title}`}>✕</button>
       </div>
       <ChartView points={points} kind={chart.kind} measure={chart.measure} />
       <div className="chart-controls"><ChartControls chart={chart} busy={busy} onChange={onChange} /></div>

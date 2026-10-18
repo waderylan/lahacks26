@@ -70,7 +70,7 @@ export function activityFeed({ companyId, history, messages, runs, tasks }: Acti
   for (const task of tasks) {
     if (task.companyId !== companyId || task.status === 'open') continue;
     add({ id: `task:${task.id}:${task.status}`, at: task.updatedAt, tone: task.status === 'done' ? 'ok' : 'muted', source: 'task', transactionIds: [task.billId],
-      label: `Task ${task.status === 'done' ? 'done' : 'cancelled'}: ${task.title}`, detail: `Owner: ${ownerLabel(task.owner)}. This does not mark the transaction reviewed or resolve its issue.` });
+      label: `Task ${task.status === 'done' ? 'done' : 'cancelled'}: ${task.title}`, detail: `Task owner: ${ownerLabel(task.owner)}` });
   }
   for (const plan of runs) {
     if (plan.companyId !== companyId) continue;

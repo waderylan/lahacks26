@@ -3,6 +3,11 @@ import { arrangeRows, sortByMatch } from './arrange';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useSemanticEval } from './useSemanticEval';
 import { useRules } from './useRules';
+import { EmployeeTabs, Inbox } from './Inbox';
+import { useMailbox } from './useMailbox';
+import { employeeById } from './employees';
+import { draftSender } from './rules';
+import { billEvents, billStatus, type BillStatus } from './billStatus';
 import { LocalStateEditor, MessageCard, NotificationBell, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel, Toasts } from './RulesPanel';
 import { actionLabel, type LocalTransaction, type Outcome } from './rules';
 import { useWorkspace, type RowPatch } from './useWorkspace';
@@ -82,6 +87,10 @@ export default function App() {
     if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
   };
   const [workspace, setWorkspace] = useState<'transactions' | 'rules' | 'tasks' | 'messages'>(() => new URLSearchParams(location.search).get('workspace') === 'rules' ? 'rules' : 'transactions');
+  // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
+  const [as, setAsState] = useState(() => { const id = new URLSearchParams(location.search).get('as'); return employeeById(id) ? id! : 'emp-ap'; });
+  const setAs = (id: string) => { const url = new URL(location.href); url.searchParams.set('as', id); history.replaceState(null, '', url); setAsState(id); };
+  const mailbox = useMailbox(companyId, as);
   const [takeAction, setTakeAction] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
@@ -168,7 +177,11 @@ export default function App() {
     if (!data) return;
     setReviewed(current => new Set([...current].filter(id => !id.startsWith(`${data.company.companyId}:`)).concat(data.rows.filter(row => row.dashboard?.reviewed).map(row => row.id))));
   }, [data]);
-  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); });
+  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as);
+  // Drafts are only actionable by their sender, so each employee sees just their own.
+  const myDrafts = rules.store.messages.filter(message => draftSender(message) === as);
+  const pendingApprovals = myDrafts.filter(message => message.status === 'pending').length;
+  const events = useMemo(() => billEvents(rules.store.history, rules.store.messages, dashboard.runs), [rules.store.history, rules.store.messages, dashboard.runs]);
   const counts = useMemo(() => {
     const rev = rows.filter((r) => reviewed.has(r.id)).length;
     return { all: rows.length, needs: rows.length - rev, reviewed: rev };
@@ -338,7 +351,8 @@ export default function App() {
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => { setWorkspace('transactions'); setTakeAction(false); }}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => { setWorkspace('rules'); setTakeAction(false); }}>Rules <span className="nav-caption">Build → Preview → Automate</span></button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{rules.store.messages.filter(message => message.status === 'pending').length > 0 && <b className="task-nav-count">{rules.store.messages.filter(message => message.status === 'pending').length}</b>}</button></nav><span className="muted">Saved in SQLite · Original dataset preserved</span></div>
+      <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => { setWorkspace('transactions'); setTakeAction(false); }}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => { setWorkspace('rules'); setTakeAction(false); }}>Rules <span className="nav-caption">Build → Preview → Automate</span></button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count" title={`${mailbox.unread[as] ?? 0} unread · ${pendingApprovals} awaiting approval`}>{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button></nav><span className="muted">Saved in SQLite · Original dataset preserved</span></div>
       {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
 
       {workspace === 'transactions' && <section className="semantic">
@@ -412,7 +426,7 @@ export default function App() {
       {workspace === 'rules' && <RulePreviewBar c={rules} total={rows.length} onInspect={() => rules.matches[0] && setDrawerId(rules.matches[0].id)} />}
       {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : data.company.synthetic ? 'synthetic bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
 
-      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <section className="dashboard-board" aria-label="Messages"><div className="dashboard-board-heading"><h2>Messages</h2><span className="small muted">Saved in SQLite · Approval does not send email</span></div>{rules.store.messages.length ? rules.store.messages.map(message => <MessageCard key={message.id} message={message} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No messages yet. Add a Draft internal message action to a rule, save, and run it.</p>}</section> : <main className="sheet-wrap">
+      {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
         {loadError ? (
           <div className="state">Could not load records ({loadError}). <button onClick={() => setCompanyId(companyId + '')}>Retry</button></div>
         ) : !data ? (
@@ -446,6 +460,7 @@ export default function App() {
                     n={i + 1}
                     selected={selected.has(r.id)}
                     reviewed={reviewed.has(r.id)}
+                    status={billStatus(events.get(r.id), reviewed.has(r.id))}
                     open={drawerId === r.id}
                     active={active}
                     match={matchOf(r.id)}
@@ -518,7 +533,7 @@ function Th(props: { w: number; right?: boolean; className?: string; onClick?: (
 }
 
 function SheetRow(p: {
-  row: Row; n: number; selected: boolean; reviewed: boolean; open: boolean; active: boolean;
+  row: Row; n: number; selected: boolean; reviewed: boolean; status: BillStatus; open: boolean; active: boolean;
   match?: { state: string; pMatch: number }; pending: boolean; failed: boolean;
   onToggle: () => void; onOpen: () => void;
   ruleOutcome?: Outcome; local?: LocalTransaction;
@@ -538,7 +553,9 @@ function SheetRow(p: {
       <td title={r.workspaceChanges?.memo !== undefined ? `Original memo: ${r.workspaceChanges.memo}` : r.memo.trim() ? r.memo : '(blank)'} className={`pre ${r.workspaceChanges?.memo !== undefined ? 'workspace-edited' : ''}`}>{r.memo}</td>
       <td title={r.workspaceChanges?.account !== undefined ? `Original category: ${r.workspaceChanges.account}` : r.account} className={r.workspaceChanges?.account !== undefined ? 'workspace-edited' : ''}>{r.account}</td>
       <td className="right num">{money(r.amountCents)}</td>
-      <td><span className={'tag ' + (p.reviewed ? 'rev' : 'need')}>{p.reviewed ? 'Reviewed' : 'Needs review'}</span></td>
+      <td title={[p.reviewed ? 'Reviewed' : 'Needs review', ...p.status.events.slice(0, 6).map(e => `${new Date(e.at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · ${e.label}`)].join('\n')}>
+        <span className={`tag status-${p.status.tone}`}>{p.status.label}</span>{p.reviewed && p.status.tone !== 'rev' && <span className="status-reviewed" aria-label="Reviewed"> ✓</span>}
+      </td>
       <td className={p.ruleOutcome ? 'rule-result-column' : undefined}>
         {p.ruleOutcome ? <ResultBadge value={p.ruleOutcome} /> : !p.active ? <span className="muted">—</span>
           : match ? (
@@ -569,7 +586,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
         {rules.draft && rules.snapshots[r.id] && <><h3>Condition results · current draft</h3><RuleEvidence node={rules.draft.expression} snapshot={rules.snapshots[r.id]} /><h3>Actions {rules.snapshots[r.id].result === 'true' ? 'that would run' : '(rule must resolve true)'}</h3>{rules.draft.actions.map(a => <p key={a.id}>{actionLabel(a)}</p>)}</>}
         {r.dashboard && <><h3>Dashboard status · Saved in SQLite</h3><dl><dt>Status</dt><dd>{r.dashboard.reviewed ? 'Reviewed' : 'Needs review'}</dd><dt>Assigned to</dt><dd>{r.dashboard.owner || 'Unassigned'}</dd><dt>Flags</dt><dd>{r.dashboard.flags.join(', ') || 'None'}</dd><dt>Tags</dt><dd>{r.dashboard.tags.join(', ') || 'None'}</dd><dt>Tasks</dt><dd>{r.dashboard.taskIds.length}</dd></dl></>}
         <details className="legacy-metadata"><summary>Edit assignment, flags & tags</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => { void rules.updateLocal(r.id, value, r.sourceVersion); }} /></details>
-        {rules.store.messages.filter(message => message.items.some(item => item.transactionId === r.id)).map(message => <MessageCard key={message.id} message={message} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}
+        {rules.store.messages.filter(message => message.items.some(item => item.transactionId === r.id)).map(message => <MessageCard key={message.id} message={message} actor={rules.actor} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}
         {r.workspaceChanges && Object.keys(r.workspaceChanges).length > 0 && <><h3>Original source values</h3><dl>{r.workspaceChanges.account !== undefined && <><dt>Category</dt><dd>{r.workspaceChanges.account}</dd></>}{r.workspaceChanges.memo !== undefined && <><dt>Memo</dt><dd>{r.workspaceChanges.memo || '(blank)'}</dd></>}</dl></>}
         <h3>Bill</h3>
         <dl>

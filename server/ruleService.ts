@@ -1,7 +1,7 @@
 import {
   EMPTY_STORE, completeDraft, decideMessage, emptyTransaction, evaluateTree, executeRule, leaves,
   markNoticesRead, markNoticeToasted, migrateMessage, migrateRule, resetCompanyDemo, retryDraft,
-  transactionVersion, undoEntry, uid, validateRule,
+  transactionVersion, undoEntry, uid, validateRule, draftSender,
   type DraftMessage, type DraftResult, type LocalTransaction, type Outcome, type Rule, type RuleStore, type Snapshot,
 } from '../src/rules.ts';
 import { standardResult } from '../src/rules.ts';
@@ -11,6 +11,8 @@ import { emptyDashboard } from './actionStore.ts';
 import type { WorkspaceData } from './workspaceData.ts';
 import type { Judge } from './actionEngine.ts';
 import { draftMessage, type DraftRequest } from './messages.ts';
+import { deliverDraft } from './mailbox.ts';
+import { employeeById } from '../src/employees.ts';
 
 interface SavedState { companyId: string; store: RuleStore; watches: Record<string, Record<string, string>>; log: string[] }
 type Writer = (request: DraftRequest, signal?: AbortSignal) => Promise<DraftResult>;
@@ -34,6 +36,7 @@ export class RuleService {
   private read(companyId: string): SavedState {
     const saved = this.db.get<SavedState>('rule-state', companyId) ?? { companyId, store: structuredClone(EMPTY_STORE), watches: {}, log: [] };
     // One source for owner/flags/tags/pass: the same working bill used by dashboard actions.
+    saved.store.rules = saved.store.rules.map(migrateRule);
     saved.store.transactions = Object.fromEntries(this.data.bills(companyId).rows.map(row => [row.id, metadata(row)] as const)
       .filter(([, value]) => value.owner || value.flags.length || value.tags.length || value.automatedCheck));
     return saved;
@@ -136,12 +139,16 @@ export class RuleService {
       saved.store.transactions[id] = { owner: input.owner, flags: [...new Set(input.flags)], tags: [...new Set(input.tags)], automatedCheck: input.automatedCheck };
     });
   }
-  decide(companyId: string, id: string, status: 'approved' | 'rejected', body?: string, expectedBody?: string) {
+  /** Approving delivers the draft to its recipient's inbox, sent from `actor` (the employee who approved it). */
+  decide(companyId: string, id: string, status: 'approved' | 'rejected', body?: string, expectedBody?: string, actor?: string) {
     if (!['approved', 'rejected'].includes(status) || (body !== undefined && (typeof body !== 'string' || !body.trim() || body.length > 8000))) throw new Error('Choose a valid message decision and body.');
+    if (!employeeById(actor)) throw new Error('Choose which employee is sending this message.');
     this.change(companyId, saved => {
       const message = saved.store.messages.find(message => message.id === id);
       if (!message || (expectedBody !== undefined && message.body !== expectedBody)) throw new Error('Message changed in another session. Refresh before approving.');
+      if (draftSender(message) !== actor) throw new Error(`Only ${employeeById(draftSender(message))?.name ?? 'the sender'} can approve or reject this draft.`);
       const result = decideMessage(saved.store, id, status, body); if (result.error) throw new Error(result.error); saved.store = result.store;
+      if (status === 'approved') deliverDraft(this.db, saved.store.messages.find(message => message.id === id)!, actor!);
     });
   }
   retry(companyId: string, id: string) {
@@ -156,6 +163,7 @@ export class RuleService {
       saved.store = full ? resetCompanyDemo(saved.store, companyId) : { ...saved.store, transactions: {}, history: [], executions: [], messages: [], notices: [] };
       if (full) { saved.watches = {}; for (const row of this.data.bills(companyId).rows.filter(row => row.dashboard?.reviewed)) this.db.write({ ...row, dashboard: { ...row.dashboard!, reviewed: false } }, row.sourceVersion!); }
       saved.log = [];
+      this.db.removeAll('mail', companyId);
     });
   }
   importLegacy(companyId: string, legacy: RuleStore, reviewed: string[] = []) {

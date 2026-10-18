@@ -36,12 +36,13 @@ test('migrated messages, approvals, notifications, rules and preferences are sha
   };
   await page.goto('/'); await pick(page);
   await page.getByRole('navigation', { name: 'Workspace' }).getByRole('button', { name: /^Messages/ }).click();
+  await page.getByRole('navigation', { name: 'Message folders' }).getByRole('button', { name: /^Approvals/ }).click();
   const card = page.locator('.dashboard-board .message-card');
   await expect(card).toContainText('Confirm coding for two bills');
   await card.getByRole('button', { name: 'Edit', exact: true }).click();
   await card.getByLabel('Edit draft message').fill('Hi Priya, please verify both receipt categories before close.');
   await card.getByRole('button', { name: 'Approve', exact: true }).click();
-  await expect(card).toContainText('Approved · not emailed'); await settled(page);
+  await expect(card).toContainText('Sent to inbox · not emailed'); await settled(page);
   await page.getByRole('button', { name: 'Transactions', exact: true }).click();
   await page.getByLabel('Bill assignee filter').selectOption('Shared review team');
   await expect(page.locator('tbody tr[data-id]')).toHaveCount(2);
@@ -54,7 +55,8 @@ test('migrated messages, approvals, notifications, rules and preferences are sha
     const other = await second.newPage(); await other.goto(new URL('/', page.url()).toString()); await pick(other);
     await expect(other.getByLabel('Rows to load')).toHaveValue('100');
     await other.getByRole('navigation', { name: 'Workspace' }).getByRole('button', { name: /^Messages/ }).click();
-    await expect(other.locator('.dashboard-board .message-card')).toContainText('Approved · not emailed');
+    await other.getByRole('navigation', { name: 'Message folders' }).getByRole('button', { name: /^Approvals/ }).click();
+    await expect(other.locator('.dashboard-board .message-card')).toContainText('Sent to inbox · not emailed');
     await other.locator('.dashboard-board .message-card').getByRole('button', { name: 'View draft', exact: true }).click();
     await expect(other.locator('.dashboard-board .message-card')).toContainText('please verify both receipt categories');
     await other.getByRole('button', { name: /^Notifications/ }).click(); await settled(other);

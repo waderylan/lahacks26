@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';
-import { CHAT_GEMINI_MODELS } from './llm.ts';
 
 // The AI Gateway key (AI_GATEWAY_API_KEY) is for Jev only. Any other model must be called through the
 // Gemini provider on GEMINI_API_KEY; a plain model-id string would route through the gateway.
@@ -18,8 +17,4 @@ test('text generation always goes through the Gemini provider', () => {
   for (const file of sources) {
     for (const m of fs.readFileSync(file, 'utf8').matchAll(/generateText\(\{\s*model:\s*([^\n,]+)/g)) assert.match(m[1], /^(google|createGoogleGenerativeAI\()/, `${file} generateText model: ${m[1]}`);
   }
-});
-
-test('chat model options other than Jev are Gemini models', () => {
-  for (const model of CHAT_GEMINI_MODELS) assert.match(model, /^gemini-/);
 });

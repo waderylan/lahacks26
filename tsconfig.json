@@ -8,8 +8,21 @@
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["node"]
+    "lib": [
+      "ES2024",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "server", "vite.config.ts", "index.ts"]
+  "include": [
+    "src",
+    "server",
+    "tests/fixtures",
+    "scripts/*.ts",
+    "vite.config.ts",
+    "playwright.config.ts"
+  ]
 }

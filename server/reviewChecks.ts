@@ -1,17 +1,13 @@
 import crypto from 'node:crypto';
-import type { Express, Request, Response } from 'express';
-import { evaluationEvidence, formatCents } from '../src/jevEvidence.ts';
-import { employeeById } from '../src/employees.ts';
-import { CHECKS, type CheckKind, type CheckResult, type CheckState, type CheckVerdict } from '../src/reviewChecks.ts';
+import { evaluationEvidence } from '../src/jevEvidence.ts';
+import { type CheckKind, type CheckResult, type CheckState, type CheckVerdict } from '../src/reviewChecks.ts';
 import type { Row } from '../src/types.ts';
-import { emptyDashboard, type ActionStore } from './actionStore.ts';
-import { jevConfigured } from './jev.ts';
-import { postMail } from './mailbox.ts';
+import { type ActionStore } from './actionStore.ts';
 import type { WorkspaceData } from './workspaceData.ts';
 
 export interface Judgment { id: string; verdict: CheckVerdict; probability: number; pFlag: number; original?: CheckResult['original'] }
 export type Company = { name: string; industry: string };
-/** What makes one review check different from another; the engine does caching, batching, storage and escalation. */
+/** What makes one review check different from another; the engine does caching, batching, storage. */
 export interface CheckDefinition {
   kind: CheckKind;
   /** One Jev call for a batch. `all` is every transaction in the company, for checks that compare across transactions. */
@@ -19,19 +15,10 @@ export interface CheckDefinition {
   signals: (row: Row, judgment: Judgment, all: Row[]) => string[];
   /** Extra input the verdict depends on beyond the row's own evidence, so a result is re-checked when it changes. */
   context?: (row: Row, all: Row[]) => unknown;
-  escalation: { subject: (count: number) => string; ask: string; line: (row: Row, result: CheckResult) => string };
 }
 type Stored = CheckState & { versions: Record<string, string> };
 /** SQLite document kind holding each check's per-company state. */
 export const CHECK_DOCS: Record<CheckKind, string> = { 'payment-risk': 'payment-risk', duplicates: 'duplicate-check' };
-
-/** Demo reset: the escalation mail and flags are gone, so forget every check's escalations too (Jev's results stay cached). */
-export function forgetEscalations(db: ActionStore, companyId: string) {
-  for (const doc of Object.values(CHECK_DOCS)) {
-    const saved = db.get<Stored>(doc, companyId);
-    if (saved && Object.keys(saved.escalated ?? {}).length) db.put(doc, companyId, companyId, { ...saved, escalated: {} });
-  }
-}
 
 /** Results stored by the first payment-risk release used its own verdict names. */
 function migrate(result: CheckResult & { pSuspicious?: number; verdict: string }): CheckResult {
@@ -89,51 +76,4 @@ export class ReviewCheck {
     return this.state(companyId);
   }
 
-  /** Flags each flagged transaction and sends `to` one summary from `as`. Already-escalated rows are skipped. */
-  escalate(companyId: string, as: string, ids: string[], to: string = CHECKS[this.def.kind].escalateTo): CheckState {
-    if (!employeeById(as)) throw new Error('Choose which employee is escalating.');
-    if (!employeeById(to)) throw new Error('Choose who to send this to.');
-    const info = CHECKS[this.def.kind];
-    return this.db.atomic(() => {
-      const saved = this.read(companyId);
-      const rows = [...new Set(ids)].filter(id => saved.results[id]?.verdict === 'flag' && !saved.escalated[id])
-        .sort((a, b) => saved.results[b].pFlag - saved.results[a].pFlag).map(id => this.data.row(companyId, id));
-      if (!rows.length) throw new Error('Nothing new to escalate. Run the check, or these were already sent.');
-      const at = new Date().toISOString();
-      for (const row of rows) {
-        const dashboard = { ...emptyDashboard(), ...row.dashboard };
-        if (!dashboard.flags.includes(info.flag)) this.db.write({ ...row, dashboard: { ...dashboard, flags: [...dashboard.flags, info.flag] } }, row.sourceVersion!);
-        saved.escalated[row.id] = { at, by: as, to };
-      }
-      const { escalation } = this.def, n = rows.length;
-      postMail(this.db, {
-        companyId, from: as, to, source: 'risk',
-        subject: escalation.subject(n),
-        body: `Hi ${employeeById(to)!.name.split(' ')[0]},\n\nJev's ${info.title.toLowerCase()} check flagged ${n === 1 ? 'this transaction' : `these ${n} transactions`}. ${escalation.ask}\n\n${rows.map(row => escalation.line(row, saved.results[row.id])).join('\n')}\n\nThese are automated warning signs, not a finding of fraud.\n\n${employeeById(as)!.name}`,
-        items: rows.map(row => ({ transactionId: row.id, billId: row.billId })),
-      });
-      this.db.put(CHECK_DOCS[this.def.kind], companyId, companyId, saved);
-      return { results: saved.results, escalated: saved.escalated };
-    });
-  }
-
-}
-
-/** Shared by every check's escalation message. */
-export const escalationLine = (row: Row, result: CheckResult, finding: string) =>
-  `- ${row.docNumber || row.billId} · ${row.vendor} · $${formatCents(row.amountCents)} · ${row.date} · Jev ${Math.round(result.pFlag * 100)}% ${finding}${result.signals.length ? ` · ${result.signals.join('; ')}` : ''}`;
-
-export function reviewCheckRoutes(app: Express, checks: Record<CheckKind, ReviewCheck>) {
-  const fail = (res: Response, error: unknown, status = 400) => res.status(status).json({ error: error instanceof Error ? error.message : 'Check failed.' });
-  const check = (req: Request) => { const found = checks[String(req.params.kind) as CheckKind]; if (!found) throw new Error('Unknown check.'); return found; };
-  app.get('/api/companies/:id/checks/:kind', (req: Request, res: Response) => { try { res.json(check(req).state(String(req.params.id))); } catch (error) { fail(res, error); } });
-  app.post('/api/companies/:id/checks/:kind/run', async (req: Request, res: Response) => {
-    if (!jevConfigured()) return res.status(503).json({ error: 'Jev is not configured (AI_GATEWAY_API_KEY missing)' });
-    const ac = new AbortController(); res.on('close', () => !res.writableEnded && ac.abort());
-    try { res.json(await check(req).check(String(req.params.id), req.body?.all === true ? 'all' : req.body?.ids, ac.signal)); }
-    catch (error) { if (ac.signal.aborted) return; console.error('review check failed:', (error as Error).message); fail(res, error, /Choose|not found|Cross-company|Unknown check/.test((error as Error).message) ? 400 : 502); }
-  });
-  app.post('/api/companies/:id/checks/:kind/escalate', (req: Request, res: Response) => {
-    try { res.json(check(req).escalate(String(req.params.id), String(req.body?.as ?? ''), Array.isArray(req.body?.ids) ? req.body.ids : [], req.body?.to === undefined ? undefined : String(req.body.to))); } catch (error) { fail(res, error); }
-  });
 }

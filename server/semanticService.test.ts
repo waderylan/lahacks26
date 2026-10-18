@@ -13,7 +13,7 @@ import { randomUUID } from 'node:crypto';
 
 test('saved judgments survive SQLite reopen and are shared between Explore and rule checks', async () => {
   const filename = path.join(os.tmpdir(), `jev-cache-${randomUUID()}.sqlite`);
-  const original = loadCompanyBills('company-018');
+  const original = loadCompanyBills('company-101');
   let db = new ActionStore(filename);
   let calls = 0;
   const evaluate = async (_request: unknown, _signal: unknown, rows: import('../src/types.ts').Row[] = []) => {
@@ -22,7 +22,7 @@ test('saved judgments survive SQLite reopen and are shared between Explore and r
   };
   try {
     let data = new WorkspaceData(db, () => original, () => []);
-    const row = data.bills('company-018').rows[0];
+    const row = data.bills('company-101').rows[0];
     assert.equal((await new SemanticService(data, evaluate).evaluateRows(row.companyId, 'Missing documentation', [row])).costNanoUsd, '100');
     db.db.close();
     db = new ActionStore(filename);
@@ -66,9 +66,9 @@ test('bank and invoice detail changes invalidate judgments; assignments reuse ex
 
 test('new reviewer details replace a cached uncertain judgment and reach the model context', async t => {
   const db = new ActionStore(':memory:'); t.after(() => db.db.close());
-  const original = loadCompanyBills('company-018');
+  const original = loadCompanyBills('company-101');
   const data = new WorkspaceData(db, () => original, () => []);
-  const row = data.bills('company-018').rows[0];
+  const row = data.bills('company-101').rows[0];
   let calls = 0;
   const semantic = new SemanticService(data, async (_request, _signal, rows = []) => {
     calls++;

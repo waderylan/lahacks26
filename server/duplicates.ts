@@ -3,7 +3,7 @@ import { evaluationEvidence, formatCents } from '../src/jevEvidence.ts';
 import { duplicateSignals, earlierCandidates } from '../src/duplicates.ts';
 import type { Row } from '../src/types.ts';
 import { JEV_MODEL } from './jev.ts';
-import { escalationLine, type CheckDefinition, type Company, type Judgment } from './reviewChecks.ts';
+import { type CheckDefinition, type Company, type Judgment } from './reviewChecks.ts';
 
 const COMMON = {
   cannot_tell: 'It closely resembles one of its earlier related bills (similar amount, wording or timing), but the records needed to tell whether it is a separate charge or a repeat are missing.',
@@ -57,9 +57,4 @@ export const duplicatesCheck: CheckDefinition = {
   signals: (row, judgment, all) => duplicateSignals(row, earlierCandidates(row, all), judgment.original?.billId),
   // The verdict depends on the earlier transactions too, so a change to one of them re-checks this one.
   context: (row, all) => earlierCandidates(row, all),
-  escalation: {
-    subject: n => `Possible duplicate charges: ${n} transaction${n === 1 ? '' : 's'}`,
-    ask: 'Please hold payment on them and check each against the vendor statement or receiving records before anything is paid twice.',
-    line: (row, result) => escalationLine(row, result, `duplicate${result.original ? ` of ${result.original.docNumber || result.original.billId} (${result.original.date})` : ''}`),
-  },
 };

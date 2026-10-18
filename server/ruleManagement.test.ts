@@ -26,25 +26,24 @@ function setup(count = 10) {
   return { db, data, service, judge, rule };
 }
 
-test('manual company runs work while off, exclude unreplayed records, retain counts, and remain idempotent', async t => {
+test('manual company runs work while off, include every company record, retain counts, and remain idempotent', async t => {
   const { db, data, service, judge, rule } = setup(); t.after(() => db.db.close());
   const saved = rule('company-101'); service.save(saved.companyId, saved, null);
   await service.runAll(saved.companyId, saved.id, 1);
   let state = service.snapshot(saved.companyId);
   assert.equal(state.store.rules[0].enabled, false);
-  assert.equal(state.runs[0].transactionCount, 5);
-  assert.equal(state.runs[0].matches, 1); assert.equal(state.runs[0].uncertain, 1); assert.equal(state.runs[0].nonmatches, 3);
+  assert.equal(state.runs[0].transactionCount, 10);
+  assert.equal(state.runs[0].matches, 1); assert.equal(state.runs[0].uncertain, 1); assert.equal(state.runs[0].nonmatches, 8);
   const history = state.store.history.length;
   await service.runAll(saved.companyId, saved.id, 1);
   assert.equal(service.snapshot(saved.companyId).store.history.length, history);
   service.toggle(saved.companyId, saved.id, 1, true);
   const reopened = new RuleService(db, data, judge);
   assert.equal(reopened.snapshot(saved.companyId).store.rules[0].enabled, true);
-  assert.equal(reopened.snapshot(saved.companyId).runs[0].transactionCount, 5);
+  assert.equal(reopened.snapshot(saved.companyId).runs[0].transactionCount, 10);
   service.toggle(saved.companyId, saved.id, 1, false);
-  await service.replay(saved.companyId);
   await reopened.runAll(saved.companyId, saved.id, 1);
-  assert.equal(reopened.snapshot(saved.companyId).runs[0].transactionCount, 6);
+  assert.equal(reopened.snapshot(saved.companyId).runs[0].transactionCount, 10);
 });
 
 test('deleting is scoped and revision checked, stops automation, and preserves prior review work', async t => {
@@ -86,7 +85,7 @@ test('whole-company runs include more than 1000 available rows while selected ru
   const { db, service, rule } = setup(1007); t.after(() => db.db.close());
   const saved = rule('company-101'); service.save(saved.companyId, saved, null);
   await service.runAll(saved.companyId, saved.id, 1);
-  assert.equal(service.snapshot(saved.companyId).runs[0].transactionCount, 1002);
+  assert.equal(service.snapshot(saved.companyId).runs[0].transactionCount, 1007);
   await assert.rejects(service.run(saved.companyId, saved.id, 1, Array.from({ length: 1001 }, (_, index) => `company-101:bill-${index}`)), /1-1000/);
 });
 

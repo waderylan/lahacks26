@@ -13,10 +13,9 @@ test('synthetic companies are listed and labeled, originals are untouched', () =
   const companies = listCompanies();
   for (const id of ids) assert.equal(companies.find(c => c.companyId === id)?.synthetic, true);
   assert.equal(companies.filter(c => c.synthetic).length, 4);
-  assert.equal(companies.filter(c => !c.synthetic && !c.scenario).length, 100);
-  const original = loadCompanyBills('company-018');
-  assert.ok(original.rows.every(r => r.evidence === undefined && r.related === undefined));
-  assert.deepEqual(supportingContext(original.rows[0]), {});
+  assert.deepEqual(companies.map(company => company.companyId), ids);
+  assert.deepEqual(ids.map(id => loadCompanyBills(id).rows.length), [346, 320, 310, 298]);
+  assert.throws(() => loadCompanyBills('company-018'), /unknown company/);
 });
 
 test('model payloads for synthetic rows carry records but no labels or case ids', () => {
@@ -53,8 +52,8 @@ test('a changed dataset version replaces that company\'s cached rows and nothing
   store.seed('company-101', a.slice(0, 1), 'v2');
   assert.equal(store.rows('company-101').length, 1, 'new version replaces the stale rows');
   assert.equal(store.rows('company-102').length, 2, 'other companies keep their rows');
-  store.seed('company-018', loadCompanyBills('company-018').rows.slice(0, 2));
-  assert.equal(store.rows('company-018').length, 2, 'unversioned companies are seeded once as before');
+  store.seed('company-103', loadCompanyBills('company-103').rows.slice(0, 2));
+  assert.equal(store.rows('company-103').length, 2, 'unversioned companies are seeded once as before');
   store.db.close();
 });
 

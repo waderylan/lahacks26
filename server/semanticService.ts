@@ -43,7 +43,7 @@ export class SemanticService {
       signal?.throwIfAborted();
       // Each batch gets its own timeout so one hung gateway call can't hold a slot (or the rule scanner) forever.
       const batchSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(90_000)]) : AbortSignal.timeout(90_000);
-      const response = await this.evaluate({ company: { name: company.name.replace(/ \u2014 review scenarios$/, ''), industry: company.industry }, criterion, ids: batch.map(row => row.id) }, batchSignal, batch);
+      const response = await this.evaluate({ company: { name: company.name, industry: company.industry }, criterion, ids: batch.map(row => row.id) }, batchSignal, batch);
       cost += BigInt(response.costNanoUsd);
       for (const row of batch) {
         const result = response.results.find(result => result.id === row.id);

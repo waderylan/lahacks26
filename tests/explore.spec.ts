@@ -7,7 +7,8 @@ test.afterEach(async () => { await app.close(); });
 
 test('grouped views reopen across browsers without actions and convert into independent rule drafts', async ({ page, browser }) => {
   await page.goto(app.url);
-  await page.getByLabel('Condition 1', { exact: true }).fill('This charge needs supporting documents.');
+  await page.getByLabel('Search transactions', { exact: true }).fill('This charge needs supporting documents.');
+  await page.getByRole('button', { name: 'Combine conditions', exact: true }).click();
   await page.getByRole('button', { name: 'Add group', exact: true }).click();
   await page.getByLabel('Condition 2', { exact: true }).fill('A receipt supports the charge.');
   await page.getByLabel('Group logic').last().selectOption('not');
@@ -59,9 +60,10 @@ test('views can be renamed, copied, deleted, and filtered without modifying tran
 test('Jev answers are reused when regrouping, refreshing, and converting to a rule', async ({ page }) => {
   let checks = 0; page.on('request', request => { if (request.url().endsWith('/api/evaluate')) checks++; });
   await page.goto(app.url);
-  await page.getByLabel('Condition 1', { exact: true }).fill('Check the receipt.');
+  await page.getByLabel('Search transactions', { exact: true }).fill('Check the receipt.');
   await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked · Complete');
   const first = checks;
+  await page.getByRole('button', { name: 'Combine conditions', exact: true }).click();
   await page.getByLabel('Group logic').selectOption('any');
   await page.getByRole('button', { name: 'Refresh records', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Records refreshed' })).toBeVisible();

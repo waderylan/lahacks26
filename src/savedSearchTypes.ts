@@ -1,5 +1,6 @@
 import type { RuleNode } from './rules';
 export interface SearchDefinition {
+  mode?: 'simple' | 'combined';
   query: string;
   expression?: RuleNode;
   result?: 'all' | 'true' | 'uncertain' | 'false';

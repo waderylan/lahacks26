@@ -15,11 +15,12 @@ import { SavedSearchService, savedSearchRoutes } from '../../server/savedSearche
 import type { Row } from '../../src/types';
 
 /** Real UI, routes, and SQLite; external model responses are deterministic in these workflow tests. */
-export async function startRuleApp(options: { synthetic?: boolean } = {}) {
+export async function startRuleApp(options: { synthetic?: boolean; rowCount?: number } = {}) {
   const db = new ActionStore(':memory:');
   const companyId = 'company-018';
-  const company = { companyId, name: 'Workflow test company', industry: 'Services', profile: '', billCount: 8, synthetic: options.synthetic ?? false };
-  const rows: Row[] = Array.from({ length: 8 }, (_, index) => ({
+  const count = options.rowCount ?? 8;
+  const company = { companyId, name: 'Workflow test company', industry: 'Services', profile: '', billCount: count, synthetic: options.synthetic ?? false };
+  const rows: Row[] = Array.from({ length: count }, (_, index) => ({
     id: `${companyId}:bill-${index + 1}`, companyId, billId: `bill-${index + 1}`, docNumber: `INV-${index + 1}`,
     date: '2026-10-01', dueDate: '2026-11-01', vendor: `Supplier ${index + 1}`, vendorId: `vendor-${index + 1}`,
     ...(options.synthetic && { txnType: (['bill', 'invoice', 'bank'] as const)[index % 3] }),

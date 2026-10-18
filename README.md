@@ -51,7 +51,7 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-- **Explore** is for viewing transactions and trying conditions. Combine English conditions and standard filters with AND, OR, and NOT. Save a view to reopen its conditions, filters, and sort order. Views never run actions.
+- **Explore** starts with a live search bar. Checks start after a one-second pause in typing; matches highlight and rise to the top, sorted by match confidence. Single searches show a percentage for every checked row. **Combine conditions** opens AND/OR/NOT editing without losing the current search. Saved views reopen their criteria and show current search parameters at the top. Views never run actions.
 - **Create rule** copies an Explore condition tree and record filters into an independent draft. Choose actions, preview their results, name the rule, and save.
 - **Rules** lists all saved rules. **Run now** opens a preview of existing records before applying actions. **Keep checking** checks new or changed available records every ten seconds while the server runs; switching it on establishes the baseline.
 - The company rules table shows last-check counts and times, open issues, record filters, and the saved revision. Edit or delete rules there. **Run all records** checks all available company records within the rule's filters after confirmation, including records outside the preview sample. Deleting preserves earlier tasks, flags, messages, and history.

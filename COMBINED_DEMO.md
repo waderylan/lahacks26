@@ -16,19 +16,28 @@ rule, messages, and saved views remain available in this preview.
 ## Explore: view and try conditions
 
 1. Open **Explore**. Choose transaction type, review status, and assignee filters.
-2. Write a condition, for example:
+2. Type into **Search transactions**. Checks start after you stop typing for one
+   second; there is no Run button. For example:
 
    > This transaction may charge for the same underlying work or goods as a nearby transaction, without supporting records showing a separate delivery, service period, or installment.
 
-3. Use **Add condition**, **Add group**, and **Add a filter** to combine English
+3. Choose **Combine conditions** when you need more than one search. Your current
+   search carries over. Use **Add condition**, **Add group**, and **Add a filter** to combine English
    conditions with amount, vendor, category, and review filters. AND requires all
    conditions; OR requires one. NOT reverses a result while preserving uncertainty.
-4. Inspect results. Expand a result to see its individual condition answers.
+4. Matches highlight green and move to the top as results arrive, highest match
+   confidence first by default. Single searches show Jev's match-confidence
+   percentage on every checked row. With combined conditions, **Confidence for**
+   selects the individual condition whose percentage is shown and sorted, before
+   AND, OR, and NOT; no combined probability is inferred. Expand a result to see its individual condition answers.
    Open a transaction to read its details and supporting records. Explore never
    changes transactions, creates tasks, or sends messages.
-5. **Save view** stores the conditions, record filters, result filter, and sort
+5. **Save view** stores simple/combined mode, conditions, record filters, result filter, and sort
    order. Reopen it from **Saved views**. Use **Save view** again to rename or
    update it, **Save as new view** to copy it, or **Delete saved view** to remove it.
+   Opened views show **Showing results for** at the top: current search, record
+   filters, result selection, sort order, and loaded preview. This summary follows
+   unsaved edits, so it describes the currently displayed results.
 6. Jev answers are cached in SQLite for each condition and transaction evidence.
    Reopening a view, regrouping conditions, and restarting the server reuse
    unchanged answers. **Refresh records** loads current records; changed evidence

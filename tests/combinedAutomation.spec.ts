@@ -8,7 +8,7 @@ test('Explore becomes an action rule; assignments, tasks, recurring checks, and 
   const workspace = (name: string) => page.getByRole('navigation', { name: 'Workspace', exact: true }).getByRole('button', { name: new RegExp(`^${name}`) }).click();
   try {
     await page.goto(app.url);
-    await page.getByLabel('Condition 1', { exact: true }).fill('This charge lacks supporting documentation.');
+    await page.getByLabel('Search transactions', { exact: true }).fill('This charge lacks supporting documentation.');
     await page.getByLabel('Explore type').selectOption('bill');
     await expect(page.getByLabel('Explore check progress')).toContainText('8/8 checked · Complete');
     await page.getByRole('button', { name: 'Save view', exact: true }).click();

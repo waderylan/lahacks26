@@ -53,7 +53,7 @@ test('legacy plain searches open as views with their original filters', async ({
   await page.request.post(`${app.url}/api/companies/company-018/searches`, { data: { name: 'Existing review', definition: { query: 'This charge lacks a receipt.', type: 'bill', status: 'needs_review', assignee: 'unassigned', tab: 'all', matchesOnly: true, sort: { key: 'date', dir: 1 } } } });
   await page.goto(app.url);
   await page.getByLabel('Saved views').getByRole('button', { name: 'Existing review', exact: true }).click();
-  await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('This charge lacks a receipt.');
+  await expect(page.getByLabel('Search transactions', { exact: true })).toHaveValue('This charge lacks a receipt.');
   await expect(page.getByLabel('Explore type')).toHaveValue('bill');
   await expect(page.getByLabel('Explore status')).toHaveValue('needs_review');
   await expect(page.getByLabel('Explore assignee')).toHaveValue('unassigned');

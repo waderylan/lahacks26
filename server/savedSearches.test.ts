@@ -25,8 +25,9 @@ test('views preserve grouped conditions and legacy monitoring is paused with its
     { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '500' },
     { id: 'not', type: 'not', children: [{ id: 'english', type: 'ai', label: '', text: 'The receipt supports the charge.' }] },
   ] };
-  const view = service.create(a, { name: 'Receipt review', definition: { ...definition, expression, result: 'uncertain' } });
+  const view = service.create(a, { name: 'Receipt review', definition: { ...definition, mode: 'combined', expression, result: 'uncertain' } });
   assert.deepEqual(view.definition.expression, expression);
+  assert.equal(service.get(a, view.id).definition.mode, 'combined');
   assert.equal(view.definition.result, 'uncertain');
   const enabled = service.toggle(a, view.id, view.revision, true);
   service.retireMonitoring();
@@ -38,6 +39,7 @@ test('views preserve grouped conditions and legacy monitoring is paused with its
   service.retireMonitoring();
   assert.equal(service.get(a, view.id).revision, retired.revision);
   assert.throws(() => service.create(a, { name: 'Broken', definition: { ...definition, expression: { ...expression, children: [] } } }), /empty/);
+  assert.throws(() => service.create(a, { name: 'Unknown mode', definition: { ...definition, mode: 'unknown' } }), /simple search/);
 });
 
 test('named searches persist through reopen, can be renamed and edited, and deletion preserves other company data', t => {

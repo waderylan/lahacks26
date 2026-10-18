@@ -15,6 +15,7 @@ const object = (input: unknown): Record<string, unknown> => {
 };
 function validate(input: unknown): { name: string; definition: SearchDefinition } {
   const value = object(input), definition = object(value.definition), sort = object(definition.sort);
+  if (definition.mode !== undefined && !['simple', 'combined'].includes(definition.mode as string)) throw new SearchError('Choose simple search or combined conditions.');
   if (typeof value.name !== 'string' || !value.name.trim() || value.name.trim().length > 80) throw new SearchError('Name the search using 1–80 characters.');
   if (typeof definition.query !== 'string' || definition.query.length > 500) throw new SearchError('Keep the search text to 500 characters.');
   if (!['all', 'bill', 'invoice', 'bank'].includes(definition.type as string) || !['all', 'needs_review', 'reviewed', 'flagged'].includes(definition.status as string)
@@ -26,7 +27,7 @@ function validate(input: unknown): { name: string; definition: SearchDefinition 
     const errors = validateRule({ id: '_view_', companyId: '_view_', name: 'View', revision: 1, enabled: false, expression: definition.expression, actions: [{ id: '_view_action_', type: 'pass', value: '' }] });
     if (errors.length) throw new SearchError(errors[0]);
   }
-  return { name: value.name.trim(), definition: { query: definition.query, ...(definition.result !== undefined && { result: definition.result as SearchDefinition['result'] }), ...(definition.expression !== undefined && { expression: definition.expression as SearchDefinition['expression'] }), type: definition.type as SearchDefinition['type'], status: definition.status as SearchDefinition['status'], assignee: definition.assignee,
+  return { name: value.name.trim(), definition: { query: definition.query, ...(definition.mode !== undefined && { mode: definition.mode as SearchDefinition['mode'] }), ...(definition.result !== undefined && { result: definition.result as SearchDefinition['result'] }), ...(definition.expression !== undefined && { expression: definition.expression as SearchDefinition['expression'] }), type: definition.type as SearchDefinition['type'], status: definition.status as SearchDefinition['status'], assignee: definition.assignee,
     tab: definition.tab as SearchDefinition['tab'], matchesOnly: definition.matchesOnly, sort: { key: sort.key as SearchDefinition['sort']['key'], dir: sort.dir as 1 | -1 } } };
 }
 

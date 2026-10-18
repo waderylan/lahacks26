@@ -2,7 +2,7 @@
 
 Accounting rules that understand meaning. Describe a problem in plain English and Jev, a System 1 model, scans every transaction, takes automated actions and sends it to the right human reviewer.
 
-[Live app](https://waderylan.github.io/lahacks26/app/) · [Slides](https://waderylan.github.io/lahacks26/slideshow/)
+[Slides](https://waderylan.github.io/lahacks26/slideshow/)
 
 ## Inspiration
 
@@ -34,7 +34,7 @@ The same engine powers the rest of the app:
 
 ## Try it yourself
 
-Open the [live app](https://waderylan.github.io/lahacks26/app/) and pick Parcelmint Online Goods, a synthetic company with 131 bills, invoices and bank rows. The [slides](https://waderylan.github.io/lahacks26/slideshow/) walk through the same flow with screenshots.
+Run the app locally (see Developer setup) and pick Parcelmint Online Goods, a synthetic company with 131 bills, invoices and bank rows. The [slides](https://waderylan.github.io/lahacks26/slideshow/) walk through the same flow with screenshots.
 
 1. In Explore, type each of these and watch the matches change:
    - `asks to change where payment is sent`

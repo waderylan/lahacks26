@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parse } from 'yaml';
 
-const ROOT = path.resolve('data/raw/hackathon-100');
+const ROOT = path.resolve(process.env.ACCOUNTING_DATA_ROOT ?? 'data/raw/hackathon-100');
 // All bills are loaded per company. Set to a number to cap the spreadsheet to an evenly spaced sample.
 export const SAMPLE_SIZE = Infinity;
 // The authored scenario fixture is off unless ENABLE_SCENARIO=1.

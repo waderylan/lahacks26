@@ -2,13 +2,15 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
 import { listCompanies, loadCompanyBills, loadCompanyBillsLimited } from './data.ts';
-import { evaluateBatch, jevConfigured, JEV_MODEL } from './jev.ts';
+import { QwenReadinessError } from './qwen.ts';
+import { evaluateSelected, providerStatus, type Provider } from './evaluator.ts';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 
-app.get('/api/status', (_req, res) => {
-  res.json({ jev: { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway' } });
+app.get('/api/status', (req, res) => {
+  const provider: Provider = req.query.model === 'qwen' ? 'qwen' : 'jev';
+  res.json({ jev: providerStatus(provider), providers: { jev: providerStatus('jev'), qwen: providerStatus('qwen') } });
 });
 
 app.get('/api/companies', (_req, res) => res.json(listCompanies()));
@@ -41,21 +43,24 @@ app.post('/api/evaluate', async (req, res) => {
   if (typeof criterion !== 'string' || !criterion.trim() || criterion.length > 500 || !Array.isArray(ids) || !ids.length || ids.length > 25 || !ids.every(id => typeof id === 'string' && id.startsWith(`${companyId}:`))) {
     return res.status(400).json({ error: 'invalid request' });
   }
-  if (!jevConfigured()) return res.status(503).json({ error: 'Jev is not configured (AI_GATEWAY_API_KEY missing)' });
+  if (req.body.model !== undefined && !['jev', 'qwen'].includes(req.body.model)) return res.status(400).json({ error: 'Unknown model' });
+  const provider: Provider = req.body.model === 'qwen' ? 'qwen' : 'jev';
+  if (!providerStatus(provider).configured) return res.status(503).json({ error: 'Selected model is not configured on the server' });
   const ac = new AbortController();
   res.on('close', () => !res.writableEnded && ac.abort());
   try {
     const { company, rows } = loadCompanyBills(String(companyId));
     if (ids.some((id: string) => !rows.some(row => row.id === id))) return res.status(400).json({ error: 'Unknown or cross-company transaction ID' });
-    const { results, costNanoUsd } = await evaluateBatch(
+    const { results, costNanoUsd, costKind } = await evaluateSelected(provider,
       { company: { name: company.name.replace(/ — review scenarios$/, ''), industry: company.industry }, criterion: criterion.slice(0, 500), ids: ids.map(String) },
       ac.signal,
     );
-    res.json({ results, costNanoUsd });
+    res.json({ results, costNanoUsd, costKind, model: providerStatus(provider).model });
   } catch (e) {
     if (ac.signal.aborted) return;
+    if (e instanceof QwenReadinessError) return res.status(503).json({ error: e.message + ' No actions were applied.' });
     console.error('evaluate failed:', (e as Error).message);
-    res.status(502).json({ error: 'Jev request failed' });
+    res.status(502).json({ error: 'Model request failed; no failed record is treated as false' });
   }
 });
 

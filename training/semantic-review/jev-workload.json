@@ -1,0 +1,263 @@
+{
+  "provider": "jev",
+  "companyId": "company-018",
+  "criterion": "Anything electronic or tech-related",
+  "n": 50,
+  "totalMs": 3972.9999580000003,
+  "concurrency": "3 batches of up to 20; Qwen uses 3 concurrent record calls per batch",
+  "requestCostNanoUsd": "865074",
+  "costNote": "Gateway metadata if available",
+  "results": [
+    {
+      "id": "company-018:bill-operating-05267",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-05502",
+      "state": "match",
+      "pMatch": 0.73
+    },
+    {
+      "id": "company-018:bill-05593",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-05713",
+      "state": "match",
+      "pMatch": 0.71
+    },
+    {
+      "id": "company-018:bill-05848",
+      "state": "match",
+      "pMatch": 0.67
+    },
+    {
+      "id": "company-018:bill-utilities-05870",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-06022",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-06169",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-operating-06325",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-06477",
+      "state": "match",
+      "pMatch": 0.71
+    },
+    {
+      "id": "company-018:bill-variable-services-02177",
+      "state": "uncertain",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-02792",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-interest-02610",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-03076",
+      "state": "match",
+      "pMatch": 0.95
+    },
+    {
+      "id": "company-018:bill-03215",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-03376",
+      "state": "match",
+      "pMatch": 0.55
+    },
+    {
+      "id": "company-018:bill-utilities-03220",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03382",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-03525",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03660",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03793",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-03938",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-variable-services-04083",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-04392",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-variable-services-04363",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-04512",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-product-development-04644",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04790",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-utilities-04946",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-05106",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-00016",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-00295",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-utilities-00138",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-operating-00218",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-utilities-00280",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-operating-00356",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-00936",
+      "state": "match",
+      "pMatch": 0.95
+    },
+    {
+      "id": "company-018:bill-01039",
+      "state": "match",
+      "pMatch": 0.99
+    },
+    {
+      "id": "company-018:bill-01124",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-01241",
+      "state": "match",
+      "pMatch": 0.95
+    },
+    {
+      "id": "company-018:bill-01365",
+      "state": "match",
+      "pMatch": 0.97
+    },
+    {
+      "id": "company-018:bill-01435",
+      "state": "match",
+      "pMatch": 0.98
+    },
+    {
+      "id": "company-018:bill-utilities-00902",
+      "state": "no_match",
+      "pMatch": 0.02
+    },
+    {
+      "id": "company-018:bill-utilities-01035",
+      "state": "no_match",
+      "pMatch": 0.03
+    },
+    {
+      "id": "company-018:bill-variable-services-01156",
+      "state": "no_match",
+      "pMatch": 0
+    },
+    {
+      "id": "company-018:bill-01987",
+      "state": "match",
+      "pMatch": 0.9
+    },
+    {
+      "id": "company-018:bill-utilities-01503",
+      "state": "no_match",
+      "pMatch": 0.01
+    },
+    {
+      "id": "company-018:bill-02240",
+      "state": "match",
+      "pMatch": 0.91
+    },
+    {
+      "id": "company-018:bill-02467",
+      "state": "no_match",
+      "pMatch": 0.36
+    },
+    {
+      "id": "company-018:bill-utilities-02028",
+      "state": "no_match",
+      "pMatch": 0.01
+    }
+  ],
+  "note": "Original records. Jev/Qwen agreement is not independent accounting accuracy. One warm-server run; not a statistical latency benchmark."
+}

@@ -1,0 +1,139 @@
+{
+  "runHash": "3049ffa86138e6ec5c87408723d5d852f45b75cdb44d220f506d100c563b846d",
+  "perClass": {
+    "match": {
+      "precision": 0.6666666666666666,
+      "recall": 0.020202020202020204,
+      "f1": 0.0392156862745098
+    },
+    "no_match": {
+      "precision": 0.5470383275261324,
+      "recall": 0.8219895287958116,
+      "f1": 0.6569037656903766
+    },
+    "uncertain": {
+      "precision": 0.35064935064935066,
+      "recall": 0.3375,
+      "f1": 0.34394904458598724
+    }
+  },
+  "macroF1": 0.34668949885029116,
+  "confusion": {
+    "match": {
+      "match": 2,
+      "no_match": 78,
+      "uncertain": 17,
+      "error": 2
+    },
+    "no_match": {
+      "match": 0,
+      "no_match": 157,
+      "uncertain": 33,
+      "error": 1
+    },
+    "uncertain": {
+      "match": 1,
+      "no_match": 52,
+      "uncertain": 27,
+      "error": 0
+    }
+  },
+  "scoreCoverage": 0.9918918918918919,
+  "matchBrier": 0.21968189702067553,
+  "provider": "base",
+  "model": "beb93c76ff97",
+  "n": 370,
+  "accuracy": 0.5027027027027027,
+  "errors": 3,
+  "falseMatches": 1,
+  "uncertainRecall": 0.3375,
+  "byFamily": {
+    "effectively_blank": {
+      "n": 30,
+      "accuracy": 0.7
+    },
+    "nonempty_uninformative": {
+      "n": 30,
+      "accuracy": 0.7333333333333333
+    },
+    "conflict": {
+      "n": 45,
+      "accuracy": 0.3333333333333333
+    },
+    "needs_attention": {
+      "n": 30,
+      "accuracy": 0.36666666666666664
+    },
+    "agreement": {
+      "n": 45,
+      "accuracy": 0.2222222222222222
+    },
+    "overhead": {
+      "n": 14,
+      "accuracy": 0.5
+    },
+    "financial_shipment": {
+      "n": 14,
+      "accuracy": 0.6428571428571429
+    },
+    "vague": {
+      "n": 15,
+      "accuracy": 0.6666666666666666
+    },
+    "attention": {
+      "n": 15,
+      "accuracy": 0.26666666666666666
+    },
+    "goods": {
+      "n": 15,
+      "accuracy": 0.26666666666666666
+    },
+    "clothing": {
+      "n": 15,
+      "accuracy": 0.4
+    },
+    "blank": {
+      "n": 15,
+      "accuracy": 0.8
+    },
+    "electronics": {
+      "n": 15,
+      "accuracy": 0.6
+    },
+    "delay": {
+      "n": 15,
+      "accuracy": 0.6
+    },
+    "utility_backorder": {
+      "n": 14,
+      "accuracy": 0.7857142857142857
+    },
+    "trading_vague": {
+      "n": 14,
+      "accuracy": 0.7142857142857143
+    },
+    "utilities": {
+      "n": 15,
+      "accuracy": 0.6
+    },
+    "goods_overhead": {
+      "n": 14,
+      "accuracy": 0.5
+    }
+  },
+  "byOrigin": {
+    "existing_authored_demo_holdout": {
+      "n": 150,
+      "accuracy": 0.48
+    },
+    "authored_overlay": {
+      "n": 220,
+      "accuracy": 0.5181818181818182
+    }
+  },
+  "requestCostNanoUsd": null,
+  "costNote": "GPU time is billed separately; no fabricated per-request price",
+  "latencyNote": "Batch end-to-end timings; Same cases in batches up to 20. Jev uses native multi-question requests; Qwen uses three concurrent record requests, as in the app adapter. These are product-workload timings, not equal-token engine benchmarks.",
+  "batchP50Ms": 372.77679200000057,
+  "batchP95Ms": 552.7911660000027
+}

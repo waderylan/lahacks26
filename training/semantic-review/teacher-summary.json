@@ -1,0 +1,7 @@
+{
+  "count": 200,
+  "costNanoUsd": null,
+  "labels": "Jev teacher predictions, not independent ground truth",
+  "totalTraining": 1000,
+  "costNote": "Initial cost was not retained across resumable collection; unknown, not zero."
+}

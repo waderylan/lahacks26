@@ -1,0 +1,10 @@
+{
+  "trainCount": 1000,
+  "trainLabelCounts": {
+    "match": 247,
+    "no_match": 551,
+    "uncertain": 202
+  },
+  "testCasesSharingAnExactTrainingCriterion": 60,
+  "note": "Some app criteria repeat intentionally across disjoint companies; this benchmark is not an entirely unseen-criterion benchmark."
+}

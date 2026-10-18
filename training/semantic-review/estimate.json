@@ -1,0 +1,8 @@
+{
+  "gpu_type": "L4-24GB",
+  "gpu_count": 1,
+  "provider": "aws",
+  "duration_minutes": 125.0,
+  "rate_usd_per_hour": 1.05,
+  "estimated_cost_usd": 2.1875000000000004
+}

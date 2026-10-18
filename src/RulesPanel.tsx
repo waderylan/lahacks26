@@ -71,7 +71,7 @@ export function RulesPanel({ controller: c, data }: { controller: RulesControlle
         {!node.children.length && <span className="small muted"> Drop a block here</span>}
       </> : node.type === 'ai' ? <>
         <input className="node-label" aria-label="AI display label" placeholder="Display label (optional)" value={node.label} onChange={e => setTree(updateNode(draft.expression, node.id, n => ({ ...n, label: e.target.value } as RuleNode)))} />
-        <textarea aria-label="AI condition text" placeholder="Describe what Jev should judge…" maxLength={500} value={node.text} onChange={e => setTree(updateNode(draft.expression, node.id, n => ({ ...n, text: e.target.value } as RuleNode)))} />
+        <textarea aria-label="AI condition text" placeholder="Describe what the selected model should judge…" maxLength={500} value={node.text} onChange={e => setTree(updateNode(draft.expression, node.id, n => ({ ...n, text: e.target.value } as RuleNode)))} />
         <div className="condition-counts" aria-live="polite">{(['true', 'false', 'uncertain', 'pending', 'error'] as Outcome[]).map(value => <span key={value} className={`count-${value}`}>{c.counts[node.id]?.[value] ?? 0} {value}</span>)}</div>
       </> : <div className="standard-fields">
         <select aria-label="Condition field" value={node.field} onChange={e => { const field = e.target.value as typeof node.field; setTree(updateNode(draft.expression, node.id, n => ({ ...n, field, operator: field === 'amountCents' ? 'gt' : 'eq', value: field === 'review' ? 'needs_review' : field === 'amountCents' ? '100' : '' } as RuleNode))); }}><option value="amountCents">Amount</option><option value="review">Review status</option><option value="vendor">Vendor</option><option value="account">Account</option></select>
@@ -92,7 +92,7 @@ export function RulesPanel({ controller: c, data }: { controller: RulesControlle
     <div className="builder-scroll" ref={scrollRef}>
       <div className="palette" aria-label="Block palette">{(['all', 'any', 'not', 'ai', 'standard'] as const).map(type => <button key={type} draggable onDragStart={e => { e.dataTransfer.setData('application/x-rule-palette', type); e.dataTransfer.effectAllowed = 'copy'; }} onClick={() => add(draft.expression.id, type)}>{labels[type]}</button>)}</div>
       <div className="section-label">1. IF <span>Which bills should match?</span></div>
-      <p className="independence-note">Each AI condition is judged independently by Jev. ALL, ANY, and NOT combine the results.</p>
+      <p className="independence-note">Each AI condition is judged independently by the selected model. ALL, ANY, and NOT combine the results.</p>
       {render(draft.expression, 1)}
       <div className="section-label then-label">2. THEN <span>What should happen?</span></div>
       <datalist id="flag-labels"><option value="Needs clarification" /><option value="Possible mismatch" /></datalist>

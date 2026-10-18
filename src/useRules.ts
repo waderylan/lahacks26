@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
-import { evaluateCondition, judgmentKey } from './jevClient';
+import { evaluateCondition, judgmentKey, evaluationIdentity } from './jevClient';
 import { EMPTY_STORE, evaluateTree, exampleRule, executeRule, leaves, standardResult, transactionVersion, undoEntry, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
 
 const STORE_KEY = 'tr.rules.v1';
@@ -82,7 +82,7 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
       if (condition.type === 'ai' && results[condition.id] === 'error') previewErrors.add(errors[judgmentKey(row, condition.text)] ?? 'Jev request failed');
     }
     if (Object.values(results).every(v => v !== 'pending' && v !== 'error')) evaluated++;
-    snapshots[row.id] = { conditions: results, result: evaluateTree(draft!.expression, results) };
+    snapshots[row.id] = { model: evaluationIdentity(), conditions: results, result: evaluateTree(draft!.expression, results) };
   }
   const validation = draft ? validateRule(draft) : ['Loading rule…'];
   const complete = validCompany && evaluated === data!.rows.length && !validation.length;
@@ -121,13 +121,13 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
         if (n.type === 'standard') results[n.id] = standardResult(n, row, isReviewed);
         else await evaluateCondition({ company: { companyId: row.companyId } as CompanyBills['company'], rows: [row] }, n.text, (_row, outcome) => { results[n.id] = outcome; });
       }));
-      const snapshot = { result: evaluateTree(rule.expression, results), conditions: results };
+      const snapshot = { model: evaluationIdentity(), result: evaluateTree(rule.expression, results), conditions: results };
       if (reviewedRef.current.has(row.id) !== isReviewed) { setAutomation(cur => [`${row.billId}: review status changed while evaluating; stale result ignored.`, ...cur].slice(0, 12)); continue; }
       const active = storeRef.current.rules.find(r => r.id === rule.id && r.enabled && r.revision === rule.revision);
       if (!active) { setAutomation(cur => [`${row.billId}: active revision changed; no actions applied.`, ...cur].slice(0, 12)); continue; }
       const failed = Object.values(results).some(v => v === 'error' || v === 'pending');
       if (!failed) commit(cur => executeRule(cur, rule, row, transactionVersion(row, isReviewed), snapshot, source));
-      setAutomation(cur => [`${row.billId} · ${rule.name}: ${failed ? 'Jev failed — no actions applied; retry available' : snapshot.result === 'true' ? 'true — actions applied' : `${snapshot.result} — no actions; previous actions preserved`}`, ...cur].slice(0, 12));
+      setAutomation(cur => [`${row.billId} · ${rule.name}: ${failed ? 'Model failed — no actions applied; retry available' : snapshot.result === 'true' ? 'true — actions applied' : `${snapshot.result} — no actions; previous actions preserved`}`, ...cur].slice(0, 12));
       if (failed) failedEvents.current.set(row.id, { row, source, isReviewed });
       else failedEvents.current.delete(row.id);
     }

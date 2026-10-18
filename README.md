@@ -53,3 +53,7 @@ npm run dev        # http://localhost:5173
 - Semantic input calls Jev (`typesafe-ai/jev` via Vercel AI Gateway, `experimental_evaluate` choice questions) from `server/jev.ts`; requires `AI_GATEWAY_API_KEY` in `.env`. Jev returns match, no match, or uncertain. Probabilities are displayed as evidence, without replacing the selected outcome.
 - Review state is stored in browser localStorage, keyed by company-scoped bill ID.
 - The **Rules** workspace adds editable ALL / ANY / NOT groups, independent AI judgments, local standard conditions, persistent actions, saved revisions, history, and conflict-aware undo. See [RULES_DEMO.md](RULES_DEMO.md) for the demo and execution semantics.
+
+## Qwen alternative on Veri
+
+A server-side Qwen semantic classifier can be selected with the Model dropdown. See `training/semantic-review/README.md` for training data, deployment, limitations and reproducible comparisons. Jev remains available. Qwen scores, when present, are explicitly uncalibrated; GPU billing is not shown as a free request.

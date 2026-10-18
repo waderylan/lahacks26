@@ -46,10 +46,12 @@ export type MatchState = 'match' | 'no_match' | 'uncertain';
 export interface RecordResult {
   id: string;
   state: MatchState;
-  pMatch: number;
+  pMatch: number | null;
+  scoreKind?: 'jev_probability' | 'candidate_score_uncalibrated' | 'validation_calibrated';
 }
 
 export interface JevStatus {
+  provider?: 'jev' | 'qwen';
   configured: boolean;
   model: string;
   via: string;

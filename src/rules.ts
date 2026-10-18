@@ -12,7 +12,7 @@ export interface Rule {
   expression: RuleNode; actions: Action[];
 }
 export interface LocalTransaction { flags: string[]; tags: string[]; owner: string; automatedCheck: boolean }
-export interface Snapshot { result: Outcome; conditions: Record<string, Outcome>; expression?: RuleNode }
+export interface Snapshot { model?: string; result: Outcome; conditions: Record<string, Outcome>; expression?: RuleNode }
 export interface HistoryEntry {
   id: string; key: string; ruleId: string; ruleName: string; revision: number;
   companyId: string; transactionId: string; transactionVersion: string; action: Action | null;

@@ -2,11 +2,19 @@ import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import { arrangeRows, sortByMatch } from './arrange';
 import type { CompanyBills, CompanySummary, JevStatus, Row } from './types';
 import { useSemanticEval } from './useSemanticEval';
+import { selectedProvider, setModelRevision } from './jevClient';
 import { readRuleStore, useRules } from './useRules';
 import { LocalStateEditor, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel } from './RulesPanel';
 import { actionLabel, type LocalTransaction, type Outcome } from './rules';
 
 const DEFAULT_COMPANY = 'company-018';
+const SWITCH_CONTEXT_KEY = 'tr.model-switch-context.v1';
+const switchContext: {companyId?: string; workspace?: 'transactions'|'rules'; input?: string} = (() => {
+  try {
+    const value=JSON.parse(sessionStorage.getItem(SWITCH_CONTEXT_KEY)??'{}');sessionStorage.removeItem(SWITCH_CONTEXT_KEY);
+    return {companyId: typeof value.companyId==='string' && /^(company-\d{3}|scenario-company-030)$/.test(value.companyId)?value.companyId:undefined, workspace: ['transactions','rules'].includes(value.workspace)?value.workspace:undefined, input: typeof value.input==='string'&&value.input.length<=500?value.input:undefined};
+  } catch { return {}; }
+})();
 const REVIEW_KEY = 'tr.reviewed.v1';
 const PREFS_KEY = 'tr.prefs.v1';
 
@@ -50,7 +58,9 @@ function loadPrefs(): { set: string; limit: number } {
 }
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const money = (cents: number) => usd.format(cents / 100);
-const pct = (p: number) => `${Math.round(p * 100)}%`;
+const pct = (p: number | null) => p === null ? 'score unavailable' : `${Math.round(p * 100)}%`;
+const scoreText = (p: number | null, kind?: string) => p === null ? '' : ` · ${selectedProvider() === 'qwen' ? (kind === 'validation_calibrated' ? 'adjusted score ' : 'raw score ') : ''}${pct(p)}`;
+const scoreTitle = (kind?: string) => selectedProvider() === 'qwen' ? (kind === 'validation_calibrated' ? 'Match score calibrated on held-out synthetic validation cases; real-world calibration is not established' : 'Uncalibrated score normalized over A/B/C tokens; not a calibrated probability') : 'Jev probability of match';
 // API spend in nano-dollars (bigint) -> "$0.000158"
 const spend = (nano: bigint) => {
   const micro = (nano + 500n) / 1000n;
@@ -73,15 +83,15 @@ function loadReviewed(): Set<string> {
 export default function App() {
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [jev, setJev] = useState<JevStatus | null>(null);
-  const [companyId, setCompanyId] = useState(DEFAULT_COMPANY);
-  const [workspace, setWorkspace] = useState<'transactions' | 'rules'>('rules');
+  const [companyId, setCompanyId] = useState(switchContext.companyId ?? DEFAULT_COMPANY);
+  const [workspace, setWorkspace] = useState<'transactions' | 'rules'>(switchContext.workspace ?? 'rules');
   const [previewFilter, setPreviewFilter] = useState('all');
   const [recordSearch, setRecordSearch] = useState('');
   const [data, setData] = useState<CompanyBills | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [input, setInput] = useState('');
-  const [query, setQuery] = useState('');
+  const [input, setInput] = useState(switchContext.input ?? '');
+  const [query, setQuery] = useState(switchContext.input ?? '');
   const [tab, setTab] = useState<Tab>('all');
   const [matchesOnly, setMatchesOnly] = useState(false);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'match', dir: -1 }); // default: match % once a query runs, date order otherwise
@@ -102,7 +112,7 @@ export default function App() {
 
   useEffect(() => {
     fetch('/api/companies').then((r) => r.json()).then(setCompanies).catch(() => {});
-    fetch('/api/status').then((r) => r.json()).then((s) => setJev(s.jev)).catch(() => {});
+    fetch('/api/status?model=' + selectedProvider()).then((r) => r.json()).then((s) => { setModelRevision(s.jev.model); setJev(s.jev); }).catch(() => {});
   }, []);
 
   // Load a company's records; never show another company's rows while loading.
@@ -293,6 +303,7 @@ export default function App() {
             Sample: {data.rows.length} of {data.totalBills} bills
           </span>
         )}
+        <label className="rows-pick">Model <select aria-label="Evaluation model" title="Switches provider and reloads the view. Save rule drafts before switching." value={selectedProvider()} onChange={e => { try { sessionStorage.setItem(SWITCH_CONTEXT_KEY, JSON.stringify({companyId, workspace, input})); } catch {} const url = new URL(window.location.href); url.searchParams.set('model', e.target.value); window.location.assign(url.toString()); }}><option value="jev">Jev</option><option value="qwen">Qwen · Veri</option></select></label>
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
       </header>
 
@@ -326,7 +337,7 @@ export default function App() {
                 <b>
                   {evaluated}/{evalState.total}
                 </b>{' '}
-                evaluated · {elapsed.toFixed(1)}s{running ? ' …' : ''} · API cost <b title="Vercel AI Gateway charge for this query">{spend(evalState.costNanoUsd)}</b>
+                evaluated · {elapsed.toFixed(1)}s{running ? ' …' : ''} · {selectedProvider() === 'qwen' ? 'Veri GPU time billed separately; request cost unavailable' : <>API cost <b title="Vercel AI Gateway charge for this query">{spend(evalState.costNanoUsd)}</b></>}
                 {evalState.failed.size > 0 && <span className="err"> · {evalState.failed.size} failed</span>}
               </>
             )}
@@ -350,17 +361,17 @@ export default function App() {
         {data?.disclosure && <div className="banner scenario"><b>Synthetic review scenarios — descriptions and memos modified.</b> {data.disclosure.replace('Synthetic review scenarios — descriptions and memos modified. ', '')}</div>}
         {active && evalState.failed.size > 0 && (
           <div className="banner error">
-            Jev request failed for {evalState.failed.size} records ({evalState.error}). The spreadsheet is unaffected.{' '}
+            Model request failed for {evalState.failed.size} records ({evalState.error}). The spreadsheet is unaffected.{' '}
             <button onClick={retry}>Retry failed</button>
           </div>
         )}
         {jev && !jev.configured && (
-          <div className="banner error">Jev is not configured: set AI_GATEWAY_API_KEY on the server. Matching is unavailable.</div>
+          <div className="banner error">Selected model is not configured on the server. Matching is unavailable.</div>
         )}
       </section>}
 
       {workspace === 'rules' && (rules.storageError || rules.message) && <div className={`rules-notice ${rules.storageError ? 'error' : ''}`} role="status">{rules.storageError || rules.message}</div>}
-      {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Jev evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
+      {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Model evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
       {workspace === 'rules' && data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
       <div className={`workspace-body ${workspace === 'rules' ? 'with-builder' : ''}`}>
       {workspace === 'rules' && data && <RulesPanel controller={rules} data={data} />}
@@ -390,7 +401,7 @@ export default function App() {
                   <Th w={widths.account} onClick={() => sortBy('account')} onResize={(e) => startResize('account', e)}>Account{arrow('account')}</Th>
                   <Th w={widths.amount} right onClick={() => sortBy('amountCents')} onResize={(e) => startResize('amount', e)}>Amount{arrow('amountCents')}</Th>
                   <Th w={widths.review} onResize={(e) => startResize('review', e)}>Review</Th>
-                  <Th w={widths.match} className={workspace === 'rules' ? 'rule-result-column' : ''} onClick={workspace === 'transactions' ? () => sortBy('match') : undefined} onResize={(e) => startResize('match', e)}>{workspace === 'rules' ? 'Rule result' : `Semantic match %${arrow('match')}`}</Th>
+                  <Th w={widths.match} className={workspace === 'rules' ? 'rule-result-column' : ''} onClick={workspace === 'transactions' ? () => sortBy('match') : undefined} onResize={(e) => startResize('match', e)}>{workspace === 'rules' ? 'Rule result' : `${selectedProvider() === 'qwen' ? 'Match score' : 'Semantic match %'}${arrow('match')}`}</Th>
                   <th style={{ minWidth: 230, width: 230 }}>Local automation</th>
                 </tr>
               </thead>
@@ -474,7 +485,7 @@ function Th(props: { w: number; right?: boolean; className?: string; onClick?: (
 
 function SheetRow(p: {
   row: Row; n: number; selected: boolean; reviewed: boolean; open: boolean; active: boolean;
-  match?: { state: string; pMatch: number }; pending: boolean; failed: boolean;
+  match?: { state: string; pMatch: number | null; scoreKind?: string }; pending: boolean; failed: boolean;
   onToggle: () => void; onOpen: () => void;
   ruleOutcome?: Outcome; local?: LocalTransaction;
 }) {
@@ -497,9 +508,9 @@ function SheetRow(p: {
       <td className={p.ruleOutcome ? 'rule-result-column' : undefined}>
         {p.ruleOutcome ? <ResultBadge value={p.ruleOutcome} /> : !p.active ? <span className="muted">—</span>
           : match ? (
-            match.state === 'match' ? <span className="tag ok" title="Jev's probability that this matches">● Match {pct(match.pMatch)}</span>
-            : match.state === 'uncertain' ? <span className="tag warn" title="Jev's probability that this matches">◐ Uncertain {pct(match.pMatch)}</span>
-            : <span className="muted" title="Jev's probability that this matches">No match {pct(match.pMatch)}</span>
+            match.state === 'match' ? <span className="tag ok" title={scoreTitle(match.scoreKind)}>● Match {scoreText(match.pMatch, match.scoreKind)}</span>
+            : match.state === 'uncertain' ? <span className="tag warn" title={scoreTitle(match.scoreKind)}>◐ Uncertain {scoreText(match.pMatch, match.scoreKind)}</span>
+            : <span className="muted" title={scoreTitle(match.scoreKind)}>No match {scoreText(match.pMatch, match.scoreKind)}</span>
           ) : p.failed ? <span className="tag bad">Failed</span>
           : p.pending ? <span className="muted">Pending…</span> : <span className="muted">—</span>}
       </td>
@@ -508,7 +519,7 @@ function SheetRow(p: {
   );
 }
 
-function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewed: boolean; match?: { state: string; pMatch: number }; onClose: () => void; rules: ReturnType<typeof useRules> }) {
+function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewed: boolean; match?: { state: string; pMatch: number | null; scoreKind?: string }; onClose: () => void; rules: ReturnType<typeof useRules> }) {
   const kv = (o: Record<string, unknown> | null) =>
     o ? Object.entries(o).filter(([, v]) => v !== null && typeof v !== 'object') : [];
   return (
@@ -535,7 +546,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
           <dt>Description</dt><dd>{r.description || '(blank)'}</dd>
           <dt>Items</dt><dd>{r.itemNames.join(', ') || '(none)'}</dd>
           <dt>Review</dt><dd>{reviewed ? 'Reviewed' : 'Needs review'}</dd>
-          <dt>Jev</dt><dd>{match ? `${match.state.replace('_', ' ')} (P(match) ${pct(match.pMatch)})` : '—'}</dd>
+          <dt>{selectedProvider() === 'qwen' ? 'Qwen · Veri' : 'Jev'}</dt><dd>{match ? `${match.state.replace('_', ' ')} (P(match) ${scoreText(match.pMatch, match.scoreKind)})` : '—'}</dd>
         </dl>
         <h3>Lines</h3>
         {r.lines.map((l, i) => (
@@ -550,7 +561,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
               <dt>Description</dt><dd>{r.provenance.description || '—'}</dd>
               <dt>Memo</dt><dd>{r.provenance.memo || '—'}</dd>
             </dl>
-            <p className="muted small">Shown for disclosure only; never sent to Jev.</p>
+            <p className="muted small">Shown for disclosure only; never sent to a model.</p>
           </>
         )}
         <h3>Payments</h3>
@@ -567,11 +578,12 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
 }
 
 function JevBadge({ jev, failed }: { jev: JevStatus | null; failed: boolean }) {
-  if (!jev) return <span className="pill">Jev: checking…</span>;
-  if (!jev.configured) return <span className="pill bad">Jev: not configured</span>;
+  const name = selectedProvider() === 'qwen' ? 'Qwen' : 'Jev';
+  if (!jev) return <span className="pill">{name}: checking…</span>;
+  if (!jev.configured) return <span className="pill bad">{name}: not configured</span>;
   return (
     <span className={'pill ' + (failed ? 'bad' : 'ok')} title={`${jev.model} via ${jev.via}`}>
-      Jev: {failed ? 'errors' : 'connected'} · {jev.via}
+      {name}: {failed ? 'errors' : name === 'Qwen' ? 'configured' : 'connected'} · {jev.via}
     </span>
   );
 }

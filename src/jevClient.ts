@@ -1,6 +1,10 @@
 import type { CompanyBills, RecordResult, Row } from './types';
 import { transactionVersion, type Outcome } from './rules';
 
+let modelRevision = 'pending-status';
+export function setModelRevision(version: string) { if (version !== modelRevision) { modelRevision = version; judgments.clear(); } }
+export const selectedProvider = () => new URLSearchParams(window.location.search).get('model') === 'qwen' ? 'qwen' : 'jev';
+
 // Shared by semantic filtering, rule preview, and arrivals: at most three gateway batches.
 let active = 0;
 let lastGroup = '';
@@ -23,15 +27,16 @@ function bounded<T>(group: string, work: () => Promise<T>): Promise<T> {
 export async function requestEvaluation(companyId: string, criterion: string, ids: string[], signal?: AbortSignal) {
   return bounded(`${companyId}:${criterion}`, async () => {
     signal?.throwIfAborted();
-    const res = await fetch('/api/evaluate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ companyId, criterion, ids }), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60000)]) : AbortSignal.timeout(60000) });
+    const res = await fetch('/api/evaluate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ companyId, criterion, ids, model: selectedProvider() }), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60000)]) : AbortSignal.timeout(60000) });
     const body = await res.json();
     if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
-    if (!Array.isArray(body.results) || ids.some(id => !body.results.some((r: RecordResult) => r.id === id && ['match', 'no_match', 'uncertain'].includes(r.state)))) throw new Error('Jev returned an incomplete result. Retry the failed condition.');
+    if (!Array.isArray(body.results) || ids.some(id => !body.results.some((r: RecordResult) => r.id === id && ['match', 'no_match', 'uncertain'].includes(r.state)))) throw new Error('The selected model returned an incomplete result. Retry the failed condition.');
     return body as { results: RecordResult[]; costNanoUsd: string };
   });
 }
+export const evaluationIdentity = () => `${selectedProvider()}:${modelRevision}`;
 export const CACHE_VERSION = 'typesafe-ai/jev:visible-context-v1:choice-v1';
-export const judgmentKey = (row: Row, text: string) => JSON.stringify([CACHE_VERSION, row.companyId, row.id, transactionVersion(row), text]);
+export const judgmentKey = (row: Row, text: string) => JSON.stringify([selectedProvider(), modelRevision, CACHE_VERSION, row.companyId, row.id, transactionVersion(row), text]);
 const judgments = new Map<string, Promise<Outcome>>();
 export function evaluateCondition(data: Pick<CompanyBills, 'company' | 'rows'>, text: string, onResult: (row: Row, outcome: Outcome, error?: string) => void): Promise<void> {
   const missing = data.rows.filter(row => !judgments.has(judgmentKey(row, text)));

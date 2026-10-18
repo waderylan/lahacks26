@@ -1,0 +1,22 @@
+kind = "train"
+[job]
+output_model = "qwen-semantic-review-06b-v1"
+[model]
+base = "Qwen/Qwen3-0.6B"
+[dataset]
+id = "5a33a7d072c2"
+[method]
+type = "sft_text"
+learning_rate = 5e-5
+num_epochs = 1
+max_steps = 125
+max_seq_length = 1024
+micro_batch_size = 1
+gradient_accumulation_steps = 8
+[resources]
+gpu_type = "L4-24GB"
+gpu_count = 1
+[provider]
+name = "aws"
+[checkpoint]
+destination = "veri"

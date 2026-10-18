@@ -180,7 +180,7 @@ export default function App() {
     if (!data) return;
     setReviewed(current => new Set([...current].filter(id => !id.startsWith(`${data.company.companyId}:`)).concat(data.rows.filter(row => row.dashboard?.reviewed).map(row => row.id))));
   }, [data]);
-  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as);
+  const rules = useRules(data?.company.companyId === companyId ? data : null, reviewed, row => setData(current => current?.company.companyId === row.companyId && !current.rows.some(r => r.id === row.id) ? { ...current, rows: [...current.rows, row] } : current), workspace === 'rules', updateRows, () => { void dashboard.refresh().catch(() => {}); void mailbox.refresh(); }, as, companyId);
   // Drafts are only actionable by their sender, so each employee sees just their own.
   const myDrafts = rules.store.messages.filter(message => draftSender(message) === as);
   const pendingApprovals = myDrafts.filter(message => message.status === 'pending').length;
@@ -441,7 +441,7 @@ export default function App() {
                     <input type="checkbox" aria-label="Select all visible" checked={allVisibleSelected} onChange={toggleAll} />
                   </th>
                   <Th w={widths.date} onClick={() => sortBy('date')} onResize={(e) => startResize('date', e)}>Date{arrow('date')}</Th>
-                  <Th w={widths.vendor} onClick={() => sortBy('vendor')} onResize={(e) => startResize('vendor', e)}>Vendor{arrow('vendor')}</Th>
+                  <Th w={widths.vendor} onClick={() => sortBy('vendor')} onResize={(e) => startResize('vendor', e)}>{isSynthetic ? 'Counterparty' : 'Vendor'}{arrow('vendor')}</Th>
                   <Th w={widths.items} onResize={(e) => startResize('items', e)}>Items</Th>
                   <Th w={widths.description} onResize={(e) => startResize('description', e)}>Description</Th>
                   <Th w={widths.memo} onResize={(e) => startResize('memo', e)}>Memo</Th>
@@ -586,7 +586,7 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
         <details className="legacy-metadata"><summary>Edit assignment, flags & tags</summary><LocalStateEditor value={rules.store.transactions[r.id]} update={value => { void rules.updateLocal(r.id, value, r.sourceVersion); }} /></details>
         {rules.store.messages.filter(message => message.items.some(item => item.transactionId === r.id)).map(message => <MessageCard key={message.id} message={message} actor={rules.actor} onDecide={rules.decideMessage} onRetry={rules.retryDraft} />)}
         {r.workspaceChanges && Object.keys(r.workspaceChanges).length > 0 && <><h3>Original source values</h3><dl>{r.workspaceChanges.account !== undefined && <><dt>Category</dt><dd>{r.workspaceChanges.account}</dd></>}{r.workspaceChanges.memo !== undefined && <><dt>Memo</dt><dd>{r.workspaceChanges.memo || '(blank)'}</dd></>}</dl></>}
-        <h3>Bill</h3>
+        <h3>{r.txnType === 'invoice' ? 'Customer invoice' : r.txnType === 'bank' ? 'Bank transaction' : 'Bill'}</h3>
         <dl>
           <dt>Date</dt><dd>{r.date}</dd>
           <dt>Due</dt><dd>{r.dueDate}</dd>
@@ -617,17 +617,17 @@ function Drawer({ row: r, reviewed, match, onClose, rules }: { row: Row; reviewe
           </>
         )}
         {r.details && (<><h3>Details</h3><dl>{Object.entries(r.details).filter(([, v]) => v !== '').map(([k, v]) => (<Fragment key={k}><dt>{k.replace(/_/g, ' ')}</dt><dd>{String(v)}</dd></Fragment>))}</dl></>)}
-        {r.evidence && (<><h3>Related records</h3>{r.evidence.length === 0 ? <p className="muted">No supporting records on file for this bill.</p> : r.evidence.map((e) => (
+        {r.evidence && (<><h3>Related records</h3>{r.evidence.length === 0 ? <p className="muted">No supporting records on file for this transaction.</p> : r.evidence.map((e) => (
           <dl key={e.id} className="line"><dt>{e.kind.replace(/_/g, ' ')}</dt><dd><b>{e.title}</b> · {e.date}<br />{e.text}</dd></dl>
         ))}</>)}
-        {r.related && r.related.length > 0 && (<><h3>Nearby bills from this vendor</h3>{r.related.map((x) => (
+        {r.related && r.related.length > 0 && (<><h3>Nearby transactions from this counterparty</h3>{r.related.map((x) => (
           <dl key={x.id} className="line"><dt>{x.docNumber}</dt><dd>{x.date} · {money(x.amountCents)} · billed as {x.vendor}<br />{x.description || '(blank)'}{x.memo ? ` — ${x.memo}` : ''}</dd></dl>
         ))}</>)}
-        <h3>Payments</h3>
+        <h3>{r.txnType === 'invoice' ? 'Customer payments' : 'Payments'}</h3>
         {r.payments.length === 0 ? <p className="muted">No payment applied.</p> : r.payments.map((p) => (
           <dl key={p.id} className="line"><dt>{p.id}</dt><dd>{p.date} · {money(p.amountCents)} from {p.account}</dd></dl>
         ))}
-        <h3>Vendor</h3>
+        <h3>{r.txnType === 'invoice' ? 'Customer' : r.txnType === 'bank' ? 'Counterparty' : 'Vendor'}</h3>
         <dl>{kv(r.vendorRecord).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}</dl>
         {r.projectRecord && (<><h3>Project</h3><dl>{kv(r.projectRecord).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{String(v)}</dd></Fragment>))}</dl></>)}
         <p className="muted small">Payments are shown as context only and are not counted as separate spend.</p>

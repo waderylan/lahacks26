@@ -16,13 +16,13 @@
 
 ## Rules and internal messages
 
-1. Open **Rules**. Build nested ALL (AND), ANY (OR), and NOT groups from independent AI conditions and amount/vendor/account/review conditions. Preview shows each condition and the resulting expression.
-2. Add actions under THEN. For **Draft internal message**, describe the request and choose a fictional employee or **Let Jev choose**.
-3. **Save rule**, then **Run once**. The server rechecks the saved revision and current bill evidence. Only definite matches execute; failed, pending, and uncertain results cannot apply matching actions.
+1. **Describe conditions:** the app opens **Rules** by default. Write each condition in English. Jev independently evaluates the exact wording against each loaded bill. Use the short **AND**, **OR**, and **NOT** controls; **Add group** creates a nested group with explicit boundaries. Optional structured filters are under **Add a filter**.
+2. **Choose actions:** add one or more flags, assignments, tags, automated checks, or message drafts. For **Draft an internal message**, describe the request, choose the sender, and choose a recipient or **Let Jev choose**.
+3. **Review matches:** inspect match/nonmatch/uncertain counts and a table with each condition's raw judgment plus the combined result. NOT is identified in the relevant header, and full grouping is available in the summary. Filter by result, status, assignee, or bill text; click a vendor for original evidence. **Save rule**, then **Run once** on the matching bills in this view. The server rechecks the saved revision and current evidence; incomplete/failed evaluations and uncertainty never execute matching actions.
 4. Each message action creates one draft covering its matches, split at 25 bills. Jev chooses one employee for the group when requested; Gemini writes from the request, frozen visible bill fields, and condition results. Messages do not treat screening judgments as proven accounting errors.
 5. Open **Messages**, review/edit the draft, then approve or reject. Decisions and edits are saved in SQLite. Approval does not send email. The notification bell shows activity; read and dismissed state are shared.
-6. Enable a saved rule to handle subsequent new/changed records without backfilling existing bills. Unsaved edits do not activate. The server checks every ten seconds and continues after browsers close.
-7. **Replay next original bill** introduces one of five reserved originals. Arrivals, execution history, and automated actions persist across sessions. Undoing a bill from an undecided grouped message removes that bill and regenerates the remaining text.
+6. Check **Run automatically on new or changed bills** after saving to handle subsequent changes without backfilling existing bills. Unsaved edits do not activate. The server checks every ten seconds and continues after browsers close.
+7. Open **Action history & advanced options** for receipts, undo, reset, or **Replay next original bill**. Replay introduces one of five reserved originals. Arrivals, history, and automated actions persist across sessions. Undoing a bill from an undecided grouped message removes that bill and re-drafts the remaining text.
 
 ## Storage and consistency
 

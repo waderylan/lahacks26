@@ -6,7 +6,7 @@ test.beforeEach(async ({ request }) => {
 
 test('search, assigned tasks, visible filters, completion and a second browser share SQLite state', async ({ page, browser }) => {
   const owner = `Review team ${Date.now()}`;
-  await page.goto('/');
+  await page.goto('/?workspace=transactions');
   await expect(page.locator('tbody tr[data-id]')).toHaveCount(50);
   const ids = await page.locator('tbody tr[data-id]').evaluateAll(rows => rows.slice(0, 2).map(row => row.getAttribute('data-id')!));
   // Only model inference is controlled here. Bills, previews, mutations, tasks,
@@ -41,7 +41,7 @@ test('search, assigned tasks, visible filters, completion and a second browser s
   const second = await browser.newContext();
   try {
     const other = await second.newPage();
-    await other.goto(new URL('/', page.url()).toString());
+    await other.goto(new URL('/?workspace=transactions', page.url()).toString());
     await other.getByLabel('Bill assignee filter').selectOption(owner);
     await other.getByLabel('Bill status filter').selectOption('reviewed');
     await expect(other.locator('tbody tr[data-id]')).toHaveCount(2);
@@ -53,7 +53,7 @@ test('search, assigned tasks, visible filters, completion and a second browser s
 });
 
 test('category and memo changes update the spreadsheet, survive reload, and undo from history', async ({ page }) => {
-  await page.goto('/'); await expect(page.locator('tbody tr[data-id]')).toHaveCount(50);
+  await page.goto('/?workspace=transactions'); await expect(page.locator('tbody tr[data-id]')).toHaveCount(50);
   const bill = page.locator('tbody tr[data-id]').nth(2), id = await bill.getAttribute('data-id');
   const oldCategory = await bill.locator('td').nth(7).innerText();
   const oldMemo = await bill.locator('td').nth(6).innerText();
@@ -84,7 +84,7 @@ test('category and memo changes update the spreadsheet, survive reload, and undo
 });
 
 test('original split layout retains visible status and owner filters on desktop and mobile', async ({ page }) => {
-  await page.goto('/'); await expect(page.locator('tbody tr[data-id]')).toHaveCount(50);
+  await page.goto('/?workspace=transactions'); await expect(page.locator('tbody tr[data-id]')).toHaveCount(50);
   const positions = await page.evaluate(() => ({ left: document.querySelector('.dashboard-action-panel')!.getBoundingClientRect().right, right: document.querySelector('.ledger-column')!.getBoundingClientRect().left }));
   expect(positions.left).toBeLessThanOrEqual(positions.right + 1);
   await expect(page.getByLabel('Bill status filter')).toBeVisible();

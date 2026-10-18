@@ -22,7 +22,7 @@ test('migrated messages, approvals, notifications, rules and preferences are sha
   const bills: Row[] = (await (await request.get(`/api/companies/${companyId}/bills?limit=50&reserve=1`)).json()).rows.slice(0, 2);
   const rule: Rule = { id: `migration-${Date.now()}`, companyId, name: 'Review bill coding', revision: 1, enabled: false,
     expression: { id: 'amount', type: 'standard', field: 'amountCents', operator: 'gt', value: '-9999999' },
-    actions: [{ id: 'assign', type: 'assign', value: 'Shared review team' }, { id: 'message', type: 'message', value: 'Confirm the coding of these bills.', recipient: 'emp-ap' }] };
+    actions: [{ id: 'assign', type: 'assign', value: 'Shared review team' }, { id: 'message', type: 'message', value: 'Confirm the coding of these bills.', recipient: 'emp-ap', sender: 'emp-ap' }] };
   let legacy: RuleStore = { ...structuredClone(EMPTY_STORE), rules: [rule] };
   for (const bill of bills) legacy = executeRule(legacy, rule, bill, 'legacy-v1', { result: 'true', conditions: { amount: 'true' } }, 'run', 'migration-batch');
   const messageId = legacy.messages[0].id;
@@ -64,6 +64,8 @@ test('migrated messages, approvals, notifications, rules and preferences are sha
     await page.getByRole('button', { name: 'Rules', exact: false }).first().click();
     await other.getByRole('button', { name: /^Notifications/ }).click();
     await other.getByRole('button', { name: 'Rules', exact: false }).first().click();
+    await page.getByRole('button', { name: 'View matching rows', exact: true }).click();
+    await other.getByRole('button', { name: 'View matching rows', exact: true }).click();
     await expect(other.getByLabel('Rule name', { exact: true })).toHaveValue(rule.name);
     await page.getByLabel('Rule name', { exact: true }).fill('Saved by the first browser');
     await page.getByRole('button', { name: 'Save rule', exact: true }).click(); await settled(page);

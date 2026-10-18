@@ -13,13 +13,7 @@ const when = (iso: string) => {
 
 /** One tab per employee. The selected employee is who you are: whose inbox you see and who approvals are sent from. */
 export function EmployeeTabs({ value, unread, onChange }: { value: string; unread: Record<string, number>; onChange: (id: string) => void }) {
-  return <nav className="employee-tabs" role="tablist" aria-label="Signed in as">
-    <span className="employee-tabs-label">Signed in as</span>
-    {EMPLOYEES.map(e => <button key={e.id} role="tab" aria-selected={e.id === value} className={e.id === value ? 'on' : ''} title={`${e.name} · ${e.title}`} onClick={() => onChange(e.id)}>
-      <span className="avatar" aria-hidden>{initials(e.id)}</span>{firstName(e.id)}
-      {unread[e.id] > 0 && <b className="employee-unread" aria-label={`${unread[e.id]} unread`}>{unread[e.id]}</b>}
-    </button>)}
-  </nav>;
+  return <label className="employee-switcher">Viewing as<select aria-label="Signed in as" value={value} onChange={event => onChange(event.target.value)}>{EMPLOYEES.map(person => <option key={person.id} value={person.id}>{person.name}{unread[person.id] ? ` (${unread[person.id]} unread)` : ''}</option>)}</select></label>;
 }
 
 type Folder = 'inbox' | 'sent' | 'approvals';

@@ -8,10 +8,11 @@ import { useMailbox } from './useMailbox';
 import { employeeById } from './employees';
 import { draftSender } from './rules';
 import { billEvents, billStatus, type BillStatus } from './billStatus';
-import { LocalStateEditor, MessageCard, NotificationBell, ResultBadge, RuleEvidence, RuleHistory, RulePreviewBar, RulesPanel, Toasts } from './RulesPanel';
-import { actionLabel, type LocalTransaction, type Outcome } from './rules';
+import { LocalStateEditor, MessageCard, NotificationBell, RuleEvidence, Toasts } from './RulesPanel';
+import { actionLabel, type LocalTransaction } from './rules';
 import { useWorkspace, type RowPatch } from './useWorkspace';
 import { ActionPanel, TaskBoard } from './ActionPanel';
+import { RuleWizard } from './RuleWizard';
 
 const DEFAULT_COMPANY = 'company-018';
 
@@ -86,17 +87,18 @@ export default function App() {
     const first = companies.find((c) => c.synthetic);
     if (on && first && !companies.find((c) => c.companyId === companyId)?.synthetic) setCompanyId(first.companyId);
   };
-  const [workspace, setWorkspace] = useState<'transactions' | 'rules' | 'tasks' | 'messages'>(() => new URLSearchParams(location.search).get('workspace') === 'rules' ? 'rules' : 'transactions');
+  const [workspace, setWorkspaceState] = useState<'transactions' | 'rules' | 'tasks' | 'messages'>(() => {
+    const selected = new URLSearchParams(location.search).get('workspace');
+    return selected === 'transactions' || selected === 'tasks' || selected === 'messages' ? selected : 'rules';
+  });
+  const setWorkspace = (next: typeof workspace) => { const url = new URL(location.href); url.searchParams.set('workspace', next); history.replaceState(null, '', url); setWorkspaceState(next); };
   // Who you are: in the URL, so separate browser tabs can be signed in as different employees.
   const [as, setAsState] = useState(() => { const id = new URLSearchParams(location.search).get('as'); return employeeById(id) ? id! : 'emp-ap'; });
   const setAs = (id: string) => { const url = new URL(location.href); url.searchParams.set('as', id); history.replaceState(null, '', url); setAsState(id); };
   const mailbox = useMailbox(companyId, as);
-  const [takeAction, setTakeAction] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [drawerExtra, setDrawerExtra] = useState<Row | null>(null);
-  const [previewFilter, setPreviewFilter] = useState('all');
-  const [recordSearch, setRecordSearch] = useState('');
   const [data, setData] = useState<CompanyBills | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -214,7 +216,7 @@ export default function App() {
   const shownBase =
     sort.key === 'match' && active ? sortByMatch(filtered, (id) => evalState.results[id], sort.dir) : filtered;
   // Matches rise to the top while a query is active; with no query the original order returns.
-  const workspaceRows = workspace === 'rules' ? tabRows.filter(r => (previewFilter === 'all' || rules.snapshots[r.id]?.result === previewFilter) && (!recordSearch.trim() || [r.billId, r.vendor, r.description, r.memo, r.account, ...r.itemNames].join(' ').toLowerCase().includes(recordSearch.trim().toLowerCase()))) : arrangeRows(shownBase, isMatch, active);
+  const workspaceRows = arrangeRows(shownBase, isMatch, active);
   const visibleRows = workspaceRows.filter(row => (statusFilter === 'all' || (statusFilter === 'reviewed' ? reviewed.has(row.id) : statusFilter === 'flagged' ? Boolean(row.dashboard?.flags.length) : !reviewed.has(row.id))) && (assigneeFilter === 'all' || (assigneeFilter === 'unassigned' ? !row.dashboard?.owner : row.dashboard?.owner === assigneeFilter)));
 
   // Animate rows to their new positions (FLIP) so the reordering is visible.
@@ -263,7 +265,7 @@ export default function App() {
     if (rows.length) void dashboard.review(rows.map(row => row.id), false).then(() => setSelected(new Set())).catch(() => {});
   };
   const selectMatches = () => {
-    const ids = visibleRows.filter((r) => workspace === 'rules' ? rules.snapshots[r.id]?.result === 'true' : matchOf(r.id)?.state === 'match').map((r) => r.id);
+    const ids = visibleRows.filter((r) => matchOf(r.id)?.state === 'match').map((r) => r.id);
     setSelected(new Set(ids));
   };
   const toggle = (id: string) =>
@@ -308,9 +310,8 @@ export default function App() {
       if (row.companyId === companyId) { setDrawerExtra(row); setDrawerId(id); }
     }).catch(() => {});
   };
-  const actionMatches = workspace === 'rules' ? { ids: visibleRows.filter(row => rules.snapshots[row.id]?.result === 'true').map(row => row.id), expression: rules.draft?.expression, scope: 'matches' as const } : { ids: visibleRows.filter(row => isMatch(row.id)).map(row => row.id), criterion: query, scope: 'matches' as const };
-  const actionReady = workspace === 'rules' ? rules.complete : complete && !awaitingDebounce;
-  const sidebarActions = workspace !== 'rules' || takeAction;
+  const actionMatches = { ids: visibleRows.filter(row => isMatch(row.id)).map(row => row.id), criterion: query, scope: 'matches' as const };
+  const actionReady = complete && !awaitingDebounce;
 
   return (
     <div className="app" aria-busy={rules.busy || dashboard.busy}>
@@ -326,13 +327,13 @@ export default function App() {
           <strong>{company?.name ?? '…'}</strong>
           <span>{company?.industry}</span>
         </div>
-        <nav className="tabs" role="tablist">
+        {workspace === 'transactions' && <nav className="tabs" role="tablist">
           {(['all', 'needs', 'reviewed'] as Tab[]).map((t) => (
             <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>
               {{ all: 'All', needs: 'Needs review', reviewed: 'Reviewed' }[t]} <b>{data ? counts[t] : '–'}</b>
             </button>
           ))}
-        </nav>
+        </nav>}
         <div className="spacer" />
         <label className="rows-pick" title="Fewer rows means faster and cheaper queries">
           Rows
@@ -348,11 +349,11 @@ export default function App() {
           </span>
         )}
         <JevBadge jev={jev} failed={active && evalState.failed.size > 0} />
+        <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
         <NotificationBell notices={rules.store.notices.filter(notice => notice.companyId === companyId)} onRead={rules.markNoticesRead} onOpen={inspect} />
       </header>
 
-      <EmployeeTabs value={as} unread={mailbox.unread} onChange={setAs} />
-      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => { setWorkspace('transactions'); setTakeAction(false); }}>Transactions</button><button className={workspace === 'rules' ? 'on' : ''} onClick={() => { setWorkspace('rules'); setTakeAction(false); }}>Rules <span className="nav-caption">Build → Preview → Automate</span></button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count" title={`${mailbox.unread[as] ?? 0} unread · ${pendingApprovals} awaiting approval`}>{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button></nav><span className="muted">Saved in SQLite · Original dataset preserved</span></div>
+      <div className="workspace-nav"><nav aria-label="Workspace"><button className={workspace === 'rules' ? 'on' : ''} onClick={() => setWorkspace('rules')}>Rules</button><button className={workspace === 'transactions' ? 'on' : ''} onClick={() => setWorkspace('transactions')}>Transactions</button><button className={workspace === 'tasks' ? 'on' : ''} onClick={() => setWorkspace('tasks')}>Tasks & activity{dashboard.tasks.filter(task => task.status === 'open').length > 0 && <b className="task-nav-count">{dashboard.tasks.filter(task => task.status === 'open').length}</b>}</button><button className={workspace === 'messages' ? 'on' : ''} onClick={() => setWorkspace('messages')}>Messages{(mailbox.unread[as] ?? 0) + pendingApprovals > 0 && <b className="task-nav-count">{(mailbox.unread[as] ?? 0) + pendingApprovals}</b>}</button></nav><span className="muted">Saved in SQLite</span></div>
       {dashboard.error && <div className="rules-notice error" role="alert">{dashboard.error}<button onClick={dashboard.clearError}>Dismiss</button></div>}
 
       {workspace === 'transactions' && <section className="semantic">
@@ -419,12 +420,10 @@ export default function App() {
       {workspace === 'rules' && (rules.storageError || rules.message) && <div className={`rules-notice ${rules.storageError ? 'error' : ''}`} role="status">{rules.storageError || rules.message}</div>}
       {workspace === 'rules' && rules.previewErrors.length > 0 && <div className="rules-notice error">Jev evaluation failed: {rules.previewErrors.join('; ')}. No failed record is treated as false. <button onClick={rules.retry}>Retry failed conditions</button></div>}
       {workspace === 'rules' && data?.disclosure && <div className="rules-notice scenario">{data.disclosure}</div>}
-      <div className="workspace-body with-builder">
-      {sidebarActions ? <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} /> : workspace === 'rules' && data && <RulesPanel controller={rules} data={data} />}
+      {workspace === 'rules' ? data ? <RuleWizard key={companyId} c={rules} data={data} onInspect={inspect} onMessages={() => setWorkspace('messages')} /> : <main className="wizard-loading" role="status">{loadError ? 'Could not load bills: ' + loadError : 'Loading company bills…'}</main> : <div className={workspace === 'transactions' ? 'workspace-body with-builder' : 'workspace-body'}>
+      {workspace === 'transactions' && <ActionPanel key={companyId} controller={dashboard} matches={actionMatches} selectedIds={[...selected]} ready={actionReady} onInspect={inspect} />}
       <div className="ledger-column">
-      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span>{workspace === 'rules' && <button onClick={() => setTakeAction(!takeAction)}>{takeAction ? 'Edit rule' : 'Take action'}</button>}</div>}
-      {workspace === 'rules' && <RulePreviewBar c={rules} total={rows.length} onInspect={() => rules.matches[0] && setDrawerId(rules.matches[0].id)} />}
-      {workspace === 'rules' && data && <div className="ledger-caption"><div><b>{data.company.name}</b><span>{rows.length} loaded · {data.totalBills} {data.company.scenario ? 'source company bills' : data.company.synthetic ? 'synthetic bills' : 'original bills'} · {rules.remaining} reserved for replay{data.sampled ? ' · Year-round sample' : ''}</span></div><div className="ledger-filters"><input aria-label="Search visible bills" placeholder="Search bills, vendors, memos…" value={recordSearch} onChange={e => setRecordSearch(e.target.value)} /><select aria-label="Preview rows" value={previewFilter} onChange={e => setPreviewFilter(e.target.value)}><option value="all">All results</option><option value="true">Definite matches</option><option value="false">False</option><option value="uncertain">Uncertain</option><option value="pending">Pending</option><option value="error">Errors</option></select></div></div>}
+      {workspace !== 'tasks' && workspace !== 'messages' && <div className="dashboard-ledger-toolbar"><label>Status<select aria-label="Bill status filter" value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setSelected(new Set()); }}><option value="all">Any status</option><option value="needs_review">Needs review</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></label><label>Assigned to<select aria-label="Bill assignee filter" value={assigneeFilter} onChange={event => { setAssigneeFilter(event.target.value); setSelected(new Set()); }}><option value="all">Anyone</option><option value="unassigned">Unassigned</option>{dashboard.owners.map(owner => <option key={owner} value={owner}>{owner}</option>)}</select></label><span className="spacer" /><span className="small muted">{visibleRows.length} bills shown</span></div>}
 
       {workspace === 'tasks' ? <TaskBoard c={dashboard} onInspect={inspect} /> : workspace === 'messages' ? <Inbox mailbox={mailbox} as={as} pendingApprovals={pendingApprovals} onInspect={inspect} approvals={myDrafts.length ? myDrafts.map(message => <MessageCard key={message.id} message={message} actor={as} onDecide={rules.decideMessage} onRetry={rules.retryDraft} onOpen={inspect} />) : <p className="dashboard-empty">No drafts to approve. Rule message actions sent from you will appear here.</p>} /> : <main className="sheet-wrap">
         {loadError ? (
@@ -448,7 +447,7 @@ export default function App() {
                   <Th w={widths.account} onClick={() => sortBy('account')} onResize={(e) => startResize('account', e)}>Account{arrow('account')}</Th>
                   <Th w={widths.amount} right onClick={() => sortBy('amountCents')} onResize={(e) => startResize('amount', e)}>Amount{arrow('amountCents')}</Th>
                   <Th w={widths.review} onResize={(e) => startResize('review', e)}>Status</Th>
-                  <Th w={widths.match} className={workspace === 'rules' ? 'rule-result-column' : ''} onClick={workspace === 'transactions' ? () => sortBy('match') : undefined} onResize={(e) => startResize('match', e)}>{workspace === 'rules' ? 'Rule result' : `Semantic match %${arrow('match')}`}</Th>
+                  <Th w={widths.match}  onClick={workspace === 'transactions' ? () => sortBy('match') : undefined} onResize={(e) => startResize('match', e)}>{`Semantic match %${arrow('match')}`}</Th>
                   <th className="dashboard-assignment-column" style={{ minWidth: 230, width: 230 }}>Assigned to</th>
                 </tr>
               </thead>
@@ -468,7 +467,6 @@ export default function App() {
                     failed={active && evalState.failed.has(r.id)}
                     onToggle={() => toggle(r.id)}
                     onOpen={() => setDrawerId(r.id)}
-                    ruleOutcome={workspace === 'rules' ? rules.snapshots[r.id]?.result ?? 'pending' : undefined}
                     local={{ ...rules.store.transactions[r.id], flags: [...new Set([...(r.dashboard?.flags ?? []), ...(rules.store.transactions[r.id]?.flags ?? [])])], tags: [...new Set([...(r.dashboard?.tags ?? []), ...(rules.store.transactions[r.id]?.tags ?? [])])], owner: r.dashboard?.owner || rules.store.transactions[r.id]?.owner || '', automatedCheck: Boolean(r.dashboard?.automatedCheck || rules.store.transactions[r.id]?.automatedCheck) }}
                   />
                 ))}
@@ -480,7 +478,7 @@ export default function App() {
                   ? evalState.pending.size
                     ? 'No matches yet — still evaluating.'
                     : 'No rows match this criterion.'
-                  : workspace === 'rules' && (previewFilter !== 'all' || recordSearch.trim()) ? 'No bills match this view. Change the result filter or search.' : tab === 'reviewed'
+                  : tab === 'reviewed'
                     ? 'No reviewed transactions yet.'
                     : tab === 'needs'
                       ? 'Everything here has been reviewed.'
@@ -490,14 +488,13 @@ export default function App() {
           </div>
         )}
       </main>}
-      {workspace === 'rules' && <RuleHistory c={rules} companyId={companyId} onOpen={inspect} />}
       </div>
-      </div>
+      </div>}
 
-      <footer className="actions">
+      {workspace === 'transactions' && <footer className="actions">
         <div className="stat">
           <span>Matches</span>
-          <b>{workspace === 'rules' ? rules.matches.length : active ? matchRows.length : '–'}</b>
+          <b>{active ? matchRows.length : '–'}</b>
           <span className="sub">
             {active ? `${money(matchCents)}${complete ? '' : ' (partial)'}` : ''}
           </span>
@@ -508,12 +505,12 @@ export default function App() {
           <span className="sub">{money(selCents)}</span>
         </div>
         <div className="spacer" />
-        <button onClick={selectMatches} disabled={workspace === 'rules' ? rules.matches.length === 0 : !active || matchRows.length === 0}>Select current matches</button>
+        <button onClick={selectMatches} disabled={!active || matchRows.length === 0}>Select current matches</button>
         <button className="primary" onClick={() => setReviewStatus(true)} disabled={selected.size === 0 || dashboard.busy}>Mark reviewed</button>
         <button onClick={() => setReviewStatus(false)} disabled={selected.size === 0 || dashboard.busy}>Mark needs review</button>
         <button className="ghost" onClick={() => setSelected(new Set())} disabled={selected.size === 0}>Clear selection</button>
         <button className="ghost" onClick={resetReview} disabled={dashboard.busy || !rows.length} title="Reset review for loaded bills in this company">Reset review state</button>
-      </footer>
+      </footer>}
 
       {drawerRow && (
         <Drawer row={drawerRow} reviewed={drawerRow.dashboard?.reviewed ?? reviewed.has(drawerRow.id)} match={matchOf(drawerRow.id)} onClose={() => setDrawerId(null)} rules={rules} />
@@ -536,10 +533,10 @@ function SheetRow(p: {
   row: Row; n: number; selected: boolean; reviewed: boolean; status: BillStatus; open: boolean; active: boolean;
   match?: { state: string; pMatch: number }; pending: boolean; failed: boolean;
   onToggle: () => void; onOpen: () => void;
-  ruleOutcome?: Outcome; local?: LocalTransaction;
+  local?: LocalTransaction;
 }) {
   const { row: r, match } = p;
-  const cls = ['row', (p.ruleOutcome ? p.ruleOutcome === 'true' : match?.state === 'match') ? 'm-match' : (p.ruleOutcome ? p.ruleOutcome === 'uncertain' : match?.state === 'uncertain') ? 'm-unc' : '', p.selected ? 'is-sel' : '', p.open ? 'is-open' : ''].join(' ');
+  const cls = ['row', match?.state === 'match' ? 'm-match' : match?.state === 'uncertain' ? 'm-unc' : '', p.selected ? 'is-sel' : '', p.open ? 'is-open' : ''].join(' ');
   return (
     <tr className={cls} data-id={r.id} onClick={p.onOpen}>
       <td className="gutter sticky-l0">{p.n}</td>
@@ -556,8 +553,8 @@ function SheetRow(p: {
       <td title={[p.reviewed ? 'Reviewed' : 'Needs review', ...p.status.events.slice(0, 6).map(e => `${new Date(e.at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · ${e.label}`)].join('\n')}>
         <span className={`tag status-${p.status.tone}`}>{p.status.label}</span>{p.reviewed && p.status.tone !== 'rev' && <span className="status-reviewed" aria-label="Reviewed"> ✓</span>}
       </td>
-      <td className={p.ruleOutcome ? 'rule-result-column' : undefined}>
-        {p.ruleOutcome ? <ResultBadge value={p.ruleOutcome} /> : !p.active ? <span className="muted">—</span>
+      <td>
+        {!p.active ? <span className="muted">—</span>
           : match ? (
             match.state === 'match' ? <span className="tag ok" title="Jev's probability that this matches">● Match {pct(match.pMatch)}</span>
             : match.state === 'uncertain' ? <span className="tag warn" title="Jev's probability that this matches">◐ Uncertain {pct(match.pMatch)}</span>

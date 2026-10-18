@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CompanyBills, Row } from './types';
 import { evaluateCondition, judgmentKey } from './jevClient';
-import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
+import { EMPTY_STORE, evaluateTree, exampleRule, syntheticExampleRules, leaves, standardResult, uid, validateRule, type Outcome, type Rule, type RuleStore, type Snapshot } from './rules';
 import type { RowPatch } from './useWorkspace';
 import { importBrowserWorkspace } from './workspaceMigration';
 
@@ -118,15 +118,15 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
   const dirty = Boolean(draft && (!saved || signature(draft) !== signature(saved)));
   const save = async (activate = false) => {
     if (!draft || validation.length || busy) return;
-    const reply = await command({ type: 'save', rule: draft, expectedRevision: saved ? draft.revision : null, activate }, 'Rule saved in SQLite.');
+    const reply = await command({ type: 'save', rule: draft, expectedRevision: saved ? draft.revision : null, activate }, 'Rule saved.');
     const next = reply?.store.rules.find(rule => rule.id === draft.id); if (next) setDraft(next);
   };
   return {
     store, draft: validCompany ? draft : null, setDraft, saved, dirty, validation, snapshots, counts, complete, evaluated, matches, uncertain,
     elapsed: timing.start ? Math.max(0, ((timing.end || now) - timing.start) / 1000) : 0,
     previewErrors: [...previewErrors], retry: () => setRetry(value => value + 1), save,
-    toggleEnabled: () => saved && command({ type: 'toggle', id: saved.id, revision: saved.revision, enabled: !saved.enabled }, saved.enabled ? 'Rule disabled.' : 'Enabled on the server for subsequent arrivals and updates.'),
-    runOnce: () => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids: data!.rows.map(row => row.id) }, 'Run once completed. Actions and messages are saved in SQLite.'),
+    toggleEnabled: () => saved && command({ type: 'toggle', id: saved.id, revision: saved.revision, enabled: !saved.enabled }, saved.enabled ? 'Automatic runs disabled.' : 'Runs automatically on new or changed bills.'),
+    runOnce: (ids?: string[]) => complete && saved && !dirty && !busy && command({ type: 'run', id: saved.id, revision: saved.revision, ids: ids ?? data!.rows.map(row => row.id) }, 'Run complete. View action history for details.'),
     replay: () => command({ type: 'replay' }, 'Original bill replayed. Actions are saved in SQLite.'),
     busy, automation, message, storageError, actor,
     undo: (id: string) => command({ type: 'undo', id }, 'Action undone. Its execution key is retained.'),
@@ -140,9 +140,9 @@ export function useRules(data: CompanyBills | null, reviewed: Set<string>, onArr
       // Synthetic extension companies cycle through four draft review policies; others keep the single example.
       const examples = data?.company.synthetic ? syntheticExampleRules(companyId) : [exampleRule(companyId)];
       const next = examples[exampleIndex.current++ % examples.length];
-      setDraft(next); setMessage(`Editable suggested review policy: ${next.name}. A match is not proof of an accounting error.`);
+      setDraft(next); setMessage('');
     },
-    newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [] }, actions: [] }); setMessage('Add conditions under IF, then actions under THEN.'); },
+    newRule: () => { const rule = exampleRule(companyId); setDraft({ ...rule, name: 'Untitled rule', expression: { id: rule.expression.id, type: 'all', children: [{ id: uid(), type: 'ai', text: '', label: '' }] }, actions: [] }); setMessage(''); },
     decideMessage: (id: string, status: 'approved' | 'rejected', body?: string) => command({ type: 'decide', id, status, body, actor, expectedBody: storeRef.current.messages.find(message => message.id === id)?.body }, status === 'approved' ? 'Sent to their inbox. No email was delivered.' : 'Draft rejected.'),
     retryDraft: (id: string) => command({ type: 'retry-draft', id }),
     markNoticesRead: () => command({ type: 'read-notices' }),

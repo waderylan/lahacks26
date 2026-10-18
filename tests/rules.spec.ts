@@ -11,6 +11,7 @@ const store = async (page: Page) => {
 };
 const openRules = async (page: Page) => {
   await page.goto('/?workspace=rules');
+  await page.locator('.rule-starters > summary').click();
   await page.locator('.starter-more > summary').click();
   await page.locator('.starter-more').getByRole('button', { name: 'Memo needs clarification', exact: true }).click();
 };

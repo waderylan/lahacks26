@@ -20,7 +20,8 @@ npm run dev
 
 ## Add and edit a starter
 
-1. Open **Rules**. **Rule starter packs** shows four accounting checks with
+1. Open **Rules**. Expand **Rule starter packs** using its header or chevron.
+   It starts collapsed and shows four accounting checks with
    **Ready to add** or **Saved · Automatic on/off**. **Your saved rules** also
    lists custom rules already in this company.
 2. **Add rule** immediately saves an editable starter with automatic runs off.

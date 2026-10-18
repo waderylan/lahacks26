@@ -1,7 +1,8 @@
 .rule-starters { max-width:1400px; margin:0 auto 24px; border:1px solid var(--line); border-radius:9px; background:var(--panel); }
 .rule-starters > summary { display:flex; align-items:center; gap:14px; cursor:pointer; padding:17px 20px; list-style:none; }
-.rule-starters > summary::after { content:'Show'; margin-left:auto; color:var(--green); font-size:12px; }
-.rule-starters[open] > summary::after { content:'Hide'; }
+.rule-starters > summary::-webkit-details-marker { display:none; }
+.rule-starters > summary > .starter-chevron { margin-left:auto; color:var(--green); font-size:24px; line-height:1; }
+.rule-starters[open] > summary > .starter-chevron { transform:rotate(90deg); }
 .rule-starters h2 { font-size:17px; margin:0; font-weight:650; }
 .rule-starters > summary > span { color:var(--muted); font-size:12px; }
 .starter-intro { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:0 20px 15px; font-size:12px; color:var(--muted); }

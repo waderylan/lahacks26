@@ -11,8 +11,8 @@ export function RuleStarters({ c, data, onInspect, onDemoSample }: {
   const companyId = data.company.companyId;
   const example = data.company.synthetic ? STARTER_DEMOS[companyId] : undefined;
   const added = presets.filter(preset => savedPreset(c.store.rules, preset, companyId)).length;
-  return <details className="rule-starters" open>
-    <summary><h2>Rule starter packs</h2><span>{added} of {presets.length} added</span></summary>
+  return <details className="rule-starters">
+    <summary><h2>Rule starter packs</h2><span>{added} of {presets.length} added</span><span className="starter-chevron" aria-hidden="true">›</span></summary>
     <div className="starter-intro"><p>Accounting checks you can add in one click, then edit for {data.company.name}.</p>
       {example && !data.curatedSample && <button onClick={onDemoSample}>Use demo sample</button>}
       {data.curatedSample && <span>Demo sample loaded</span>}

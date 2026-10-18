@@ -9,6 +9,9 @@ test('starters add once, stay editable, retain saved status after reload, and ru
     await page.goto(`${app.url}/?workspace=rules`);
     await expect(page.getByRole('combobox', { name: 'Start from a preset', exact: true })).toHaveCount(0);
     const starter = page.getByRole('article', { name: 'Missing documentation starter', exact: true });
+    await expect(page.locator('.rule-starters')).not.toHaveAttribute('open');
+    await page.locator('.rule-starters > summary').click();
+    await expect(starter).toBeVisible();
     await expect(starter).toContainText('Ready to add');
     await starter.getByRole('button', { name: 'Add rule', exact: true }).click();
     await expect(starter).toContainText('Saved · Automatic off');
@@ -30,6 +33,7 @@ test('starters add once, stay editable, retain saved status after reload, and ru
     const state = await (await page.request.get(`${app.url}/api/companies/company-018/workspace`)).json();
     expect(state.tasks).toHaveLength(2);
     await page.reload();
+    await page.locator('.rule-starters > summary').click();
     await expect(starter).toContainText('Saved · Automatic off');
     await starter.getByRole('button', { name: 'Open rule', exact: true }).click();
     await expect(page.getByLabel('Condition 1', { exact: true })).toHaveValue('This charge lacks supporting documentation.');
@@ -58,6 +62,7 @@ test('all four custom companies show a useful starter, public example, and indep
     for (const [company, preset, clue] of cases) {
       await page.getByLabel('Company', { exact: true }).fill(company);
       await page.getByLabel('Company', { exact: true }).press('Enter');
+      await page.locator('.rule-starters > summary').click();
       const starter = page.getByRole('article', { name: `${preset} starter`, exact: true });
       await expect(starter).toContainText('Try first for this company');
       await expect(starter).toContainText(clue);

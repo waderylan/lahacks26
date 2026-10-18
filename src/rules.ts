@@ -1,6 +1,7 @@
+import type { EvaluationContext } from './modelContext';
 import type { RuleScope } from './ruleScope';
 import type { Row } from './types';
-import { employeeById } from './employees';
+import { employeeById, ownerLabel } from './employees';
 import type { ReviewTask } from './actionTypes';
 
 export type Truth = 'true' | 'false' | 'uncertain';
@@ -24,6 +25,7 @@ export const actionsForOutcome = (rule: Rule, outcome: Outcome): Action[] =>
 export const DEFAULT_SENDER = 'emp-ap';
 export interface Rule {
   provider?: 'jev' | 'qwen';
+  evaluation?: EvaluationContext;
   id: string; companyId: string; name: string; revision: number; enabled: boolean;
   /** Retained after editing or renaming a starter so the library can reopen it. */
   presetId?: string;
@@ -41,6 +43,7 @@ export interface RuleIssue {
   flags: { label: string; removable: boolean }[]; taskIds: string[];
 }
 export interface RuleRunSummary {
+  evaluation?: EvaluationContext;
   ruleId: string; revision: number; checkedAt: string; transactionCount: number;
   matches: number; uncertain: number; nonmatches: number; source: 'run' | 'arrival' | 'update';
 }
@@ -68,7 +71,7 @@ export interface Notice {
   id: string; companyId: string; title: string; body?: string; tone: NoticeTone;
   time: string; read: boolean; toasted: boolean; transactionId?: string;
 }
-export interface Snapshot { result: Outcome; conditions: Record<string, Outcome>; expression?: RuleNode }
+export interface Snapshot { evaluation?: EvaluationContext; result: Outcome; conditions: Record<string, Outcome>; expression?: RuleNode }
 export interface HistoryEntry {
   id: string; key: string; ruleId: string; ruleName: string; revision: number;
   companyId: string; transactionId: string; transactionVersion: string; action: Action | null;
@@ -166,21 +169,21 @@ function accountingStarter(companyId: string, sender: string, name: string, labe
 export function duplicateChargesRule(companyId: string, sender = DEFAULT_SENDER): Rule {
   return accountingStarter(companyId, sender, 'Possible duplicate charges', 'Same charge more than once',
     'This transaction appears to charge or pay again for the same underlying goods, work, invoice or one-time fee as a nearby transaction. Compare the related records, amounts, dates and references. Exclude separate deliveries, documented installments, distinct service periods and payments applied to different invoices. If similar charges cannot be distinguished with the available records, return uncertain.',
-    'Possible duplicate', 'Verify whether this charge was already billed or paid', 'Priya Natarajan',
+    'Possible duplicate', 'Verify whether this charge was already billed or paid', 'emp-ap',
     'Ask whether these charges cover the same work, goods or invoice. Request the original invoice and delivery, service-period or payment records that distinguish them. Describe them as possible duplicates pending review.');
 }
 
 export function missingDocumentationRule(companyId: string, sender = DEFAULT_SENDER): Rule {
   return accountingStarter(companyId, sender, 'Missing documentation', 'Insufficient purchase detail',
     'The available description, memo and supporting records together do not identify what was bought or paid for, its business purpose, or its applicable service period, job or event. An unitemized receipt or generic placeholder without supporting detail counts. A blank memo or description alone does not count when the other records explain the transaction. Do not require a job or event for ordinary overhead.',
-    'Needs documentation', 'Request itemized documentation and business purpose', 'Priya Natarajan',
+    'Needs documentation', 'Request itemized documentation and business purpose', 'emp-ap',
     'Ask for itemized purchase details, business purpose and any applicable service period, job or event reference for these transactions. Explain what is missing without calling the charge fraudulent.');
 }
 
 export function unsupportedExpensesRule(companyId: string, sender = DEFAULT_SENDER): Rule {
   return accountingStarter(companyId, sender, 'Unsupported expenses', 'Expense conflicts with supporting records',
     'The transaction claims goods, work or a business expense that the receiving, completion, project, order or receipt records contradict: undelivered quantities, work after cancellation, unauthorized scope, or personal purchases inconsistent with the stated purpose. Exclude approved change orders, documented business purchases and late invoices for work completed before cancellation. If authorization or receipt evidence is missing rather than contradictory, return uncertain.',
-    'Unsupported expense', 'Verify delivery, authorization or business purpose', 'Grace Adeyemi',
+    'Unsupported expense', 'Verify delivery, authorization or business purpose', 'emp-projects',
     'Ask for the delivery, completion, approval or receipt records supporting these expenses. Identify any conflict with the billed quantity, project timeline or stated business purpose. Request review before payment; do not present a screening result as proven fraud.');
 }
 
@@ -242,6 +245,7 @@ export function standardResult(node: StandardCondition, row: Row, reviewed: bool
 export function validateRule(input: unknown): string[] {
   const errors: string[] = []; const ids = new Set<string>(); const r = input as Rule;
   if (!r || typeof r !== 'object') return ['Invalid rule'];
+  if (r.provider !== undefined && !['jev', 'qwen'].includes(r.provider)) errors.push('Choose a valid evaluation provider.');
   if (typeof r.id !== 'string' || !r.id || typeof r.companyId !== 'string' || !r.companyId) errors.push('Rule and company IDs are required.');
   if (typeof r.name !== 'string' || !r.name.trim()) errors.push('Name the rule.');
   if (!Number.isSafeInteger(r.revision) || r.revision < 1 || typeof r.enabled !== 'boolean') errors.push('Invalid revision or enabled state.');
@@ -295,7 +299,7 @@ export function transactionVersion(row: Row, reviewed?: boolean): string {
 }
 export const actionField = (a: Action): keyof LocalTransaction | null => a.type === 'message' || a.type === 'task' ? null : ({ flag: 'flags', tag: 'tags', assign: 'owner', pass: 'automatedCheck' } as const)[a.type];
 export const recipientLabel = (recipient?: string) => recipient === 'jev' ? 'Jev chooses recipient' : employeeById(recipient)?.name ?? 'No recipient';
-export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : a.type === 'task' ? `Task for ${a.owner}: ${a.value} (due in ${a.dueDays} ${a.dueDays === 1 ? 'day' : 'days'})` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.value}`;
+export const actionLabel = (a: Action) => a.type === 'pass' ? 'Mark passed automated check' : a.type === 'message' ? `Draft message (${employeeById(a.sender)?.name ?? 'No sender'} → ${recipientLabel(a.recipient)}): ${a.value}` : a.type === 'task' ? `Task for ${ownerLabel(a.owner)}: ${a.value} (due in ${a.dueDays} ${a.dueDays === 1 ? 'day' : 'days'})` : `${{ flag: 'Add flag', tag: 'Add tag', assign: 'Assign to' }[a.type]}: ${a.type === 'assign' ? ownerLabel(a.value) : a.value}`;
 
 export const describeCondition = (n: AICondition | StandardCondition) => n.type === 'ai' ? n.label ? `${n.label}: ${n.text}` : n.text
   : `${{ amountCents: 'Amount', review: 'Review status', vendor: 'Vendor', account: 'Account' }[n.field]} ${{ gt: 'greater than', lt: 'less than', eq: 'equals' }[n.operator]} ${n.field === 'amountCents' ? `$${n.value}` : n.value}`;
@@ -377,7 +381,7 @@ export function markNoticeToasted(store: RuleStore, id: string): RuleStore {
 export function executeRule(store: RuleStore, rule: Rule, row: Row, version: string, snapshot: Snapshot, source: HistoryEntry['source'], batchId: string = uid(), tasks: ReviewTask[] = []): RuleStore {
   if (validateRule(rule).length || row.companyId !== rule.companyId) return store;
   if (leaves(rule.expression).some(n => !['true', 'false', 'uncertain'].includes(snapshot.conditions[n.id])) || evaluateTree(rule.expression, snapshot.conditions) !== snapshot.result) return store;
-  const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}`;
+  const prefix = `${rule.id}:${rule.revision}:${row.id}:${version}:${snapshot.evaluation?.identity ?? rule.provider ?? 'jev'}`;
   const executionKey = `${prefix}:evaluation:${source}`;
   if (store.executions.includes(executionKey)) return store;
   if (snapshot.result === 'pending' || snapshot.result === 'error' || Object.values(snapshot.conditions).some(v => v === 'pending' || v === 'error')) return store;

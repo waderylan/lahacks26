@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { money } from './insights';
+import { money } from './chartMath';
 import type { ChartKind, Measure, Point } from './charts';
 
 const usdShort = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 });
-export const formatValue = (measure: Measure, v: number, short = false) => (measure === 'count' ? `${v} ${v === 1 ? 'bill' : 'bills'}` : short ? usdShort.format(v / 100) : money(v));
+export const formatValue = (measure: Measure, v: number, short = false) => (measure === 'count' ? `${v} ${v === 1 ? 'transaction' : 'transactions'}` : short ? usdShort.format(v / 100) : money(v));
 
 /** One series, drawn as SVG. Hover (or focus) a mark to see its exact value. */
 export function ChartView({ points, kind, measure, height = 200, width = 640 }: { points: Point[]; kind: ChartKind; measure: Measure; height?: number; width?: number }) {
   const [hover, setHover] = useState<number | null>(null);
-  if (!points.length || points.every(p => p.value === 0)) return <p className="chart-empty muted">No bills to chart.</p>;
+  if (!points.length || points.every(p => p.value === 0)) return <p className="chart-empty muted">No matching transactions to chart.</p>;
   const max = Math.max(...points.map(p => p.value), 1);
 
   if (kind === 'hbar') {
     return (
       <ul className="chart-hbars" role="list">
         {points.map((p, i) => (
-          <li key={p.key} className={hover === i ? 'on' : ''} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} title={`${p.label}: ${formatValue(measure, p.value)} · ${p.count} bills`}>
+          <li key={p.key} className={hover === i ? 'on' : ''} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} title={`${p.label}: ${formatValue(measure, p.value)} · ${p.count} transactions`}>
             <span className="ch-label">{p.label}</span>
             <span className="ch-track"><span className="ch-fill" style={{ width: `${(p.value / max) * 100}%` }} /></span>
             <span className="ch-val">{formatValue(measure, p.value, true)}</span>
@@ -47,7 +47,7 @@ export function ChartView({ points, kind, measure, height = 200, width = 640 }: 
           </g>
         ))}
       </svg>
-      {hover !== null && <div className="ch-tip" style={{ left: `${(x(hover) / W) * 100}%` }}><b>{points[hover].label}</b> {formatValue(measure, points[hover].value)} · {points[hover].count} bills</div>}
+      {hover !== null && <div className="ch-tip" style={{ left: `${(x(hover) / W) * 100}%` }}><b>{points[hover].label}</b> {formatValue(measure, points[hover].value)} · {points[hover].count} transactions</div>}
     </div>
   );
 }

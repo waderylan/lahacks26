@@ -1,4 +1,4 @@
-import { dueWindow, DUE_WINDOWS, monthLabel, openCents, asOfDate } from './insights';
+import { dueWindow, DUE_WINDOWS, monthLabel, openCents, asOfDate } from './chartMath';
 import type { Row } from './types';
 
 /**
@@ -7,7 +7,7 @@ import type { Row } from './types';
  * a model only decides which bills belong in a chart that answers a question.
  */
 export type GroupBy = 'month' | 'vendor' | 'account' | 'due';
-export type Measure = 'spend' | 'count' | 'open';
+export type Measure = 'spend' | 'count' | 'open' | 'receivable' | 'bank_in' | 'bank_out';
 export type ChartKind = 'bar' | 'line' | 'hbar';
 export interface ChartSpec {
   id: string;
@@ -25,7 +25,7 @@ export interface ChartSpec {
 export interface Point { label: string; key: string; value: number; count: number }
 
 export const GROUP_LABELS: Record<GroupBy, string> = { month: 'Month', vendor: 'Vendor', account: 'Account', due: 'Due date' };
-export const MEASURE_LABELS: Record<Measure, string> = { spend: 'Billed spend', count: 'Number of bills', open: 'Open balance' };
+export const MEASURE_LABELS: Record<Measure, string> = { spend: 'Vendor-bill amount', count: 'Transaction count', open: 'Vendor-bill open amount', receivable: 'Invoice open amount', bank_in: 'Bank deposits', bank_out: 'Bank withdrawals' };
 export const KIND_LABELS: Record<ChartKind, string> = { bar: 'Bars', line: 'Line', hbar: 'Horizontal bars' };
 
 export const STARTER_CHARTS: ChartSpec[] = [
@@ -40,13 +40,17 @@ const TOP = 8;
 /** Groups and sums bills for a chart. Months are chronological; vendors/accounts are largest first with the rest as "Other". */
 export function aggregate(allRows: Row[], spec: Pick<ChartSpec, 'groupBy' | 'measure' | 'ids'>): Point[] {
   const ids = spec.ids ? new Set(spec.ids) : null;
-  const rows = ids ? allRows.filter(r => ids.has(r.id)) : allRows;
+  const rows = (ids ? allRows.filter(r => ids.has(r.id)) : allRows).filter(r => spec.measure === 'count'
+    || (spec.measure === 'spend' || spec.measure === 'open') && (r.txnType ?? 'bill') === 'bill'
+    || spec.measure === 'receivable' && r.txnType === 'invoice'
+    || spec.measure === 'bank_in' && r.txnType === 'bank' && r.details?.direction === 'deposit'
+    || spec.measure === 'bank_out' && r.txnType === 'bank' && r.details?.direction === 'withdrawal');
   const asOf = asOfDate(allRows);
-  const value = (r: Row) => (spec.measure === 'count' ? 1 : spec.measure === 'open' ? openCents(r) : r.amountCents);
+  const value = (r: Row) => (spec.measure === 'count' ? 1 : ['open', 'receivable'].includes(spec.measure) ? openCents(r) : r.amountCents);
   const keyOf = (r: Row) => (spec.groupBy === 'month' ? r.date.slice(0, 7) : spec.groupBy === 'vendor' ? r.vendor : spec.groupBy === 'account' ? r.account || '(none)' : dueWindow(r.dueDate, asOf));
   const map = new Map<string, Point>();
   for (const r of rows) {
-    if (spec.measure === 'open' && openCents(r) <= 0) continue;
+    if (['open', 'receivable'].includes(spec.measure) && openCents(r) <= 0) continue;
     const key = keyOf(r);
     const p = map.get(key) ?? { key, label: key, value: 0, count: 0 };
     p.value += value(r);
@@ -97,4 +101,23 @@ export function chartTitle(question: string): string {
     .trim();
   const title = t || question.trim();
   return (title.charAt(0).toUpperCase() + title.slice(1)).slice(0, 120);
+}
+
+export const CHART_LIMIT = 24;
+export function validateCharts(value: unknown, companyId: string, validIds?: Set<string>): ChartSpec[] {
+ if (!Array.isArray(value) || value.length > CHART_LIMIT) throw new Error('A dashboard supports up to ' + CHART_LIMIT + ' charts.');
+ const seen = new Set<string>();
+ return value.map((c: any) => {
+  if (!c || typeof c.id !== 'string' || !c.id.trim() || c.id.length > 100 || seen.has(c.id)
+   || typeof c.title !== 'string' || !c.title.trim() || c.title.length > 120
+   || !Object.hasOwn(GROUP_LABELS,c.groupBy) || !Object.hasOwn(MEASURE_LABELS,c.measure) || !Object.hasOwn(KIND_LABELS,c.kind)
+   || c.starter !== undefined && typeof c.starter !== 'boolean') throw new Error('Invalid chart specification or duplicate chart ID.');
+  seen.add(c.id);
+  if (c.ids !== undefined && (!Array.isArray(c.ids) || c.ids.length > 5000 || new Set(c.ids).size !== c.ids.length || !c.ids.every((id: unknown) => typeof id === 'string' && id.startsWith(companyId + ':') && (!validIds || validIds.has(id))))) throw new Error('Chart records must belong to this company.');
+  if (c.source !== undefined && (!c.source || typeof c.source !== 'object' || typeof c.source.question !== 'string' || !c.source.question.trim() || c.source.question.length > 500
+    || typeof c.source.model !== 'string' || !c.source.model.trim() || c.source.model.length > 200 || typeof c.source.at !== 'string' || !Number.isFinite(Date.parse(c.source.at)))) throw new Error('Invalid chart source.');
+  return { id:c.id,title:c.title.trim(),groupBy:c.groupBy,measure:c.measure,kind:c.kind,
+   ...(c.ids !== undefined && {ids:[...c.ids]}), ...(c.starter !== undefined && {starter:c.starter}),
+   ...(c.source && {source:{question:c.source.question,model:c.source.model,at:c.source.at}}) };
+ });
 }

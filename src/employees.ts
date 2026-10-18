@@ -23,3 +23,22 @@ export const EMPLOYEES: Employee[] = [
 ];
 
 export const employeeById = (id: string | null | undefined) => EMPLOYEES.find(e => e.id === id);
+
+/** Rules and tasks saved before employee IDs stored display names ("Priya Natarajan", "Bookkeeper"); new assignments store IDs. */
+export const resolveEmployee = (value: string | null | undefined) => {
+  const text = value?.trim();
+  if (!text) return undefined;
+  const lower = text.toLowerCase();
+  return EMPLOYEES.find(e => e.id === text) ?? EMPLOYEES.find(e => e.name.toLowerCase() === lower);
+};
+/** Employee name for a known ID or legacy name; any other stored label is shown as written. */
+export const ownerLabel = (value: string | null | undefined, empty = 'Unassigned') => value?.trim() ? resolveEmployee(value)?.name ?? value.trim() : empty;
+/** Comparison key: the employee ID when the value is a known ID or name, otherwise the label itself. */
+export const ownerKey = (value: string | null | undefined) => resolveEmployee(value)?.id ?? value?.trim() ?? '';
+export const sameOwner = (a: string | null | undefined, b: string | null | undefined) => ownerKey(a) !== '' && ownerKey(a) === ownerKey(b);
+/** Employees first, then any stored labels that are not employees, so older assignments stay selectable. */
+export function ownerOptions(stored: Iterable<string | null | undefined> = []): { value: string; label: string }[] {
+  const options = EMPLOYEES.map(e => ({ value: e.id, label: e.name }));
+  const unknown = [...new Set([...stored].map(value => value?.trim() ?? '').filter(value => value && !resolveEmployee(value)))].sort();
+  return [...options, ...unknown.map(value => ({ value, label: value }))];
+}

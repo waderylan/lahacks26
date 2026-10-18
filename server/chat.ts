@@ -11,8 +11,13 @@ import { CHAT_GEMINI_MODELS, geminiReady, isGeminiModel, judgeWithGemini, routeW
  * "Ask your books" chat: history per company and employee in SQLite, plus "let AI choose" routing.
  * The model is the user's pick: Jev runs on the AI Gateway key, Gemini models on GEMINI_API_KEY.
  */
+export interface ChatOptions {
+  configured?: (model: unknown) => boolean;
+  understand?: (question: string, model: unknown) => ReturnType<typeof understandQuestion>;
+  route?: (companyId: string, ids: string[], request: string, model: unknown) => Promise<{ employeeId: string; probability: number }>;
+}
 export class ChatStore {
-  constructor(readonly db: ActionStore, readonly data: WorkspaceData) {}
+  constructor(readonly db: ActionStore, readonly data: WorkspaceData, readonly options: ChatOptions = {}) {}
 
   history(companyId: string, as: string) {
     return this.db.list<{ id: string; as: string; createdAt: string }>('chat-turn', companyId).filter(t => t.as === as).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).slice(-50);
@@ -24,15 +29,6 @@ export class ChatStore {
     if (existing && (existing.companyId !== companyId || existing.as !== turn.as)) throw new Error('Invalid chat turn.');
     this.db.put('chat-turn', turn.id, companyId, { ...turn, companyId, createdAt: turn.createdAt ?? new Date().toISOString() });
   }
-  /** Dashboard charts are shared by everyone in the company; null until someone changes the starter set. */
-  charts(companyId: string) { return this.db.get<{ charts: unknown[] }>('dashboard-charts', companyId)?.charts ?? null; }
-  saveCharts(companyId: string, charts: unknown) {
-    const ok = (c: any) => c && typeof c.id === 'string' && typeof c.title === 'string' && c.title.length <= 200
-      && ['month', 'vendor', 'account', 'due'].includes(c.groupBy) && ['spend', 'count', 'open'].includes(c.measure) && ['bar', 'line', 'hbar'].includes(c.kind)
-      && (c.ids === undefined || (Array.isArray(c.ids) && c.ids.length <= 5000 && c.ids.every((id: unknown) => typeof id === 'string' && id.startsWith(`${companyId}:`))));
-    if (!Array.isArray(charts) || charts.length > 24 || !charts.every(ok)) throw new Error('Invalid dashboard charts.');
-    this.db.put('dashboard-charts', companyId, companyId, { charts });
-  }
   clear(companyId: string, as: string) {
     // Every turn, not just the 50 that history() returns.
     for (const turn of this.db.list<{ id: string; as: string }>('chat-turn', companyId).filter(t => t.as === as)) this.db.db.prepare('DELETE FROM documents WHERE kind=? AND id=?').run('chat-turn', turn.id);
@@ -42,6 +38,7 @@ export class ChatStore {
   async route(companyId: string, ids: string[], request: string, model?: unknown) {
     const company = this.data.bills(companyId).company;
     const rows = ids.slice(0, 25).map(id => this.data.row(companyId, id));
+    if (this.options.route) return this.options.route(companyId, ids.slice(0, 25), request, model);
     if (isGeminiModel(model)) return routeWithGemini({ name: company.name, industry: company.industry }, rows, request, model);
     const { employee, probability } = await chooseEmployee({ company: { name: company.name, industry: company.industry }, bills: rows.map(row => ({ row, context: [] })), request, recipient: 'jev' });
     return { employeeId: employee.id, probability };
@@ -54,16 +51,18 @@ export function chatRoutes(app: Express, chat: ChatStore) {
   };
   const company = (req: Request) => { const id = String(req.params.id); chat.data.bills(id); return id; };
   const ready = (res: Response, model: unknown) => {
+    if (model !== undefined && model !== 'jev' && !isGeminiModel(model)) { res.status(400).json({ error: 'Invalid chat model.' }); return false; }
+    if (chat.options.configured) { if (!chat.options.configured(model)) { res.status(503).json({ error: 'Selected chat model is not configured.' }); return false; } return true; }
     if (isGeminiModel(model)) { if (!geminiReady()) { res.status(503).json({ error: 'GEMINI_API_KEY is not set' }); return false; } }
     else if (!jevConfigured()) { res.status(503).json({ error: 'Jev is not configured' }); return false; }
     return true;
   };
-  app.get('/api/chat/models', (_req, res) => res.json({ jev: jevConfigured(), gemini: geminiReady(), geminiModels: CHAT_GEMINI_MODELS }));
+  app.get('/api/chat/models', (_req, res) => res.json({ jev: chat.options.configured?.('jev') ?? jevConfigured(), gemini: chat.options.configured?.(CHAT_GEMINI_MODELS[0]) ?? geminiReady(), geminiModels: CHAT_GEMINI_MODELS }));
   app.post('/api/understand', route(async (req, res) => {
     const question = req.body?.question, model = req.body?.model;
     if (typeof question !== 'string' || !question.trim() || question.length > 300) throw new Error('invalid question');
     if (!ready(res, model)) return;
-    res.json(isGeminiModel(model) ? await understandWithGemini(question.trim(), model) : await understandQuestion(question.trim()));
+    res.json(chat.options.understand ? await chat.options.understand(question.trim(), model) : isGeminiModel(model) ? await understandWithGemini(question.trim(), model) : await understandQuestion(question.trim()));
   }));
   // Gemini's per-bill judging for the chat (Jev's goes through the team's /api/evaluate).
   app.post('/api/companies/:id/llm-evaluate', route(async (req, res) => {
@@ -75,8 +74,6 @@ export function chatRoutes(app: Express, chat: ChatStore) {
     const { company: c } = chat.data.bills(id);
     res.json(await judgeWithGemini({ name: c.name, industry: c.industry }, criterion.slice(0, 500), ids.map((b: unknown) => chat.data.row(id, String(b))), model));
   }));
-  app.get('/api/companies/:id/dashboard', route((req, res) => res.json({ charts: chat.charts(company(req)) })));
-  app.put('/api/companies/:id/dashboard', route((req, res) => { chat.saveCharts(company(req), req.body?.charts); res.json({ ok: true }); }));
   app.get('/api/companies/:id/chat', route((req, res) => res.json(chat.history(company(req), String(req.query.as ?? '')))));
   app.post('/api/companies/:id/chat', route((req, res) => { chat.save(company(req), req.body); res.json({ ok: true }); }));
   app.delete('/api/companies/:id/chat', route((req, res) => { chat.clear(company(req), String(req.query.as ?? '')); res.json({ ok: true }); }));

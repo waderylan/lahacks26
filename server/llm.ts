@@ -75,7 +75,7 @@ export async function judgeWithGemini(company: { name: string; industry: string 
   const results: RecordResult[] = rows.map((row, i) => {
     const state = json[`t${i}`];
     if (state !== 'match' && state !== 'no_match' && state !== 'uncertain') throw new Error(`Gemini skipped ${rows.length - Object.keys(json).length || 'some'} bills. Try again.`);
-    return { id: row.id, state: state as MatchState, pMatch: state === 'match' ? 1 : 0 };
+    return { id: row.id, state: state as MatchState, pMatch: null };
   });
   return { results, tokens };
 }

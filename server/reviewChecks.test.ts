@@ -36,7 +36,7 @@ test('payment signals explain account mismatches, recent payee changes and press
     ['Account 6620 differs from 1359 on file', 'Asks to change where payment goes']);
 });
 
-test('checks are cached by evidence, and escalation flags rows and messages the chosen person once', async t => {
+test('specialized checks cache evidence without applying flags or sending messages', async t => {
   const rows = [row(1), row(2, { memo: 'Remit to the account ending 7731 today.' }), row(3)];
   const { db, data } = setup(rows); t.after(() => db.db.close());
   let calls = 0;
@@ -49,18 +49,8 @@ test('checks are cached by evidence, and escalation flags rows and messages the 
   assert.equal(state.results[rows[1].id].summary.amountCents, 728156);
   await risk.check(companyId, rows.map(r => r.id)); assert.equal(calls, 1, 'unchanged evidence is not re-checked');
   await assert.rejects(risk.check(companyId, []), /1-1000/);
-  assert.throws(() => risk.escalate(companyId, 'emp-nobody', [rows[1].id]), /which employee/);
-  assert.throws(() => risk.escalate(companyId, 'emp-ap', [rows[1].id], 'emp-nobody'), /who to send/);
-  assert.throws(() => risk.escalate(companyId, 'emp-ap', [rows[0].id, rows[2].id]), /Nothing new/);
-  const escalated = risk.escalate(companyId, 'emp-ap', rows.map(r => r.id));
-  assert.deepEqual(Object.keys(escalated.escalated), [rows[1].id]); assert.equal(escalated.escalated[rows[1].id].to, 'emp-cfo');
-  assert.deepEqual(data.row(companyId, rows[1].id).dashboard?.flags, [CHECKS['payment-risk'].flag]);
-  assert.deepEqual(data.row(companyId, rows[0].id).dashboard?.flags, []);
-  const mail = mailbox.view(companyId, 'emp-cfo').inbox;
-  assert.equal(mail.length, 1); assert.equal(mail[0].from, 'emp-ap'); assert.equal(mail[0].source, 'risk');
-  assert.match(mail[0].body, /^Hi Robert,/);
-  assert.match(mail[0].body, /INV-2 · Halvorsen Wholesale · \$7281\.56 · 2026-09-06 · Jev 94% suspicious · Account 7731 differs from 3341 on file/);
-  assert.throws(() => risk.escalate(companyId, 'emp-ap', [rows[1].id]), /Nothing new/);
+  assert.deepEqual(data.row(companyId, rows[1].id).dashboard?.flags, []);
+  assert.deepEqual(mailbox.view(companyId, 'emp-cfo').inbox, []);
   db.write({ ...data.row(companyId, rows[2].id), memo: 'Edited memo' }, data.row(companyId, rows[2].id).sourceVersion!);
   await risk.check(companyId, 'all'); assert.equal(calls, 2, 'an edited transaction is re-checked');
 });
@@ -80,17 +70,13 @@ test('results stored by the first payment-risk release are read with the new ver
   assert.equal(result.verdict, 'flag'); assert.equal(result.pFlag, .9);
 });
 
-test('a demo reset forgets every check\'s escalations along with their mail', async t => {
-  const rows = [row(1, { memo: 'Remit to the account ending 7731.' }), row(2, { date: '2026-09-10' })];
-  const { db, data } = setup(rows); t.after(() => db.db.close());
-  const risk = new ReviewCheck(db, data, withJudge(paymentRiskCheck, () => ({ verdict: 'flag', probability: .9, pFlag: .9 })));
-  const dupes = new ReviewCheck(db, data, withJudge(duplicatesCheck, () => ({ verdict: 'flag', probability: .8, pFlag: .8 })));
-  await risk.check(companyId, 'all'); risk.escalate(companyId, 'emp-ap', [rows[0].id]);
-  await dupes.check(companyId, 'all'); dupes.escalate(companyId, 'emp-controller', [rows[1].id]);
-  assert.equal(new Mailbox(db, data).view(companyId, 'emp-ap').inbox[0].from, 'emp-controller', 'duplicates go to AP by default');
-  new RuleService(db, data, async () => ({})).reset(companyId);
-  assert.deepEqual(risk.state(companyId).escalated, {}); assert.deepEqual(dupes.state(companyId).escalated, {});
-  assert.equal(Object.keys(dupes.state(companyId).results).length, 2, 'Jev results are kept');
+test('restore removes specialized check state and historical escalation state', async t => {
+  const { db, data } = setup([row(1)]); t.after(() => db.db.close());
+  data.bills(companyId);
+  for (const kind of ['payment-risk', 'duplicate-check']) db.put(kind, companyId, companyId, { results: {}, escalated: { old: {} } });
+  new RuleService(db, data, async () => ({})).reset(companyId, true);
+  assert.deepEqual(db.list('payment-risk', companyId), []);
+  assert.deepEqual(db.list('duplicate-check', companyId), []);
 });
 
 test('duplicate candidates are earlier same-vendor transactions of the same type, nearest first, from the whole company', () => {

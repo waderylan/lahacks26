@@ -1,3 +1,6 @@
+import './chat.css';
+import { useEvaluationContext } from './useEvaluationContext';
+import type { EvaluationContext } from './modelContext';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { pMatchFor } from './jevClient';
 import { EMPLOYEES, employeeById } from './employees';
@@ -14,10 +17,11 @@ import type { CompanyBills, Row } from './types';
 interface Plate { tasks: ReviewTask[]; assignedIds: string[]; unread: Pick<Mail, 'id' | 'from' | 'subject' | 'sentAt'>[]; approvals: number }
 
 /** reading: the model's understanding of the question; 'choose' while waiting for the user to pick a model, 'pending' while it reads, 'rules' when the text-rule fallback was used. */
-interface Turn { id: string; model: ChatModel; createdAt: string; question: string; parsed: ParsedQuestion; scope: Row[]; run: SemanticRun | null; reading: Understanding | 'choose' | 'pending' | 'rules'; plate?: Plate | 'loading' | { error: string }; /** The answer's chart was shown on the Dashboard. */ graphed?: boolean }
+interface Turn { evaluation?: EvaluationContext; id: string; model: ChatModel; createdAt: string; question: string; parsed: ParsedQuestion; scope: Row[]; run: SemanticRun | null; reading: Understanding | 'choose' | 'pending' | 'rules'; plate?: Plate | 'loading' | { error: string }; /** The answer's chart was shown on the Dashboard. */ graphed?: boolean }
 
 /** Compact form saved in SQLite; rebuilt into a Turn against the company's current bills. */
 interface StoredTurn {
+  evaluation?: EvaluationContext;
   id: string; as: string; createdAt: string; question: string;
   intent: Intent; topic: string; criterion: string | null; periodLabel: string | null;
   scopeIds: string[]; outcomes: Record<string, 'true' | 'uncertain'>; costNano: string; ms: number;
@@ -33,15 +37,13 @@ async function api<T>(path: string, init?: RequestInit & { json?: unknown }): Pr
 }
 const understand = (question: string, model: ChatModel) => api<Understanding>('/api/understand', { method: 'POST', json: { question, model }, signal: AbortSignal.timeout(model === 'jev' ? 15000 : 90000) });
 
-// Chosen model, remembered per browser. Jev uses the AI Gateway key; Gemini models use GEMINI_API_KEY.
-const MODEL_KEY = 'chat.model.v1';
-let currentModel: ChatModel = (() => { try { const m = localStorage.getItem(MODEL_KEY); return CHAT_MODELS.some(x => x.id === m) ? m as ChatModel : 'jev'; } catch { return 'jev'; } })();
+// Model choice is transient; completed turns are persisted in SQLite.
+let currentModel: ChatModel = 'jev';
 const modelListeners = new Set<() => void>();
-function setModel(m: ChatModel) { currentModel = m; try { localStorage.setItem(MODEL_KEY, m); } catch {} modelListeners.forEach(l => l()); }
+function setModel(m: ChatModel) { currentModel = m; modelListeners.forEach(l => l()); }
 // Unless the user ticks "use this for the rest of the chat", every question asks which model should answer.
-const REMEMBER_KEY = 'chat.model.remember.v1';
-let rememberModel = (() => { try { return localStorage.getItem(REMEMBER_KEY) === '1'; } catch { return false; } })();
-function setRemember(on: boolean) { rememberModel = on; try { localStorage.setItem(REMEMBER_KEY, on ? '1' : '0'); } catch {} modelListeners.forEach(l => l()); }
+let rememberModel = false;
+function setRemember(on: boolean) { rememberModel = on; modelListeners.forEach(l => l()); }
 function useRemember() { return useSyncExternalStore(cb => { modelListeners.add(cb); return () => modelListeners.delete(cb); }, () => rememberModel); }
 function useModel() { return useSyncExternalStore(cb => { modelListeners.add(cb); return () => modelListeners.delete(cb); }, () => currentModel); }
 let availability: Promise<{ jev: boolean; gemini: boolean }> | null = null;
@@ -68,7 +70,7 @@ function toStored(turn: Turn, as: string): StoredTurn {
   const outcomes: StoredTurn['outcomes'] = {};
   for (const [id, o] of Object.entries(turn.run?.outcomes ?? {})) if (o === 'true' || o === 'uncertain') outcomes[id] = o;
   return {
-    id: turn.id, as, createdAt: turn.createdAt, question: turn.question, intent: turn.parsed.intent, topic: turn.parsed.topic,
+    id: turn.id, as, evaluation: turn.evaluation, createdAt: turn.createdAt, question: turn.question, intent: turn.parsed.intent, topic: turn.parsed.topic,
     criterion: turn.parsed.criterion, periodLabel: turn.parsed.period?.label ?? null, scopeIds: turn.scope.map(r => r.id), outcomes,
     costNano: String(turn.run?.costNano ?? 0n), ms: turn.run && turn.run.finishedAt !== null ? Math.round(turn.run.finishedAt - turn.run.startedAt) : 0,
     model: turn.model, tokens: turn.run?.tokens, graphed: turn.graphed,
@@ -79,13 +81,23 @@ function fromStored(s: StoredTurn, rows: Row[]): Turn {
   const byId = new Map(rows.map(r => [r.id, r]));
   const scope = s.scopeIds.map(id => byId.get(id)).filter((r): r is Row => !!r);
   return {
-    id: s.id, model: s.model ?? 'jev', graphed: s.graphed, createdAt: s.createdAt, question: s.question, reading: s.reading, plate: s.plate,
+    id: s.id, evaluation: s.evaluation, model: s.model ?? 'jev', graphed: s.graphed, createdAt: s.createdAt, question: s.question, reading: s.reading, plate: s.plate,
     parsed: { intent: s.intent, topic: s.topic, criterion: s.criterion, period: s.periodLabel ? { label: s.periodLabel, test: () => true } : null },
     scope,
     run: s.criterion ? { outcomes: s.outcomes, done: scope.length, total: scope.length, costNano: BigInt(s.costNano), startedAt: 0, finishedAt: s.ms, error: null, tokens: s.tokens } : null,
   };
 }
-const save = (companyId: string, as: string, turn: Turn) => void api(`/api/companies/${companyId}/chat`, { method: 'POST', json: toStored(turn, as) }).catch(() => {});
+const saveFailures = new Map<string, { key: string; error: string; retry: () => void }>();
+function save(companyId: string, as: string, turn: Turn) {
+  const key = `${companyId}|${as}`;
+  if (!conversations.get(key)?.some(current => current.id === turn.id)) return;
+  void api(`/api/companies/${companyId}/chat`, { method: 'POST', json: toStored(turn, as) }).then(() => {
+    if (saveFailures.delete(turn.id)) setTurns(key, current => [...current]);
+  }, error => {
+    saveFailures.set(turn.id, { key, error: error.message, retry: () => save(companyId, as, turn) });
+    setTurns(key, current => [...current]);
+  });
+}
 
 function BillList({ rows, onOpen, amount }: { rows: Row[]; onOpen: (row: Row) => void; amount?: (r: Row) => number }) {
   return (
@@ -116,10 +128,26 @@ let openDashboard: (() => void) | undefined;
 export function ChatWidget(props: ChatProps) {
   openDashboard = props.onOpenDashboard;
   const [open, setOpen] = useState(false);
-  const { data } = useFullBills(props.companyId);
+  const [clearError, setClearError] = useState('');
+  const { data, error: loadError } = useFullBills(props.companyId);
   const key = `${props.companyId}|${props.as}`;
   const turns = useTurns(key);
-  const clear = () => { setTurns(key, () => EMPTY); void api(`/api/companies/${props.companyId}/chat?as=${encodeURIComponent(props.as)}`, { method: 'DELETE' }).catch(() => {}); };
+  const clear = () => {
+    setClearError('');
+    void api(`/api/companies/${props.companyId}/chat?as=${encodeURIComponent(props.as)}`, { method: 'DELETE' }).then(() => {
+      for (const [id, failure] of saveFailures) if (failure.key === key) saveFailures.delete(id);
+      setTurns(key, () => EMPTY);
+    }, error => setClearError(error.message));
+  };
+  useEffect(() => {
+    const reset = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== props.companyId) return;
+      loaded.delete(key); setTurns(key, () => EMPTY);
+      for (const [id, failure] of saveFailures) if (failure.key === key) saveFailures.delete(id);
+    };
+    window.addEventListener('company-restored', reset);
+    return () => window.removeEventListener('company-restored', reset);
+  }, [key, props.companyId]);
   return (
     <>
       {open && (
@@ -132,7 +160,8 @@ export function ChatWidget(props: ChatProps) {
             {turns.length > 0 && <button className="icon-btn" title="Clear conversation" onClick={clear}>↺</button>}
             <button className="icon-btn" aria-label="Close chat" onClick={() => setOpen(false)}>✕</button>
           </div>
-          {data ? <Chat {...props} data={data} compact /> : <div className="state"><span className="spinner" /></div>}
+          {clearError && <p role="alert">Could not clear conversation: {clearError}</p>}
+          {data ? <Chat {...props} data={data} compact /> : loadError ? <p role="alert">{loadError}</p> : <div className="state"><span className="spinner" /></div>}
         </div>
       )}
       <button className={`chat-fab ${open ? 'open' : ''} ${props.lifted ? 'lifted' : ''}`} onClick={() => setOpen(o => !o)} aria-label={open ? 'Close chat' : 'Ask your books'}>
@@ -195,9 +224,11 @@ function ModelPicker() {
 }
 
 function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }: ChatProps & { data: CompanyBills; compact?: boolean }) {
+  const evaluation = useEvaluationContext('jev');
   const model = useModel();
-  const avail = useAvailability();
-  const readyFor = (m: ChatModel) => (m === 'jev' ? jevReady : !!avail?.gemini);
+  const available = useAvailability();
+  const avail = { jev: Boolean(available?.jev && evaluation.context), gemini: Boolean(available?.gemini) };
+  const readyFor = (m: ChatModel) => (m === 'jev' ? Boolean((avail?.jev ?? jevReady) && evaluation.context) : !!avail?.gemini);
   const key = `${companyId}|${as}`;
   const turns = useTurns(key);
   const [input, setInput] = useState('');
@@ -234,8 +265,8 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
     const q = base.question, id = base.id;
     const rules = parseQuestion(q, latest);
     const ready = readyFor(m);
-    let turn: Turn = { ...base, model: m, parsed: rules, reading: ready ? 'pending' : 'rules' };
-    const inScope = (p: ParsedQuestion) => (p.intent === 'my_work' || p.intent === 'upcoming' ? [] : p.period ? data.rows.filter(r => p.period!.test(r.date)) : data.rows);
+    let turn: Turn = { ...base, model: m, evaluation: m === 'jev' ? evaluation.context : undefined, parsed: rules, reading: ready ? 'pending' : 'rules' };
+    const inScope = (p: ParsedQuestion) => (p.intent === 'my_work' || p.intent === 'upcoming' ? [] : (p.period ? data.rows.filter(r => p.period!.test(r.date)) : data.rows).filter(r => (r.txnType ?? 'bill') === 'bill'));
     const patch = (fields: Partial<Turn>) => { turn = { ...turn, ...fields }; setTurns(key, ts => ts.map(t => (t.id === id ? turn : t))); };
     // Graph questions ("graph utilities by month") put their chart on the Dashboard instead of in the chat.
     const done = () => {
@@ -250,7 +281,7 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
         loadPlate(companyId, as).then(plate => { patch({ plate }); save(companyId, as, turn); }, e => patch({ plate: { error: (e as Error).message } }));
       } else if (parsed.criterion && ready) {
         const onRun = (run: SemanticRun) => { patch({ run }); if (run.finishedAt !== null && !run.error) done(); };
-        void (m === 'jev' ? runSemantic(data.company, scope, parsed.criterion, onRun) : runSemanticGemini(data.company, scope, parsed.criterion, m, onRun));
+        void (m === 'jev' ? runSemantic(data.company, scope, parsed.criterion, onRun, turn.evaluation) : runSemanticGemini(data.company, scope, parsed.criterion, m, onRun));
       } else done();
     };
     setTurns(key, ts => ts.map(t => (t.id === id ? turn : t)));
@@ -284,10 +315,11 @@ function Chat({ data, companyId, as, jevReady, onOpenBill, onChanged, compact }:
         <div ref={endRef} />
       </div>
       {voice.error && <p className="voice-error" role="alert">{voice.error} <button className="linkish" onClick={voice.clearError}>Dismiss</button></p>}
+      {[...saveFailures].filter(([, failure]) => failure.key === key).map(([id, failure]) => <p className="voice-error" role="alert" key={id}>Could not save this answer: {failure.error} <button className="linkish" onClick={failure.retry}>Retry save</button></p>)}
       <form className="chat-input" onSubmit={e => { e.preventDefault(); voice.stop(); ask(input); }}>
         <input value={input} onChange={e => setInput(e.target.value)} placeholder={voice.listening ? 'Listening… speak your question' : busy ? 'Working…' : `Ask about ${data.company.name}'s spending…`} maxLength={300} autoFocus />
         {voice.supported && <button type="button" className={`mic ${voice.listening ? 'on' : ''}`} onClick={voice.listening ? voice.stop : voice.start} aria-pressed={voice.listening} aria-label={voice.listening ? 'Stop listening' : 'Ask by voice'} title={voice.listening ? 'Stop listening' : 'Ask by voice (sends when you pause)'}>🎤</button>}
-        <button className="send" disabled={!input.trim()} aria-label="Send">↑</button>
+        <button className="send" disabled={!input.trim() || (remember && model === 'jev' && Boolean(available?.jev) && !evaluation.context)} aria-label="Send">↑</button>
       </form>
     </div>
   );
@@ -348,7 +380,7 @@ function Answer({ turn, data, as, jevReady, onChoose, availability, onOpenBill, 
 
   // Nothing matched: say so plainly, then show the closest bills and what the company actually pays for.
   if (parsed.criterion && matches.length === 0) {
-    const near = scope.map(r => ({ r, p: pMatchFor(r, parsed.criterion!) ?? 0 })).sort((a, b) => b.p - a.p).filter(x => x.p >= 0.3).slice(0, 3);
+    const near = scope.map(r => ({ r, p: pMatchFor(r, parsed.criterion!, turn.evaluation) ?? 0 })).sort((a, b) => b.p - a.p).filter(x => x.p >= 0.3).slice(0, 3);
     const top = groupTotals(scope, r => r.account || '(none)').sort((a, b) => b.cents - a.cents).slice(0, 4);
     return (
       <div className="msg bot">
@@ -484,7 +516,7 @@ function ActOnBills({ companyId, as, model, rows, label, onChanged }: { companyI
     setOwner(k === 'message' || k === 'task' || k === 'assign' ? 'jev' : as); setPicked(null);
   };
   const nameOf = (id: string) => employeeById(id)?.name ?? id;
-  const action = (ownerId = owner): BillAction => kind === 'task' ? { type: 'task', title: text, owner: nameOf(ownerId), dueDate: due } : kind === 'assign' ? { type: 'assign', owner: nameOf(ownerId) } : kind === 'review' ? { type: 'review', reviewed: true } : { type: kind as 'flag' | 'tag', label: text };
+  const action = (ownerId = owner): BillAction => kind === 'task' ? { type: 'task', title: text, owner: ownerId, dueDate: due } : kind === 'assign' ? { type: 'assign', owner: nameOf(ownerId) } : kind === 'review' ? { type: 'review', reviewed: true } : { type: kind as 'flag' | 'tag', label: text };
   const run = async (fn: () => Promise<void>) => { setBusy(true); setError(''); try { await fn(); } catch (e) { setError((e as Error).message); } finally { setBusy(false); } };
   const preview = () => run(async () => {
     // "Let Jev choose" (tasks and assignments): Jev reads the bills, picks the owner, and the preview shows who before anything is saved.
@@ -498,7 +530,7 @@ function ActOnBills({ companyId, as, model, rows, label, onChanged }: { companyI
   });
   const apply = () => run(async () => {
     const { plan: receipt } = await api<{ plan: ActionPlan }>(`/api/companies/${companyId}/actions/${plan!.id}/apply`, { method: 'POST', json: {} });
-    setDone(`${receipt.items.filter(i => i.status === 'succeeded').length} ${receipt.action.type === 'task' ? `tasks created for ${receipt.action.owner}` : receipt.action.type === 'assign' ? `bills assigned to ${receipt.action.owner}` : 'bills updated'}. Undo any of them in Tasks & activity.`); setPlan(null); setKind(null); onChanged?.();
+    setDone(`${receipt.items.filter(i => i.status === 'succeeded').length} ${receipt.action.type === 'task' ? `tasks created for ${receipt.action.owner}` : receipt.action.type === 'assign' ? `bills assigned to ${receipt.action.owner}` : 'bills updated'}. Undo any of them in Tasks & activity.`); setPlan(null); setKind(null); window.dispatchEvent(new Event('workspace-changed')); onChanged?.();
   });
   const send = () => run(async () => {
     const lines = rows.slice(0, 25).map(r => `- ${r.docNumber || r.billId} · ${r.vendor} · ${money(r.amountCents)} · ${r.date}`).join('\n');

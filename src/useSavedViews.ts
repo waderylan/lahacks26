@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SavedSearch, SearchDefinition } from './savedSearchTypes';
+import { usePolling } from './usePolling';
 
-export function useSavedViews(companyId: string) {
+/** Saved views for one company. Polling and focus refresh run only while `active` (the Explore tab is showing). */
+export function useSavedViews(companyId: string, active = true) {
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
@@ -18,11 +20,9 @@ export function useSavedViews(companyId: string) {
   }, [companyId]);
   useEffect(() => {
     mounted.current = true; void refresh();
-    const reload = () => { if (!pending.current) void refresh(); };
-    const timer = setInterval(reload, 2000);
-    window.addEventListener('focus', reload);
-    return () => { mounted.current = false; sequence.current++; clearInterval(timer); window.removeEventListener('focus', reload); };
+    return () => { mounted.current = false; sequence.current++; };
   }, [refresh]);
+  usePolling(() => { if (!pending.current) void refresh(); }, active ? 2000 : 0);
   const mutate = async (method: string, id: string, body: unknown, suffix = '') => {
     if (pending.current) return;
     pending.current = true; setBusy(true); sequence.current++;

@@ -4,13 +4,13 @@ import type { Rule } from '../src/rules';
 
 test('rule messages remain drafts until the sender approves, then appear in the recipient inbox', async ({ page }) => {
   const app = await startRuleApp();
-  const base = `${app.url}/api/companies/company-018`;
-  const rule: Rule = { id: 'receipt-message', companyId: 'company-018', name: 'Ask for receipt', revision: 1, enabled: false,
+  const base = `${app.url}/api/companies/company-101`;
+  const rule: Rule = { id: 'receipt-message', companyId: 'company-101', name: 'Ask for receipt', revision: 1, enabled: false,
     expression: { id: 'missing', type: 'ai', text: 'This charge lacks support.', label: '' },
     actions: [{ id: 'message', type: 'message', when: 'uncertain', value: 'Ask for the missing receipt.', recipient: 'jev', sender: 'emp-ap' }] };
   try {
     await page.request.post(`${base}/rules/commands`, { data: { type: 'save', rule, expectedRevision: null } });
-    await page.request.post(`${base}/rules/commands`, { data: { type: 'run', id: rule.id, revision: 1, ids: ['company-018:bill-1'] } });
+    await page.request.post(`${base}/rules/commands`, { data: { type: 'run', id: rule.id, revision: 1, ids: ['company-101:bill-1'] } });
     await page.goto(`${app.url}/?workspace=messages`);
     await page.getByRole('navigation', { name: 'Message folders' }).getByRole('button', { name: /^Approvals/ }).click();
     const card = page.locator('.inbox-approvals .message-card');

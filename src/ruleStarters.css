@@ -1,10 +1,7 @@
 .rule-starters { max-width:1400px; margin:0 auto 24px; border:1px solid var(--line); border-radius:9px; background:var(--panel); }
-.rule-starters > summary { display:flex; align-items:center; gap:14px; cursor:pointer; padding:17px 20px; list-style:none; }
-.rule-starters > summary::-webkit-details-marker { display:none; }
-.rule-starters > summary > .starter-chevron { margin-left:auto; color:var(--green); font-size:24px; line-height:1; }
-.rule-starters[open] > summary > .starter-chevron { transform:rotate(90deg); }
+.rule-starters > header { display:flex; align-items:center; gap:14px; cursor:pointer; padding:17px 20px; list-style:none; }
 .rule-starters h2 { font-size:17px; margin:0; font-weight:650; }
-.rule-starters > summary > span { color:var(--muted); font-size:12px; }
+.rule-starters > header > span { color:var(--muted); font-size:12px; }
 .starter-intro { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:0 20px 15px; font-size:12px; color:var(--muted); }
 .starter-intro p { margin:0; flex:1; }
 .starter-intro button { font-size:11px; }
@@ -26,17 +23,12 @@
 .starter-controls small { max-width:100%; overflow-wrap:anywhere; color:var(--muted); }
 .starter-added { color:var(--green); }
 .starter-available { color:var(--muted); }
-.starter-more { margin:0 20px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; }
-.starter-more > summary { cursor:pointer; color:var(--green); }
-.starter-more > div { display:grid; gap:8px; padding:12px 0; }
-.starter-more button { text-align:left; display:grid; gap:5px; font-size:12px; }
-.starter-more button span { color:var(--muted); font-size:11px; line-height:1.6; }
 .starter-footnote { font-size:11px; color:var(--muted); line-height:1.6; padding:14px 20px; margin:0; }
 @media (max-width:1100px) { .starter-row { grid-template-columns:170px minmax(0,1fr) 145px; gap:14px; } }
 @media (max-width:640px) {
-  .rule-starters > summary { padding:15px 12px; gap:9px; flex-wrap:wrap; }
+  .rule-starters > header { padding:15px 12px; gap:9px; flex-wrap:wrap; }
   .rule-starters h2 { font-size:15px; }
-  .rule-starters > summary > span { font-size:10px; }
+  .rule-starters > header > span { font-size:10px; }
   .starter-intro { padding:0 12px 14px; }
   .starter-intro p { flex-basis:100%; }
   .starter-row { grid-template-columns:minmax(0,1fr); gap:6px; padding:16px 8px; }

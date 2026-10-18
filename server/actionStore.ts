@@ -1,8 +1,9 @@
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ActionPlan, ActionState, ReviewTask, ServerAutomation } from '../src/actionTypes.ts';
+import type { ActionPlan, ActionState, ReviewTask } from '../src/actionTypes.ts';
 import type { Row } from '../src/types.ts';
+import { EMPTY_STORE, type RuleStore } from '../src/rules.ts';
 
 export const emptyDashboard = (): NonNullable<Row['dashboard']> => ({ owner: '', flags: [], tags: [], reviewed: false, automatedCheck: false, taskIds: [] });
 export class ActionStore {
@@ -21,15 +22,50 @@ export class ActionStore {
    * regenerated dataset never shows stale rows. Dashboard state on replaced rows resets.
    */
   seed(company: string, rows: Row[], version?: string) {
-    if (version && this.get<{ version: string }>('dataset', company)?.version !== version) {
-      this.db.prepare('DELETE FROM bills WHERE company=?').run(company);
-      this.put('dataset', company, company, { version });
-    }
-    const insert = this.db.prepare('INSERT OR IGNORE INTO bills(company,id,original,body) VALUES(?,?,?,?)');
-    this.atomic(() => { for (const row of rows) {
-      if (row.companyId !== company || !row.id.startsWith(`${company}:`)) throw new Error('Cross-company import refused.');
-      insert.run(company, row.id, JSON.stringify(row), JSON.stringify({ ...row, dashboard: emptyDashboard() }));
-    } });
+    const insert = this.db.prepare('INSERT OR IGNORE INTO bills(company,id,original,body,revision) VALUES(?,?,?,?,?)');
+    this.atomic(() => {
+      const dataset = this.get<{ version: string; revision?: number }>('dataset', company);
+      let revision = 0;
+      if (version && dataset?.version !== version) {
+        const existing = this.db.prepare('SELECT MAX(revision) AS revision FROM bills WHERE company=?').get(company) as { revision: number | null };
+        // A replacement must invalidate editors holding a revision from any earlier dataset, including after an empty replacement.
+        revision = Math.max(existing.revision ?? -1, dataset?.revision ?? -1) + 1;
+        this.clearCompanyReview(company);
+        this.db.prepare('DELETE FROM bills WHERE company=?').run(company);
+        this.put('dataset', company, company, { version, revision });
+      }
+      for (const row of rows) {
+        if (row.companyId !== company || !row.id.startsWith(`${company}:`)) throw new Error('Cross-company import refused.');
+        insert.run(company, row.id, JSON.stringify(row), JSON.stringify({ ...row, dashboard: emptyDashboard() }), revision);
+      }
+      if (version && dataset?.version !== version) {
+        const dashboard = this.get<{ charts: { ids?: string[] }[]; revision?: number }>('dashboard-charts', company);
+        if (dashboard) {
+          const ids = new Set(rows.map(row => row.id));
+          this.put('dashboard-charts', company, company, { charts: dashboard.charts.map(chart => chart.ids ? { ...chart, ids: chart.ids.filter(id => ids.has(id)) } : chart), revision: (dashboard.revision ?? 0) + 1 });
+        }
+      }
+    });
+  }
+  /** Called inside the same transaction as row restore/replacement. Definitions and semantic caches survive. */
+  private clearCompanyReview(company: string) {
+    const saved = this.get<{ companyId: string; store: RuleStore }>('rule-state', company);
+    // A whitelist prevents newly added activity documents from surviving a restore by accident.
+    this.db.prepare("DELETE FROM documents WHERE company=? AND kind NOT IN ('dataset','semantic-judgment','saved-search','dashboard-charts','rule-state','deleted-rule')").run(company);
+    if (saved) this.put('rule-state', company, company, {
+      companyId: company,
+      store: { ...structuredClone(EMPTY_STORE), rules: saved.store.rules.map(rule => ({ ...rule, enabled: false, revision: rule.revision + 1 })) },
+      watches: {}, log: [],
+    });
+  }
+  restore(company: string) {
+    this.atomic(() => {
+      this.clearCompanyReview(company);
+      // Increment revisions so stale editors and previews cannot overwrite restored evidence.
+      for (const row of this.rows(company)) {
+        this.write({ ...this.original(company, row.id), dashboard: emptyDashboard() }, row.sourceVersion!);
+      }
+    });
   }
   row(company: string, id: string): Row | undefined {
     const saved = this.db.prepare('SELECT body,revision FROM bills WHERE company=? AND id=?').get(company, id) as { body: string; revision: number } | undefined;
@@ -72,7 +108,7 @@ export class ActionStore {
     return {
       tasks: this.list<ReviewTask>('task', company).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
       runs: this.list<ActionPlan>('plan', company).filter(plan => plan.status !== 'preview').sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-      automations: this.list<ServerAutomation>('automation', company),
+      automations: [], // Compatibility shape; the retired producer/scanner never resumes stored automations.
     };
   }
 }

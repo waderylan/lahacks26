@@ -4,7 +4,7 @@ import { rulePresets, leaves, evaluateTree, actionsForOutcome, type Outcome } fr
 import { STARTER_DEMOS } from '../src/ruleStarterDemos.ts';
 import type { CompanyBills } from '../src/types.ts';
 
-const url = process.env.RULES_TEST_URL ?? 'http://localhost:5192';
+const url = process.env.RULES_TEST_URL ?? 'http://localhost:5173';
 const report: unknown[] = [];
 const failures: string[] = [];
 let cost = 0n;
@@ -14,7 +14,7 @@ async function json(path: string, body?: unknown) {
   return response.json();
 }
 for (const [companyId, demo] of Object.entries(STARTER_DEMOS)) {
-  const data: CompanyBills = await json(`/api/companies/${companyId}/bills?limit=-1&reserve=1`);
+  const data: CompanyBills = await json(`/api/companies/${companyId}/bills?limit=-1`);
   for (const preset of rulePresets(true).filter(preset => preset.starter)) {
     const rule = preset.build(companyId, 'emp-ap');
     const judgments: Record<string, Record<string, Outcome>> = Object.fromEntries(data.rows.map(row => [row.id, {}]));

@@ -1,3 +1,11 @@
+import { ModelFeedbackService, feedbackRoutes, type Observation } from '../../server/modelFeedback';
+import { decisionMessages } from '../../server/modelContract';
+import { visibleInput } from '../../server/evaluator';
+import { qwenDeploymentId } from '../../server/qwen';
+import { createHash } from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { loadCompanyBills, listCompanies, demoSample } from '../../server/data';
 import { ChatStore, chatRoutes } from '../../server/chat';
 import { paymentRiskCheck } from '../../server/paymentRisk';
@@ -17,7 +25,7 @@ import { SavedSearchService, savedSearchRoutes } from '../../server/savedSearche
 import type { Row } from '../../src/types';
 
 /** Real UI, routes, and SQLite; external model responses are deterministic in these workflow tests. */
-export async function startRuleApp(options: { synthetic?: boolean; rowCount?: number } = {}) {
+export async function startRuleApp(options: { synthetic?: boolean; rowCount?: number; feedback?: boolean } = {}) {
   const db = new ActionStore(':memory:');
   const companyId = 'company-018';
   const count = options.rowCount ?? 8;
@@ -46,7 +54,20 @@ export async function startRuleApp(options: { synthetic?: boolean; rowCount?: nu
     const visible = curated ? full.rows.filter(row => curated.ids.has(row.billId)) : limit > 0 ? full.rows.slice(0, limit) : full.rows;
     res.json({ ...full, rows: visible, sampled: visible.length < full.rows.length, curatedSample: Boolean(curated) });
   });
-  app.post('/api/evaluate', (req, res) => res.json({ results: req.body.ids.map((id: string) => ({ id, state: outcome(data.row(req.body.companyId, id)), pMatch: 0.5 })), costNanoUsd: '0' }));
+  const feedbackFolder=options.feedback?fs.mkdtempSync(path.join(os.tmpdir(),'feedback-workflow-')):null;
+  if(feedbackFolder)feedbackRoutes(app,new ModelFeedbackService(db,data,undefined,feedbackFolder));
+  app.post('/api/evaluate',(req,res)=>{
+    const results=req.body.ids.map((id:string)=>{
+      const row=data.row(req.body.companyId,id),state=outcome(row);
+      if(options.feedback&&req.body.model==='qwen') {
+        const input=visibleInput({name:company.name,industry:company.industry},req.body.criterion,row);
+        const key=createHash('sha256').update(JSON.stringify([input,state])).digest('hex');
+        const observation:Observation={id:key,companyId,rowId:id,vendor:row.vendor,criterion:req.body.criterion,deploymentId:qwenDeploymentId()!,input,messages:decisionMessages(input),result:state,createdAt:new Date().toISOString()};
+        db.put('model-observation',key,companyId,observation);
+      }
+      return{id,state,pMatch:.5};
+    });res.json({results,costNanoUsd:'0'});
+  });
   actionRoutes(app, new ActionEngine(db, data, judge));
   ruleRoutes(app, rules); mailRoutes(app, new Mailbox(db, data));
   savedSearchRoutes(app, searches);
@@ -61,6 +82,6 @@ export async function startRuleApp(options: { synthetic?: boolean; rowCount?: nu
   if (!address || typeof address === 'string') throw new Error('Test server did not start.');
   return {
     url: `http://127.0.0.1:${address.port}`,
-    close: async () => { clearInterval(timer); const closing = new Promise<void>(resolve => server.close(() => resolve())); server.closeAllConnections(); await closing; await vite.close(); db.db.close(); },
+    close: async () => { clearInterval(timer); const closing = new Promise<void>(resolve => server.close(() => resolve())); server.closeAllConnections(); await closing; await vite.close(); db.db.close(); if(feedbackFolder)fs.rmSync(feedbackFolder,{recursive:true,force:true}); },
   };
 }

@@ -90,3 +90,7 @@ The next planned task is a Simulate tab for timestamped arrivals and user-contro
 ## Qwen alternative on Veri
 
 Explore and Rules offer a Jev/Qwen model selector. Qwen runs server-side on Veri using VERI_API_KEY and VERI_DEPLOYMENT_ID. Messages, chat and fraud checks retain their own model routing. See training/semantic-review/README.md for training and score limitations. GPU request cost is unavailable.
+
+## Human model feedback
+
+Rules now includes local Qwen corrections, preference JSONL preview/download, and independently confirmed Veri dataset upload and optional paid replay-SFT training. Nothing uploads or trains automatically. See [MODEL_FEEDBACK.md](MODEL_FEEDBACK.md).

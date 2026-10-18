@@ -1,3 +1,4 @@
+import { ModelFeedbackService, feedbackRoutes } from './modelFeedback.ts';
 import express from 'express';
 import { createServer } from 'node:http';
 import { createServer as createVite } from 'vite';
@@ -91,6 +92,7 @@ app.post('/api/evaluate', async (req, res) => {
   }
 });
 
+feedbackRoutes(app, new ModelFeedbackService(database, workspace));
 actionRoutes(app, actions);
 ruleRoutes(app, rules);
 mailRoutes(app, new Mailbox(database, workspace));

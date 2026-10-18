@@ -1,6 +1,8 @@
+import { POLICY, decisionMessages } from './modelContract.ts';
+import type { Observation } from './modelFeedback.ts';
 import crypto from 'node:crypto';
 import type { RecordResult } from './jev.ts';
-import { evaluateSelected, type Provider } from './evaluator.ts';
+import { visibleInput, evaluateSelected, type Provider } from './evaluator.ts';
 import type { Row } from '../src/types.ts';
 import type { WorkspaceData } from './workspaceData.ts';
 import { qwenDeploymentId } from './qwen.ts';
@@ -14,7 +16,7 @@ export class SemanticService {
   private key(companyId: string, criterion: string, row: Row, provider: Provider = 'jev') {
     // Match the business evidence sent to Jev. Task/owner changes do not consume
     // another model call, while edits to category or memo invalidate the result.
-    return crypto.createHash('sha256').update(JSON.stringify([provider === 'qwen' ? `qwen:${qwenDeploymentId()}:visible-context-v2` : 'typesafe-ai/jev:visible-context-v2:choice-v1', companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
+    return crypto.createHash('sha256').update(JSON.stringify([provider === 'qwen' ? `qwen:${qwenDeploymentId()}:${crypto.createHash('sha256').update(POLICY).digest('hex')}:visible-context-v2` : 'typesafe-ai/jev:visible-context-v2:choice-v1', companyId, criterion, row.id, evaluationEvidence(row)])).digest('hex');
   }
   private pump() {
     while (this.active < 3 && this.waiting.length) {
@@ -57,6 +59,15 @@ export class SemanticService {
       }
       while (this.cache.size > 10_000) this.cache.delete(this.cache.keys().next().value!);
     })));
+    if(provider === 'qwen') for(const row of rows) {
+      const result=found.get(row.id)!;
+      const input=visibleInput({name:company.name.replace(/ \u2014 review scenarios$/, ''),industry:company.industry},criterion,row);
+      const id=crypto.createHash('sha256').update(JSON.stringify([this.key(companyId,criterion,row,provider),result.state])).digest('hex');
+      if(!this.data.store.get('model-observation',id)) {
+        const observation:Observation={id,companyId,rowId:row.id,vendor:row.vendor,criterion,deploymentId:qwenDeploymentId()!,input,messages:decisionMessages(input),result:result.state,createdAt:new Date().toISOString()};
+        this.data.store.put('model-observation',id,companyId,observation);
+      }
+    }
     return { results: rows.map(row => found.get(row.id)!), costNanoUsd: String(cost) };
   }
   async judge(companyId: string, criterion: string, rows: Row[], provider: Provider = 'jev') {

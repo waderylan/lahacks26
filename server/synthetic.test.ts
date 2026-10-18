@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import { listCompanies, loadCompanyBills, demoSample } from './data.ts';
+import { listCompanies, loadCompanyBills, demoSample, formatCents } from './data.ts';
+import { ActionStore } from './actionStore.ts';
+import { WorkspaceData } from './workspaceData.ts';
 import { supportingContext } from './jev.ts';
 
 const FORBIDDEN = /fraud|suspicious|scenario|inject|answer key|expected|ground.?truth|documentation_issue|legitimate|uncertain/i;
@@ -34,8 +36,14 @@ test('model payloads for synthetic rows carry records but no labels or case ids'
   }
 });
 
+test('formatCents writes dollar strings from integer cents', () => {
+  assert.equal(formatCents(1050), '10.50');
+  assert.equal(formatCents(0), '0.00');
+  assert.equal(formatCents(-1), '-0.01');
+  assert.equal(formatCents(100), '1.00');
+});
+
 test('a changed dataset version replaces that company\'s cached rows and nothing else', async () => {
-  const { ActionStore } = await import('./actionStore.ts');
   const store = new ActionStore(':memory:');
   const a = loadCompanyBills('company-101').rows.slice(0, 3);
   const b = loadCompanyBills('company-102').rows.slice(0, 2);
@@ -47,4 +55,24 @@ test('a changed dataset version replaces that company\'s cached rows and nothing
   assert.equal(store.rows('company-102').length, 2, 'other companies keep their rows');
   store.seed('company-018', loadCompanyBills('company-018').rows.slice(0, 2));
   assert.equal(store.rows('company-018').length, 2, 'unversioned companies are seeded once as before');
+  store.db.close();
+});
+
+test('WorkspaceData reseeds and clears accounts when the dataset version changes', () => {
+  const store = new ActionStore(':memory:');
+  const first = loadCompanyBills('company-101').rows.slice(0, 3);
+  const next = first.slice(0, 1);
+  let version = 'v1';
+  let rows = first;
+  const data = new WorkspaceData(store, id => ({
+    company: { companyId: id, name: id, industry: '', profile: '', billCount: rows.length, synthetic: true },
+    totalBills: rows.length, sampled: false, rows, datasetVersion: version,
+  }), () => version === 'v1' ? [{ id: 'old', name: 'Old account' }] : [{ id: 'new', name: 'New account' }]);
+  try {
+    assert.equal(data.bills('company-101').rows.length, 3);
+    assert.equal(data.accounts('company-101')[0].name, 'Old account');
+    version = 'v2'; rows = next;
+    assert.equal(data.bills('company-101').rows.length, 1);
+    assert.equal(data.accounts('company-101')[0].name, 'New account');
+  } finally { store.db.close(); }
 });

@@ -32,13 +32,21 @@ export class ActionEngine {
       const conditions: Record<string, Record<string, Outcome>> = Object.fromEntries(rows.map(row => [row.id, {}]));
       await Promise.all(leaves(selection.expression).map(async node => {
         if (node.type === 'standard') rows.forEach(row => { conditions[row.id][node.id] = standardResult(node, row, Boolean(row.dashboard?.reviewed)); });
-        else { const results = await this.judge(companyId, node.text, rows); rows.forEach(row => { conditions[row.id][node.id] = ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[results[row.id]]; }); }
+        else { const results = await this.judge(companyId, node.text, rows); rows.forEach(row => {
+          const result = results[row.id];
+          if (result !== 'match' && result !== 'no_match' && result !== 'uncertain') throw new Error('Incomplete condition results. Retry the action.');
+          conditions[row.id][node.id] = ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[result];
+        }); }
       }));
       return Object.fromEntries(rows.map(row => [row.id, evaluateTree(selection.expression!, conditions[row.id])]));
     }
     if (typeof selection.criterion !== 'string' || !selection.criterion.trim() || selection.criterion.length > 500) throw new Error('A completed search is required.');
     const outcomes = await this.judge(companyId, selection.criterion, rows);
-    return Object.fromEntries(rows.map(row => [row.id, ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[outcomes[row.id]]]));
+    return Object.fromEntries(rows.map(row => {
+      const result = outcomes[row.id];
+      if (result !== 'match' && result !== 'no_match' && result !== 'uncertain') throw new Error('Incomplete search results. Retry the action.');
+      return [row.id, ({ match: 'true', no_match: 'false', uncertain: 'uncertain' } as const)[result]];
+    }));
   }
   private field(action: BillAction): 'account' | 'memo' | 'owner' | 'flags' | 'tags' | 'reviewed' | 'task' {
     return ({ category: 'account', memo: 'memo', assign: 'owner', flag: 'flags', tag: 'tags', review: 'reviewed', task: 'task' } as const)[action.type];

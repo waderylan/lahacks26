@@ -1,5 +1,5 @@
 import { experimental_evaluate as evaluate } from 'ai';
-import { getRow, type Row } from './data.ts';
+import { formatCents, getRow, type Row } from './data.ts';
 
 export type MatchState = 'match' | 'no_match' | 'uncertain';
 export interface RecordResult {
@@ -25,7 +25,7 @@ export function supportingContext(row: Row) {
     ...(row.details && { details: row.details }),
     ...(row.project && { project: { name: row.project, status: project.status, started: project.started_date, cancelled: project.cancelled_date, completed: project.completed_date } }),
     ...(row.evidence.length && { evidence: row.evidence.map(e => ({ kind: e.kind, date: e.date, title: e.title, text: e.text })) }),
-    ...(row.related?.length && { related_bills: row.related.map(r => ({ doc_number: r.docNumber, billed_as: r.vendor, date: r.date, amount: (r.amountCents / 100).toFixed(2), description: r.description, memo: r.memo })) }),
+    ...(row.related?.length && { related_bills: row.related.map(r => ({ doc_number: r.docNumber, billed_as: r.vendor, date: r.date, amount: formatCents(r.amountCents), description: r.description, memo: r.memo })) }),
   }));
 }
 
@@ -74,7 +74,7 @@ export async function evaluateBatch(
       vendor: row.vendor,
       account: row.account,
       expense_kind: row.expenseKind,
-      amount: (row.amountCents / 100).toFixed(2),
+      amount: formatCents(row.amountCents),
       item_names: row.itemNames,
       description: row.description,
       memo: row.memo,

@@ -34,6 +34,7 @@
 .after-value { color:var(--green); font-weight:550; }
 .action-preview-items p { font-size:10px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
 .action-confirmation { background:var(--green-bg); color:var(--green); border-radius:5px; padding:12px; font-size:12px; line-height:1.5; }
+.action-confirmation.error { background:var(--red-bg); color:var(--red); }
 .repeat-action { margin-top:15px; font-size:12px; }
 .repeat-action summary { cursor:pointer; color:var(--muted); }
 .repeat-action p { line-height:1.6; }

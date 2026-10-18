@@ -8,7 +8,8 @@ import express from 'express';
 import { ActionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
 import { ActionEngine, validateAction } from './actionEngine.ts';
-import { actionRoutes } from './actionRoutes.ts';
+import { SemanticService } from './semanticService.ts';
+import { actionRoutes, sameOriginApi } from './actionRoutes.ts';
 import type { CompanyBills, Row } from '../src/types.ts';
 import type { ActionSelection } from '../src/actionTypes.ts';
 
@@ -140,6 +141,23 @@ test('enabled server automation establishes a baseline then acts on changed matc
   assert.equal(store.state(companyId).automations[0].enabled, false);
 });
 
+test('incomplete judge results fail the preview instead of silently skipping bills', async t => {
+  const { store, data } = setup(); t.after(() => store.db.close());
+  const engine = new ActionEngine(store, data, async () => ({}));
+  await assert.rejects(engine.preview(companyId, { ids: [row(1).id], criterion: 'Equipment', scope: 'matches' }, reviewTask), /Incomplete search results/);
+});
+
+test('POST /api/evaluate is covered by the same-origin write guard', async t => {
+  const app = express(); app.use(express.json()); app.use('/api', sameOriginApi);
+  app.post('/api/evaluate', (_req, res) => res.json({ ok: true }));
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise<void>(resolve => server.once('listening', resolve));
+  t.after(async () => { await new Promise<void>(resolve => server.close(() => resolve())); });
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/evaluate`;
+  assert.equal((await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://unrelated.example' }, body: '{}' })).status, 403);
+  assert.equal((await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status, 200);
+});
+
 test('HTTP action routes expose durable task status, owners and receipts and reject cross-origin writes', async t => {
   const { store, engine } = setup();
   const app = express(); app.use(express.json()); actionRoutes(app, engine);
@@ -155,4 +173,19 @@ test('HTTP action routes expose durable task status, owners and receipts and rej
   assert.equal(workspace.tasks.length, 1);
   assert.deepEqual(workspace.owners, ['Rylan Wade']);
   assert.equal(workspace.rows.find((row: Row) => row.id.endsWith('bill-1')).dashboard.owner, 'Rylan Wade');
+});
+
+test('SemanticService never starts more than three evaluate batches at once', async t => {
+  const { store, data, originals } = setup(); t.after(() => store.db.close());
+  const rows = Array.from({ length: 80 }, (_, index) => row(index + 1));
+  originals.set(companyId, { company: { companyId, name: companyId, industry: '', profile: '', billCount: rows.length }, totalBills: rows.length, sampled: false, rows });
+  let current = 0, peak = 0;
+  const semantics = new SemanticService(data, async (_req, _signal, batch) => {
+    current++; peak = Math.max(peak, current);
+    await new Promise(resolve => setTimeout(resolve, 40));
+    current--;
+    return { results: (batch ?? []).map(item => ({ id: item.id, state: 'match' as const, pMatch: 1 })), costNanoUsd: '0' };
+  });
+  await semantics.evaluateRows(companyId, 'equipment', rows);
+  assert.equal(peak, 3);
 });

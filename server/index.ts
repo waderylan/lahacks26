@@ -7,7 +7,7 @@ import { actionStore } from './actionStore.ts';
 import { WorkspaceData } from './workspaceData.ts';
 import { ActionEngine } from './actionEngine.ts';
 import { SemanticService } from './semanticService.ts';
-import { actionRoutes } from './actionRoutes.ts';
+import { actionRoutes, sameOriginApi } from './actionRoutes.ts';
 import { geminiConfigured, GEMINI_MODEL } from './messages.ts';
 import { RuleService } from './ruleService.ts';
 import { ruleRoutes } from './ruleRoutes.ts';
@@ -20,6 +20,8 @@ const workspace = new WorkspaceData(database);
 const semantics = new SemanticService(workspace);
 const actions = new ActionEngine(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
 const rules = new RuleService(database, workspace, (companyId, criterion, rows) => semantics.judge(companyId, criterion, rows));
+
+app.use('/api', sameOriginApi);
 
 app.get('/api/status', (_req, res) => {
   res.json({ jev: { configured: jevConfigured(), model: JEV_MODEL, via: 'Vercel AI Gateway' }, gemini: { configured: geminiConfigured(), model: GEMINI_MODEL } });

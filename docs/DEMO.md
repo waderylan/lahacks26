@@ -2,6 +2,8 @@
 
 A local demo of rule-based transaction review over four synthetic companies (101–104). Jev, an AI judge, answers English conditions about each transaction; rules turn those answers into flags, assignments, tasks and message drafts. Employees are fictional and no email is sent.
 
+The project is complete and public hosting is retired. Run it locally with your own valid provider credentials. See [hosting retirement](HOSTING_RETIRED.md) for cleanup status.
+
 ## Run it
 
 ```sh

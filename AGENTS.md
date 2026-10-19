@@ -14,11 +14,13 @@ Keep the floating **Ask your books** assistant (`src/AskPanel.tsx`). It supports
 - `npm run dev` serves the app at http://localhost:5173 (needs `AI_GATEWAY_API_KEY` in `.env`; `GEMINI_API_KEY` for message drafts).
 - `npm test` discovers source/server unit and API tests. `npm run typecheck` checks server, client, fixtures, and TypeScript scripts. `npm run test:browser` uses isolated fixtures by default.
 
-## Hosted demo
+## Hosting retired
 
-- Frontend: https://waderylan.github.io/lahacks26/app/ (built by `.github/workflows/pages.yml` on push to `main`; slideshow stays under `docs/`).
-- API: https://lahacks26-api.vercel.app (Vercel Hobby project `lahacks26-api`, built by `scripts/build_vercel.mjs`, starts from `server/seed/actions.sqlite`). `AI_GATEWAY_API_KEY`, `GEMINI_API_KEY`, and `ALLOWED_ORIGINS` live only in Vercel env; env changes need `npx vercel deploy --prod`.
-- Vercel spreads requests across instances with separate /tmp databases, so the Pages build sends API calls through `POST /api/_tunnel` and the tab carries the user state (`src/apiBase.ts`, `server/hostedState.ts`, `server/vercel.ts`). That hosted-only sessionStorage copy is the one exception to the browser-storage rule. Local dev never uses the tunnel.
+- The hackathon project is complete and maintained as a local archive. Do not recreate Vercel projects or enable automatic deployments unless explicitly requested.
+- The former Vercel project was `lahacks26-api` in team `rylanwwade-5123`. An authenticated audit on 2026-10-19 confirmed zero remaining projects, deployments, storage stores, integrations, aliases and domains after deleting six leftover deployments. See `docs/HOSTING_RETIRED.md` for cleanup evidence.
+- Vercel deployment configuration and the GitHub Pages publishing workflow have been removed. Slides remain in `docs/slideshow/` and `docs/presentation/`.
+- Historical hosting code (`src/apiBase.ts`, `server/hostedState.ts`, `server/vercel.ts`) is retained for reference. Its sessionStorage state sync was specific to the retired demo; local dev never uses the tunnel.
+- Local model calls still require valid provider credentials. Hosting retirement does not replace or reactivate revoked API keys.
 
 ## Rules
 

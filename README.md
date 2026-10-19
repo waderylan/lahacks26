@@ -1,8 +1,12 @@
 # QuickLy
 
+**Won 3rd place in the Intuit System One Challenge.**
+
 Accounting rules that understand meaning. Describe a problem in plain English and Jev, a System 1 model, scans every transaction, takes automated actions and sends it to the right human reviewer.
 
-[Slides](https://waderylan.github.io/lahacks26/slideshow/)
+The hackathon project is complete. Public hosting is retired; the source, slides and local demo remain available. See [hosting retirement](docs/HOSTING_RETIRED.md).
+
+[Slides source](docs/slideshow/index.html)
 
 ## Inspiration
 
@@ -34,7 +38,7 @@ The same engine powers the rest of the app:
 
 ## Try it yourself
 
-Run the app locally (see Developer setup) and pick Parcelmint Online Goods, a synthetic company with 131 bills, invoices and bank rows. The [slides](https://waderylan.github.io/lahacks26/slideshow/) walk through the same flow with screenshots.
+Run the app locally (see Developer setup) and pick Parcelmint Online Goods, a synthetic company with 131 bills, invoices and bank rows. Open the [slides](docs/slideshow/index.html) locally for the same flow with screenshots. Model features require valid provider keys; the former hosted credentials are not supplied.
 
 1. In Explore, type each of these and watch the matches change:
    - `asks to change where payment is sent`
@@ -94,7 +98,7 @@ Cheap judgments change what is worth building. When a decision costs a fraction 
 
 Routing is the same kind of decision. Picking the right reviewer from a list of job descriptions turned out to be a classification problem that fits Jev as well as judging bills does.
 
-## What's next for QuickLy
+## Possible extensions
 
 - Connecting to live QuickBooks Online data and a company's real team directory instead of fictional employees.
 - Learning from routing corrections: when a recipient forwards a message to someone else, use that as feedback for the next decision.
